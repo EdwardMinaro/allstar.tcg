@@ -1,6 +1,6 @@
 {
   "name": "allstar-desktop",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "description": "ALLSTAR desktop build",
   "author": "ALLSTAR",
@@ -52,7 +52,8 @@
       {
         "provider": "github",
         "owner": "EdwardMinaro",
-        "repo": "Allstar.tcg"
+        "repo": "Allstar.tcg",
+        "releaseType": "release"
       }
     ]
   }
