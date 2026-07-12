@@ -17,5 +17,8 @@ contextBridge.exposeInMainWorld("AllstarDesktop", {
   },
   quitApp() {
     return ipcRenderer.invoke("allstar:quit-app");
+  },
+  getAppVersion() {
+    return ipcRenderer.invoke("allstar:get-app-version");
   }
 });

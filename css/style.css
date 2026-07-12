@@ -4758,6 +4758,19 @@ button{font-family:inherit;cursor:pointer}
 }
 
 /* ALLSTAR button language: adapt the home buttons across the game. */
+.home-version{
+  position:absolute;
+  left:50%;
+  bottom:16px;
+  z-index:4;
+  transform:translateX(-50%);
+  color:rgba(255,255,255,.62);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-shadow:1px 1px 2px #000;
+}
+
 :root{
   --btn-blue-top:#102b3d;
   --btn-blue-bottom:#06131d;

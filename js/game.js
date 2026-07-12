@@ -2210,6 +2210,16 @@ function wireDisplayOptions(){
   });
   applyDisplaySettings(settings);
 }
+async function showInstalledVersion(){
+  const target=document.getElementById("appVersion");
+  if(!target)return;
+  try{
+    const version=await window.AllstarDesktop?.getAppVersion?.();
+    target.textContent=version ? `Version ${version}` : "Version navigateur";
+  }catch{
+    target.textContent="Version inconnue";
+  }
+}
 function openSessionModal(title="Pause", body="Que veux-tu faire ?"){
   const modal=document.getElementById("sessionModal");
   const titleEl=document.getElementById("sessionModalTitle");
@@ -6372,6 +6382,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   runAllstarAudit();
   wireSaveScreen();
   wireDisplayOptions();
+  showInstalledVersion();
   window.AllstarDesktop?.onDesktopEvent?.(({type})=>{
     if(type==="update-checking")showSystemToast("Recherche d'une mise a jour...");
     if(type==="update-available")showSystemToast("Mise a jour trouvee : telechargement en cours...",5000);

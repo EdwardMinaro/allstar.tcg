@@ -64,6 +64,8 @@ ipcMain.handle("allstar:quit-app", () => {
   return true;
 });
 
+ipcMain.handle("allstar:get-app-version", () => app.getVersion());
+
 function setupAutoUpdater() {
   if (!app.isPackaged) {
     return;
