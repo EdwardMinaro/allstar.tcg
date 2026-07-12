@@ -51,12 +51,14 @@ function setMultiDeckReadyAvailable(available) {
 function showCustomMatchOptions() {
   document.getElementById("multiMainActions")?.setAttribute("hidden", "");
   document.getElementById("multiCustomActions")?.removeAttribute("hidden");
+  document.getElementById("multiExitButton")?.setAttribute("hidden", "");
   setMultiStatus("Cr\u00e9e une partie ou rejoins-en une avec un code.");
 }
 
 function showOnlineModes() {
   document.getElementById("multiMainActions")?.removeAttribute("hidden");
   document.getElementById("multiCustomActions")?.setAttribute("hidden", "");
+  document.getElementById("multiExitButton")?.removeAttribute("hidden");
   document.getElementById("multiJoinPanel")?.classList.remove("active");
   if (!multiplayer.room) document.getElementById("multiRoomPanel")?.classList.remove("active");
   setMultiStatus("");

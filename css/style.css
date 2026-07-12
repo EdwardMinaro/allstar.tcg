@@ -2998,6 +2998,12 @@ button{font-family:inherit;cursor:pointer}
   margin:16px 0;
 }
 
+.multi-actions[hidden],
+#multiExitButton[hidden],
+#multiCustomActions button[onclick="quickRankedMatch()"]{
+  display:none !important;
+}
+
 .multi-room-panel,
 .multi-join-panel{
   display:none;
