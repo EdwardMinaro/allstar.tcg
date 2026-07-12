@@ -24,6 +24,7 @@
     "directories": {
       "output": "dist"
     },
+    "electronDist": "node_modules/electron/dist",
     "files": [
       "index.html",
       "electron-main.js",
