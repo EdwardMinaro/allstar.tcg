@@ -5393,29 +5393,17 @@ button:disabled,
   border-radius:inherit !important;
 }
 
-/* Ring cards stay legible without their large outer halo crowding the ring. */
 @media (min-width:901px){
-  #game .zone .game-card.rendered{
-    border-radius:8px !important;
-    clip-path:inset(2.25% 2% 1.5% round 8px) !important;
-    filter:drop-shadow(0 5px 6px rgba(0,0,0,.42));
-  }
-
-  #game .zone .game-card.rendered .full-card-art{
-    transform:scale(1.035);
-    transform-origin:center;
-  }
-
   #game .zone.man.enemy,
   #game .zone.cat.enemy,
   #game .zone.obj.enemy{
-    top:clamp(88px,14vh,122px) !important;
+    top:clamp(32px,5vh,58px) !important;
   }
 
   #game .zone.man.player,
   #game .zone.cat.player,
   #game .zone.obj.player{
-    bottom:clamp(88px,14vh,122px) !important;
+    bottom:clamp(32px,5vh,58px) !important;
   }
 }
 
