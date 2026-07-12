@@ -25,5 +25,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create the version tag
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          $tag = "v$version"
+          $existingTag = git ls-remote --tags origin "refs/tags/$tag"
+          if (-not $existingTag) {
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a $tag -m "ALLSTAR $version"
+            git push origin $tag
+          }
+
       - name: Build and publish the Windows release
         run: npm run publish
