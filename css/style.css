@@ -5425,6 +5425,67 @@ button:disabled,
   pointer-events:none;
 }
 
+/* Keep the desktop board inside the viewport without cropping the hand. */
+@media (min-width:901px){
+  #game .game-layout{
+    box-sizing:border-box;
+    grid-template-rows:clamp(112px,12vh,132px) minmax(0,1fr) clamp(170px,18vh,190px) !important;
+  }
+
+  #game .hand-area{
+    align-items:flex-start;
+    overflow:visible;
+  }
+
+  #game .hand-panel{
+    align-items:flex-start;
+    padding:8px 4px 0 !important;
+    overflow:visible !important;
+  }
+
+  #game .hand{
+    width:max-content;
+    max-width:none !important;
+    overflow:visible !important;
+    padding:0 4px !important;
+    scrollbar-width:none;
+  }
+
+  #game .hand::-webkit-scrollbar{display:none}
+
+  #game .hand .game-card{
+    width:clamp(84px,5.25vw,104px) !important;
+    height:auto !important;
+    aspect-ratio:112/148;
+  }
+
+  #game .zone{
+    width:clamp(116px,7.35vw,142px) !important;
+    height:auto !important;
+    aspect-ratio:112/148;
+    padding:0 !important;
+    box-sizing:border-box;
+  }
+
+  #game .zone .game-card{
+    width:100% !important;
+    height:100% !important;
+    aspect-ratio:112/148;
+  }
+
+  #game .zone.man.enemy,
+  #game .zone.cat.enemy,
+  #game .zone.obj.enemy{
+    top:clamp(42px,5vh,60px) !important;
+  }
+
+  #game .zone.man.player,
+  #game .zone.cat.player,
+  #game .zone.obj.player{
+    bottom:clamp(42px,5vh,60px) !important;
+  }
+}
+
 #menu .home-settings{
   -webkit-user-select:none !important;
   user-select:none !important;

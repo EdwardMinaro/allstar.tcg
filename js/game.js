@@ -706,7 +706,7 @@ const CARD_DATA = [
       "Technique": 6,
       "Charisme": 6
     },
-    "effect": "S’i vous jouez en second : + 2 Technique et +2 Charisme",
+    "effect": "Si vous jouez en second : +2 Technique et +2 Charisme.",
     "renderArt": "assets/card_renders/rare_catcheurs_kevin_avanti.png",
     "musicId": "kevin_avanti",
     "ability": "secondPlayerTechniqueCharisma2"
@@ -1750,8 +1750,7 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "ALBERT ROCHE",
     "stats": {},
-    "effect": "+1 Force.",
-    "ability": "mForce1",
+    "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_managers_albert_roche.png"
   },
   {
@@ -1760,8 +1759,7 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "DON ALIAS",
     "stats": {},
-    "effect": "Chaque tour : 10% de chance de gagner un point de stat aléatoire de manière permanente.",
-    "ability": "turnRandomPermanent10",
+    "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_managers_don_alias.png"
   },
   {
@@ -1770,8 +1768,7 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Edward Minaro",
     "stats": {},
-    "effect": "+1 Charisme.",
-    "ability": "mCharisme1",
+    "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_managers_edward_minaro.png"
   },
   {
@@ -1780,8 +1777,7 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Loïc BLOODYKILT",
     "stats": {},
-    "effect": "Premier tour : +1 dans 1 stat aléatoire.",
-    "ability": "mRandom",
+    "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_managers_loic_bloodykilt.png"
   },
   {
@@ -1790,8 +1786,7 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "YANN LE KERSAUDEC",
     "stats": {},
-    "effect": "Annule tous les objets.",
-    "ability": "cancelAllObjects",
+    "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_managers_yann_le_kersaudec.png"
   },
   {
@@ -1870,8 +1865,7 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Barrière",
     "stats": {},
-    "effect": "- 5 Tombé adverse.",
-    "ability": "pinShield5",
+    "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_objets_barriere.png"
   },
   {
@@ -1880,8 +1874,7 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Chaise",
     "stats": {},
-    "effect": "+1 Force.",
-    "ability": "mForce1",
+    "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_objets_chaise.png"
   },
   {
@@ -1890,8 +1883,7 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Echelle",
     "stats": {},
-    "effect": "+1 en Vitesse.",
-    "ability": "mVitesse1",
+    "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_objets_echelle.png"
   },
   {
@@ -1900,8 +1892,7 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Table",
     "stats": {},
-    "effect": "Victoire : Tombé +5.",
-    "ability": "pinObject5",
+    "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_objets_table.png"
   }
 ];
@@ -3337,11 +3328,20 @@ function openingRoundEffectLabel(s){
   return labels[wrestlerAbility(s)]||"";
 }
 
+function turnOrderEffectLabel(s){
+  const ability=wrestlerAbility(s);
+  if(ability==="secondPlayerTechniqueCharisma2"&&s.owner?.side&&G?.roundStarter&&s.owner.side!==G.roundStarter){
+    return "+2 Technique / +2 Charisme";
+  }
+  return "";
+}
+
 function announceOpeningRoundEffect(owner){
   const s=owner?.cat;
-  const effect=openingRoundEffectLabel(s);
+  const orderEffect=turnOrderEffectLabel(s);
+  const effect=openingRoundEffectLabel(s)||orderEffect;
   if(!effect)return;
-  const timing=isMatchRoundOneAbility(wrestlerAbility(s))?"Round 1":"Premier round";
+  const timing=orderEffect?"Joue en second":(isMatchRoundOneAbility(wrestlerAbility(s))?"Round 1":"Premier round");
   log(`[EFFET] ${s.card.name} : ${timing}, ${effect}.`);
   showEffectFeedback(s.card,s.card.name,`${timing} : ${effect}`,"buff",2200);
 }
