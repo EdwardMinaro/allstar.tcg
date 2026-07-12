@@ -1,0 +1,1900 @@
+{
+  "cards": [
+    {
+      "key": "legende_catcheurs_alex_ezio",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Alex Ezio",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 9
+      },
+      "effect": "Si ce catcheur est joué au Round 1, il gagne +1 en Charisme, en Technique et en Force",
+      "ability": "firstRoundForceCharTech",
+      "renderArt": "assets/card_renders/legende_catcheurs_alex_ezio.png",
+      "musicId": "alex_ezio"
+    },
+    {
+      "key": "legende_catcheurs_andre_levissieux",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "André Levissieux",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 4,
+        "Technique": 8,
+        "Charisme": 9
+      },
+      "effect": "S'il remporte un combat, le prochain catcheur adverse commence avec -3 Technique.",
+      "ability": "winNextEnemyTechniqueMinus3",
+      "renderArt": "assets/card_renders/legende_catcheurs_andre_levissieux.png",
+      "musicId": "andre_levissieux"
+    },
+    {
+      "key": "legende_catcheurs_baadshah_pehalwan_khan",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Baadshah Pehalwan Khan",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 9
+      },
+      "effect": "S'il gagne, piochez deux cartes.",
+      "ability": "drawOnWin2",
+      "renderArt": "assets/card_renders/legende_catcheurs_baadshah_pehalwan_khan.png",
+      "musicId": "baadshah_pehalwan_khan"
+    },
+    {
+      "key": "legende_catcheurs_big_sam",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Big Sam",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 3,
+        "Technique": 7,
+        "Charisme": 8
+      },
+      "effect": "+20 Tombé et -10 Tombé adverse.",
+      "ability": "pinDual20Shield10",
+      "renderArt": "assets/card_renders/legende_catcheurs_big_sam.png",
+      "musicId": "big_sam"
+    },
+    {
+      "key": "legende_catcheurs_black_sam",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Black Sam",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 8
+      },
+      "effect": "Arrivée : prochain tombé adverse -20.",
+      "ability": "pinShield20",
+      "renderArt": "assets/card_renders/legende_catcheurs_black_sam.png",
+      "musicId": "black_sam"
+    },
+    {
+      "key": "legende_catcheurs_cameron_merchant",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Cameron Merchant",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 5,
+        "Technique": 9,
+        "Charisme": 5
+      },
+      "effect": "1x/tour : -2 Force adverse.",
+      "ability": "turnEnemyForceMinus2",
+      "renderArt": "assets/card_renders/legende_catcheurs_cameron_merchant.png",
+      "musicId": "cameron_merchant"
+    },
+    {
+      "key": "legende_catcheurs_car_crash_gonzo",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Car Crash Gonzo",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 9
+      },
+      "effect": "Si vous jouez en premier ce tour : +2 Vitesse et +2 Technique.",
+      "ability": "starterSpeedTechnique2",
+      "renderArt": "assets/card_renders/legende_catcheurs_car_crash_gonzo.png",
+      "musicId": "car_crash_gonzo"
+    },
+    {
+      "key": "legende_catcheurs_drix",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Drix",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 6,
+        "Technique": 9,
+        "Charisme": 6
+      },
+      "effect": "Round 1 : +3 Vitesse et +3 Charisme.",
+      "ability": "firstRoundSpeedCharisma3",
+      "renderArt": "assets/card_renders/legende_catcheurs_drix.png",
+      "musicId": "drix"
+    },
+    {
+      "key": "legende_catcheurs_ethan_riley",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Ethan Riley",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 6,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Victoire : choisissez la statistique du prochain duel.",
+      "ability": "sameStatNext",
+      "renderArt": "assets/card_renders/legende_catcheurs_ethan_riley.png",
+      "musicId": "ethan_riley"
+    },
+    {
+      "key": "legende_catcheurs_jaydon_ross",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Jaydon Ross",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 10
+      },
+      "effect": "Si ce catcheur perd son premier round, le catcheur suivant gagne +2 en Vitesse sur son premier round",
+      "ability": "nextSpeedOnFirstLoss2",
+      "renderArt": "assets/card_renders/legende_catcheurs_jaydon_ross.png",
+      "musicId": "jaydon_ross"
+    },
+    {
+      "key": "legende_catcheurs_jet_kid",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Jet Kid",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 10,
+        "Technique": 8,
+        "Charisme": 5
+      },
+      "effect": "Sur son premier round, la roulette a 50% de chance de tomber sur Vitesse.",
+      "ability": "speedWheel50",
+      "renderArt": "assets/card_renders/legende_catcheurs_jet_kid.png",
+      "musicId": "jet_kid"
+    },
+    {
+      "key": "legende_catcheurs_kevin_valdez",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Kevin Valdez",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 5,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "Round 1 : +2 Technique et +2 Vitesse.",
+      "ability": "firstRoundSpeedTechnique2",
+      "renderArt": "assets/card_renders/legende_catcheurs_kevin_valdez.png",
+      "musicId": "kevin_valdez"
+    },
+    {
+      "key": "legende_catcheurs_kyle_hoxton",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Kyle Hoxton",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "Chaque tour, gagne +3 dans une stat aléatoire.",
+      "ability": "turnCatRandom3",
+      "renderArt": "assets/card_renders/legende_catcheurs_kyle_hoxton.png",
+      "musicId": "kyle_hoxton"
+    },
+    {
+      "key": "legende_catcheurs_mareck",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Mareck",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 5,
+        "Technique": 8,
+        "Charisme": 7
+      },
+      "effect": "Apparition : Récupérez dans votre main ou jouez une carte objet depuis votre vestiaire.",
+      "renderArt": "assets/card_renders/legende_catcheurs_mareck.png",
+      "musicId": "mareck"
+    },
+    {
+      "key": "legende_catcheurs_maxime_cuadrado",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Maxime Cuadrado",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 10
+      },
+      "effect": "Adversaire à 2 KO : tombé +40.",
+      "ability": "pinBonus40",
+      "renderArt": "assets/card_renders/legende_catcheurs_maxime_cuadrado.png",
+      "musicId": "maxime_cuadrado"
+    },
+    {
+      "key": "legende_catcheurs_nilsn",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Nils'N",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 9,
+        "Technique": 6,
+        "Charisme": 8
+      },
+      "effect": "Premier round : +3 Vitesse.",
+      "ability": "firstRoundSpeed3",
+      "renderArt": "assets/card_renders/legende_catcheurs_nilsn.png",
+      "musicId": "nilsn"
+    },
+    {
+      "key": "legende_catcheurs_s_m_s",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "S.M.S",
+      "stats": {
+        "Force": 2,
+        "Vitesse": 5,
+        "Technique": 8,
+        "Charisme": 9
+      },
+      "effect": "Une fois par match, apparition : Regagnez deux tag.",
+      "renderArt": "assets/card_renders/legende_catcheurs_s_m_s.png",
+      "musicId": "s_m_s",
+      "ability": "smsRecoverTags2"
+    },
+    {
+      "key": "legende_catcheurs_saitovic",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Saitovic",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 7,
+        "Charisme": 9
+      },
+      "effect": "Apparition : Récupérez une carte de votre vestiaire. et votre adversaire défausse aléatoirement une carte.",
+      "renderArt": "assets/card_renders/legende_catcheurs_saitovic.png",
+      "musicId": "saitovic",
+      "ability": "recoverGraveDiscard1"
+    },
+    {
+      "key": "legende_catcheurs_shawn_olsen",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Shawn Olsen",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 10
+      },
+      "effect": "1x/match : annule sa 1re défaite, puis +1 Force, Vitesse et Technique.",
+      "ability": "firstLossDeck",
+      "renderArt": "assets/card_renders/legende_catcheurs_shawn_olsen.png",
+      "musicId": "shawn_olsen"
+    },
+    {
+      "key": "legende_catcheurs_tlb",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "TLB",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 10,
+        "Technique": 4,
+        "Charisme": 7
+      },
+      "effect": "S'il remporte un combat, le prochaine catcheur apparaît avec -3 Vitesse.",
+      "renderArt": "assets/card_renders/legende_catcheurs_tlb.png",
+      "musicId": "tlb",
+      "ability": "winNextEnemySpeedMinus3"
+    },
+    {
+      "key": "legende_catcheurs_tyson_briggs",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Tyson Briggs",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "S'il gagne son premier duel : +1 dans toutes les stats.",
+      "ability": "firstWinAll1",
+      "renderArt": "assets/card_renders/legende_catcheurs_tyson_briggs.png",
+      "musicId": "tyson_briggs"
+    },
+    {
+      "key": "legende_catcheurs_zaeken",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Zaeken",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 10,
+        "Charisme": 7
+      },
+      "effect": "Piochez deux cartes.",
+      "ability": "drawOnEntry2",
+      "renderArt": "assets/card_renders/legende_catcheurs_zaeken.png",
+      "musicId": "zaeken"
+    },
+    {
+      "key": "rare_catcheurs_alex_ezio",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Alex Ezio",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 8
+      },
+      "effect": "Si ce catcheur est joué au Round 1, il gagne +1 en Charisme et en Technique",
+      "ability": "firstRoundCharTech",
+      "renderArt": "assets/card_renders/rare_catcheurs_alex_ezio.png",
+      "musicId": "alex_ezio"
+    },
+    {
+      "key": "rare_catcheurs_andre_levissieux",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "André Levissieux",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 3,
+        "Technique": 7,
+        "Charisme": 8
+      },
+      "effect": "S'il remporte un combat, le prochain catcheur adverse commence avec -2 Technique.",
+      "ability": "winNextEnemyTechniqueMinus2",
+      "renderArt": "assets/card_renders/rare_catcheurs_andre_levissieux.png",
+      "musicId": "andre_levissieux"
+    },
+    {
+      "key": "rare_catcheurs_angelo_folena",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Angelo Folena",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "Premier round : +1 Force et +1 Technique.",
+      "ability": "firstRoundForceTechnique",
+      "renderArt": "assets/card_renders/rare_catcheurs_angelo_folena.png",
+      "musicId": "angelo_folena"
+    },
+    {
+      "key": "rare_catcheurs_baadshah_pehalwan_khan",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Baadshah Pehalwan Khan",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "S'il gagne, piochez une carte.",
+      "ability": "drawOnWin1",
+      "renderArt": "assets/card_renders/rare_catcheurs_baadshah_pehalwan_khan.png",
+      "musicId": "baadshah_pehalwan_khan"
+    },
+    {
+      "key": "rare_catcheurs_big_sam",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Big Sam",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 2,
+        "Technique": 5,
+        "Charisme": 7
+      },
+      "effect": "+20 Tombé et -10 Tombé adverse.",
+      "ability": "pinDual20Shield10",
+      "renderArt": "assets/card_renders/rare_catcheurs_big_sam.png",
+      "musicId": "big_sam"
+    },
+    {
+      "key": "rare_catcheurs_black_sam",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Black Sam",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 3,
+        "Technique": 5,
+        "Charisme": 7
+      },
+      "effect": "Arrivée : prochain tombé adverse -10.",
+      "ability": "pinShield",
+      "renderArt": "assets/card_renders/rare_catcheurs_black_sam.png",
+      "musicId": "black_sam"
+    },
+    {
+      "key": "rare_catcheurs_cameron_merchant",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Cameron Merchant",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 4,
+        "Technique": 8,
+        "Charisme": 4
+      },
+      "effect": "1x/tour : -1 Force adverse.",
+      "ability": "turnEnemyForceMinus1",
+      "renderArt": "assets/card_renders/rare_catcheurs_cameron_merchant.png",
+      "musicId": "cameron_merchant"
+    },
+    {
+      "key": "rare_catcheurs_camus",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Camus",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Si vous jouez en premier : +1 en Technique et +1 en Charisme.",
+      "renderArt": "assets/card_renders/rare_catcheurs_camus.png",
+      "musicId": "camus",
+      "ability": "starterTechniqueCharisma1"
+    },
+    {
+      "key": "rare_catcheurs_car_crash_gonzo",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Car Crash Gonzo",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "Si vous jouez en premier ce tour : +2 Vitesse.",
+      "ability": "starterSpeed2",
+      "renderArt": "assets/card_renders/rare_catcheurs_car_crash_gonzo.png",
+      "musicId": "car_crash_gonzo"
+    },
+    {
+      "key": "rare_catcheurs_charlie_bergson",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Charlie Bergson",
+      "stats": {
+        "Force": 3,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 10
+      },
+      "effect": "Apparition : Si vous avez Trevor Mayden dans votre vestiaire : +1 en Force, en Technique et en Vitesse.",
+      "ability": "entryIfTrevorInGraveFTV1",
+      "renderArt": "assets/card_renders/rare_catcheurs_charlie_bergson.png",
+      "musicId": "charlie_bergson"
+    },
+    {
+      "key": "rare_catcheurs_christophe_cassagne",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Christophe Cassagne",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 2,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Apparition : -2 Force adverse.",
+      "ability": "turnEnemyForceMinus2",
+      "renderArt": "assets/card_renders/rare_catcheurs_christophe_cassagne.png",
+      "musicId": "christophe_cassagne"
+    },
+    {
+      "key": "rare_catcheurs_dadou_bazooka",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Dadou Bazooka",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 5,
+        "Technique": 4,
+        "Charisme": 8
+      },
+      "effect": "S'il a un bonus, + 1 en Force et +1 en Vitesse.",
+      "ability": "managerOwnedForceSpeed1",
+      "renderArt": "assets/card_renders/rare_catcheurs_dadou_bazooka.png",
+      "musicId": "dadou_bazooka"
+    },
+    {
+      "key": "rare_catcheurs_dorian_garcia",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Dorian Garcia",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "S'il gagne un duel : +1 Vitesse et +1 Charisme.",
+      "ability": "winSpeedCharisma1",
+      "renderArt": "assets/card_renders/rare_catcheurs_dorian_garcia.png",
+      "musicId": "dorian_garcia"
+    },
+    {
+      "key": "rare_catcheurs_drix",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Drix",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 8,
+        "Charisme": 5
+      },
+      "effect": "Round 1 : +3 Technique.",
+      "ability": "techniqueRound1",
+      "renderArt": "assets/card_renders/rare_catcheurs_drix.png",
+      "musicId": "drix"
+    },
+    {
+      "key": "rare_catcheurs_eddy_marston",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Eddy Marston",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "Lorsqu'une carte objet lui est équipée, elle dure deux tours.",
+      "renderArt": "assets/card_renders/rare_catcheurs_eddy_marston.png",
+      "musicId": "eddy_marston",
+      "ability": "objectExtra1"
+    },
+    {
+      "key": "rare_catcheurs_elionis",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Elionis",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 3,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "Apparition : Votre adversaire défausse une carte de son choix.",
+      "renderArt": "assets/card_renders/rare_catcheurs_elionis.png",
+      "musicId": "elionis",
+      "ability": "opponentDiscardChoice1"
+    },
+    {
+      "key": "rare_catcheurs_ethan_riley",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Ethan Riley",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 5
+      },
+      "effect": "Victoire : prochain duel sur la même statistique.",
+      "ability": "sameStatNext",
+      "renderArt": "assets/card_renders/rare_catcheurs_ethan_riley.png",
+      "musicId": "ethan_riley"
+    },
+    {
+      "key": "rare_catcheurs_fenrir_strom",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Fenrir Strom",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 4
+      },
+      "effect": "Round 4 : +1 / Stats.",
+      "renderArt": "assets/card_renders/rare_catcheurs_fenrir_strom.png",
+      "musicId": "fenrir_strom",
+      "ability": "round4All1"
+    },
+    {
+      "key": "rare_catcheurs_jafar_jordan",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Jafar Jordan",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Round 1 : +2 Technique et +2 Charisme.",
+      "renderArt": "assets/card_renders/rare_catcheurs_jafar_jordan.png",
+      "musicId": "jafar_jordan",
+      "ability": "firstRoundCharTech2"
+    },
+    {
+      "key": "rare_catcheurs_jaydon_ross",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Jaydon Ross",
+      "stats": {
+        "Force": 3,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 9
+      },
+      "effect": "Si ce catcheur perd son premier round, le catcheur suivant gagne +1 en Vitesse sur son premier round",
+      "ability": "nextSpeedOnFirstLoss1",
+      "renderArt": "assets/card_renders/rare_catcheurs_jaydon_ross.png",
+      "musicId": "jaydon_ross"
+    },
+    {
+      "key": "rare_catcheurs_jet_kid",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Jet Kid",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 9,
+        "Technique": 7,
+        "Charisme": 4
+      },
+      "effect": "Sur son premier round, la roulette a 25% de chance de tomber sur Vitesse.",
+      "ability": "speedWheel25",
+      "renderArt": "assets/card_renders/rare_catcheurs_jet_kid.png",
+      "musicId": "jet_kid"
+    },
+    {
+      "key": "rare_catcheurs_kevin_avanti",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Kevin Avanti",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "S’i vous jouez en second : + 2 Technique et +2 Charisme",
+      "renderArt": "assets/card_renders/rare_catcheurs_kevin_avanti.png",
+      "musicId": "kevin_avanti",
+      "ability": "secondPlayerTechniqueCharisma2"
+    },
+    {
+      "key": "rare_catcheurs_kevin_valdez",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Kevin Valdez",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 4,
+        "Technique": 4,
+        "Charisme": 7
+      },
+      "effect": "Round 1 : +1 Technique et +1 Vitesse.",
+      "ability": "firstRoundSpeedTechnique1",
+      "renderArt": "assets/card_renders/rare_catcheurs_kevin_valdez.png",
+      "musicId": "kevin_valdez"
+    },
+    {
+      "key": "rare_catcheurs_koro",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Koro",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 8,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Apparition : Piochez une carte.",
+      "renderArt": "assets/card_renders/rare_catcheurs_koro.png",
+      "musicId": "koro",
+      "ability": "drawOnEntry1"
+    },
+    {
+      "key": "rare_catcheurs_kyle_hoxton",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Kyle Hoxton",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 6
+      },
+      "effect": "Chaque tour, gagne +2 dans une stat aléatoire.",
+      "ability": "turnCatRandom2",
+      "renderArt": "assets/card_renders/rare_catcheurs_kyle_hoxton.png",
+      "musicId": "kyle_hoxton"
+    },
+    {
+      "key": "rare_catcheurs_maffa",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Maffa",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 4,
+        "Technique": 5,
+        "Charisme": 5
+      },
+      "effect": "Apparition : Prochain tombé +20",
+      "renderArt": "assets/card_renders/rare_catcheurs_maffa.png",
+      "musicId": "maffa",
+      "ability": "entryPinBonus20"
+    },
+    {
+      "key": "rare_catcheurs_mareck",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Mareck",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Apparition : Récupérez une carte de votre vestiaire. et votre adversaire défausse aléatoirement une carte.",
+      "renderArt": "assets/card_renders/rare_catcheurs_mareck.png",
+      "musicId": "mareck",
+      "ability": "recoverGraveDiscard1"
+    },
+    {
+      "key": "rare_catcheurs_max_corleone",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Max Corleone",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 6
+      },
+      "effect": "S'il possède un bonus : +1 Technique, Force et Vitesse.",
+      "ability": "managerOwnedTechForceSpeed1",
+      "renderArt": "assets/card_renders/rare_catcheurs_max_corleone.png",
+      "musicId": "max_corleone"
+    },
+    {
+      "key": "rare_catcheurs_maxime_cuadrado",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Maxime Cuadrado",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 5,
+        "Technique": 5,
+        "Charisme": 9
+      },
+      "effect": "Adversaire à 2 KO : tombé +20.",
+      "ability": "pinBonus",
+      "renderArt": "assets/card_renders/rare_catcheurs_maxime_cuadrado.png",
+      "musicId": "maxime_cuadrado"
+    },
+    {
+      "key": "rare_catcheurs_nilsn",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Nils'N",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 8,
+        "Technique": 5,
+        "Charisme": 7
+      },
+      "effect": "Premier round : +2 Vitesse.",
+      "ability": "firstRoundSpeed2",
+      "renderArt": "assets/card_renders/rare_catcheurs_nilsn.png",
+      "musicId": "nilsn"
+    },
+    {
+      "key": "rare_catcheurs_paul_meunier",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Paul Meunier",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 6
+      },
+      "effect": "1x/match : relance la roulette.",
+      "ability": "rerollStat",
+      "renderArt": "assets/card_renders/rare_catcheurs_paul_meunier.png",
+      "musicId": "paul_meunier"
+    },
+    {
+      "key": "rare_catcheurs_r_man",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "R-MAN",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 3,
+        "Technique": 9,
+        "Charisme": 7
+      },
+      "effect": "Une fois par match : +1 à toutes les stats du catcheur suivant.",
+      "ability": "nextEntryAll1",
+      "renderArt": "assets/card_renders/rare_catcheurs_r_man.png",
+      "musicId": "r_man"
+    },
+    {
+      "key": "rare_catcheurs_rayen_gurzil",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Rayen Gurzil",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 5,
+        "Technique": 5,
+        "Charisme": 7
+      },
+      "effect": "Round 2 : +3 dans la statistique du duel.",
+      "ability": "round2ActiveStat3",
+      "renderArt": "assets/card_renders/rare_catcheurs_rayen_gurzil.png",
+      "musicId": "rayen_gurzil"
+    },
+    {
+      "key": "rare_catcheurs_romain_lestrange",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Romain Lestrange",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Si vous jouez en second : +1 Force et +1 Charisme.",
+      "renderArt": "assets/card_renders/rare_catcheurs_romain_lestrange.png",
+      "musicId": "romain_lestrange",
+      "ability": "secondPlayerForceCharisma1"
+    },
+    {
+      "key": "rare_catcheurs_rukasu",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "RUKASU",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 6,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "S'il perd : -2 Technique adverse.",
+      "ability": "lossEnemyTechniqueMinus2",
+      "renderArt": "assets/card_renders/rare_catcheurs_rukasu.png",
+      "musicId": "rukasu"
+    },
+    {
+      "key": "rare_catcheurs_s_m_s",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "S.M.S",
+      "stats": {
+        "Force": 2,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 10
+      },
+      "effect": "Une fois par match, apparition : Regagnez deux tag.",
+      "renderArt": "assets/card_renders/rare_catcheurs_s_m_s.png",
+      "musicId": "s_m_s",
+      "ability": "smsRecoverTags2"
+    },
+    {
+      "key": "rare_catcheurs_saitovic",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Saitovic",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 8
+      },
+      "effect": "Apparition : Récupérez une carte de votre vestiaire.",
+      "renderArt": "assets/card_renders/rare_catcheurs_saitovic.png",
+      "musicId": "saitovic",
+      "ability": "recoverGrave"
+    },
+    {
+      "key": "rare_catcheurs_shawn_olsen",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Shawn Olsen",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 4,
+        "Charisme": 9
+      },
+      "effect": "1x/match : annule sa 1re défaite.",
+      "ability": "firstLossDeck",
+      "renderArt": "assets/card_renders/rare_catcheurs_shawn_olsen.png",
+      "musicId": "shawn_olsen"
+    },
+    {
+      "key": "rare_catcheurs_stan_corey",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Stan Corey",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 6,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Si vous jouez en second : +2 Technique.",
+      "renderArt": "assets/card_renders/rare_catcheurs_stan_corey.png",
+      "musicId": "stan_corey",
+      "ability": "secondPlayerTechnique2"
+    },
+    {
+      "key": "rare_catcheurs_thomas_sabia",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Thomas Sabia",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Apparition : Votre adversaire doit vous montrer sa main.",
+      "renderArt": "assets/card_renders/rare_catcheurs_thomas_sabia.png",
+      "musicId": "thomas_sabia",
+      "ability": "revealOpponentHand"
+    },
+    {
+      "key": "rare_catcheurs_tlb",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "TLB",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 9,
+        "Technique": 3,
+        "Charisme": 6
+      },
+      "effect": "S'il remporte un combat, le prochaine catcheur apparaît avec -2 Vitesse.",
+      "renderArt": "assets/card_renders/rare_catcheurs_tlb.png",
+      "musicId": "tlb",
+      "ability": "winNextEnemySpeedMinus2"
+    },
+    {
+      "key": "rare_catcheurs_trevor_mayden",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Trevor Mayden",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 6,
+        "Technique": 3,
+        "Charisme": 7
+      },
+      "effect": "Une fois par tour, Révélez Charlie Bergson dans votre main : + 1 force et + 20 tombé",
+      "ability": "revealCharlieEachRoundForcePin",
+      "renderArt": "assets/card_renders/rare_catcheurs_trevor_mayden.png",
+      "musicId": "trevor_mayden"
+    },
+    {
+      "key": "rare_catcheurs_tyson_briggs",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Tyson Briggs",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 5,
+        "Technique": 4,
+        "Charisme": 7
+      },
+      "effect": "S'il gagne son premier duel : +1 dans toutes les stats.",
+      "ability": "firstWinAll1",
+      "renderArt": "assets/card_renders/rare_catcheurs_tyson_briggs.png",
+      "musicId": "tyson_briggs"
+    },
+    {
+      "key": "rare_catcheurs_zaeken",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Zaeken",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 4,
+        "Technique": 10,
+        "Charisme": 6
+      },
+      "effect": "Piochez une carte.",
+      "ability": "drawOnEntry1",
+      "renderArt": "assets/card_renders/rare_catcheurs_zaeken.png",
+      "musicId": "zaeken"
+    },
+    {
+      "key": "standard_catcheurs_alex_ezio",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Alex Ezio",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 8
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_alex_ezio.png",
+      "musicId": "alex_ezio"
+    },
+    {
+      "key": "standard_catcheurs_angelo_folena",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Angelo Folena",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_angelo_folena.png",
+      "musicId": "angelo_folena"
+    },
+    {
+      "key": "standard_catcheurs_black_sam",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Black Sam",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 3,
+        "Technique": 5,
+        "Charisme": 7
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_black_sam.png",
+      "musicId": "black_sam"
+    },
+    {
+      "key": "standard_catcheurs_car_crash_gonzo",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Car Crash Gonzo",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_car_crash_gonzo.png",
+      "musicId": "car_crash_gonzo"
+    },
+    {
+      "key": "standard_catcheurs_christophe_cassagne",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Christophe Cassagne",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 2,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_christophe_cassagne.png",
+      "musicId": "christophe_cassagne"
+    },
+    {
+      "key": "standard_catcheurs_dorian_garcia",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Dorian Garcia",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_dorian_garcia.png",
+      "musicId": "dorian_garcia"
+    },
+    {
+      "key": "standard_catcheurs_drix",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Drix",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 8,
+        "Charisme": 5
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_drix.png",
+      "musicId": "drix"
+    },
+    {
+      "key": "standard_catcheurs_elionis",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Elionis",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 3,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_elionis.png",
+      "musicId": "elionis"
+    },
+    {
+      "key": "standard_catcheurs_ethan_riley",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Ethan Riley",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 5
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_ethan_riley.png",
+      "musicId": "ethan_riley"
+    },
+    {
+      "key": "standard_catcheurs_fenrir_strom",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Fenrir Strom",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 4
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_fenrir_strom.png",
+      "musicId": "fenrir_strom"
+    },
+    {
+      "key": "standard_catcheurs_jafar_jordan",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Jafar Jordan",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_jafar_jordan.png",
+      "musicId": "jafar_jordan"
+    },
+    {
+      "key": "standard_catcheurs_jaydon_ross",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Jaydon Ross",
+      "stats": {
+        "Force": 3,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 9
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_jaydon_ross.png",
+      "musicId": "jaydon_ross"
+    },
+    {
+      "key": "standard_catcheurs_jet_kid",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Jet Kid",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 9,
+        "Technique": 7,
+        "Charisme": 4
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_jet_kid.png",
+      "musicId": "jet_kid"
+    },
+    {
+      "key": "standard_catcheurs_jey_kill",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Jey Kill",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_jey_kill.png",
+      "musicId": "jey_kill"
+    },
+    {
+      "key": "standard_catcheurs_kevin_avanti",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Kevin Avanti",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_kevin_avanti.png",
+      "musicId": "kevin_avanti"
+    },
+    {
+      "key": "standard_catcheurs_kyle_hoxton",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Kyle Hoxton",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_kyle_hoxton.png",
+      "musicId": "kyle_hoxton"
+    },
+    {
+      "key": "standard_catcheurs_luke_kane",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Luke Kane",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 7,
+        "Technique": 2,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_luke_kane.png",
+      "musicId": "luke_kane"
+    },
+    {
+      "key": "standard_catcheurs_maffa",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Maffa",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 4,
+        "Technique": 5,
+        "Charisme": 5
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_maffa.png",
+      "musicId": "maffa"
+    },
+    {
+      "key": "standard_catcheurs_max_corleone",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Max Corleone",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_max_corleone.png",
+      "musicId": "max_corleone"
+    },
+    {
+      "key": "standard_catcheurs_maxime_cuadrado",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Maxime Cuadrado",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 5,
+        "Technique": 5,
+        "Charisme": 9
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_maxime_cuadrado.png",
+      "musicId": "maxime_cuadrado"
+    },
+    {
+      "key": "standard_catcheurs_nilsn",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Nils'N",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 8,
+        "Technique": 5,
+        "Charisme": 7
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_nilsn.png",
+      "musicId": "nilsn"
+    },
+    {
+      "key": "standard_catcheurs_nocif",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Nocif",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 9,
+        "Technique": 4,
+        "Charisme": 7
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_nocif.png",
+      "musicId": "nocif"
+    },
+    {
+      "key": "standard_catcheurs_paul_meunier",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Paul Meunier",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_paul_meunier.png",
+      "musicId": "paul_meunier"
+    },
+    {
+      "key": "standard_catcheurs_r_man",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "R-MAN",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 3,
+        "Technique": 9,
+        "Charisme": 7
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_r_man.png",
+      "musicId": "r_man"
+    },
+    {
+      "key": "standard_catcheurs_romain_lestrange",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Romain Lestrange",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_romain_lestrange.png",
+      "musicId": "romain_lestrange"
+    },
+    {
+      "key": "standard_catcheurs_rukasu",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "RUKASU",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 6,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_rukasu.png",
+      "musicId": "rukasu"
+    },
+    {
+      "key": "standard_catcheurs_shawn_olsen",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Shawn Olsen",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 4,
+        "Charisme": 9
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_shawn_olsen.png",
+      "musicId": "shawn_olsen"
+    },
+    {
+      "key": "standard_catcheurs_stan_corey",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Stan Corey",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 6,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_stan_corey.png",
+      "musicId": "stan_corey"
+    },
+    {
+      "key": "standard_catcheurs_terry_robinson",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Terry Robinson",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 9,
+        "Technique": 5,
+        "Charisme": 4
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_terry_robinson.png",
+      "musicId": "terry_robinson"
+    },
+    {
+      "key": "standard_catcheurs_tom_desavoy",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Tom Desavoy",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 4,
+        "Charisme": 9
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_tom_desavoy.png",
+      "musicId": "tom_desavoy"
+    },
+    {
+      "key": "standard_catcheurs_zaeken",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Zaeken",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 4,
+        "Technique": 10,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_zaeken.png",
+      "musicId": "zaeken"
+    },
+    {
+      "key": "ultime_catcheurs_tom_la_ruffa",
+      "type": "Catcheur",
+      "rarity": "Ultime",
+      "name": "Tom La Ruffa",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 8,
+        "Charisme": 9
+      },
+      "effect": "Une fois par partie, lorsqu'il est vaincu, Tom La Ruffa retourne immédiatement sur le ring avec +3 Force et +3 Vitesse.",
+      "ability": "bossSecondWind",
+      "renderArt": "assets/card_renders/ultime_catcheurs_tom_la_ruffa.png",
+      "musicId": "tom_la_ruffa"
+    },
+    {
+      "key": "legende_managers_artemis",
+      "type": "Manager",
+      "rarity": "Legende",
+      "name": "Artemis",
+      "stats": {},
+      "effect": "Lorsque Artémis est sur le terrain, l'effet des catcheurs adverses est annulé.",
+      "renderArt": "assets/card_renders/legende_managers_artemis.png",
+      "ability": "cancelOpponentWrestlerEffects"
+    },
+    {
+      "key": "legende_managers_don_alias",
+      "type": "Manager",
+      "rarity": "Legende",
+      "name": "DON ALIAS",
+      "stats": {},
+      "effect": "Chaque tour : 30% de chance de gagner un point de stat aléatoire de manière permanente.",
+      "ability": "turnRandomPermanent30",
+      "renderArt": "assets/card_renders/legende_managers_don_alias.png"
+    },
+    {
+      "key": "legende_managers_loic_bloodykilt",
+      "type": "Manager",
+      "rarity": "Legende",
+      "name": "Loïc BLOODYKILT",
+      "stats": {},
+      "effect": "Premier tour : +1 dans toutes les statistiques.",
+      "ability": "mAll1",
+      "renderArt": "assets/card_renders/legende_managers_loic_bloodykilt.png"
+    },
+    {
+      "key": "legende_managers_mr_ringsider",
+      "type": "Manager",
+      "rarity": "Legende",
+      "name": "MR Ringsider",
+      "stats": {},
+      "effect": "Une fois par tour, vous pouvez récupérer deux carte dans votre vestiaire. Si vous le faîtes, Perdez un tag.",
+      "renderArt": "assets/card_renders/legende_managers_mr_ringsider.png",
+      "ability": "ringsiderRecover2LoseTag"
+    },
+    {
+      "key": "legende_managers_r_man",
+      "type": "Manager",
+      "rarity": "Legende",
+      "name": "R-MAN",
+      "stats": {},
+      "effect": "Si 3 catcheurs ou plus dans le vestiaire : +2 à toutes les stats.",
+      "ability": "mAll2IfGrave3",
+      "renderArt": "assets/card_renders/legende_managers_r_man.png"
+    },
+    {
+      "key": "legende_managers_tommy_rauzy",
+      "type": "Manager",
+      "rarity": "Legende",
+      "name": "TOMMY RAUZY",
+      "stats": {},
+      "effect": "Permet d'utiliser un objet deux fois supplémentaire",
+      "ability": "objectExtra2",
+      "renderArt": "assets/card_renders/legende_managers_tommy_rauzy.png"
+    },
+    {
+      "key": "legende_managers_yann_le_kersaudec",
+      "type": "Manager",
+      "rarity": "Legende",
+      "name": "YANN LE KERSAUDEC",
+      "stats": {},
+      "effect": "Annule objets et bonus adverses.",
+      "ability": "cancelObjectsManagers",
+      "renderArt": "assets/card_renders/legende_managers_yann_le_kersaudec.png"
+    },
+    {
+      "key": "rare_managers_albert_roche",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "ALBERT ROCHE",
+      "stats": {},
+      "effect": "+2 Force.",
+      "ability": "mForce",
+      "renderArt": "assets/card_renders/rare_managers_albert_roche.png"
+    },
+    {
+      "key": "rare_managers_damien_chevallier",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "Damien Chevallier",
+      "stats": {},
+      "effect": "Une seule fois : Permet de relancer la roulette.",
+      "ability": "rerollStat",
+      "renderArt": "assets/card_renders/rare_managers_damien_chevallier.png"
+    },
+    {
+      "key": "rare_managers_don_alias",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "DON ALIAS",
+      "stats": {},
+      "effect": "Chaque tour : 20% de chance de gagner un point de stat aléatoire de manière permanente.",
+      "ability": "turnRandomPermanent20",
+      "renderArt": "assets/card_renders/rare_managers_don_alias.png"
+    },
+    {
+      "key": "rare_managers_edward_minaro",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "Edward Minaro",
+      "stats": {},
+      "effect": "+2 Charisme.",
+      "ability": "mCharisme",
+      "renderArt": "assets/card_renders/rare_managers_edward_minaro.png"
+    },
+    {
+      "key": "rare_managers_l_odyssee",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "L'Odyssée",
+      "stats": {},
+      "effect": "+1 en Technique et +1 en Force. Si vous jouez Charlie Bergson ou Trevor Mayden, Doublez cet effet.",
+      "ability": "bonusOdysseeTechForceTeam",
+      "renderArt": "assets/card_renders/rare_managers_l_odyssee.png"
+    },
+    {
+      "key": "rare_managers_loic_bloodykilt",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "Loïc BLOODYKILT",
+      "stats": {},
+      "effect": "Premier tour : +1 dans 2 stats aléatoires.",
+      "ability": "mRandom2",
+      "renderArt": "assets/card_renders/rare_managers_loic_bloodykilt.png"
+    },
+    {
+      "key": "rare_managers_mr_ringsider",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "MR Ringsider",
+      "stats": {},
+      "effect": "Une fois par tour, vous pouvez récupérer une carte dans votre vestiaire. Si vous le faîtes, Perdez un tag.",
+      "renderArt": "assets/card_renders/rare_managers_mr_ringsider.png",
+      "ability": "ringsiderRecover1LoseTag"
+    },
+    {
+      "key": "rare_managers_passion_baston",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "Passion Baston",
+      "stats": {},
+      "effect": "+ 1 en Force et +1 en Charisme. Si vous jouez Black Sam ou Angelo Folena, doublez cet effet.",
+      "ability": "bonusPassionForceCharTeam",
+      "renderArt": "assets/card_renders/rare_managers_passion_baston.png"
+    },
+    {
+      "key": "rare_managers_perfect_fighters_industry",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "Perfect Fighters Industry",
+      "stats": {},
+      "effect": "+ 1 en Charisme et +1 en Vitesse. Si vous jouez Ethan Riley ou Maxime Cuadrado, doublez cet effet.",
+      "ability": "bonusPfiCharSpeedTeam",
+      "renderArt": "assets/card_renders/rare_managers_perfect_fighters_industry.png"
+    },
+    {
+      "key": "rare_managers_pierreluck",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "PierreLuck",
+      "stats": {},
+      "effect": "Une fois par tour, votre adversaire perd -10 tombé.",
+      "renderArt": "assets/card_renders/rare_managers_pierreluck.png",
+      "ability": "turnEnemyPinMinus10"
+    },
+    {
+      "key": "rare_managers_pure_tradition",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "PURE TRADITION",
+      "stats": {},
+      "effect": "Chaque tour, piochez une carte. Si vous jouez Romain Lestrange ou Zaeken, l'effet est doublé.",
+      "renderArt": "assets/card_renders/rare_managers_pure_tradition.png",
+      "ability": "bonusPureTraditionDrawTeam"
+    },
+    {
+      "key": "rare_managers_tommy_rauzy",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "TOMMY RAUZY",
+      "stats": {},
+      "effect": "Permet d'utiliser un objet une fois supplémentaire",
+      "ability": "objectExtra1",
+      "renderArt": "assets/card_renders/rare_managers_tommy_rauzy.png"
+    },
+    {
+      "key": "rare_managers_yann_le_kersaudec",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "YANN LE KERSAUDEC",
+      "stats": {},
+      "effect": "Annule les objets adverses.",
+      "ability": "cancelObjects",
+      "renderArt": "assets/card_renders/rare_managers_yann_le_kersaudec.png"
+    },
+    {
+      "key": "standard_managers_albert_roche",
+      "type": "Manager",
+      "rarity": "Standard",
+      "name": "ALBERT ROCHE",
+      "stats": {},
+      "effect": "+1 Force.",
+      "ability": "mForce1",
+      "renderArt": "assets/card_renders/standard_managers_albert_roche.png"
+    },
+    {
+      "key": "standard_managers_don_alias",
+      "type": "Manager",
+      "rarity": "Standard",
+      "name": "DON ALIAS",
+      "stats": {},
+      "effect": "Chaque tour : 10% de chance de gagner un point de stat aléatoire de manière permanente.",
+      "ability": "turnRandomPermanent10",
+      "renderArt": "assets/card_renders/standard_managers_don_alias.png"
+    },
+    {
+      "key": "standard_managers_edward_minaro",
+      "type": "Manager",
+      "rarity": "Standard",
+      "name": "Edward Minaro",
+      "stats": {},
+      "effect": "+1 Charisme.",
+      "ability": "mCharisme1",
+      "renderArt": "assets/card_renders/standard_managers_edward_minaro.png"
+    },
+    {
+      "key": "standard_managers_loic_bloodykilt",
+      "type": "Manager",
+      "rarity": "Standard",
+      "name": "Loïc BLOODYKILT",
+      "stats": {},
+      "effect": "Premier tour : +1 dans 1 stat aléatoire.",
+      "ability": "mRandom",
+      "renderArt": "assets/card_renders/standard_managers_loic_bloodykilt.png"
+    },
+    {
+      "key": "standard_managers_yann_le_kersaudec",
+      "type": "Manager",
+      "rarity": "Standard",
+      "name": "YANN LE KERSAUDEC",
+      "stats": {},
+      "effect": "Annule tous les objets.",
+      "ability": "cancelAllObjects",
+      "renderArt": "assets/card_renders/standard_managers_yann_le_kersaudec.png"
+    },
+    {
+      "key": "legende_objets_ceinture_de_champion",
+      "type": "Objet",
+      "rarity": "Legende",
+      "name": "Ceinture de champion",
+      "stats": {},
+      "effect": "+ 3 à toutes les stats.",
+      "ability": "mAll3",
+      "renderArt": "assets/card_renders/legende_objets_ceinture_de_champion.png"
+    },
+    {
+      "key": "legende_objets_malette",
+      "type": "Objet",
+      "rarity": "Legende",
+      "name": "Malette",
+      "stats": {},
+      "effect": "+ 2 Charisme ou +20 Tombé.",
+      "ability": "pinObject20",
+      "renderArt": "assets/card_renders/legende_objets_malette.png"
+    },
+    {
+      "key": "rare_objets_caddie",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Caddie",
+      "stats": {},
+      "effect": "Prochain tour : +1 pioche.",
+      "ability": "drawNext1",
+      "renderArt": "assets/card_renders/rare_objets_caddie.png"
+    },
+    {
+      "key": "rare_objets_cloche",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Cloche",
+      "stats": {},
+      "effect": "+1 dans deux stats aléatoires.",
+      "ability": "mRandom2",
+      "renderArt": "assets/card_renders/rare_objets_cloche.png"
+    },
+    {
+      "key": "rare_objets_extincteur",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Extincteur",
+      "stats": {},
+      "effect": "Récupérez une carte dans votre vestiaire.",
+      "ability": "recoverGrave",
+      "renderArt": "assets/card_renders/rare_objets_extincteur.png"
+    },
+    {
+      "key": "rare_objets_micro",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Micro",
+      "stats": {},
+      "effect": "+2 Charisme.",
+      "ability": "mCharisme",
+      "renderArt": "assets/card_renders/rare_objets_micro.png"
+    },
+    {
+      "key": "rare_objets_poubelle",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Poubelle",
+      "stats": {},
+      "effect": "Votre adversaire défausse une carte.",
+      "ability": "opponentDiscard1",
+      "renderArt": "assets/card_renders/rare_objets_poubelle.png"
+    },
+    {
+      "key": "standard_objets_barriere",
+      "type": "Objet",
+      "rarity": "Standard",
+      "name": "Barrière",
+      "stats": {},
+      "effect": "- 5 Tombé adverse.",
+      "ability": "pinShield5",
+      "renderArt": "assets/card_renders/standard_objets_barriere.png"
+    },
+    {
+      "key": "standard_objets_chaise",
+      "type": "Objet",
+      "rarity": "Standard",
+      "name": "Chaise",
+      "stats": {},
+      "effect": "+1 Force.",
+      "ability": "mForce1",
+      "renderArt": "assets/card_renders/standard_objets_chaise.png"
+    },
+    {
+      "key": "standard_objets_echelle",
+      "type": "Objet",
+      "rarity": "Standard",
+      "name": "Echelle",
+      "stats": {},
+      "effect": "+1 en Vitesse.",
+      "ability": "mVitesse1",
+      "renderArt": "assets/card_renders/standard_objets_echelle.png"
+    },
+    {
+      "key": "standard_objets_table",
+      "type": "Objet",
+      "rarity": "Standard",
+      "name": "Table",
+      "stats": {},
+      "effect": "Victoire : Tombé +5.",
+      "ability": "pinObject5",
+      "renderArt": "assets/card_renders/standard_objets_table.png"
+    }
+  ]
+}

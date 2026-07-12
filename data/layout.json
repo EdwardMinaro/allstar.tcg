@@ -1,0 +1,33 @@
+{
+  "version": "ALLSTARS-player",
+  "locked_layout_note": "Layout joueur stabilise pour le ring responsive.",
+  "screen": {
+    "no_scroll": true,
+    "grid_columns": "230px minmax(640px,1fr) 260px",
+    "grid_rows": "112px 1fr 142px"
+  },
+  "zones": {
+    "enemy": [
+      "manager",
+      "catcheur",
+      "objet"
+    ],
+    "player": [
+      "manager",
+      "catcheur",
+      "objet"
+    ]
+  },
+  "piles": {
+    "enemy_side": "right",
+    "player_side": "left",
+    "player_piles_position": "raised",
+    "preview_position": "left_between_player_piles_and_ring"
+  },
+  "ring": {
+    "ropes": "decorative_behind_cards",
+    "cards_layer": "above_ropes",
+    "mat": "large_center_play_area",
+    "perspective": "slight_top_down"
+  }
+}

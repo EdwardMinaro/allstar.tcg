@@ -1,0 +1,320 @@
+{
+  "source": "E:/cards",
+  "imported": [
+    {
+      "key": "standard_managers_don_alias",
+      "name": "DON ALIAS",
+      "type": "Manager",
+      "rarity": "Standard",
+      "ability": "turnRandomPermanent10"
+    },
+    {
+      "key": "legende_managers_don_alias",
+      "name": "DON ALIAS",
+      "type": "Manager",
+      "rarity": "Legende",
+      "ability": "turnRandomPermanent30"
+    },
+    {
+      "key": "rare_managers_don_alias",
+      "name": "DON ALIAS",
+      "type": "Manager",
+      "rarity": "Rare",
+      "ability": "turnRandomPermanent20"
+    },
+    {
+      "key": "rare_catcheurs_car_crash_gonzo",
+      "name": "Car Crash Gonzo",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "starterSpeed2"
+    },
+    {
+      "key": "legende_catcheurs_car_crash_gonzo",
+      "name": "Car Crash Gonzo",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "ability": "starterSpeedTechnique2"
+    },
+    {
+      "key": "standard_catcheurs_car_crash_gonzo",
+      "name": "Car Crash Gonzo",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": "drawOnEntry2"
+    },
+    {
+      "key": "legende_catcheurs_zaeken",
+      "name": "Zaeken",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "ability": "drawOnEntry2"
+    },
+    {
+      "key": "rare_catcheurs_zaeken",
+      "name": "Zaeken",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "drawOnEntry1"
+    },
+    {
+      "key": "standard_catcheurs_zaeken",
+      "name": "Zaeken",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": null
+    },
+    {
+      "key": "legende_catcheurs_alex_ezio",
+      "name": "Alex Ezio",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "ability": "firstRoundForceCharTech"
+    },
+    {
+      "key": "standard_catcheurs_alex_ezio",
+      "name": "Alex Ezio",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": "nextSpeedOnFirstLoss2"
+    },
+    {
+      "key": "rare_catcheurs_alex_ezio",
+      "name": "Alex Ezio",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "firstRoundCharTech"
+    },
+    {
+      "key": "legende_catcheurs_jaydon_ross",
+      "name": "Jaydon Ross",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "ability": "nextSpeedOnFirstLoss2"
+    },
+    {
+      "key": "standard_catcheurs_jaydon_ross",
+      "name": "Jaydon Ross",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": "speedWheel50"
+    },
+    {
+      "key": "rare_catcheurs_jaydon_ross",
+      "name": "Jaydon Ross",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "nextSpeedOnFirstLoss1"
+    },
+    {
+      "key": "legende_catcheurs_jet_kid",
+      "name": "Jet Kid",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "ability": "speedWheel50"
+    },
+    {
+      "key": "rare_catcheurs_jet_kid",
+      "name": "Jet Kid",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "speedWheel25"
+    },
+    {
+      "key": "standard_catcheurs_jet_kid",
+      "name": "Jet Kid",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": "speedWheel50"
+    },
+    {
+      "key": "rare_catcheurs_kevin_valdez",
+      "name": "Kevin Valdez",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "firstRoundSpeedTechnique1"
+    },
+    {
+      "key": "legende_catcheurs_kevin_valdez",
+      "name": "Kevin Valdez",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "ability": "firstRoundSpeedTechnique2"
+    },
+    {
+      "key": "standard_catcheurs_max_corleone",
+      "name": "Max Corleone",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": "firstRoundSpeedTechnique2"
+    },
+    {
+      "key": "rare_catcheurs_max_corleone",
+      "name": "Max Corleone",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "managerOwnedTechForceSpeed1"
+    },
+    {
+      "key": "standard_catcheurs_kevin_avanti",
+      "name": "Kevin Avanti",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": null
+    },
+    {
+      "key": "rare_catcheurs_kevin_avanti",
+      "name": "Kevin Avanti",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "secondPlayerTechniqueCharisma2"
+    },
+    {
+      "key": "rare_catcheurs_rukasu",
+      "name": "RUKASU",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "lossEnemyTechniqueMinus2"
+    },
+    {
+      "key": "standard_catcheurs_rukasu",
+      "name": "RUKASU",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": "managerOwnedTechForceSpeed1"
+    },
+    {
+      "key": "rare_catcheurs_dadou_bazooka",
+      "name": "Dadou Bazooka",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "managerOwnedForceSpeed1"
+    },
+    {
+      "key": "rare_catcheurs_baadshah_pehalwan_khan",
+      "name": "Baadshah Pehalwan Khan",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "drawOnWin1"
+    },
+    {
+      "key": "legende_catcheurs_baadshah_pehalwan_khan",
+      "name": "Baadshah Pehalwan Khan",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "ability": "drawOnWin2"
+    },
+    {
+      "key": "rare_catcheurs_rayen_gurzil",
+      "name": "Rayen Gurzil",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "round2ActiveStat3"
+    },
+    {
+      "key": "legende_catcheurs_tyson_briggs",
+      "name": "Tyson Briggs",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "ability": "firstWinAll1"
+    },
+    {
+      "key": "rare_catcheurs_tyson_briggs",
+      "name": "Tyson Briggs",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "firstWinAll1"
+    },
+    {
+      "key": "legende_managers_tommy_rauzy",
+      "name": "TOMMY RAUZY",
+      "type": "Manager",
+      "rarity": "Legende",
+      "ability": "objectExtra2"
+    },
+    {
+      "key": "rare_managers_tommy_rauzy",
+      "name": "TOMMY RAUZY",
+      "type": "Manager",
+      "rarity": "Rare",
+      "ability": "objectExtra1"
+    },
+    {
+      "key": "standard_catcheurs_dorian_garcia",
+      "name": "Dorian Garcia",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": "forcePlus"
+    },
+    {
+      "key": "rare_catcheurs_dorian_garcia",
+      "name": "Dorian Garcia",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "winSpeedCharisma1"
+    },
+    {
+      "key": "standard_catcheurs_terry_robinson",
+      "name": "Terry Robinson",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": "forcePlus"
+    },
+    {
+      "key": "ultime_catcheurs_tom_la_ruffa",
+      "name": "Tom La Ruffa",
+      "type": "Catcheur",
+      "rarity": "Ultime",
+      "ability": "bossSecondWind"
+    },
+    {
+      "key": "rare_catcheurs_christophe_cassagne",
+      "name": "Christophe Cassagne",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "ability": "turnEnemyForceMinus2"
+    },
+    {
+      "key": "standard_catcheurs_christophe_cassagne",
+      "name": "Christophe Cassagne",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "ability": "forcePlus"
+    },
+    {
+      "key": "rare_managers_damien_chevallier",
+      "name": "Damien Chevallier",
+      "type": "Manager",
+      "rarity": "Rare",
+      "ability": "rerollStat"
+    }
+  ],
+  "quarantined": [],
+  "unmappedEffects": [],
+  "missingPng": [],
+  "warnings": [
+    "Source principale absente: E:/cards"
+  ],
+  "adjustedStats": [
+    {
+      "file": "C:\\Users\\LENOVO\\Downloads\\Max Corleone\\Max_Corleone.json",
+      "reason": "Stats 23/24",
+      "added": "+1 Vitesse"
+    },
+    {
+      "file": "C:\\Users\\LENOVO\\Downloads\\Max Corleone\\R Max_Corleone.json",
+      "reason": "Stats 23/24",
+      "added": "+1 Vitesse"
+    },
+    {
+      "file": "C:\\Users\\LENOVO\\Downloads\\Kevin Avanti\\Kevin_Avanti.json",
+      "reason": "Stats 23/24",
+      "added": "+1 Vitesse"
+    },
+    {
+      "file": "C:\\Users\\LENOVO\\Downloads\\Kevin Avanti\\r Kevin_Avanti.json",
+      "reason": "Stats 23/24",
+      "added": "+1 Vitesse"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "name": "allstar-desktop",
+  "version": "0.1.1",
+  "private": true,
+  "description": "ALLSTAR desktop build",
+  "author": "ALLSTAR",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win nsis",
+    "publish": "electron-builder --win nsis --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2"
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "build": {
+    "appId": "fr.allstar.game",
+    "productName": "ALLSTAR",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "electron-main.js",
+      "electron-preload.js",
+      "assets/**/*",
+      "css/**/*",
+      "data/**/*",
+      "js/**/*",
+      "README.txt"
+    ],
+    "win": {
+      "icon": "assets/branding/allstars_icon.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ALLSTAR"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "EdwardMinaro",
+        "repo": "Allstar.tcg"
+      }
+    ]
+  }
+}

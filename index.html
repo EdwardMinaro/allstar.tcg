@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>ALLSTARS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="screen-transition" id="screenTransition" aria-hidden="true"></div>
+
+<section id="saveScreen" class="screen active">
+  <div class="home-stage save-stage">
+    <div class="home-light red"></div>
+    <div class="home-light blue"></div>
+    <div class="stage-spotlight spot-left"></div>
+    <div class="stage-spotlight spot-right"></div>
+    <div class="crowd-flashes" aria-hidden="true"></div>
+    <div class="save-panel account-panel">
+      <img class="home-logo-img save-logo-img" src="assets/branding/allstars_logo_cropped.png" alt="ALLSTAR - Collect / Build / Compete">
+      <div class="account-view account-choice active" id="accountChoiceView">
+        <div class="save-actions account-actions">
+          <button type="button" class="home-action primary" id="openLoginButton" onclick="showAccountLogin()">Connexion</button>
+          <button type="button" class="home-action" id="openCreateButton" onclick="showAccountCreate()">Créer un compte</button>
+          <button type="button" class="home-action guest" id="guestModeButton" onclick="startGuestMode()">Mode invité</button>
+        </div>
+      </div>
+      <div class="account-view" id="accountLoginView">
+        <div class="account-form">
+          <label for="loginEmail">E-mail</label>
+          <input id="loginEmail" type="email" autocomplete="email" placeholder="joueur@allstar.local">
+          <label for="loginPassword">Mot de passe</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Mot de passe">
+        </div>
+        <div class="save-actions account-actions split-actions">
+          <button type="button" class="home-action primary" id="loginAccountButton" onclick="loginAccountFromStart()">Se connecter</button>
+          <button type="button" class="home-action guest" id="backFromLoginButton" onclick="showAccountChoice()">Retour</button>
+        </div>
+        <button type="button" class="forgot-password-button" id="resetPasswordButton" onclick="sendPasswordResetFromStart()">Mot de passe oublié ?</button>
+      </div>
+      <div class="account-view" id="accountCreateView">
+        <div class="account-form">
+          <label for="createPseudo">Pseudo</label>
+          <input id="createPseudo" type="text" maxlength="24" autocomplete="nickname" placeholder="Nom de ring">
+          <label for="createEmail">E-mail</label>
+          <input id="createEmail" type="email" autocomplete="email" placeholder="joueur@allstar.local">
+          <label for="createPassword">Mot de passe</label>
+          <input id="createPassword" type="password" autocomplete="new-password" placeholder="6 caractères minimum">
+        </div>
+        <div class="save-actions account-actions split-actions">
+          <button type="button" class="home-action primary" id="createAccountButton" onclick="createAccountFromStart()">Créer le compte</button>
+          <button type="button" class="home-action guest" id="backFromCreateButton" onclick="showAccountChoice()">Retour</button>
+        </div>
+      </div>
+      <p class="save-status" id="saveStatus"></p>
+    </div>
+  </div>
+</section>
+
+<section id="menu" class="screen">
+  <div class="home-stage">
+    <button class="settings home-settings" onclick="showHomeOptions()" aria-label="Options">&#9881;</button>
+    <button class="settings home-profile-button" onclick="showProfile()" aria-label="Profil"><span class="profile-icon" aria-hidden="true"></span></button>
+    <div class="home-light red"></div>
+    <div class="home-light blue"></div>
+    <div class="stage-spotlight spot-left"></div>
+    <div class="stage-spotlight spot-right"></div>
+    <div class="crowd-flashes" aria-hidden="true"></div>
+    <div class="home-center">
+      <img class="home-logo-img" src="assets/branding/allstars_logo_cropped.png" alt="ALLSTAR - Collect / Build / Compete">
+      <p class="home-tagline">LE RING EST À TOI !</p>
+
+      <div class="home-main-actions">
+        <button class="home-action primary" onclick="showCareer()">Carrière</button>
+        <button class="home-action" onclick="startGame()">Duel Libre</button>
+        <button class="home-action" onclick="showMulti()">Jouer en ligne</button>
+        <button class="home-action" onclick="showAllstarChallenge()">Défi ALLSTAR</button>
+        <button class="home-action" onclick="showDecks()">Decks</button>
+        <button class="home-action" onclick="showShop()">Boutique</button>
+        <button class="home-action" onclick="showCollection()">Collection</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="profileScreen" class="screen">
+  <button class="options-return-fixed" onclick="showMenu()">Retour</button>
+  <div class="menu-wrap">
+    <div class="menu-card options-page-card profile-page-card">
+      <h1 class="logo small-logo">Profil</h1>
+      <div class="profile-page-grid" id="profileContent">
+        <div class="options-block">
+          <div class="home-options-title">Compte ALLSTAR</div>
+          <p class="profile-muted">Chargement du profil...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="challenge" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-card challenge-menu-card">
+      <h1 class="logo small-logo">Défi ALLSTAR</h1>
+      <p class="subtitle" id="challengeStatus"></p>
+      <div class="challenge-layout">
+        <aside class="challenge-preview" id="challengePreview"></aside>
+        <div class="challenge-panel">
+          <div class="challenge-week" id="challengeWeek"></div>
+          <div class="challenge-boss-name" id="challengeBossName"></div>
+          <div class="challenge-boss-meta" id="challengeBossMeta"></div>
+          <div class="challenge-rules">
+            <span><b id="challengeBossHp">0</b> PV boss</span>
+            <span><b>3</b> vies joueur</span>
+            <span id="challengeRewardText"></span>
+          </div>
+          <div class="challenge-note">
+            Gagne les rounds pour retirer au boss la différence entre les statistiques. Encaisse trois tombés et le défi est perdu.
+          </div>
+          <div class="shop-actions">
+            <button class="small-btn" onclick="startAllstarChallenge()">Choisir mon deck</button>
+            <button class="small-btn dark" onclick="showMenu()">Retour</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="deckSelect" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-card deck-select-card">
+      <h1 class="logo small-logo">Choisis ton deck !</h1>
+      <p class="subtitle" id="deckSelectStatus"></p>
+      <div class="deck-select-list" id="deckSelectList"></div>
+      <div class="shop-actions deck-select-actions">
+        <button class="small-btn" onclick="confirmDeckReady()">Prêt</button>
+        <button class="small-btn dark" onclick="cancelDeckSelect()">Retour</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="career" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-card career-menu-card">
+      <h1 class="logo small-logo">Carrière</h1>
+      <p class="subtitle" id="careerStatus"></p>
+      <div class="career-grid" id="careerGrid"></div>
+      <div class="shop-actions">
+        <button class="small-btn" onclick="startUnlockedCareerMatch()">Lancer le prochain combat</button>
+        <button class="small-btn dark" onclick="showMenu()">Retour</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="homeOptionsScreen" class="screen">
+  <button class="options-return-fixed" onclick="showMenu()">Retour</button>
+  <div class="menu-wrap">
+    <div class="menu-card options-page-card">
+      <h1 class="logo small-logo">Options</h1>
+      <p class="subtitle"></p>
+      <div class="options-page-grid">
+        <div class="options-block">
+          <div class="home-options-title">Audio</div>
+          <div class="audio-options home-audio-options">
+            <label for="homeMusicVolume">Volume musique</label>
+            <input id="homeMusicVolume" class="music-volume-control" type="range" min="0" max="100" value="70">
+
+            <label for="homeSfxVolume">Volume bruitages</label>
+            <input id="homeSfxVolume" class="sfx-volume-control" type="range" min="0" max="100" value="85">
+
+            <button class="mute-button-control" type="button">Couper le son</button>
+
+            <label for="homeMusicSelect">Themes catcheurs</label>
+            <select id="homeMusicSelect" class="music-select-control"></select>
+            <div class="audio-controls">
+              <button class="music-play-control" type="button">Play</button>
+              <button class="music-stop-control" type="button">Stop</button>
+            </div>
+            <div class="current-track">Theme : <span class="current-music-label">aucun</span></div>
+          </div>
+        </div>
+        <div class="options-block">
+          <div class="home-options-title">Affichage / session</div>
+          <div class="display-options">
+            <label class="display-check"><input id="homeFullscreenToggle" class="fullscreen-control" type="checkbox"> Plein ecran</label>
+            <label for="homeResolutionSelect">Resolution</label>
+            <select id="homeResolutionSelect" class="resolution-control">
+              <option value="1280x720">1280 x 720</option>
+              <option value="1366x768">1366 x 768</option>
+              <option value="1600x900">1600 x 900</option>
+              <option value="1920x1080">1920 x 1080</option>
+            </select>
+            <div class="profile-actions">
+              <button class="profile-action dark" type="button" onclick="requestProfileLogout()">Se deconnecter</button>
+              <button class="profile-action danger" type="button" onclick="requestQuitGame()">Quitter le jeu</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="game" class="screen">
+  <div class="crowd"></div>
+  <button class="settings" onclick="toggleOptions()" aria-label="Options">&#9881;</button>
+  <div class="options-menu" id="optionsMenu">
+    <button onclick="toggleOptions()">Revenir à la partie</button>
+    <button class="danger" onclick="startGame()">Abandonner</button>
+    <button class="dark" onclick="requestProfileLogout()">Se deconnecter</button>
+    <button class="danger" onclick="requestQuitGame()">Quitter le jeu</button>
+    <button onclick="hideOptions();showMenu()">Retour menu principal</button>
+
+    <div class="audio-options">
+      <label for="musicVolume">Volume musique</label>
+      <input id="musicVolume" class="music-volume-control" type="range" min="0" max="100" value="70">
+
+      <label for="sfxVolume">Volume bruitages</label>
+      <input id="sfxVolume" class="sfx-volume-control" type="range" min="0" max="100" value="85">
+
+      <button id="muteButton" class="mute-button-control" type="button">Couper le son</button>
+
+      <label for="musicSelect">Thèmes catcheurs</label>
+      <select id="musicSelect" class="music-select-control"></select>
+      <div class="audio-controls">
+        <button id="musicPlayButton" class="music-play-control" type="button">Play</button>
+        <button id="musicStopButton" class="music-stop-control" type="button">Stop</button>
+      </div>
+      <div class="current-track">Thème : <span id="currentMusic" class="current-music-label">aucun</span></div>
+    </div>
+    <div class="display-options compact-display-options">
+      <label class="display-check"><input id="gameFullscreenToggle" class="fullscreen-control" type="checkbox"> Plein ecran</label>
+      <label for="gameResolutionSelect">Resolution</label>
+      <select id="gameResolutionSelect" class="resolution-control">
+        <option value="1280x720">1280 x 720</option>
+        <option value="1366x768">1366 x 768</option>
+        <option value="1600x900">1600 x 900</option>
+        <option value="1920x1080">1920 x 1080</option>
+      </select>
+    </div>
+  </div>
+  <div class="game-layout">
+    <div class="top-hand-area"><div class="enemy-hand" id="enemyHand"></div></div>
+
+    <div class="left-panel">
+      <div class="preview-panel" id="preview">
+        <div class="preview-title">Carte survolée</div>
+        <div class="preview-empty">Passe la souris<br>sur une carte</div>
+      </div>
+
+      <button class="pile-panel pile-button player-vestiaire-pile" type="button" onclick="showPileViewer('player')">
+        <div class="pile-title">Vestiaire</div>
+        <div class="pile-body">
+          <div class="pile-card"><span>ALL<br>STARS</span><b id="playerGrave">0</b></div>
+        </div>
+      </button>
+
+      <div class="pile-panel player-deck-pile">
+        <div class="pile-title">Deck</div>
+        <div class="pile-body">
+          <div class="pile-card"><span>ALL<br>STARS</span><b id="playerDeck">20</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ring-area">
+      <div class="challenge-match-hud" id="challengeMatchHud" hidden>
+        <div class="challenge-hud-head">
+          <span>Défi ALLSTAR</span>
+          <strong id="challengeHudName">Boss</strong>
+        </div>
+        <div class="challenge-hp-bar"><span id="challengeHpFill"></span></div>
+        <div class="challenge-hud-meta">
+          <span id="challengeHudHp">PV 0 / 0</span>
+          <span id="challengeHudLives">Vies 3</span>
+        </div>
+      </div>
+      <div class="ring">
+        <div class="ring-frame"></div>
+        <div class="ring-mat"><div class="mid-line"></div></div>
+        <div class="rope-h rh1"></div><div class="rope-h rh2"></div><div class="rope-h rh3"></div>
+        <div class="rope-h rh4"></div><div class="rope-h rh5"></div><div class="rope-h rh6"></div>
+        <div class="rope-v rv1"></div><div class="rope-v rv2"></div><div class="rope-v rv3"></div>
+        <div class="rope-v rv4"></div><div class="rope-v rv5"></div><div class="rope-v rv6"></div>
+        <div class="post p1"></div><div class="post p2"></div><div class="post p3"></div><div class="post p4"></div>
+        <div class="vs">VS</div>
+
+        <div class="zone man enemy" id="enemyMan"></div>
+        <div class="zone cat enemy" id="enemyCat"></div>
+        <div class="zone obj enemy" id="enemyObj"></div>
+        <div class="zone man player" id="playerMan"></div>
+        <div class="zone cat player" id="playerCat"></div>
+        <div class="zone obj player" id="playerObj"></div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="round-box">
+        <div class="round-title">Round</div>
+        <div class="round-num" id="roundNum">1</div>
+        <div class="round-sub" id="statDisplay">MAIN EVENT</div>
+      </div>
+
+      <div class="enemy-piles">
+        <div class="pile-panel">
+          <div class="pile-title">Deck</div>
+          <div class="pile-body">
+            <div class="pile-card"><span>ALL<br>STARS</span><b id="enemyDeck">20</b></div>
+          </div>
+        </div>
+
+        <button class="pile-panel pile-button" type="button" onclick="showPileViewer('ai')">
+          <div class="pile-title">Vestiaire</div>
+          <div class="pile-body">
+            <div class="pile-card"><span>ALL<br>STARS</span><b id="enemyGrave">0</b></div>
+          </div>
+        </button>
+      </div>
+
+      <button class="action-btn tag-btn" id="tagButton" onclick="tagPlayer()">Tag <span id="tagCount">2/2</span></button>
+      <button class="action-btn" onclick="resolveRound()">Fin du tour</button>
+      <div class="journal">
+        <div class="journal-title">Journal</div>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+
+    <div class="hand-area"><div class="hand-panel"><div class="hand" id="playerHand"></div></div></div>
+    <div class="effect-toast" id="effectToast" aria-live="polite"></div>
+  </div>
+</section>
+
+<section id="decks" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-card deck-menu-card">
+      <h1 class="logo small-logo">Mes Decks</h1>
+      <p class="subtitle" id="deckStatus"></p>
+      <div class="deck-hub" id="deckHub">
+        <button class="small-btn" onclick="openDeckNewFromHub()">Nouveau Deck</button>
+        <button class="small-btn" onclick="openDeckSelectFromHub()">Modifier Deck</button>
+        <button class="small-btn danger" onclick="openDeckDeleteFromHub()">Effacer Deck</button>
+        <button class="small-btn dark" onclick="showMenu()">Retour</button>
+      </div>
+      <div class="deck-manager deck-editor-shell" id="deckEditorShell">
+        <div class="deck-actions">
+          <button class="small-btn dark" onclick="showDecks()">Retour</button>
+          <div class="deck-side-preview" id="deckPreview">
+            <div class="preview-empty">Survole une carte</div>
+          </div>
+        </div>
+
+        <div class="deck-build-panel"
+             ondragover="event.preventDefault();this.classList.add('drop-ready')"
+             ondragleave="this.classList.remove('drop-ready')"
+             ondrop="dropCardToDeck(event)">
+          <div class="deck-build-top">
+            <label for="deckName">Nom du deck</label>
+            <div class="deck-name-row">
+              <input id="deckName" type="text" maxlength="28" placeholder="Nom du deck">
+              <button class="small-btn" onclick="saveDeck()">Sauvegarder</button>
+            </div>
+            <div class="deck-edit-meta" id="deckEditMeta"></div>
+            <div class="deck-rules">Max 20 cartes - 2 identiques - 8 Rares - 3 Légendaires</div>
+          </div>
+          <div class="deck-selected-grid" id="deckSelectedGrid"></div>
+        </div>
+
+        <div class="deck-inventory-panel">
+          <div class="deck-filter-row">
+            <input id="deckSearch" type="search" placeholder="Rechercher par nom" oninput="renderDeckManager()">
+            <select id="deckSort" onchange="renderDeckManager()">
+              <option value="name">Trier : nom</option>
+              <option value="rarity">Trier : rarete</option>
+              <option value="type">Trier : type</option>
+              <option value="owned">Trier : possedees</option>
+            </select>
+          </div>
+          <div class="deck-card-pool" id="deckCardPool"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="deck-modal" id="deckModal">
+    <div class="deck-modal-card">
+      <h2 id="deckModalTitle">Deck</h2>
+      <div id="deckModalBody"></div>
+      <div class="deck-modal-actions" id="deckModalActions"></div>
+    </div>
+  </div>
+</section>
+
+<section id="shop" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-card shop-menu-card">
+      <h1 class="logo small-logo">Boutique</h1>
+      <p class="subtitle" id="shopStatus"></p>
+      <div class="wallet-strip">
+        <span>Crédits</span>
+        <strong id="creditDisplay">0</strong>
+      </div>
+      <div class="booster-grid">
+        <button class="booster-pack classic" onclick="buyBooster('classic')">
+          <span>Pack Classique</span>
+          <b>250 crédits</b>
+          <small>5 cartes - 1 Rare garantie</small>
+        </button>
+        <button class="booster-pack premium" onclick="buyBooster('premium')">
+          <span>Pack Premium</span>
+          <b>500 crédits</b>
+          <small>5 cartes - 3 Rares garanties</small>
+        </button>
+        <button class="booster-pack champion" onclick="buyBooster('champion')">
+          <span>Pack Champion</span>
+          <b>1000 crédits</b>
+          <small>5 cartes - 1 Légende garantie</small>
+        </button>
+      </div>
+      <div class="booster-ticket-grid" id="boosterTicketGrid"></div>
+      <div class="shop-actions">
+        <button class="small-btn" onclick="showCollection()">Voir la collection</button>
+        <button class="small-btn dark" onclick="showMenu()">Retour</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="collection" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-card collection-menu-card">
+      <h1 class="logo small-logo">Collection</h1>
+      <p class="subtitle" id="collectionStatus"></p>
+      <div class="collection-summary" id="collectionSummary"></div>
+      <div class="collection-layout">
+        <aside class="collection-preview" id="collectionPreview">
+          <div class="preview-empty">Sélectionne une carte</div>
+        </aside>
+        <div class="collection-grid" id="collectionGrid"></div>
+      </div>
+      <div class="shop-actions">
+        <button class="small-btn" onclick="showShop()">Boutique</button>
+        <button class="small-btn" onclick="showDecks()">Mes decks</button>
+        <button class="small-btn dark" onclick="showMenu()">Retour</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="multi" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-card multi-menu-card">
+      <h1 class="logo small-logo">Jouer en ligne</h1>
+      <p class="subtitle" id="multiStatus"></p>
+      <div class="multi-actions" id="multiMainActions">
+        <button class="small-btn" type="button" onclick="quickMatch()">Partie rapide</button>
+        <button class="small-btn" type="button" onclick="quickRankedMatch()">Partie class&eacute;e</button>
+        <button class="small-btn" type="button" onclick="showCustomMatchOptions()">Partie personnalis&eacute;e</button>
+      </div>
+      <div class="multi-actions" id="multiCustomActions" hidden>
+        <button class="small-btn" type="button" onclick="quickRankedMatch()">Match rapide classé</button>
+        <button class="small-btn" type="button" onclick="createOnlineRoom()">Créer une partie</button>
+        <button class="small-btn" type="button" onclick="showJoinRoom()">Rejoindre une partie</button>
+        <button class="small-btn dark" type="button" onclick="showOnlineModes()">Retour</button>
+      </div>
+      <div class="multi-room-panel" id="multiRoomPanel">
+        <div class="room-code-label">Code de room</div>
+        <div class="room-code" id="roomCodeDisplay">----</div>
+        <div class="room-state" id="roomStateDisplay">En attente...</div>
+        <button class="small-btn" id="multiDeckReadyButton" type="button" onclick="showOnlineDeckReady()">Choisir mon deck</button>
+      </div>
+      <div class="multi-join-panel" id="multiJoinPanel">
+        <label for="roomCodeInput">Entrer un code</label>
+        <input id="roomCodeInput" type="text" maxlength="10" placeholder="RING-4821">
+        <button class="small-btn" type="button" onclick="joinOnlineRoom()">Rejoindre</button>
+      </div>
+      <div class="multi-log" id="multiLog"></div>
+      <button class="small-btn dark" type="button" onclick="showMenu()">Retour</button>
+    </div>
+  </div>
+</section>
+
+<div class="overlay" id="rpsOverlay">
+  <div class="splash rps-splash">
+    <p class="sub-text" id="rpsInstruction">Choisis ton ouverture !</p>
+
+    <div class="rps-buttons" id="rpsButtons">
+      <button class="rps-btn" onclick="chooseRps('Pierre')">✊<span>Pierre</span></button>
+      <button class="rps-btn" onclick="chooseRps('Feuille')">✋<span>Feuille</span></button>
+      <button class="rps-btn" onclick="chooseRps('Ciseaux')">✌<span>Ciseaux</span></button>
+    </div>
+
+    <div class="rps-result" id="rpsResult"></div>
+  </div>
+</div>
+
+<div class="overlay" id="roundOverlay"><div class="splash"><p class="big-text" id="roundText">ROUND 1</p><p class="sub-text">La cloche sonne.</p></div></div>
+<div class="overlay" id="effectChoiceOverlay">
+  <div class="splash effect-choice-splash">
+    <p class="big-text effect-choice-title" id="effectChoiceTitle">Choix d'effet</p>
+    <p class="sub-text" id="effectChoiceText">Choisis l'effet à appliquer.</p>
+    <div class="effect-choice-buttons" id="effectChoiceButtons"></div>
+  </div>
+</div>
+<div class="overlay" id="wheelOverlay">
+  <div class="splash wheel-splash">
+    <div class="wheel-kicker">Roulette du round</div>
+    <div class="wheel-shell">
+      <div class="wheel-pointer"></div>
+      <div class="wheel">
+        <div class="wheel-mark mark-force">Force</div>
+        <div class="wheel-mark mark-vitesse">Vitesse</div>
+        <div class="wheel-mark mark-technique">Technique</div>
+        <div class="wheel-mark mark-charisme">Charisme</div>
+      </div>
+      <div class="wheel-inner" id="wheelText">FORCE</div>
+    </div>
+    <p class="wheel-sub-text" id="wheelSubText">La stat du duel va tomber.</p>
+    <div class="overlay-actions wheel-reroll-actions" id="wheelRerollActions">
+      <button class="small-btn" id="wheelRerollButton" type="button">Relancer</button>
+      <button class="small-btn dark" id="wheelKeepButton" type="button">Garder</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="pinOverlay">
+  <div class="splash">
+    <p class="pin-count" id="pinCount">1</p>
+    <p class="pin-message" id="pinMessage"></p>
+    <p class="pin-sub" id="pinSub"></p>
+    <div class="match-xp-result" id="matchXpResult"></div>
+    <div class="overlay-actions" id="pinActions">
+      <button class="small-btn" id="careerNextButton" onclick="startNextCareerMatch()">Match suivant</button>
+      <button class="small-btn" id="pinReplayButton" onclick="restartCurrentMatch()">Rejouer</button>
+      <button class="small-btn dark" onclick="hidePin();showMenu()">Retourner au menu</button>
+    </div>
+  </div>
+</div>
+
+<div class="music-toast" id="musicToast" aria-live="polite">
+  <span>Thème de</span>
+  <strong id="musicToastName">Passion Baston</strong>
+</div>
+<div class="system-toast" id="systemToast" aria-live="polite"></div>
+
+<div class="deck-modal" id="sessionModal">
+  <div class="deck-modal-card session-modal-card">
+    <h2 id="sessionModalTitle">Pause</h2>
+    <p class="deck-confirm-text" id="sessionModalBody">Que veux-tu faire ?</p>
+    <div class="deck-modal-actions session-modal-actions" id="sessionModalActions">
+      <button class="small-btn" type="button" onclick="closeSessionModal()">Continuer</button>
+      <button class="small-btn dark" type="button" onclick="closeSessionModal();showHomeOptions()">Options</button>
+      <button class="small-btn dark" type="button" onclick="confirmProfileLogout()">Se deconnecter</button>
+      <button class="small-btn danger" type="button" onclick="confirmQuitGame()">Quitter le jeu</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay booster-overlay" id="boosterOverlay">
+  <div class="booster-splash">
+    <div class="booster-title" id="boosterTitle">PACK CHAMPION</div>
+    <div class="booster-sub" id="boosterSub">Ouverture du booster...</div>
+    <div class="booster-cards" id="boosterCards"></div>
+    <div class="overlay-actions" id="boosterActions">
+      <button class="small-btn" onclick="closeBooster()">Continuer</button>
+      <button class="small-btn dark" onclick="closeBooster();showCollection()">Collection</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay pile-viewer-overlay" id="pileViewerOverlay">
+  <div class="pile-viewer">
+    <div class="pile-viewer-head">
+      <div>
+        <h2 id="pileViewerTitle">Vestiaire</h2>
+        <p id="pileViewerCount">0 carte</p>
+      </div>
+      <button class="small-btn dark" type="button" onclick="closePileViewer()">Retour</button>
+    </div>
+    <div class="pile-viewer-grid" id="pileViewerGrid"></div>
+  </div>
+</div>
+
+<script src="js/audio.js"></script>
+<script src="js/firebaseConfig.js"></script>
+<script src="js/firebaseService.js"></script>
+<script src="js/profileService.js"></script>
+<script src="js/authService.js"></script>
+<script src="js/connectionManager.js"></script>
+<script src="js/saveService.js"></script>
+<script src="js/matchmakingService.js"></script>
+<script src="js/rankingService.js"></script>
+<script src="js/networkAdapter.js"></script>
+<script src="js/roomService.js"></script>
+<script src="js/multiplayerClient.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

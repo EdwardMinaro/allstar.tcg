@@ -1,0 +1,93 @@
+{
+  "generatedAt": "2026-06-19T18:30:53.067Z",
+  "issues": [
+    {
+      "severity": "automation",
+      "key": "legende_catcheurs_cameron_merchant",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Cameron Merchant",
+      "ability": "turnEnemyForceMinus2",
+      "effect": "1 /Tour : -2 Force adversaire",
+      "issue": "L effet 1/tour est automatique au d?but de round, pas d?clench? par bouton.",
+      "recommendation": "Acceptable pour garder le jeu fluide; sinon ajouter une action active."
+    },
+    {
+      "severity": "ui-needed",
+      "key": "legende_catcheurs_ethan_riley",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Ethan RIley",
+      "ability": "sameStatNext",
+      "effect": "Victoire : choisissez la statistique du prochain duel.",
+      "issue": "Le texte demande un choix de statistique; le moteur verrouille actuellement la statistique du duel gagn?.",
+      "recommendation": "Ajouter une petite UI de choix apr?s la victoire, ou modifier le texte de la carte."
+    },
+    {
+      "severity": "partial",
+      "key": "legende_catcheurs_luke_kane",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "LUKE KANE",
+      "ability": "forcePlus",
+      "effect": "Une fois par match : gagne +2 sur un duel de Force ou impose une relance.",
+      "issue": "Le bonus +2 Force est limit? ? une fois, mais l alternative relance n est pas interactive.",
+      "recommendation": "Ajouter un choix +2 Force / relance, ou simplifier le texte."
+    },
+    {
+      "severity": "wording",
+      "key": "legende_managers_don_alias",
+      "type": "Manager",
+      "rarity": "Legende",
+      "name": "DON ALIAS",
+      "ability": "turnRandomPermanent30",
+      "effect": "Chaque tour : 30% de chance de gagner un point de stat aléatoire de manière permanente.",
+      "issue": "Le bonus est permanent tant que le catcheur reste sur le ring; il n ?crit pas dans les stats de base de la carte.",
+      "recommendation": "Acceptable en match; pr?ciser si tu veux que ?a survive au vestiaire."
+    },
+    {
+      "severity": "automation",
+      "key": "rare_catcheurs_cameron_merchant",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Cameron Merchant",
+      "ability": "turnEnemyForceMinus1",
+      "effect": "1 /Tour : -1 Force adversaire",
+      "issue": "L effet 1/tour est automatique au d?but de round, pas d?clench? par bouton.",
+      "recommendation": "Acceptable pour garder le jeu fluide; sinon ajouter une action active."
+    },
+    {
+      "severity": "partial",
+      "key": "rare_catcheurs_luke_kane",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "LUKE KANE",
+      "ability": "forcePlus",
+      "effect": "Une fois par match : gagne +2 sur un duel de Force ou impose une relance.",
+      "issue": "Le bonus +2 Force est limit? ? une fois, mais l alternative relance n est pas interactive.",
+      "recommendation": "Ajouter un choix +2 Force / relance, ou simplifier le texte."
+    },
+    {
+      "severity": "wording",
+      "key": "rare_managers_don_alias",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "DON ALIAS",
+      "ability": "turnRandomPermanent20",
+      "effect": "Chaque tour : 20% de chance de gagner un point de stat aléatoire de manière permanente.",
+      "issue": "Le bonus est permanent tant que le catcheur reste sur le ring; il n ?crit pas dans les stats de base de la carte.",
+      "recommendation": "Acceptable en match; pr?ciser si tu veux que ?a survive au vestiaire."
+    },
+    {
+      "severity": "wording",
+      "key": "standard_managers_don_alias",
+      "type": "Manager",
+      "rarity": "Standard",
+      "name": "DON ALIAS",
+      "ability": "turnRandomPermanent10",
+      "effect": "Chaque tour : 10% de chance de gagner un point de stat aléatoire de manière permanente.",
+      "issue": "Le bonus est permanent tant que le catcheur reste sur le ring; il n ?crit pas dans les stats de base de la carte.",
+      "recommendation": "Acceptable en match; pr?ciser si tu veux que ?a survive au vestiaire."
+    }
+  ]
+}

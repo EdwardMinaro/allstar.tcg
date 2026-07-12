@@ -1,0 +1,13 @@
+# Dependencies and generated desktop builds
+node_modules/
+dist/
+outputs/
+
+# Local tooling and operating-system files
+.DS_Store
+Thumbs.db
+*.log
+
+# Card import scratch space and rejected source files
+tools/import_staging/
+quarantine/
