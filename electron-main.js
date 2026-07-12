@@ -79,7 +79,8 @@ function setupAutoUpdater() {
   }
 
   autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.autoInstallOnAppQuit = false;
+  let installingUpdate = false;
 
   autoUpdater.on("checking-for-update", () => {
     sendDesktopEvent("update-checking");
@@ -99,6 +100,9 @@ function setupAutoUpdater() {
 
   autoUpdater.on("update-downloaded", (info) => {
     sendDesktopEvent("update-downloaded", info);
+    if (installingUpdate) return;
+    installingUpdate = true;
+    setTimeout(() => autoUpdater.quitAndInstall(false, true), 1200);
   });
 
   autoUpdater.on("error", (error) => {

@@ -6372,5 +6372,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
   runAllstarAudit();
   wireSaveScreen();
   wireDisplayOptions();
+  window.AllstarDesktop?.onDesktopEvent?.(({type})=>{
+    if(type==="update-checking")showSystemToast("Recherche d'une mise a jour...");
+    if(type==="update-available")showSystemToast("Mise a jour trouvee : telechargement en cours...",5000);
+    if(type==="update-downloaded")showSystemToast("Mise a jour prete : redemarrage automatique...",5000);
+    if(type==="update-error")showSystemToast("Verification de mise a jour impossible.",4000);
+  });
   document.addEventListener("keydown",handleEscapeKey);
 });
