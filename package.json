@@ -25,6 +25,7 @@
       "output": "dist"
     },
     "electronDist": "node_modules/electron/dist",
+    "artifactName": "${productName}-Setup-${version}.${ext}",
     "files": [
       "index.html",
       "electron-main.js",
