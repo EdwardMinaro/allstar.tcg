@@ -27,6 +27,7 @@ function createMainWindow() {
 
   Menu.setApplicationMenu(null);
   mainWindow.loadFile(path.join(__dirname, "index.html"));
+  mainWindow.webContents.once("did-finish-load", setupAutoUpdater);
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -120,7 +121,6 @@ function setupAutoUpdater() {
 
 app.whenReady().then(() => {
   createMainWindow();
-  setupAutoUpdater();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
