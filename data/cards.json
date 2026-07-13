@@ -619,7 +619,7 @@
         "Charisme": 5
       },
       "effect": "Victoire : prochain duel sur la même statistique.",
-      "ability": "sameStatNext",
+      "ability": "sameStatNextFixed",
       "renderArt": "assets/card_renders/rare_catcheurs_ethan_riley.png",
       "musicId": "ethan_riley"
     },

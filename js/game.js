@@ -627,7 +627,7 @@ const CARD_DATA = [
       "Charisme": 5
     },
     "effect": "Victoire : prochain duel sur la même statistique.",
-    "ability": "sameStatNext",
+    "ability": "sameStatNextFixed",
     "renderArt": "assets/card_renders/rare_catcheurs_ethan_riley.png",
     "musicId": "ethan_riley"
   },
@@ -2008,6 +2008,7 @@ const EFFECT_REGISTRY = {
   round4All1: { timing:"round4", text:"Round 4 : +1 à toutes les stats." },
   round2ActiveStat3: { timing:"duel", text:"À partir du round 2 : +3 dans la stat active." },
   sameStatNext: { timing:"win", text:"Verrouille la statistique du prochain duel.", choice:true },
+  sameStatNextFixed: { timing:"win", text:"Verrouille la statistique du duel gagné pour le prochain duel." },
   secondPlayerTechnique2: { timing:"duel", text:"Si joué en second : +2 Technique." },
   secondPlayerForceCharisma1: { timing:"duel", text:"Si joué en second : +1 Force et +1 Charisme." },
   secondPlayerTechniqueCharisma2: { timing:"duel", text:"Si joué en second : +2 Technique et +2 Charisme." },
@@ -3352,6 +3353,11 @@ function applyWrestlerEntryEffect(owner,c){
     showEffectFeedback(c,c.name,"Effet annulé","block");
     return;
   }
+  if(c.ability==="objectExtra1"){
+    owner.objectDurationBonus=Math.max(owner.objectDurationBonus||0,1);
+    log(`[EFFET] ${c.name} : les objets qui lui sont équipés durent 2 tours.`);
+    showEffectFeedback(c,c.name,"Objets : 2 tours","special");
+  }
   if(c.ability==="drawOnEntry1"||c.ability==="drawOnEntry2"){
     const amount=c.ability==="drawOnEntry2"?2:1;
     const before=owner.hand.length;
@@ -4394,14 +4400,16 @@ function win(winner,loser,reason){
     attemptPin(winner,loser);
   };
 
-  if(winnerAbility==="sameStatNext"&&G.stat){
+  if((winnerAbility==="sameStatNext"||winnerAbility==="sameStatNextFixed")&&G.stat){
     const applyChosenStat=stat=>{
       G.lockedStat=stat||G.stat;
       log(`[EFFET] ${winner.cat.card.name} : prochaine statistique verrouillée sur ${G.lockedStat}.`);
       showEffectFeedback(winner.cat.card,winner.cat.card.name,`${G.lockedStat} verrouillée`,"special");
       finishWin();
     };
-    if(winner.side==="player"){
+    if(winnerAbility==="sameStatNextFixed"){
+      applyChosenStat(G.stat);
+    }else if(winner.side==="player"){
       requestEffectChoice({
         title:winner.cat.card.name,
         text:"Choisis la statistique du prochain duel.",
@@ -4529,7 +4537,7 @@ function previewEffectStrip(c){
   if(owner.obj&&owner.objTurnsRemaining>1)parts.push(`Objet ${owner.objTurnsRemaining} tours`);
   const ability=wrestlerAbility(s);
   if(ability==="pinBonus")parts.push("Tombé +20");
-  if(ability==="sameStatNext"&&G.lockedStat)parts.push(`${G.lockedStat} verrouillée`);
+  if((ability==="sameStatNext"||ability==="sameStatNextFixed")&&G.lockedStat)parts.push(`${G.lockedStat} verrouillée`);
   const openingEffect=openingRoundEffectLabel(s);
   if(openingEffect){
     const timing=isMatchRoundOneAbility(ability)?"Round 1":"Premier round";
