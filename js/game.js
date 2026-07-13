@@ -1750,7 +1750,8 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "ALBERT ROCHE",
     "stats": {},
-    "effect": "Aucun effet.",
+    "effect": "+1 Force.",
+    "ability": "mForce1",
     "renderArt": "assets/card_renders/standard_managers_albert_roche.png"
   },
   {
@@ -1759,7 +1760,8 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "DON ALIAS",
     "stats": {},
-    "effect": "Aucun effet.",
+    "effect": "Chaque tour : 10% de chance de gagner un point de stat aléatoire de manière permanente.",
+    "ability": "turnRandomPermanent10",
     "renderArt": "assets/card_renders/standard_managers_don_alias.png"
   },
   {
@@ -1768,7 +1770,8 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Edward Minaro",
     "stats": {},
-    "effect": "Aucun effet.",
+    "effect": "+1 Charisme.",
+    "ability": "mCharisme1",
     "renderArt": "assets/card_renders/standard_managers_edward_minaro.png"
   },
   {
@@ -1777,7 +1780,8 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Loïc BLOODYKILT",
     "stats": {},
-    "effect": "Aucun effet.",
+    "effect": "Premier tour : +1 dans 1 stat aléatoire.",
+    "ability": "mRandom",
     "renderArt": "assets/card_renders/standard_managers_loic_bloodykilt.png"
   },
   {
@@ -1786,7 +1790,8 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "YANN LE KERSAUDEC",
     "stats": {},
-    "effect": "Aucun effet.",
+    "effect": "Annule tous les objets.",
+    "ability": "cancelAllObjects",
     "renderArt": "assets/card_renders/standard_managers_yann_le_kersaudec.png"
   },
   {
@@ -1865,7 +1870,8 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Barrière",
     "stats": {},
-    "effect": "Aucun effet.",
+    "effect": "- 5 Tombé adverse.",
+    "ability": "pinShield5",
     "renderArt": "assets/card_renders/standard_objets_barriere.png"
   },
   {
@@ -1874,7 +1880,8 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Chaise",
     "stats": {},
-    "effect": "Aucun effet.",
+    "effect": "+1 Force.",
+    "ability": "mForce1",
     "renderArt": "assets/card_renders/standard_objets_chaise.png"
   },
   {
@@ -1883,7 +1890,8 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Echelle",
     "stats": {},
-    "effect": "Aucun effet.",
+    "effect": "+1 en Vitesse.",
+    "ability": "mVitesse1",
     "renderArt": "assets/card_renders/standard_objets_echelle.png"
   },
   {
@@ -1892,7 +1900,8 @@ const CARD_DATA = [
     "rarity": "Standard",
     "name": "Table",
     "stats": {},
-    "effect": "Aucun effet.",
+    "effect": "Victoire : Tombé +5.",
+    "ability": "pinObject5",
     "renderArt": "assets/card_renders/standard_objets_table.png"
   }
 ];
@@ -5060,10 +5069,13 @@ function ownedCount(key){return Number(playerState.collection[key]||0)}
 function ownedCards(){return CARD_DATA.filter(card=>ownedCount(cardKey(card))>0)}
 
 function addCardsToCollection(cards){
+  const newCardKeys=new Set();
   cards.forEach(card=>{
     const key=cardKey(card);
+    if(!ownedCount(key))newCardKeys.add(key);
     playerState.collection[key]=(playerState.collection[key]||0)+1;
   });
+  return newCardKeys;
 }
 
 function rarityPool(rarity){
@@ -5130,9 +5142,9 @@ function buyBooster(id){
   }
   playerState.credits-=booster.price;
   const cards=generateBooster(id);
-  addCardsToCollection(cards);
+  const newCardKeys=addCardsToCollection(cards);
   savePlayerState();
-  openBooster(cards,booster.label);
+  openBooster(cards,booster.label,newCardKeys);
 }
 
 function openTicketBooster(id){
@@ -5146,9 +5158,9 @@ function openTicketBooster(id){
   }
   playerState.boosterTickets[id]=count-1;
   const cards=generateBooster(id);
-  addCardsToCollection(cards);
+  const newCardKeys=addCardsToCollection(cards);
   savePlayerState();
-  openBooster(cards,`${booster.label} gagné`);
+  openBooster(cards,`${booster.label} gagné`,newCardKeys);
 }
 
 function renderBoosterTickets(){
@@ -5217,7 +5229,7 @@ function setCollectionPreview(cardOrId){
     : `<div class="preview-empty">Sélectionne une carte</div>`;
 }
 
-function openBooster(cards,title){
+function openBooster(cards,title,newCardKeys=new Set()){
   const overlay=document.getElementById("boosterOverlay");
   const cardBox=document.getElementById("boosterCards");
   const actions=document.getElementById("boosterActions");
@@ -5233,6 +5245,12 @@ function openBooster(cards,title){
       const slot=document.createElement("div");
       slot.className=`booster-reveal ${String(card.rarity||"").toLowerCase()}`;
       slot.innerHTML=cardHTML(card,"","");
+      if(newCardKeys.has(cardKey(card))){
+        const badge=document.createElement("span");
+        badge.className="booster-new-label";
+        badge.textContent="Nouveau";
+        slot.appendChild(badge);
+      }
       cardBox.appendChild(slot);
       document.getElementById("boosterSub").textContent=`${card.rarity} - ${card.name}`;
       playSound((card.rarity==="Legende"||card.rarity==="Ultime")?"victoire_duel":"carte_jouee");

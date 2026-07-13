@@ -1742,7 +1742,8 @@
       "rarity": "Standard",
       "name": "ALBERT ROCHE",
       "stats": {},
-      "effect": "Aucun effet.",
+      "effect": "+1 Force.",
+      "ability": "mForce1",
       "renderArt": "assets/card_renders/standard_managers_albert_roche.png"
     },
     {
@@ -1751,7 +1752,8 @@
       "rarity": "Standard",
       "name": "DON ALIAS",
       "stats": {},
-      "effect": "Aucun effet.",
+      "effect": "Chaque tour : 10% de chance de gagner un point de stat aléatoire de manière permanente.",
+      "ability": "turnRandomPermanent10",
       "renderArt": "assets/card_renders/standard_managers_don_alias.png"
     },
     {
@@ -1760,7 +1762,8 @@
       "rarity": "Standard",
       "name": "Edward Minaro",
       "stats": {},
-      "effect": "Aucun effet.",
+      "effect": "+1 Charisme.",
+      "ability": "mCharisme1",
       "renderArt": "assets/card_renders/standard_managers_edward_minaro.png"
     },
     {
@@ -1769,7 +1772,8 @@
       "rarity": "Standard",
       "name": "Loïc BLOODYKILT",
       "stats": {},
-      "effect": "Aucun effet.",
+      "effect": "Premier tour : +1 dans 1 stat aléatoire.",
+      "ability": "mRandom",
       "renderArt": "assets/card_renders/standard_managers_loic_bloodykilt.png"
     },
     {
@@ -1778,7 +1782,8 @@
       "rarity": "Standard",
       "name": "YANN LE KERSAUDEC",
       "stats": {},
-      "effect": "Aucun effet.",
+      "effect": "Annule tous les objets.",
+      "ability": "cancelAllObjects",
       "renderArt": "assets/card_renders/standard_managers_yann_le_kersaudec.png"
     },
     {
@@ -1857,7 +1862,8 @@
       "rarity": "Standard",
       "name": "Barrière",
       "stats": {},
-      "effect": "Aucun effet.",
+      "effect": "- 5 Tombé adverse.",
+      "ability": "pinShield5",
       "renderArt": "assets/card_renders/standard_objets_barriere.png"
     },
     {
@@ -1866,7 +1872,8 @@
       "rarity": "Standard",
       "name": "Chaise",
       "stats": {},
-      "effect": "Aucun effet.",
+      "effect": "+1 Force.",
+      "ability": "mForce1",
       "renderArt": "assets/card_renders/standard_objets_chaise.png"
     },
     {
@@ -1875,7 +1882,8 @@
       "rarity": "Standard",
       "name": "Echelle",
       "stats": {},
-      "effect": "Aucun effet.",
+      "effect": "+1 en Vitesse.",
+      "ability": "mVitesse1",
       "renderArt": "assets/card_renders/standard_objets_echelle.png"
     },
     {
@@ -1884,7 +1892,8 @@
       "rarity": "Standard",
       "name": "Table",
       "stats": {},
-      "effect": "Aucun effet.",
+      "effect": "Victoire : Tombé +5.",
+      "ability": "pinObject5",
       "renderArt": "assets/card_renders/standard_objets_table.png"
     }
   ]
