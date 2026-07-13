@@ -5619,3 +5619,73 @@ button:disabled,
     min-height:min(620px,70vh);
   }
 }
+
+/* Final desktop board sizing: preserve room around the ring and every hand card. */
+@media (min-width:901px){
+  #game .game-layout{
+    box-sizing:border-box;
+    grid-template-rows:clamp(92px,10vh,108px) minmax(0,1fr) clamp(142px,16vh,164px) !important;
+  }
+
+  #game .ring-area{
+    overflow:visible !important;
+  }
+
+  #game .ring{
+    width:min(100%,820px) !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    aspect-ratio:760 / 540 !important;
+  }
+
+  #game .zone.man.enemy,
+  #game .zone.cat.enemy,
+  #game .zone.obj.enemy{
+    top:clamp(58px,7.5vh,84px) !important;
+  }
+
+  #game .zone.man.player,
+  #game .zone.cat.player,
+  #game .zone.obj.player{
+    bottom:clamp(58px,7.5vh,84px) !important;
+  }
+
+  #game .hand-area,
+  #game .hand-panel,
+  #game .hand{
+    min-height:0;
+    overflow:visible !important;
+  }
+
+  #game .hand-panel{
+    padding:10px 6px 14px !important;
+  }
+
+  #game .hand{
+    padding:2px 6px 10px !important;
+  }
+
+  #game .hand .game-card,
+  #game .enemy-hand .card-back{
+    box-sizing:border-box;
+    height:clamp(100px,6.6vw,122px) !important;
+  }
+
+  #game .hand .game-card{
+    width:auto !important;
+    aspect-ratio:112 / 148;
+  }
+}
+
+/* Empty slots and placed cards now share the same rounded silhouette. */
+#game .slot-empty,
+#game .game-card.rendered{
+  border-radius:12px !important;
+}
+
+#game .game-card.rendered{
+  box-sizing:border-box;
+  border:2px solid #050508 !important;
+  clip-path:inset(0 round 12px) !important;
+}
