@@ -105,7 +105,7 @@ function setupAutoUpdater() {
     sendDesktopEvent("update-downloaded", info);
     if (installingUpdate) return;
     installingUpdate = true;
-    setTimeout(() => autoUpdater.quitAndInstall(false, true), 1200);
+    setTimeout(() => autoUpdater.quitAndInstall(true, true), 1200);
   });
 
   autoUpdater.on("error", (error) => {

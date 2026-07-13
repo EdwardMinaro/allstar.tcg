@@ -4400,6 +4400,10 @@ button{font-family:inherit;cursor:pointer}
 
 /* Hard placement for the in-game left rail, including short desktop screens. */
 @media (min-width:901px){
+  #game .ring{
+    width:min(100%,800px) !important;
+  }
+
   #game .left-panel{
     --left-bottom:clamp(8px,2vh,28px);
     --pile-gap:clamp(10px,1.8vh,14px);
@@ -5484,6 +5488,11 @@ button:disabled,
   #game .zone.obj.player{
     bottom:clamp(42px,5vh,60px) !important;
   }
+}
+
+#game .game-card.rendered{
+  box-sizing:border-box;
+  border:2px solid #050508 !important;
 }
 
 #menu .home-settings{
