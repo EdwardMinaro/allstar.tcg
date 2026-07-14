@@ -1961,7 +1961,7 @@ const CARD_DATA = [
   },
   {
     "key": "rare_catcheurs_leon", "type": "Catcheur", "rarity": "Rare", "name": "Léon",
-    "stats": { "Force": 8, "Vitesse": 4, "Technique": 6, "Charisme": 6 }, "effect": "À l'arrivée : récupérez un objet depuis votre vestiaire.", "ability": "recoverObjectGrave",
+    "stats": { "Force": 8, "Vitesse": 4, "Technique": 6, "Charisme": 6 }, "effect": "À l'arrivée : récupérez un objet depuis votre vestiaire.", "ability": "recoverObjectGrave", "musicId": "leon",
     "renderArt": "assets/card_renders/rare_catcheurs_leon.png"
   },
   {

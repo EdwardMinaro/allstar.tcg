@@ -30,6 +30,11 @@ const AUDIO_LIBRARY = {
       wrestler: "Lucas Menil",
       src: "assets/audio/music/lucas_menil.mp3"
     },
+    leon: {
+      label: "Léon",
+      wrestler: "Léon",
+      src: "assets/audio/music/leon.mp3"
+    },
     ethan_riley: {
       label: "Ethan Riley",
       wrestler: "Ethan Riley",
