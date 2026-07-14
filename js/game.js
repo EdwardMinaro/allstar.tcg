@@ -3238,7 +3238,9 @@ function startRound(){
   });
 
   applyRoundManagerEffects();
+  reactivateExtendedObjects(false);
   drawStartOfRound();
+  reactivateExtendedObjects(true);
 
   // Le PFC a choisi le starter du round 1.
   // Ensuite, l'initiative alterne à chaque round.
@@ -3843,7 +3845,7 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
   markOnlineDirty();
 }
 
-function revertActiveObject(owner,sendToGrave=true){
+function revertActiveObject(owner,sendToGrave=true,preserveNextDraw=false){
   if(!owner)return;
   const effect=owner.objEffect;
   if(effect){
@@ -3857,11 +3859,13 @@ function revertActiveObject(owner,sendToGrave=true){
     }
     if(effect.pinShield)owner.pinShield=Math.max(0,(owner.pinShield||0)-effect.pinShield);
   }
-  if(owner.obj?.ability==="drawNext1")owner.nextDrawBonus=0;
+  if(owner.obj?.ability==="drawNext1"&&!preserveNextDraw)owner.nextDrawBonus=0;
   if(owner.obj&&sendToGrave)owner.grave.push(owner.obj);
   owner.obj=null;
   owner.objEffect=null;
   owner.objTurnsRemaining=0;
+  owner.objLastActivationRound=null;
+  owner.objExtraDrawQueued=false;
 }
 
 function releaseSupportEffects(owner,opp){
@@ -4171,6 +4175,8 @@ function playCard(p,opp,c,idx,announce=false){
     }
     p.obj=c;
     p.objTurnsRemaining=1+Number(p.objectDurationBonus||0);
+    p.objLastActivationRound=G.round;
+    p.objExtraDrawQueued=false;
     p.played.Objet=true;
     p.hand.splice(idx,1);
     triggerLudovicSupportDiscard(p,opp,c);
@@ -4453,6 +4459,23 @@ function duel(){
   ps>as?win(G.player,G.ai,"score supérieur"):win(G.ai,G.player,"score supérieur");
 }
 
+const REPEATABLE_EXTENDED_OBJECT_ABILITIES=new Set(["drawNext1","recoverGrave","opponentDiscard1"]);
+
+function reactivateExtendedObjects(afterDraw){
+  [G.player,G.ai].forEach(p=>{
+    const object=p.obj;
+    if(!object||!REPEATABLE_EXTENDED_OBJECT_ABILITIES.has(object.ability))return;
+    if(p.objTurnsRemaining<=0||p.objLastActivationRound===G.round)return;
+    const isDrawBonus=object.ability==="drawNext1";
+    if(isDrawBonus!==afterDraw)return;
+    p.objLastActivationRound=G.round;
+    if(isDrawBonus)p.objExtraDrawQueued=true;
+    const opponent=p.side==="player"?G.ai:G.player;
+    applyTrackedObjectEffect(p,opponent,object);
+    log(`[EFFET] ${object.name} se réactive pour son tour supplémentaire.`);
+  });
+}
+
 function consumeRoundObjects(){
   [G.player,G.ai].forEach(p=>{
     if(p.obj){
@@ -4460,7 +4483,7 @@ function consumeRoundObjects(){
       p.objTurnsRemaining-=1;
       if(p.objTurnsRemaining<=0){
         log(`${p.obj.name} quitte le terrain : ses bonus s'arrêtent.`);
-        revertActiveObject(p,true);
+        revertActiveObject(p,true,Boolean(p.objExtraDrawQueued));
       }else{
         log(`${p.obj.name} reste actif (${p.objTurnsRemaining} tour${p.objTurnsRemaining>1?"s":""}).`);
       }
