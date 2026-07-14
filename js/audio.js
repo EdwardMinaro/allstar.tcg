@@ -25,6 +25,11 @@ const AUDIO_LIBRARY = {
       wrestler: "Luke Kane",
       src: "assets/audio/music/luke_kane.mp3"
     },
+    lucas_menil: {
+      label: "Lucas Menil",
+      wrestler: "Lucas Menil",
+      src: "assets/audio/music/lucas_menil.mp3"
+    },
     ethan_riley: {
       label: "Ethan Riley",
       wrestler: "Ethan Riley",
@@ -119,6 +124,11 @@ const AUDIO_LIBRARY = {
       label: "Tom La Ruffa",
       wrestler: "Tom La Ruffa",
       src: "assets/audio/music/tom_la_ruffa.mp3"
+    },
+    the_butcher_zerk: {
+      label: "The Butcher Zerk",
+      wrestler: "The Butcher Zerk",
+      src: "assets/audio/music/the_butcher_zerk.mp3"
     },
     shawn_olsen: {
       label: "Shawn Olsen",

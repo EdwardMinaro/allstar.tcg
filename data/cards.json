@@ -261,10 +261,10 @@
       "rarity": "Legende",
       "name": "S.M.S",
       "stats": {
-        "Force": 2,
-        "Vitesse": 5,
-        "Technique": 8,
-        "Charisme": 9
+        "Force": 3,
+        "Vitesse": 6,
+        "Technique": 9,
+        "Charisme": 10
       },
       "effect": "Une fois par match, apparition : Regagnez deux tag.",
       "renderArt": "assets/card_renders/legende_catcheurs_s_m_s.png",
@@ -294,8 +294,8 @@
       "name": "Shawn Olsen",
       "stats": {
         "Force": 7,
-        "Vitesse": 6,
-        "Technique": 5,
+        "Vitesse": 5,
+        "Technique": 6,
         "Charisme": 10
       },
       "effect": "1x/match : annule sa 1re défaite, puis +1 Force, Vitesse et Technique.",
@@ -1895,6 +1895,157 @@
       "effect": "Victoire : Tombé +5.",
       "ability": "pinObject5",
       "renderArt": "assets/card_renders/standard_objets_table.png"
+    },
+    {
+      "key": "standard_catcheurs_boume",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Boumé",
+      "stats": { "Force": 3, "Vitesse": 5, "Technique": 10, "Charisme": 6 },
+      "effect": "",
+      "renderArt": "assets/card_renders/standard_catcheurs_boume.png"
+    },
+    {
+      "key": "rare_catcheurs_caiman_jr",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Caïman Jr",
+      "stats": { "Force": 8, "Vitesse": 7, "Technique": 6, "Charisme": 3 },
+      "effect": "Chaque tour : -1 Vitesse adverse.",
+      "ability": "turnEnemySpeedMinus1",
+      "renderArt": "assets/card_renders/rare_catcheurs_caiman_jr.png"
+    },
+    {
+      "key": "rare_catcheurs_dan_nocas",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Dan Nocas",
+      "stats": { "Force": 5, "Vitesse": 4, "Technique": 7, "Charisme": 8 },
+      "effect": "À l'arrivée, si The Butcher Zerk est en main : l'adversaire défausse 1 carte.",
+      "ability": "entryIfZerkInHandDiscard1",
+      "renderArt": "assets/card_renders/rare_catcheurs_dan_nocas.png"
+    },
+    {
+      "key": "standard_catcheurs_dario_murro",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Dario Murro",
+      "stats": { "Force": 8, "Vitesse": 6, "Technique": 5, "Charisme": 5 },
+      "effect": "",
+      "renderArt": "assets/card_renders/standard_catcheurs_dario_murro.png"
+    },
+    {
+      "key": "rare_catcheurs_dario_murro",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Dario Murro",
+      "stats": { "Force": 8, "Vitesse": 6, "Technique": 5, "Charisme": 5 },
+      "effect": "À l'arrivée : piochez 1 carte.",
+      "ability": "drawOnEntry1",
+      "renderArt": "assets/card_renders/rare_catcheurs_dario_murro.png"
+    },
+    {
+      "key": "rare_catcheurs_heracles",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Héraclès",
+      "stats": { "Force": 10, "Vitesse": 4, "Technique": 5, "Charisme": 5 },
+      "effect": "À l'arrivée : choisissez un bonus dans le deck et ajoutez-le à votre main.",
+      "ability": "tutorManagerFromDeck",
+      "renderArt": "assets/card_renders/rare_catcheurs_heracles.png"
+    },
+    {
+      "key": "legende_catcheurs_heracles",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Héraclès",
+      "stats": { "Force": 10, "Vitesse": 5, "Technique": 6, "Charisme": 7 },
+      "effect": "À l'arrivée : choisissez un bonus et un objet dans le deck et ajoutez-les à votre main.",
+      "ability": "tutorManagerObjectFromDeck",
+      "renderArt": "assets/card_renders/legende_catcheurs_heracles.png"
+    },
+    {
+      "key": "standard_catcheurs_lucas_menil",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Lucas Menil",
+      "stats": { "Force": 6, "Vitesse": 5, "Technique": 7, "Charisme": 6 },
+      "effect": "",
+      "musicId": "lucas_menil",
+      "renderArt": "assets/card_renders/standard_catcheurs_lucas_menil.png"
+    },
+    {
+      "key": "rare_catcheurs_lucas_menil",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Lucas Menil",
+      "stats": { "Force": 6, "Vitesse": 5, "Technique": 7, "Charisme": 6 },
+      "effect": "Chaque tour : +1 dans une stat aléatoire, cumulable 5 fois.",
+      "ability": "turnCatRandomPermanent1Max5",
+      "musicId": "lucas_menil",
+      "renderArt": "assets/card_renders/rare_catcheurs_lucas_menil.png"
+    },
+    {
+      "key": "legende_catcheurs_lucas_menil",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Lucas Menil",
+      "stats": { "Force": 7, "Vitesse": 6, "Technique": 8, "Charisme": 7 },
+      "effect": "Chaque tour : +2 dans une stat aléatoire, cumulable 3 fois.",
+      "ability": "turnCatRandomPermanent2Max3",
+      "musicId": "lucas_menil",
+      "renderArt": "assets/card_renders/legende_catcheurs_lucas_menil.png"
+    },
+    {
+      "key": "rare_managers_ludovic_vaillant",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "Ludovic Vaillant",
+      "stats": {},
+      "effect": "Tant qu'il est actif, jouer un bonus ou un objet force l'adversaire à défausser 1 carte.",
+      "ability": "opponentDiscardOnSupport",
+      "renderArt": "assets/card_renders/rare_managers_ludovic_vaillant.png"
+    },
+    {
+      "key": "rare_catcheurs_leon",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Léon",
+      "stats": { "Force": 8, "Vitesse": 4, "Technique": 6, "Charisme": 6 },
+      "effect": "À l'arrivée : récupérez un objet depuis votre vestiaire.",
+      "ability": "recoverObjectGrave",
+      "renderArt": "assets/card_renders/rare_catcheurs_leon.png"
+    },
+    {
+      "key": "rare_objets_ringside_apparel",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Ringside Apparel",
+      "stats": {},
+      "effect": "+2 Charisme, -1 Vitesse.",
+      "ability": "mCharisma2SpeedMinus1",
+      "renderArt": "assets/card_renders/rare_objets_ringside_apparel.png"
+    },
+    {
+      "key": "standard_catcheurs_the_butcher_zerk",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "The Butcher Zerk",
+      "stats": { "Force": 10, "Vitesse": 2, "Technique": 7, "Charisme": 5 },
+      "effect": "",
+      "musicId": "the_butcher_zerk",
+      "renderArt": "assets/card_renders/standard_catcheurs_the_butcher_zerk.png"
+    },
+    {
+      "key": "rare_catcheurs_the_butcher_zerk",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "The Butcher Zerk",
+      "stats": { "Force": 10, "Vitesse": 2, "Technique": 7, "Charisme": 5 },
+      "effect": "Chaque tour, si Dan Nocas est en main : +2 Technique et +2 Vitesse.",
+      "ability": "revealDanEachRoundTechSpeed2",
+      "musicId": "the_butcher_zerk",
+      "renderArt": "assets/card_renders/rare_catcheurs_the_butcher_zerk.png"
     }
   ]
 }

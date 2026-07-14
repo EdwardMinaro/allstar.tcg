@@ -269,10 +269,10 @@ const CARD_DATA = [
     "rarity": "Legende",
     "name": "S.M.S",
     "stats": {
-      "Force": 2,
-      "Vitesse": 5,
-      "Technique": 8,
-      "Charisme": 9
+      "Force": 3,
+      "Vitesse": 6,
+      "Technique": 9,
+      "Charisme": 10
     },
     "effect": "Une fois par match, apparition : Regagnez deux tag.",
     "renderArt": "assets/card_renders/legende_catcheurs_s_m_s.png",
@@ -302,8 +302,8 @@ const CARD_DATA = [
     "name": "Shawn Olsen",
     "stats": {
       "Force": 7,
-      "Vitesse": 6,
-      "Technique": 5,
+      "Vitesse": 5,
+      "Technique": 6,
       "Charisme": 10
     },
     "effect": "1x/match : annule sa 1re défaite, puis +1 Force, Vitesse et Technique.",
@@ -1903,6 +1903,81 @@ const CARD_DATA = [
     "effect": "Victoire : Tombé +5.",
     "ability": "pinObject5",
     "renderArt": "assets/card_renders/standard_objets_table.png"
+  },
+  {
+    "key": "standard_catcheurs_boume", "type": "Catcheur", "rarity": "Standard", "name": "Boumé",
+    "stats": { "Force": 3, "Vitesse": 5, "Technique": 10, "Charisme": 6 }, "effect": "",
+    "renderArt": "assets/card_renders/standard_catcheurs_boume.png"
+  },
+  {
+    "key": "rare_catcheurs_caiman_jr", "type": "Catcheur", "rarity": "Rare", "name": "Caïman Jr",
+    "stats": { "Force": 8, "Vitesse": 7, "Technique": 6, "Charisme": 3 }, "effect": "Chaque tour : -1 Vitesse adverse.", "ability": "turnEnemySpeedMinus1",
+    "renderArt": "assets/card_renders/rare_catcheurs_caiman_jr.png"
+  },
+  {
+    "key": "rare_catcheurs_dan_nocas", "type": "Catcheur", "rarity": "Rare", "name": "Dan Nocas",
+    "stats": { "Force": 5, "Vitesse": 4, "Technique": 7, "Charisme": 8 }, "effect": "À l'arrivée, si The Butcher Zerk est en main : l'adversaire défausse 1 carte.", "ability": "entryIfZerkInHandDiscard1",
+    "renderArt": "assets/card_renders/rare_catcheurs_dan_nocas.png"
+  },
+  {
+    "key": "standard_catcheurs_dario_murro", "type": "Catcheur", "rarity": "Standard", "name": "Dario Murro",
+    "stats": { "Force": 8, "Vitesse": 6, "Technique": 5, "Charisme": 5 }, "effect": "",
+    "renderArt": "assets/card_renders/standard_catcheurs_dario_murro.png"
+  },
+  {
+    "key": "rare_catcheurs_dario_murro", "type": "Catcheur", "rarity": "Rare", "name": "Dario Murro",
+    "stats": { "Force": 8, "Vitesse": 6, "Technique": 5, "Charisme": 5 }, "effect": "À l'arrivée : piochez 1 carte.", "ability": "drawOnEntry1",
+    "renderArt": "assets/card_renders/rare_catcheurs_dario_murro.png"
+  },
+  {
+    "key": "rare_catcheurs_heracles", "type": "Catcheur", "rarity": "Rare", "name": "Héraclès",
+    "stats": { "Force": 10, "Vitesse": 4, "Technique": 5, "Charisme": 5 }, "effect": "À l'arrivée : choisissez un bonus dans le deck et ajoutez-le à votre main.", "ability": "tutorManagerFromDeck",
+    "renderArt": "assets/card_renders/rare_catcheurs_heracles.png"
+  },
+  {
+    "key": "legende_catcheurs_heracles", "type": "Catcheur", "rarity": "Legende", "name": "Héraclès",
+    "stats": { "Force": 10, "Vitesse": 5, "Technique": 6, "Charisme": 7 }, "effect": "À l'arrivée : choisissez un bonus et un objet dans le deck et ajoutez-les à votre main.", "ability": "tutorManagerObjectFromDeck",
+    "renderArt": "assets/card_renders/legende_catcheurs_heracles.png"
+  },
+  {
+    "key": "standard_catcheurs_lucas_menil", "type": "Catcheur", "rarity": "Standard", "name": "Lucas Menil",
+    "stats": { "Force": 6, "Vitesse": 5, "Technique": 7, "Charisme": 6 }, "effect": "", "musicId": "lucas_menil",
+    "renderArt": "assets/card_renders/standard_catcheurs_lucas_menil.png"
+  },
+  {
+    "key": "rare_catcheurs_lucas_menil", "type": "Catcheur", "rarity": "Rare", "name": "Lucas Menil",
+    "stats": { "Force": 6, "Vitesse": 5, "Technique": 7, "Charisme": 6 }, "effect": "Chaque tour : +1 dans une stat aléatoire, cumulable 5 fois.", "ability": "turnCatRandomPermanent1Max5", "musicId": "lucas_menil",
+    "renderArt": "assets/card_renders/rare_catcheurs_lucas_menil.png"
+  },
+  {
+    "key": "legende_catcheurs_lucas_menil", "type": "Catcheur", "rarity": "Legende", "name": "Lucas Menil",
+    "stats": { "Force": 7, "Vitesse": 6, "Technique": 8, "Charisme": 7 }, "effect": "Chaque tour : +2 dans une stat aléatoire, cumulable 3 fois.", "ability": "turnCatRandomPermanent2Max3", "musicId": "lucas_menil",
+    "renderArt": "assets/card_renders/legende_catcheurs_lucas_menil.png"
+  },
+  {
+    "key": "rare_managers_ludovic_vaillant", "type": "Manager", "rarity": "Rare", "name": "Ludovic Vaillant", "stats": {},
+    "effect": "Tant qu'il est actif, jouer un bonus ou un objet force l'adversaire à défausser 1 carte.", "ability": "opponentDiscardOnSupport",
+    "renderArt": "assets/card_renders/rare_managers_ludovic_vaillant.png"
+  },
+  {
+    "key": "rare_catcheurs_leon", "type": "Catcheur", "rarity": "Rare", "name": "Léon",
+    "stats": { "Force": 8, "Vitesse": 4, "Technique": 6, "Charisme": 6 }, "effect": "À l'arrivée : récupérez un objet depuis votre vestiaire.", "ability": "recoverObjectGrave",
+    "renderArt": "assets/card_renders/rare_catcheurs_leon.png"
+  },
+  {
+    "key": "rare_objets_ringside_apparel", "type": "Objet", "rarity": "Rare", "name": "Ringside Apparel", "stats": {},
+    "effect": "+2 Charisme, -1 Vitesse.", "ability": "mCharisma2SpeedMinus1",
+    "renderArt": "assets/card_renders/rare_objets_ringside_apparel.png"
+  },
+  {
+    "key": "standard_catcheurs_the_butcher_zerk", "type": "Catcheur", "rarity": "Standard", "name": "The Butcher Zerk",
+    "stats": { "Force": 10, "Vitesse": 2, "Technique": 7, "Charisme": 5 }, "effect": "", "musicId": "the_butcher_zerk",
+    "renderArt": "assets/card_renders/standard_catcheurs_the_butcher_zerk.png"
+  },
+  {
+    "key": "rare_catcheurs_the_butcher_zerk", "type": "Catcheur", "rarity": "Rare", "name": "The Butcher Zerk",
+    "stats": { "Force": 10, "Vitesse": 2, "Technique": 7, "Charisme": 5 }, "effect": "Chaque tour, si Dan Nocas est en main : +2 Technique et +2 Vitesse.", "ability": "revealDanEachRoundTechSpeed2", "musicId": "the_butcher_zerk",
+    "renderArt": "assets/card_renders/rare_catcheurs_the_butcher_zerk.png"
   }
 ];
 
@@ -1966,6 +2041,7 @@ const EFFECT_REGISTRY = {
   drawOnWin1: { timing:"win", text:"Pioche 1 carte après une victoire de duel." },
   drawOnWin2: { timing:"win", text:"Pioche 2 cartes après une victoire de duel." },
   entryIfTrevorInGraveFTV1: { timing:"entry", text:"Si Trevor Mayden est au vestiaire : +1 Force, Technique et Vitesse." },
+  entryIfZerkInHandDiscard1: { timing:"entry", text:"Si The Butcher Zerk est en main : l'adversaire défausse 1 carte." },
   firstLossDeck: { timing:"defeat", text:"Une fois par match, annule la première défaite et retourne dans le deck." },
   firstRoundCharTech: { timing:"round1", text:"+1 Charisme et +1 Technique au round 1." },
   firstRoundCharTech2: { timing:"round1", text:"+2 Charisme et +2 Technique au round 1." },
@@ -1984,6 +2060,7 @@ const EFFECT_REGISTRY = {
   mCharisme: { timing:"manager", text:"+1 Charisme." },
   mCharisme1: { timing:"manager", text:"+1 Charisme." },
   mCharisme3: { timing:"manager", text:"+3 Charisme." },
+  mCharisma2SpeedMinus1: { timing:"object", text:"+2 Charisme et -1 Vitesse." },
   mForce: { timing:"manager", text:"+1 Force." },
   mForce1: { timing:"manager", text:"+1 Force." },
   mForce3: { timing:"manager", text:"+3 Force." },
@@ -1999,6 +2076,7 @@ const EFFECT_REGISTRY = {
   objectExtra2: { timing:"manager", text:"Les objets durent 2 tours supplémentaires." },
   opponentDiscard1: { timing:"object", text:"L'adversaire défausse 1 carte." },
   opponentDiscardChoice1: { timing:"entry", text:"L'adversaire défausse 1 carte de son choix.", choice:true },
+  opponentDiscardOnSupport: { timing:"manager", text:"Chaque bonus ou objet adverse force une défausse." },
   pinBonus: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +20." },
   pinBonus40: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +40." },
   pinDual20Shield10: { timing:"entry", text:"+20 Tombé et -10 au prochain tombé adverse." },
@@ -2009,6 +2087,7 @@ const EFFECT_REGISTRY = {
   pinShield5: { timing:"object", text:"Prochain tombé adverse -5." },
   recoverGrave: { timing:"object", text:"Récupère une carte du vestiaire." },
   recoverGraveDiscard1: { timing:"entry", text:"À l'arrivée : récupère une carte du vestiaire et l'adversaire défausse une carte aléatoire." },
+  recoverObjectGrave: { timing:"entry", text:"À l'arrivée : récupère un objet du vestiaire." },
   revealOpponentHand: { timing:"entry", text:"À l'arrivée : révèle la main adverse." },
   revealCharlieEachRoundForcePin: { timing:"round", text:"Une fois par tour, si Charlie Bergson est en main : +1 Force et +20 Tombé." },
   rerollStat: { timing:"roulette", text:"Relance la statistique du duel une fois." },
@@ -2030,13 +2109,19 @@ const EFFECT_REGISTRY = {
   techniqueRound1: { timing:"round1", text:"Round 1 : +3 Technique." },
   turnCatRandom2: { timing:"round", text:"Chaque tour : +2 dans une stat aléatoire, non cumulatif." },
   turnCatRandom3: { timing:"round", text:"Chaque tour : +3 dans une stat aléatoire, non cumulatif." },
+  turnCatRandomPermanent1Max5: { timing:"round", text:"Chaque tour : +1 dans une stat aléatoire, cumulable 5 fois." },
+  turnCatRandomPermanent2Max3: { timing:"round", text:"Chaque tour : +2 dans une stat aléatoire, cumulable 3 fois." },
   turnEnemyForceMinus1: { timing:"round", text:"Chaque tour : -1 Force adverse." },
   turnEnemyForceMinus2: { timing:"round", text:"Chaque tour : -2 Force adverse." },
+  turnEnemySpeedMinus1: { timing:"round", text:"Chaque tour : -1 Vitesse adverse." },
   turnEnemyPinMinus10: { timing:"round", text:"Chaque tour : prochain tombé adverse -10." },
   turnRandomPermanent10: { timing:"round", text:"Chaque tour : 10% de chance de +1 stat permanent." },
   turnRandomPermanent20: { timing:"round", text:"Chaque tour : 20% de chance de +1 stat permanent." },
   turnRandomPermanent30: { timing:"round", text:"Chaque tour : 30% de chance de +1 stat permanent." },
   entryPinBonus20: { timing:"entry", text:"À l'arrivée : prochain tombé +20." },
+  tutorManagerFromDeck: { timing:"entry", text:"À l'arrivée : choisissez un bonus dans le deck." },
+  tutorManagerObjectFromDeck: { timing:"entry", text:"À l'arrivée : choisissez un bonus et un objet dans le deck." },
+  revealDanEachRoundTechSpeed2: { timing:"round", text:"Chaque tour, si Dan Nocas est en main : +2 Technique et +2 Vitesse." },
   bonusPureTraditionDrawTeam: { timing:"manager", text:"Chaque tour : pioche 1 carte. Doublé avec Romain Lestrange ou Zaeken." },
   winNextEnemyTechniqueMinus2: { timing:"win", text:"Après victoire : prochain catcheur adverse -2 Technique." },
   winNextEnemyTechniqueMinus3: { timing:"win", text:"Après victoire : prochain catcheur adverse -3 Technique." },
@@ -3356,6 +3441,42 @@ function announceOpeningRoundEffect(owner){
   showEffectFeedback(s.card,s.card.name,`${timing} : ${effect}`,"buff",2200);
 }
 
+function tutorDeckCards(owner,source,types){
+  const queue=[...types];
+  const chooseNext=()=>{
+    const type=queue.shift();
+    if(!type)return;
+    const candidates=owner.deck.filter(card=>card.type===type);
+    if(!candidates.length){
+      log(`[EFFET] ${source.name} : aucun ${type==="Manager"?"bonus":"objet"} dans le deck.`);
+      chooseNext();
+      return;
+    }
+    const takeCard=cardId=>{
+      const index=owner.deck.findIndex(card=>card.id===cardId);
+      if(index<0)return;
+      const [card]=owner.deck.splice(index,1);
+      owner.hand.push(card);
+      log(`[EFFET] ${source.name} ajoute ${card.name} à la main.`);
+      showEffectFeedback(source,source.name,`Récupère ${card.name}`,"special");
+      markOnlineDirty();
+      render();
+      chooseNext();
+    };
+    if(owner.side==="player"){
+      requestEffectChoice({
+        title:source.name,
+        text:`Choisis un${type==="Manager"?" bonus":" objet"} dans ton deck.`,
+        choices:candidates.map(card=>({label:card.name,value:card.id})),
+        onChoose:takeCard
+      });
+    }else{
+      takeCard(candidates[Math.floor(Math.random()*candidates.length)].id);
+    }
+  };
+  chooseNext();
+}
+
 function applyWrestlerEntryEffect(owner,c){
   if(owner.wrestlerEffectsBlocked&&c.ability){
     log(`[EFFET] ${c.name} est annulé par le bonus adverse.`);
@@ -3389,6 +3510,32 @@ function applyWrestlerEntryEffect(owner,c){
       log(`[EFFET] ${c.name} : Trevor Mayden absent du vestiaire.`);
     }
   }
+  if(c.ability==="entryIfZerkInHandDiscard1"){
+    const hasZerk=owner.hand.some(card=>card.key==="standard_catcheurs_the_butcher_zerk"||card.key==="rare_catcheurs_the_butcher_zerk");
+    const enemy=owner.side==="player"?G.ai:G.player;
+    if(hasZerk&&enemy.hand.length){
+      const index=Math.floor(Math.random()*enemy.hand.length);
+      const [discarded]=enemy.hand.splice(index,1);
+      enemy.grave.push(discarded);
+      log(`[EFFET] ${c.name} révèle The Butcher Zerk : ${enemy.label} défausse ${discarded.name}.`);
+      showEffectFeedback(c,c.name,"Défausse adverse","malus");
+    }else if(!hasZerk){
+      log(`[EFFET] ${c.name} : The Butcher Zerk n'est pas en main.`);
+    }
+  }
+  if(c.ability==="recoverObjectGrave"){
+    const index=owner.grave.map(card=>card.type).lastIndexOf("Objet");
+    if(index>=0){
+      const [recovered]=owner.grave.splice(index,1);
+      owner.hand.push(recovered);
+      log(`[EFFET] ${c.name} récupère ${recovered.name} depuis le vestiaire.`);
+      showEffectFeedback(c,c.name,`Récupère ${recovered.name}`,"special");
+    }else{
+      log(`[EFFET] ${c.name} : aucun objet à récupérer au vestiaire.`);
+    }
+  }
+  if(c.ability==="tutorManagerFromDeck")tutorDeckCards(owner,c,["Manager"]);
+  if(c.ability==="tutorManagerObjectFromDeck")tutorDeckCards(owner,c,["Manager","Objet"]);
   if(c.ability==="smsRecoverTags2"&&!owner.oncePerMatch?.smsRecoverTags2){
     owner.oncePerMatch=owner.oncePerMatch||{};
     owner.oncePerMatch.smsRecoverTags2=true;
@@ -3489,6 +3636,33 @@ function applyRoundManagerEffects(){
       log(`${owner.cat.card.name} affaiblit ${opp.cat.card.name} : -${value} Force.`);
       showEffectFeedback(opp.cat.card,owner.cat.card.name,`-${value} Force`,"malus");
     }
+    if(catAbility==="turnEnemySpeedMinus1"&&opp.cat){
+      opp.cat.mods.Vitesse-=1;
+      log(`${owner.cat.card.name} affaiblit ${opp.cat.card.name} : -1 Vitesse.`);
+      showEffectFeedback(opp.cat.card,owner.cat.card.name,"-1 Vitesse","malus");
+    }
+    if(catAbility==="turnCatRandomPermanent1Max5"||catAbility==="turnCatRandomPermanent2Max3"){
+      const value=catAbility==="turnCatRandomPermanent2Max3"?2:1;
+      const max=catAbility==="turnCatRandomPermanent2Max3"?3:5;
+      const count=owner.cat.permanentGrowthCount||0;
+      if(count<max){
+        const stat=STATS[Math.floor(Math.random()*STATS.length)];
+        owner.cat.mods[stat]+=value;
+        owner.cat.permanentGrowthCount=count+1;
+        log(`[EFFET] ${owner.cat.card.name} progresse : +${value} ${stat} (${count+1}/${max}).`);
+        showEffectFeedback(owner.cat.card,owner.cat.card.name,`+${value} ${stat} (${count+1}/${max})`,"buff");
+      }
+    }
+    if(catAbility==="revealDanEachRoundTechSpeed2"){
+      const hasDan=owner.hand.some(card=>card.key==="rare_catcheurs_dan_nocas");
+      if(hasDan&&owner.cat.danRevealRound!==G.round){
+        owner.cat.danRevealRound=G.round;
+        owner.cat.mods.Technique+=2;
+        owner.cat.mods.Vitesse+=2;
+        log(`[EFFET] ${owner.cat.card.name} révèle Dan Nocas : +2 Technique et +2 Vitesse.`);
+        showEffectFeedback(owner.cat.card,owner.cat.card.name,"+2 Technique / +2 Vitesse","buff");
+      }
+    }
     if(catAbility==="revealCharlieEachRoundForcePin"){
       const hasCharlie=owner.hand.some(card=>card.name==="Charlie Bergson");
       if(hasCharlie&&owner.cat.trevorRevealRound!==G.round){
@@ -3579,6 +3753,11 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
     case"mCharisme1":addTrackedStat(effect,s,"Charisme",1);feedback="+1 Charisme";break;
     case"mCharisme":addTrackedStat(effect,s,"Charisme",2);feedback="+2 Charisme";break;
     case"mCharisme3":addTrackedStat(effect,s,"Charisme",3);feedback="+3 Charisme";break;
+    case"mCharisma2SpeedMinus1":
+      addTrackedStat(effect,s,"Charisme",2);
+      addTrackedStat(effect,s,"Vitesse",-1);
+      feedback="+2 Charisme / -1 Vitesse";
+      break;
     case"mAll1":addTrackedAllStats(effect,s,1);feedback="+1 partout";break;
     case"mAll2":addTrackedAllStats(effect,s,2);feedback="+2 partout";break;
     case"mAll2IfGrave3":{
@@ -3934,6 +4113,20 @@ function playPlayer(idx){
   render();
 }
 
+function triggerLudovicSupportDiscard(player,opponent,playedCard){
+  if(opponent?.man?.ability!=="opponentDiscardOnSupport")return;
+  if(playedCard.type!=="Manager"&&playedCard.type!=="Objet")return;
+  if(!player.hand.length){
+    log(`[EFFET] ${opponent.man.name} : ${player.label} n'a aucune carte à défausser.`);
+    return;
+  }
+  const index=Math.floor(Math.random()*player.hand.length);
+  const [discarded]=player.hand.splice(index,1);
+  player.grave.push(discarded);
+  log(`[EFFET] ${opponent.man.name} : ${player.label} défausse ${discarded.name} après avoir joué ${playedCard.name}.`);
+  showEffectFeedback(opponent.cat?.card||opponent.man,opponent.man.name,"Défausse adverse","malus");
+}
+
 function playCard(p,opp,c,idx,announce=false){
   if(c.type==="Catcheur"){
     if(G.tagging===p.side&&c.id===p.tagLockedCardId)return announce&&log("Ce catcheur vient de sortir : choisis un autre relais.");
@@ -3964,6 +4157,7 @@ function playCard(p,opp,c,idx,announce=false){
     p.cat.managers++;
     p.hand.splice(idx,1);
     applyEffect(p,opp,c);
+    triggerLudovicSupportDiscard(p,opp,c);
   } else if(c.type==="Objet"){
     if(G.tagging===p.side)return announce&&log("Choisis un catcheur pour terminer le TAG.");
     if(!p.cat)return announce&&log("Il faut un catcheur pour jouer un objet.");
@@ -3979,6 +4173,7 @@ function playCard(p,opp,c,idx,announce=false){
     p.objTurnsRemaining=1+Number(p.objectDurationBonus||0);
     p.played.Objet=true;
     p.hand.splice(idx,1);
+    triggerLudovicSupportDiscard(p,opp,c);
     if(p.objTurnsRemaining>1)log(`${c.name} restera actif ${p.objTurnsRemaining} tours.`);
     if(c.ability==="pinObject20"&&p.side==="player"){
       requestEffectChoice({
