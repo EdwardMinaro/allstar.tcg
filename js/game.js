@@ -4664,6 +4664,7 @@ function updateTagButton(){
 }
 
 function render(){
+  document.getElementById("game")?.classList.toggle("allstar-match",G?.mode==="challenge");
   renderChallengeMatchHud();
   updateTagButton();
   document.getElementById("roundNum").textContent=G.round||1;
