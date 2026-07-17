@@ -1978,6 +1978,66 @@ const CARD_DATA = [
     "key": "rare_catcheurs_the_butcher_zerk", "type": "Catcheur", "rarity": "Rare", "name": "The Butcher Zerk",
     "stats": { "Force": 10, "Vitesse": 2, "Technique": 7, "Charisme": 5 }, "effect": "Chaque tour, si Dan Nocas est en main : +2 Technique et +2 Vitesse.", "ability": "revealDanEachRoundTechSpeed2", "musicId": "the_butcher_zerk",
     "renderArt": "assets/card_renders/rare_catcheurs_the_butcher_zerk.png"
+  },
+  {
+    "key": "rare_catcheurs_matheo_navarro", "type": "Catcheur", "rarity": "Rare", "name": "Matheo Navarro",
+    "stats": { "Force": 4, "Vitesse": 7, "Technique": 5, "Charisme": 8 }, "effect": "S'il est joue au premier round : +3 Vitesse.", "ability": "firstRoundSpeed3", "musicId": "matheo_navarro",
+    "renderArt": "assets/card_renders/rare_catcheurs_matheo_navarro.png"
+  },
+  {
+    "key": "legende_catcheurs_matheo_navarro", "type": "Catcheur", "rarity": "Legende", "name": "Matheo Navarro",
+    "stats": { "Force": 5, "Vitesse": 8, "Technique": 6, "Charisme": 9 }, "effect": "S'il est joue au premier round : +2 Vitesse et +2 Force.", "ability": "firstRoundForceSpeed2", "musicId": "matheo_navarro",
+    "renderArt": "assets/card_renders/legende_catcheurs_matheo_navarro.png"
+  },
+  {
+    "key": "rare_catcheurs_osvaldo", "type": "Catcheur", "rarity": "Rare", "name": "Osvaldo",
+    "stats": { "Force": 5, "Vitesse": 7, "Technique": 7, "Charisme": 5 }, "effect": "Premier round : +1 Vitesse et +1 Force.", "ability": "firstRoundForceSpeed1", "musicId": "osvaldo",
+    "renderArt": "assets/card_renders/rare_catcheurs_osvaldo.png"
+  },
+  {
+    "key": "standard_catcheurs_osvaldo", "type": "Catcheur", "rarity": "Standard", "name": "Osvaldo",
+    "stats": { "Force": 5, "Vitesse": 7, "Technique": 7, "Charisme": 5 }, "effect": "", "musicId": "osvaldo",
+    "renderArt": "assets/card_renders/standard_catcheurs_osvaldo.png"
+  },
+  {
+    "key": "ultime_catcheurs_princesse_lauriana", "type": "Catcheur", "rarity": "Ultime", "name": "Princesse Lauriana",
+    "stats": { "Force": 9, "Vitesse": 4, "Technique": 7, "Charisme": 8 }, "effect": "Apparition : piochez jusqu'a avoir 6 cartes en main. Gagnez un point aleatoire par carte bonus tiree par cet effet.", "ability": "drawToSixBonusStats", "musicId": "princesse_lauriana",
+    "renderArt": "assets/card_renders/ultime_catcheurs_princesse_lauriana.png"
+  },
+  {
+    "key": "rare_catcheurs_tom_evans", "type": "Catcheur", "rarity": "Rare", "name": "Tom Evans",
+    "stats": { "Force": 7, "Vitesse": 8, "Technique": 5, "Charisme": 4 }, "effect": "Apparition : recuperez un Jaydon Ross ou un Fenrir Strom depuis votre deck ou vestiaire.", "ability": "recoverJaydonOrFenrir", "musicId": "tom_evans",
+    "renderArt": "assets/card_renders/rare_catcheurs_tom_evans.png"
+  },
+  {
+    "key": "standard_catcheurs_tom_evans", "type": "Catcheur", "rarity": "Standard", "name": "Tom Evans",
+    "stats": { "Force": 7, "Vitesse": 8, "Technique": 5, "Charisme": 4 }, "effect": "", "musicId": "tom_evans",
+    "renderArt": "assets/card_renders/standard_catcheurs_tom_evans.png"
+  },
+  {
+    "key": "rare_catcheurs_ace_angel", "type": "Catcheur", "rarity": "Rare", "name": "Ace Angel",
+    "stats": { "Force": 6, "Vitesse": 8, "Technique": 6, "Charisme": 4 }, "effect": "Apparition : revelez un objet dans votre main, gagnez +2 Charisme et +1 Vitesse.", "ability": "revealObjectHandCharSpeed", "musicId": "ace_angel",
+    "renderArt": "assets/card_renders/rare_catcheurs_ace_angel.png"
+  },
+  {
+    "key": "standard_catcheurs_el_amnesico", "type": "Catcheur", "rarity": "Standard", "name": "El Amnesico",
+    "stats": { "Force": 4, "Vitesse": 8, "Technique": 6, "Charisme": 6 }, "effect": "", "musicId": "el_amnesico",
+    "renderArt": "assets/card_renders/standard_catcheurs_el_amnesico.png"
+  },
+  {
+    "key": "rare_catcheurs_el_amnesico", "type": "Catcheur", "rarity": "Rare", "name": "El Amnesico",
+    "stats": { "Force": 4, "Vitesse": 8, "Technique": 6, "Charisme": 6 }, "effect": "Tant que cette carte est sur le terrain, 20% de chance que la roulette se relance automatiquement.", "ability": "wheelAutoReroll20", "musicId": "el_amnesico",
+    "renderArt": "assets/card_renders/rare_catcheurs_el_amnesico.png"
+  },
+  {
+    "key": "ultime_catcheurs_heddi_karaoui", "type": "Catcheur", "rarity": "Ultime", "name": "Heddi Karaoui",
+    "stats": { "Force": 7, "Vitesse": 4, "Technique": 10, "Charisme": 7 }, "effect": "Tant que cette carte est sur le terrain, 75% de chance en plus que la roulette s'arrete sur Technique.", "ability": "techniqueWheel75", "musicId": "heddi_karaoui",
+    "renderArt": "assets/card_renders/ultime_catcheurs_heddi_karaoui.png"
+  },
+  {
+    "key": "rare_catcheurs_jose_moreno", "type": "Catcheur", "rarity": "Rare", "name": "Jose Moreno",
+    "stats": { "Force": 4, "Vitesse": 9, "Technique": 4, "Charisme": 7 }, "effect": "Premier tour : votre adversaire envoie la carte au-dessus de son deck au vestiaire.", "ability": "firstRoundOpponentMill1", "musicId": "jose_moreno",
+    "renderArt": "assets/card_renders/rare_catcheurs_jose_moreno.png"
   }
 ];
 
@@ -2047,12 +2107,16 @@ const EFFECT_REGISTRY = {
   firstRoundCharTech2: { timing:"round1", text:"+2 Charisme et +2 Technique au round 1." },
   firstRoundForceCharTech: { timing:"round1", text:"+1 Force, Technique et Charisme au round 1." },
   firstRoundForceTechnique: { timing:"round1", text:"+1 Force et +1 Technique au premier round." },
+  firstRoundForceSpeed1: { timing:"firstRound", text:"+1 Force et +1 Vitesse au premier round de la carte." },
+  firstRoundForceSpeed2: { timing:"firstRound", text:"+2 Force et +2 Vitesse au premier round de la carte." },
+  firstRoundOpponentMill1: { timing:"entry", text:"Envoie la carte au-dessus du deck adverse au vestiaire." },
   firstRoundSpeed2: { timing:"firstRound", text:"+2 Vitesse au premier round de la carte." },
   firstRoundSpeed3: { timing:"firstRound", text:"+3 Vitesse au premier round de la carte." },
   firstRoundSpeedCharisma3: { timing:"round1", text:"+3 Vitesse et +3 Charisme au round 1." },
   firstRoundSpeedTechnique1: { timing:"round1", text:"+1 Vitesse et +1 Technique au round 1." },
   firstRoundSpeedTechnique2: { timing:"round1", text:"+2 Vitesse et +2 Technique au round 1." },
   firstWinAll1: { timing:"win", text:"Première victoire : +1 à toutes les stats." },
+  drawToSixBonusStats: { timing:"entry", text:"Pioche jusqu'à six cartes et gagne +1 stat aléatoire par bonus ainsi pioché." },
   lossEnemyTechniqueMinus2: { timing:"loss", text:"Après une défaite, -2 Technique au vainqueur." },
   mAll1: { timing:"manager", text:"+1 à toutes les stats." },
   mAll2IfGrave3: { timing:"manager", text:"Si 3 catcheurs ou plus au vestiaire : +2 partout." },
@@ -2088,6 +2152,8 @@ const EFFECT_REGISTRY = {
   recoverGrave: { timing:"object", text:"Récupère une carte du vestiaire." },
   recoverGraveDiscard1: { timing:"entry", text:"À l'arrivée : récupère une carte du vestiaire et l'adversaire défausse une carte aléatoire." },
   recoverObjectGrave: { timing:"entry", text:"À l'arrivée : récupère un objet du vestiaire." },
+  recoverJaydonOrFenrir: { timing:"entry", choice:true, text:"Récupère Jaydon Ross ou Fenrir Strom depuis le deck ou le vestiaire." },
+  revealObjectHandCharSpeed: { timing:"entry", text:"Révélez un objet en main : +2 Charisme et +1 Vitesse." },
   revealOpponentHand: { timing:"entry", text:"À l'arrivée : révèle la main adverse." },
   revealCharlieEachRoundForcePin: { timing:"round", text:"Une fois par tour, si Charlie Bergson est en main : +1 Force et +20 Tombé." },
   rerollStat: { timing:"roulette", text:"Relance la statistique du duel une fois." },
@@ -2103,6 +2169,8 @@ const EFFECT_REGISTRY = {
   smsRecoverTags2: { timing:"entry", text:"Une fois par match : regagne jusqu'à 2 TAG." },
   speedWheel25: { timing:"roulette", text:"Premier round : 25% de chance de forcer Vitesse." },
   speedWheel50: { timing:"roulette", text:"Premier round : 50% de chance de forcer Vitesse." },
+  techniqueWheel75: { timing:"roulette", text:"75% de chance de forcer Technique." },
+  wheelAutoReroll20: { timing:"roulette", text:"20% de chance de relancer automatiquement la roulette." },
   starterTechniqueCharisma1: { timing:"entry", text:"Si joué en premier ce tour : +1 Technique et +1 Charisme." },
   starterSpeed2: { timing:"duel", text:"Si joué en premier ce tour : +2 Vitesse." },
   starterSpeedTechnique2: { timing:"duel", text:"Si joué en premier ce tour : +2 Vitesse et +2 Technique." },
@@ -3413,6 +3481,8 @@ function openingRoundEffectLabel(s){
     firstRoundSpeedTechnique1:"+1 Vitesse / +1 Technique",
     firstRoundSpeedTechnique2:"+2 Vitesse / +2 Technique",
     firstRoundForceTechnique:"+1 Force / +1 Technique",
+    firstRoundForceSpeed1:"+1 Force / +1 Vitesse",
+    firstRoundForceSpeed2:"+2 Force / +2 Vitesse",
     firstRoundForceTechnique2:"+2 Force / +2 Technique",
     firstRoundCharTech:"+1 Charisme / +1 Technique",
     firstRoundCharTech2:"+2 Charisme / +2 Technique",
@@ -3420,7 +3490,9 @@ function openingRoundEffectLabel(s){
     firstRoundSpeedCharisma3:"+3 Vitesse / +3 Charisme",
     techniqueRound1:"+3 Technique",
     speedWheel25:"Roulette Vitesse 25%",
-    speedWheel50:"Roulette Vitesse 50%"
+    speedWheel50:"Roulette Vitesse 50%",
+    techniqueWheel75:"Roulette Technique 75%",
+    wheelAutoReroll20:"Relance roulette 20%"
   };
   return labels[wrestlerAbility(s)]||"";
 }
@@ -3479,6 +3551,38 @@ function tutorDeckCards(owner,source,types){
   chooseNext();
 }
 
+function recoverNamedWrestler(owner,source,names){
+  const candidates=[...owner.deck.map(card=>({card,zone:"deck"})),...owner.grave.map(card=>({card,zone:"grave"}))]
+    .filter(entry=>names.includes(entry.card.name));
+  if(!candidates.length){
+    log(`[EFFET] ${source.name} : aucun ${names.join(" ou ")} dans le deck ou le vestiaire.`);
+    return;
+  }
+  const recover=value=>{
+    const [zone,id]=value.split(":");
+    const collection=zone==="deck"?owner.deck:owner.grave;
+    const index=collection.findIndex(card=>card.id===id);
+    if(index<0)return;
+    const [card]=collection.splice(index,1);
+    owner.hand.push(card);
+    log(`[EFFET] ${source.name} récupère ${card.name} depuis ${zone==="deck"?"le deck":"le vestiaire"}.`);
+    showEffectFeedback(source,source.name,`Récupère ${card.name}`,"special");
+    markOnlineDirty();
+    render();
+  };
+  if(owner.side!=="player"){
+    const pick=candidates[Math.floor(Math.random()*candidates.length)];
+    recover(`${pick.zone}:${pick.card.id}`);
+    return;
+  }
+  requestEffectChoice({
+    title:source.name,
+    text:"Choisis le catcheur à récupérer.",
+    choices:candidates.map(({card,zone})=>({label:`${card.name} (${zone==="deck"?"deck":"vestiaire"})`,value:`${zone}:${card.id}`})),
+    onChoose:recover
+  });
+}
+
 function applyWrestlerEntryEffect(owner,c){
   if(owner.wrestlerEffectsBlocked&&c.ability){
     log(`[EFFET] ${c.name} est annulé par le bonus adverse.`);
@@ -3489,6 +3593,41 @@ function applyWrestlerEntryEffect(owner,c){
     owner.objectDurationBonus=Math.max(owner.objectDurationBonus||0,1);
     log(`[EFFET] ${c.name} : les objets qui lui sont équipés durent 2 tours.`);
     showEffectFeedback(c,c.name,"Objets : 2 tours","special");
+  }
+  if(c.ability==="drawToSixBonusStats"){
+    const before=owner.hand.length;
+    while(owner.hand.length<6){
+      const count=owner.hand.length;
+      draw(owner,1);
+      if(owner.hand.length===count)break;
+    }
+    const drawn=owner.hand.slice(before);
+    const bonuses=drawn.filter(card=>card.type==="Manager");
+    bonuses.forEach(()=>{
+      const stat=STATS[Math.floor(Math.random()*STATS.length)];
+      owner.cat.mods[stat]+=1;
+    });
+    log(`[EFFET] ${c.name} pioche ${drawn.length} carte${drawn.length>1?"s":""} jusqu'à 6 en main${bonuses.length?` : +${bonuses.length} point${bonuses.length>1?"s":""} aléatoire${bonuses.length>1?"s":""}`:""}.`);
+    showEffectFeedback(c,c.name,`Pioche +${drawn.length}${bonuses.length?` / +${bonuses.length} stat${bonuses.length>1?"s":""}`:""}`,"special");
+  }
+  if(c.ability==="recoverJaydonOrFenrir")recoverNamedWrestler(owner,c,["Jaydon Ross","Fenrir Strom"]);
+  if(c.ability==="revealObjectHandCharSpeed"){
+    const object=owner.hand.find(card=>card.type==="Objet");
+    if(object){
+      owner.cat.mods.Charisme+=2;
+      owner.cat.mods.Vitesse+=1;
+      log(`[EFFET] ${c.name} révèle ${object.name} : +2 Charisme et +1 Vitesse.`);
+      showEffectFeedback(c,c.name,"+2 Charisme / +1 Vitesse","buff");
+    }else log(`[EFFET] ${c.name} : aucun objet à révéler en main.`);
+  }
+  if(c.ability==="firstRoundOpponentMill1"){
+    const enemy=owner.side==="player"?G.ai:G.player;
+    const milled=enemy.deck.pop();
+    if(milled){
+      enemy.grave.push(milled);
+      log(`[EFFET] ${c.name} envoie ${milled.name}, au-dessus du deck de ${enemy.label}, au vestiaire.`);
+      showEffectFeedback(c,c.name,"Carte adverse au vestiaire","malus");
+    }else log(`[EFFET] ${c.name} : deck adverse vide.`);
   }
   if(c.ability==="drawOnEntry1"||c.ability==="drawOnEntry2"){
     const amount=c.ability==="drawOnEntry2"?2:1;
@@ -4378,6 +4517,8 @@ function score(s,stat){
   if(ability==="firstRoundSpeedTechnique2"&&firstRound&&(stat==="Vitesse"||stat==="Technique"))v+=2;
   if(ability==="firstRoundForceTechnique"&&firstRound&&(stat==="Force"||stat==="Technique"))v+=1;
   if(ability==="firstRoundForceTechnique2"&&firstRound&&(stat==="Force"||stat==="Technique"))v+=2;
+  if(ability==="firstRoundForceSpeed1"&&firstRound&&(stat==="Force"||stat==="Vitesse"))v+=1;
+  if(ability==="firstRoundForceSpeed2"&&firstRound&&(stat==="Force"||stat==="Vitesse"))v+=2;
   if(ability==="firstRoundCharTech"&&firstRound&&(stat==="Charisme"||stat==="Technique"))v+=1;
   if(ability==="firstRoundCharTech2"&&firstRound&&(stat==="Charisme"||stat==="Technique"))v+=2;
   if(ability==="firstRoundForceCharTech"&&firstRound&&(stat==="Force"||stat==="Charisme"||stat==="Technique"))v+=1;
@@ -4407,6 +4548,8 @@ function statAbilityFeedback(s,stat){
   if(ability==="firstRoundSpeedTechnique2"&&firstRound&&(stat==="Vitesse"||stat==="Technique"))return `+2 ${stat}`;
   if(ability==="firstRoundForceTechnique"&&firstRound&&(stat==="Force"||stat==="Technique"))return `+1 ${stat}`;
   if(ability==="firstRoundForceTechnique2"&&firstRound&&(stat==="Force"||stat==="Technique"))return `+2 ${stat}`;
+  if(ability==="firstRoundForceSpeed1"&&firstRound&&(stat==="Force"||stat==="Vitesse"))return `+1 ${stat}`;
+  if(ability==="firstRoundForceSpeed2"&&firstRound&&(stat==="Force"||stat==="Vitesse"))return `+2 ${stat}`;
   if(ability==="firstRoundCharTech"&&firstRound&&(stat==="Charisme"||stat==="Technique"))return `+1 ${stat}`;
   if(ability==="firstRoundCharTech2"&&firstRound&&(stat==="Charisme"||stat==="Technique"))return `+2 ${stat}`;
   if(ability==="firstRoundForceCharTech"&&firstRound&&(stat==="Force"||stat==="Charisme"||stat==="Technique"))return `+1 ${stat}`;
@@ -4850,6 +4993,12 @@ function showRound(){
 }
 
 function rollRoundStat(){
+  const techniqueSource=[G.player,G.ai].map(p=>p.cat).find(s=>s&&wrestlerAbility(s)==="techniqueWheel75");
+  if(techniqueSource&&Math.random()<.75){
+    log(`[EFFET] ${techniqueSource.card.name} influence la roulette : Technique.`);
+    showEffectFeedback(techniqueSource.card,techniqueSource.card.name,"Roulette : Technique","special",2200);
+    return "Technique";
+  }
   const speedWeights={speedWheel25:.25,speedWheel50:.5};
   const active=[G.player,G.ai]
     .map(p=>p.cat)
@@ -4895,7 +5044,15 @@ function showWheel(cb){
   const rerollActions=document.getElementById("wheelRerollActions");
   const rerollButton=document.getElementById("wheelRerollButton");
   const keepButton=document.getElementById("wheelKeepButton");
-  const finalStat=chooseRoundStat();
+  const statWasLocked=Boolean(G.lockedStat);
+  let finalStat=chooseRoundStat();
+  const autoReroller=!statWasLocked?[G.player,G.ai].map(p=>p.cat).find(s=>s&&wrestlerAbility(s)==="wheelAutoReroll20"):null;
+  if(autoReroller&&Math.random()<.2){
+    const previous=finalStat;
+    finalStat=rollRoundStat();
+    log(`[EFFET] ${autoReroller.card.name} relance automatiquement la roulette (${previous} -> ${finalStat}).`);
+    showEffectFeedback(autoReroller.card,autoReroller.card.name,`Roulette : ${previous} -> ${finalStat}`,"special",2200);
+  }
   const statAngles={Force:0,Vitesse:270,Technique:180,Charisme:90};
   G.stat=finalStat;
   markOnlineDirty();

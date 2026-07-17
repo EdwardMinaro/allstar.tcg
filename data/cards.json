@@ -2047,6 +2047,66 @@
       "ability": "revealDanEachRoundTechSpeed2",
       "musicId": "the_butcher_zerk",
       "renderArt": "assets/card_renders/rare_catcheurs_the_butcher_zerk.png"
+    },
+    {
+      "key": "rare_catcheurs_matheo_navarro", "type": "Catcheur", "rarity": "Rare", "name": "Matheo Navarro",
+      "stats": { "Force": 4, "Vitesse": 7, "Technique": 5, "Charisme": 8 }, "effect": "S'il est joue au premier round : +3 Vitesse.", "ability": "firstRoundSpeed3", "musicId": "matheo_navarro",
+      "renderArt": "assets/card_renders/rare_catcheurs_matheo_navarro.png"
+    },
+    {
+      "key": "legende_catcheurs_matheo_navarro", "type": "Catcheur", "rarity": "Legende", "name": "Matheo Navarro",
+      "stats": { "Force": 5, "Vitesse": 8, "Technique": 6, "Charisme": 9 }, "effect": "S'il est joue au premier round : +2 Vitesse et +2 Force.", "ability": "firstRoundForceSpeed2", "musicId": "matheo_navarro",
+      "renderArt": "assets/card_renders/legende_catcheurs_matheo_navarro.png"
+    },
+    {
+      "key": "rare_catcheurs_osvaldo", "type": "Catcheur", "rarity": "Rare", "name": "Osvaldo",
+      "stats": { "Force": 5, "Vitesse": 7, "Technique": 7, "Charisme": 5 }, "effect": "Premier round : +1 Vitesse et +1 Force.", "ability": "firstRoundForceSpeed1", "musicId": "osvaldo",
+      "renderArt": "assets/card_renders/rare_catcheurs_osvaldo.png"
+    },
+    {
+      "key": "standard_catcheurs_osvaldo", "type": "Catcheur", "rarity": "Standard", "name": "Osvaldo",
+      "stats": { "Force": 5, "Vitesse": 7, "Technique": 7, "Charisme": 5 }, "effect": "", "musicId": "osvaldo",
+      "renderArt": "assets/card_renders/standard_catcheurs_osvaldo.png"
+    },
+    {
+      "key": "ultime_catcheurs_princesse_lauriana", "type": "Catcheur", "rarity": "Ultime", "name": "Princesse Lauriana",
+      "stats": { "Force": 9, "Vitesse": 4, "Technique": 7, "Charisme": 8 }, "effect": "Apparition : piochez jusqu'a avoir 6 cartes en main. Gagnez un point aleatoire par carte bonus tiree par cet effet.", "ability": "drawToSixBonusStats", "musicId": "princesse_lauriana",
+      "renderArt": "assets/card_renders/ultime_catcheurs_princesse_lauriana.png"
+    },
+    {
+      "key": "rare_catcheurs_tom_evans", "type": "Catcheur", "rarity": "Rare", "name": "Tom Evans",
+      "stats": { "Force": 7, "Vitesse": 8, "Technique": 5, "Charisme": 4 }, "effect": "Apparition : recuperez un Jaydon Ross ou un Fenrir Strom depuis votre deck ou vestiaire.", "ability": "recoverJaydonOrFenrir", "musicId": "tom_evans",
+      "renderArt": "assets/card_renders/rare_catcheurs_tom_evans.png"
+    },
+    {
+      "key": "standard_catcheurs_tom_evans", "type": "Catcheur", "rarity": "Standard", "name": "Tom Evans",
+      "stats": { "Force": 7, "Vitesse": 8, "Technique": 5, "Charisme": 4 }, "effect": "", "musicId": "tom_evans",
+      "renderArt": "assets/card_renders/standard_catcheurs_tom_evans.png"
+    },
+    {
+      "key": "rare_catcheurs_ace_angel", "type": "Catcheur", "rarity": "Rare", "name": "Ace Angel",
+      "stats": { "Force": 6, "Vitesse": 8, "Technique": 6, "Charisme": 4 }, "effect": "Apparition : revelez un objet dans votre main, gagnez +2 Charisme et +1 Vitesse.", "ability": "revealObjectHandCharSpeed", "musicId": "ace_angel",
+      "renderArt": "assets/card_renders/rare_catcheurs_ace_angel.png"
+    },
+    {
+      "key": "standard_catcheurs_el_amnesico", "type": "Catcheur", "rarity": "Standard", "name": "El Amnesico",
+      "stats": { "Force": 4, "Vitesse": 8, "Technique": 6, "Charisme": 6 }, "effect": "", "musicId": "el_amnesico",
+      "renderArt": "assets/card_renders/standard_catcheurs_el_amnesico.png"
+    },
+    {
+      "key": "rare_catcheurs_el_amnesico", "type": "Catcheur", "rarity": "Rare", "name": "El Amnesico",
+      "stats": { "Force": 4, "Vitesse": 8, "Technique": 6, "Charisme": 6 }, "effect": "Tant que cette carte est sur le terrain, 20% de chance que la roulette se relance automatiquement.", "ability": "wheelAutoReroll20", "musicId": "el_amnesico",
+      "renderArt": "assets/card_renders/rare_catcheurs_el_amnesico.png"
+    },
+    {
+      "key": "ultime_catcheurs_heddi_karaoui", "type": "Catcheur", "rarity": "Ultime", "name": "Heddi Karaoui",
+      "stats": { "Force": 7, "Vitesse": 4, "Technique": 10, "Charisme": 7 }, "effect": "Tant que cette carte est sur le terrain, 75% de chance en plus que la roulette s'arrete sur Technique.", "ability": "techniqueWheel75", "musicId": "heddi_karaoui",
+      "renderArt": "assets/card_renders/ultime_catcheurs_heddi_karaoui.png"
+    },
+    {
+      "key": "rare_catcheurs_jose_moreno", "type": "Catcheur", "rarity": "Rare", "name": "Jose Moreno",
+      "stats": { "Force": 4, "Vitesse": 9, "Technique": 4, "Charisme": 7 }, "effect": "Premier tour : votre adversaire envoie la carte au-dessus de son deck au vestiaire.", "ability": "firstRoundOpponentMill1", "musicId": "jose_moreno",
+      "renderArt": "assets/card_renders/rare_catcheurs_jose_moreno.png"
     }
   ]
 }

@@ -5,6 +5,26 @@ const AUDIO_LIBRARY = {
     tension: { label: "Tension", src: "assets/audio/music/tension.mp3" },
     victoire: { label: "Victoire", src: "assets/audio/music/victoire.mp3" },
     defaite: { label: "Defaite", src: "assets/audio/music/defaite.mp3" },
+    matheo_navarro: {
+      label: "Matheo Navarro",
+      wrestler: "Matheo Navarro",
+      src: "assets/audio/music/matheo_navarro.mp3"
+    },
+    osvaldo: {
+      label: "Osvaldo",
+      wrestler: "Osvaldo",
+      src: "assets/audio/music/osvaldo.mp3"
+    },
+    princesse_lauriana: {
+      label: "Princesse Lauriana",
+      wrestler: "Princesse Lauriana",
+      src: "assets/audio/music/princesse_lauriana.mp3"
+    },
+    jose_moreno: {
+      label: "Jose Moreno",
+      wrestler: "Jose Moreno",
+      src: "assets/audio/music/jose_moreno.mp3"
+    },
     passion_baston: {
       label: "Passion Baston",
       wrestler: "Passion Baston",
