@@ -26,10 +26,13 @@ jobs:
         run: npm ci
 
       - name: Create the version tag
+        id: version
         shell: pwsh
         run: |
           $version = node -p "require('./package.json').version"
           $tag = "v$version"
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "tag=$tag" >> $env:GITHUB_OUTPUT
           $existingTag = git ls-remote --tags origin "refs/tags/$tag"
           if (-not $existingTag) {
             git config user.name "github-actions[bot]"
@@ -38,5 +41,14 @@ jobs:
             git push origin $tag
           }
 
-      - name: Build and publish the Windows release
-        run: npm run publish
+      - name: Build the Windows release
+        run: npm run dist
+
+      - name: Attach the release files
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          files: |
+            dist/ALLSTAR-Setup-${{ steps.version.outputs.version }}.exe
+            dist/ALLSTAR-Setup-${{ steps.version.outputs.version }}.exe.blockmap
+            dist/latest.yml
