@@ -6596,19 +6596,52 @@ function setDeckPreview(cardOrKey){
   preview.innerHTML=card ? `<div class="deck-preview-card">${cardHTML(card,"","")}</div>` : `<div class="preview-empty">Survole une carte</div>`;
 }
 
+const deckInventoryFilters={type:"",rarity:"",stat:""};
+
+function normalizeDeckFilterText(value){
+  return String(value||"")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLocaleLowerCase("fr-FR");
+}
+
+function updateDeckFilterControls(){
+  document.querySelectorAll("[data-deck-filter]").forEach(button=>{
+    const filter=button.dataset.deckFilter;
+    button.classList.toggle("active",deckInventoryFilters[filter]===button.dataset.filterValue);
+  });
+}
+
+function setDeckInventoryFilter(filter,value){
+  if(!(filter in deckInventoryFilters))return;
+  deckInventoryFilters[filter]=value;
+  const deck=selectedDeck();
+  if(deck)renderDeckInventory(deck);
+}
+
 function renderDeckInventory(deck){
   loadPlayerState();
   const pool=document.getElementById("deckCardPool");
   if(!pool)return;
-  const search=String(document.getElementById("deckSearch")?.value||"").trim().toLowerCase();
+  const search=normalizeDeckFilterText(document.getElementById("deckSearch")?.value||"").trim();
   const sort=document.getElementById("deckSort")?.value||"name";
-  let poolCards=ownedCards().filter(card=>!search || String(card.name||"").toLowerCase().includes(search));
-  poolCards.sort((a,b)=>{
-    if(sort==="rarity")return rarityRank(a.rarity)-rarityRank(b.rarity) || String(a.name).localeCompare(String(b.name));
-    if(sort==="type")return String(a.type).localeCompare(String(b.type)) || String(a.name).localeCompare(String(b.name));
-    if(sort==="owned")return ownedCount(cardKey(b))-ownedCount(cardKey(a)) || String(a.name).localeCompare(String(b.name));
-    return String(a.name).localeCompare(String(b.name));
+  let poolCards=ownedCards().filter(card=>{
+    const searchable=normalizeDeckFilterText(`${card.name||""} ${displayCardType(card.type)} ${card.rarity||""}`);
+    if(search&&!searchable.includes(search))return false;
+    if(deckInventoryFilters.type&&card.type!==deckInventoryFilters.type)return false;
+    if(deckInventoryFilters.rarity&&card.rarity!==deckInventoryFilters.rarity)return false;
+    return true;
   });
+  poolCards.sort((a,b)=>{
+    if(sort==="owned")return ownedCount(cardKey(b))-ownedCount(cardKey(a)) || String(a.name).localeCompare(String(b.name));
+    if(deckInventoryFilters.stat){
+      const stat=deckInventoryFilters.stat;
+      return Number(b.stats?.[stat]||0)-Number(a.stats?.[stat]||0) || String(a.name).localeCompare(String(b.name),"fr");
+    }
+    return String(a.name).localeCompare(String(b.name),"fr");
+  });
+
+  updateDeckFilterControls();
 
   pool.innerHTML=poolCards.map(card=>{
     const key=cardKey(card);
@@ -6842,6 +6875,7 @@ Object.assign(window,{
   openDeckSelectFromHub,
   openDeckDeleteFromHub,
   showDeckEditor,
+  setDeckInventoryFilter,
   showPileViewer,
   closePileViewer,
   discardPlayerCard,

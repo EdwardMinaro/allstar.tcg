@@ -4006,7 +4006,7 @@ button{font-family:inherit;cursor:pointer}
 .selected-deck-card{
   position:relative;
   min-width:0;
-  aspect-ratio:0.68;
+  aspect-ratio:1108/1504;
 }
 
 .selected-deck-card > div{
@@ -4063,7 +4063,7 @@ button{font-family:inherit;cursor:pointer}
 
 .deck-thumb{
   width:74px;
-  aspect-ratio:0.68;
+  aspect-ratio:1108/1504;
   display:block;
 }
 
@@ -4072,6 +4072,55 @@ button{font-family:inherit;cursor:pointer}
   height:100% !important;
   min-width:0 !important;
   min-height:0 !important;
+}
+
+#decks .deck-thumb .full-card-art{
+  object-fit:contain !important;
+}
+
+.deck-filter-groups{
+  display:grid;
+  gap:5px;
+}
+
+.deck-filter-group{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:4px;
+}
+
+.deck-filter-group > span{
+  width:50px;
+  color:#d9c99c;
+  font-size:10px;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+
+.deck-filter-chip{
+  min-height:24px;
+  padding:3px 6px;
+  border:1px solid rgba(255,211,93,.28);
+  border-radius:5px;
+  background:#141720;
+  color:#d7d2c5;
+  font-size:10px;
+  font-weight:1000;
+  line-height:1;
+  text-transform:uppercase;
+}
+
+.deck-filter-chip:hover{
+  border-color:#ffd35d;
+  color:#fff2c4;
+}
+
+.deck-filter-chip.active{
+  border-color:#f3bd32;
+  background:linear-gradient(180deg,#d89e22,#82570c);
+  color:#111;
+  box-shadow:0 0 0 1px rgba(255,234,143,.34) inset;
 }
 
 .inventory-card-info{

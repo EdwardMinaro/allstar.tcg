@@ -375,11 +375,34 @@
           <div class="deck-filter-row">
             <input id="deckSearch" type="search" placeholder="Rechercher par nom" oninput="renderDeckManager()">
             <select id="deckSort" onchange="renderDeckManager()">
-              <option value="name">Trier : nom</option>
-              <option value="rarity">Trier : rarete</option>
-              <option value="type">Trier : type</option>
-              <option value="owned">Trier : possedees</option>
+              <option value="name">Tri : nom A-Z</option>
+              <option value="owned">Tri : poss&eacute;d&eacute;es</option>
             </select>
+            <div class="deck-filter-groups" aria-label="Filtres de cartes">
+              <div class="deck-filter-group">
+                <span>Type</span>
+                <button class="deck-filter-chip" type="button" data-deck-filter="type" data-filter-value="" onclick="setDeckInventoryFilter('type','')">Tout</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="type" data-filter-value="Catcheur" onclick="setDeckInventoryFilter('type','Catcheur')">Catcheur</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="type" data-filter-value="Manager" onclick="setDeckInventoryFilter('type','Manager')">Bonus</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="type" data-filter-value="Objet" onclick="setDeckInventoryFilter('type','Objet')">Objet</button>
+              </div>
+              <div class="deck-filter-group">
+                <span>Raret&eacute;</span>
+                <button class="deck-filter-chip" type="button" data-deck-filter="rarity" data-filter-value="" onclick="setDeckInventoryFilter('rarity','')">Toutes</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="rarity" data-filter-value="Standard" onclick="setDeckInventoryFilter('rarity','Standard')">Standard</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="rarity" data-filter-value="Rare" onclick="setDeckInventoryFilter('rarity','Rare')">Rare</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="rarity" data-filter-value="Legende" onclick="setDeckInventoryFilter('rarity','Legende')">L&eacute;gende</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="rarity" data-filter-value="Ultime" onclick="setDeckInventoryFilter('rarity','Ultime')">Ultime</button>
+              </div>
+              <div class="deck-filter-group">
+                <span>Stat</span>
+                <button class="deck-filter-chip" type="button" data-deck-filter="stat" data-filter-value="" onclick="setDeckInventoryFilter('stat','')">Aucune</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="stat" data-filter-value="Force" onclick="setDeckInventoryFilter('stat','Force')">Force</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="stat" data-filter-value="Vitesse" onclick="setDeckInventoryFilter('stat','Vitesse')">Vitesse</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="stat" data-filter-value="Technique" onclick="setDeckInventoryFilter('stat','Technique')">Technique</button>
+                <button class="deck-filter-chip" type="button" data-deck-filter="stat" data-filter-value="Charisme" onclick="setDeckInventoryFilter('stat','Charisme')">Charisme</button>
+              </div>
+            </div>
           </div>
           <div class="deck-card-pool" id="deckCardPool"></div>
         </div>
