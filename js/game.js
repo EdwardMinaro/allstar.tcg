@@ -2644,9 +2644,18 @@ function remoteDeckState(remote){
 async function hydrateCloudSaveForUser(user){
   if(!user || !window.AllstarSaveService)return false;
   const remote=await window.AllstarSaveService.loadPlayerData(user.uid);
-  const nextPlayer=remotePlayerState(remote);
+  let nextPlayer=remotePlayerState(remote);
   const nextDecks=remoteDeckState(remote);
   if(!nextPlayer && !nextDecks)return false;
+  let needsCloudSync=false;
+  try{
+    const local=JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)||"null");
+    const localCareerUnlocked=Number(local?.careerUnlocked)||0;
+    if(nextPlayer&&localCareerUnlocked>Number(nextPlayer.careerUnlocked||0)){
+      nextPlayer={...nextPlayer,careerUnlocked:localCareerUnlocked};
+      needsCloudSync=true;
+    }
+  }catch{}
   cloudSaveHydrating=true;
   try{
     if(nextPlayer)localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(nextPlayer));
@@ -2655,6 +2664,7 @@ async function hydrateCloudSaveForUser(user){
   }finally{
     cloudSaveHydrating=false;
   }
+  if(needsCloudSync)queueCloudSave();
   return true;
 }
 async function createProfileAccount(){
@@ -5294,8 +5304,12 @@ function showPin(name,success,chance,roll,winnerSide=null){
           const nextIndex=G.careerIndex+1;
       const lastPlayableIndex=opponents.findLastIndex(opponent=>opponent&&!opponent.missing);
           const nextUnlocked=Math.min(nextIndex,lastPlayableIndex);
-          playerState.careerUnlocked=Math.max(Number(playerState.careerUnlocked)||0,nextUnlocked);
+          const previousUnlocked=Number(playerState.careerUnlocked)||0;
+          playerState.careerUnlocked=Math.max(previousUnlocked,nextUnlocked);
           savePlayerState();
+          if(playerState.careerUnlocked>previousUnlocked){
+            void pushCloudSaveNow().catch(()=>{});
+          }
           renderCareer();
           if(nextButton&&nextIndex<=lastPlayableIndex){
             nextButton.hidden=false;
