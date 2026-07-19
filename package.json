@@ -27,6 +27,7 @@
     "artifactName": "${productName}-Setup-${version}.${ext}",
     "files": [
       "index.html",
+      "update.html",
       "electron-main.js",
       "electron-preload.js",
       "assets/**/*",

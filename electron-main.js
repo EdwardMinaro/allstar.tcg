@@ -2,10 +2,35 @@ const path = require("path");
 const { app, BrowserWindow, Menu, shell, ipcMain } = require("electron");
 
 let mainWindow = null;
+let splashWindow = null;
+let applicationStarted = false;
 
 function sendDesktopEvent(type, payload = {}) {
-  if (!mainWindow || mainWindow.isDestroyed()) return;
-  mainWindow.webContents.send("allstar:desktop-event", { type, payload });
+  [splashWindow, mainWindow].forEach(window => {
+    if (!window || window.isDestroyed()) return;
+    window.webContents.send("allstar:desktop-event", { type, payload });
+  });
+}
+
+function createSplashWindow() {
+  splashWindow = new BrowserWindow({
+    width: 520,
+    height: 280,
+    resizable: false,
+    maximizable: false,
+    minimizable: false,
+    frame: false,
+    transparent: false,
+    backgroundColor: "#11121b",
+    icon: path.join(__dirname, "assets", "branding", "allstars_icon.ico"),
+    webPreferences: {
+      preload: path.join(__dirname, "electron-preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false
+    }
+  });
+  splashWindow.loadFile(path.join(__dirname, "update.html"));
 }
 
 function createMainWindow() {
@@ -27,7 +52,6 @@ function createMainWindow() {
 
   Menu.setApplicationMenu(null);
   mainWindow.loadFile(path.join(__dirname, "index.html"));
-  mainWindow.webContents.once("did-finish-load", setupAutoUpdater);
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -40,6 +64,13 @@ function createMainWindow() {
       shell.openExternal(url);
     }
   });
+}
+
+function startApplication() {
+  if (applicationStarted) return;
+  applicationStarted = true;
+  createMainWindow();
+  if (splashWindow && !splashWindow.isDestroyed()) splashWindow.close();
 }
 
 ipcMain.handle("allstar:set-fullscreen", (_event, enabled) => {
@@ -68,6 +99,8 @@ ipcMain.handle("allstar:get-app-version", () => app.getVersion());
 
 function setupAutoUpdater() {
   if (!app.isPackaged) {
+    sendDesktopEvent("update-not-available");
+    setTimeout(startApplication, 650);
     return;
   }
 
@@ -75,9 +108,8 @@ function setupAutoUpdater() {
   try {
     ({ autoUpdater } = require("electron-updater"));
   } catch (error) {
-    sendDesktopEvent("update-unavailable", {
-      message: "electron-updater n'est pas installe."
-    });
+    sendDesktopEvent("update-error", { message: "electron-updater n'est pas installe." });
+    setTimeout(startApplication, 1000);
     return;
   }
 
@@ -85,54 +117,47 @@ function setupAutoUpdater() {
   autoUpdater.autoInstallOnAppQuit = false;
   let installingUpdate = false;
 
-  autoUpdater.on("checking-for-update", () => {
-    sendDesktopEvent("update-checking");
-  });
-
-  autoUpdater.on("update-available", (info) => {
-    sendDesktopEvent("update-available", info);
-  });
-
-  autoUpdater.on("update-not-available", (info) => {
+  autoUpdater.on("checking-for-update", () => sendDesktopEvent("update-checking"));
+  autoUpdater.on("update-available", info => sendDesktopEvent("update-available", info));
+  autoUpdater.on("update-not-available", info => {
     sendDesktopEvent("update-not-available", info);
+    setTimeout(startApplication, 650);
   });
-
-  autoUpdater.on("download-progress", (progress) => {
-    sendDesktopEvent("update-progress", progress);
-  });
-
-  autoUpdater.on("update-downloaded", (info) => {
+  autoUpdater.on("download-progress", progress => sendDesktopEvent("update-progress", progress));
+  autoUpdater.on("update-downloaded", info => {
     sendDesktopEvent("update-downloaded", info);
     if (installingUpdate) return;
     installingUpdate = true;
-    setTimeout(() => autoUpdater.quitAndInstall(true, true), 1200);
+    setTimeout(() => autoUpdater.quitAndInstall(true, true), 900);
   });
-
-  autoUpdater.on("error", (error) => {
+  autoUpdater.on("error", error => {
     sendDesktopEvent("update-error", {
       message: error && error.message ? error.message : String(error)
     });
+    setTimeout(startApplication, 1000);
   });
 
-  autoUpdater.checkForUpdatesAndNotify().catch((error) => {
+  autoUpdater.checkForUpdates().catch(error => {
     sendDesktopEvent("update-error", {
       message: error && error.message ? error.message : String(error)
     });
+    setTimeout(startApplication, 1000);
   });
 }
 
 app.whenReady().then(() => {
-  createMainWindow();
+  createSplashWindow();
+  splashWindow.webContents.once("did-finish-load", setupAutoUpdater);
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createMainWindow();
+      applicationStarted = false;
+      createSplashWindow();
+      splashWindow.webContents.once("did-finish-load", setupAutoUpdater);
     }
   });
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  if (process.platform !== "darwin") app.quit();
 });

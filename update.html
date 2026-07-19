@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>ALLSTAR</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle at 50% 0%, #2c2231, #11121b 62%); color: #f5eee0; font-family: Arial, sans-serif; }
+    .launcher { width: 100%; height: 100%; padding: 42px 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid #050508; box-shadow: inset 0 0 0 2px rgba(255, 211, 84, .14); }
+    h1 { margin: 0 0 28px; color: #ffcb43; font-size: 38px; font-style: italic; letter-spacing: 1px; text-shadow: 3px 3px 0 #16110c; }
+    #status { margin: 0; font-size: 18px; font-weight: 700; text-align: center; }
+    .bar { width: 100%; height: 12px; margin-top: 24px; overflow: hidden; border: 2px solid #050508; border-radius: 999px; background: #08090e; }
+    #progress { width: 12%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #d69213, #ffdc62); transition: width .2s ease; }
+    #detail { min-height: 18px; margin: 12px 0 0; color: #cabda9; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main class="launcher">
+    <h1>ALLSTAR</h1>
+    <p id="status">Recherche d'une mise à jour...</p>
+    <div class="bar" aria-hidden="true"><div id="progress"></div></div>
+    <p id="detail"></p>
+  </main>
+  <script>
+    const status = document.getElementById("status");
+    const progress = document.getElementById("progress");
+    const detail = document.getElementById("detail");
+    window.AllstarDesktop?.onDesktopEvent?.(({ type, payload = {} }) => {
+      if (type === "update-checking") status.textContent = "Recherche d'une mise à jour...";
+      if (type === "update-available") {
+        status.textContent = "Mise à jour trouvée. Téléchargement...";
+        detail.textContent = payload.version ? `Version ${payload.version}` : "";
+      }
+      if (type === "update-progress") {
+        const percent = Math.max(8, Math.min(100, Number(payload.percent) || 0));
+        progress.style.width = `${percent}%`;
+        detail.textContent = `${Math.round(percent)} % téléchargé`;
+      }
+      if (type === "update-downloaded") {
+        progress.style.width = "100%";
+        status.textContent = "Mise à jour prête. Installation...";
+        detail.textContent = "Le jeu se lancera juste après.";
+      }
+      if (type === "update-not-available") {
+        progress.style.width = "100%";
+        status.textContent = "Jeu à jour. Lancement...";
+      }
+      if (type === "update-error") {
+        progress.style.width = "100%";
+        status.textContent = "Vérification indisponible. Lancement du jeu...";
+      }
+    });
+  </script>
+</body>
+</html>
