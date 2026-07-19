@@ -3739,6 +3739,24 @@ function recoverNamedWrestler(owner,source,names){
   });
 }
 
+function showOpponentHandReveal(source,enemy){
+  const overlay=document.getElementById("handRevealOverlay");
+  const title=document.getElementById("handRevealTitle");
+  const subtitle=document.getElementById("handRevealSubtitle");
+  const grid=document.getElementById("handRevealGrid");
+  if(!overlay||!title||!subtitle||!grid)return;
+  title.textContent="Main adverse révélée";
+  subtitle.textContent=`${source.name} vous montre ${enemy.hand.length} carte${enemy.hand.length>1?"s":""} de ${enemy.label}.`;
+  grid.innerHTML=enemy.hand.length
+    ? enemy.hand.map(card=>cardHTML(card)).join("")
+    : '<p class="hand-reveal-empty">La main adverse est vide.</p>';
+  overlay.classList.add("active");
+}
+
+function closeHandReveal(){
+  document.getElementById("handRevealOverlay")?.classList.remove("active");
+}
+
 function applyWrestlerEntryEffect(owner,c){
   if(owner.wrestlerEffectsBlocked&&c.ability){
     log(`[EFFET] ${c.name} est annulé par le bonus adverse.`);
@@ -3914,6 +3932,7 @@ function applyWrestlerEntryEffect(owner,c){
     const names=enemy.hand.length ? enemy.hand.map(card=>card.name).join(", ") : "main vide";
     log(`[EFFET] ${c.name} révèle la main de ${enemy.label} : ${names}.`);
     showEffectFeedback(c,c.name,"Main adverse révélée","special");
+    if(owner.side==="player")showOpponentHandReveal(c,enemy);
   }
 }
 
@@ -7094,6 +7113,7 @@ Object.assign(window,{
   applyOnlineRoomSnapshot,
   openOnlineProfile,
   closeOnlineProfile,
+  closeHandReveal,
   closeLevelRewards,
   selectProfileTitle,
   showDeckSelect,
