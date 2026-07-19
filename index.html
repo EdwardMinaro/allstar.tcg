@@ -496,9 +496,15 @@
         <button class="small-btn dark" type="button" onclick="showOnlineModes()">Retour</button>
       </div>
       <div class="multi-room-panel" id="multiRoomPanel">
-        <div class="room-code-label">Code de room</div>
-        <div class="room-code" id="roomCodeDisplay">----</div>
-        <div class="room-state" id="roomStateDisplay">En attente...</div>
+        <div id="roomCodePanel">
+          <div class="room-code-label">Code de room</div>
+          <div class="room-code" id="roomCodeDisplay">----</div>
+          <div class="room-state" id="roomStateDisplay">En attente...</div>
+        </div>
+        <div class="match-search" id="matchSearchDisplay" hidden>
+          <strong id="matchSearchTimer">00:00</strong>
+          <span id="matchSearchState">Recherche d'adversaire en cours</span>
+        </div>
         <button class="small-btn" id="multiDeckReadyButton" type="button" onclick="showOnlineDeckReady()">Choisir mon deck</button>
       </div>
       <div class="multi-join-panel" id="multiJoinPanel">

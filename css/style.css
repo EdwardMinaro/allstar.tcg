@@ -3082,6 +3082,10 @@ button{font-family:inherit;cursor:pointer}
   text-shadow:3px 3px 0 #000;
 }
 
+.match-search{display:grid;gap:8px;padding:10px 0 4px;text-align:center}
+.match-search strong{color:#ffd35d;font-size:48px;font-weight:1000;letter-spacing:1px;text-shadow:3px 3px 0 #000}
+.match-search span{color:#e5dbc8;font-size:16px;font-weight:900;text-transform:uppercase}
+
 .multi-join-panel input{
   width:min(260px,90%);
   height:44px;

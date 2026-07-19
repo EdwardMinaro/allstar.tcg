@@ -48,6 +48,51 @@ function setMultiDeckReadyAvailable(available) {
   button.disabled = !available;
 }
 
+let matchmakingTimerId = null;
+let matchmakingStartedAt = 0;
+
+function stopMatchmakingTimer() {
+  clearInterval(matchmakingTimerId);
+  matchmakingTimerId = null;
+}
+
+function renderMatchmakingTimer() {
+  const timer = document.getElementById("matchSearchTimer");
+  if (!timer) return;
+  const seconds = Math.max(0, Math.floor((Date.now() - matchmakingStartedAt) / 1000));
+  timer.textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+function showMatchmakingSearch(found = false) {
+  const codePanel = document.getElementById("roomCodePanel");
+  const search = document.getElementById("matchSearchDisplay");
+  const state = document.getElementById("matchSearchState");
+  codePanel?.setAttribute("hidden", "");
+  search?.removeAttribute("hidden");
+  if (found) {
+    stopMatchmakingTimer();
+    if (state) state.textContent = "Adversaire trouvé !";
+    return;
+  }
+  if (!matchmakingStartedAt) matchmakingStartedAt = Date.now();
+  renderMatchmakingTimer();
+  if (state) state.textContent = "Recherche d'adversaire en cours";
+  if (!matchmakingTimerId) matchmakingTimerId = setInterval(renderMatchmakingTimer, 1000);
+}
+
+function showCustomRoomCode(room) {
+  stopMatchmakingTimer();
+  matchmakingStartedAt = 0;
+  document.getElementById("roomCodePanel")?.removeAttribute("hidden");
+  document.getElementById("matchSearchDisplay")?.setAttribute("hidden", "");
+  const code = document.getElementById("roomCodeDisplay");
+  if (code) code.textContent = room?.roomCode || "----";
+}
+
+function isMatchmakingRoom(room) {
+  return Boolean(room?.matchmaking?.mode === "quick" || room?.matchmaking?.mode === "ranked");
+}
+
 function showCustomMatchOptions() {
   document.getElementById("multiMainActions")?.setAttribute("hidden", "");
   document.getElementById("multiCustomActions")?.removeAttribute("hidden");
@@ -66,6 +111,8 @@ function showOnlineModes() {
 }
 
 function resetMultiplayerScreen() {
+  stopMatchmakingTimer();
+  matchmakingStartedAt = 0;
   document.getElementById("multiMainActions")?.removeAttribute("hidden");
   document.getElementById("multiCustomActions")?.setAttribute("hidden", "");
   document.getElementById("multiExitButton")?.removeAttribute("hidden");
@@ -142,10 +189,10 @@ async function showOnlineLeaderboard() {
 function openMultiRoomPanel(message = "Cr\u00e9ation de la room...", options = {}) {
   document.getElementById("multiRoomPanel")?.classList.add("active");
   document.getElementById("multiJoinPanel")?.classList.remove("active");
-  const code = document.getElementById("roomCodeDisplay");
   const state = document.getElementById("roomStateDisplay");
   const log = document.getElementById("multiLog");
-  if (code) code.textContent = multiplayer.room?.roomCode || "----";
+  if (options.matchmaking) showMatchmakingSearch();
+  else showCustomRoomCode(multiplayer.room);
   if (state) state.textContent = message;
   if (log) log.innerHTML = `<p>${message}</p>`;
   setMultiDeckReadyAvailable(Boolean(options.canChooseDeck));
@@ -168,8 +215,10 @@ function renderMultiRoom(room) {
   const state = document.getElementById("roomStateDisplay");
   const log = document.getElementById("multiLog");
   if (!room) return;
-  setMultiDeckReadyAvailable(true);
-  if (code) code.textContent = room.roomCode;
+  const automatic = isMatchmakingRoom(room);
+  setMultiDeckReadyAvailable(!automatic);
+  if (automatic) showMatchmakingSearch(Boolean(room.players?.p2));
+  else if (code) showCustomRoomCode(room);
   if (state) {
     const p1Ready = Boolean(room.players?.p1?.ready);
     const p2Ready = Boolean(room.players?.p2?.ready);
@@ -310,6 +359,7 @@ async function enterQuickQueue(deck, mode = "ranked") {
     const label = mode === "ranked" ? "class\u00e9" : "rapide";
     setMultiStatus(`Recherche d'un match ${label}...`);
     openMultiRoomPanel(`Recherche d'un adversaire ${label}...`, { canChooseDeck: false });
+    showMatchmakingSearch();
     const result = await window.AllstarMatchmakingService.findMatch({
       name: "Joueur classé",
       deck: deck.cards,
