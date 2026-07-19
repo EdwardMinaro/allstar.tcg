@@ -5622,6 +5622,16 @@ button:disabled,
   font-size:22px;
 }
 
+@media (max-width:1180px), (max-height:760px){
+  #game .game-next-track-button{
+    left:78px;
+    top:12px;
+    width:54px;
+    height:54px;
+    font-size:20px;
+  }
+}
+
 #challenge .challenge-menu-card{
   width:min(1440px,96vw);
 }
