@@ -54,7 +54,7 @@
       updatedAt: now
     };
     await setDoc(doc(db, "users", uid), profile, {merge: true});
-    await syncLeaderboardProfile(uid, profile);
+    void syncLeaderboardProfile(uid, profile);
     return profile;
   }
 
@@ -73,7 +73,7 @@
       updatedAt: serverTimestamp()
     });
     const profile=await getUserProfile(uid);
-    await syncLeaderboardProfile(uid, profile);
+    void syncLeaderboardProfile(uid, profile);
     return profile;
   }
 
@@ -116,8 +116,21 @@
     if(!user)return null;
     const existing = await getUserProfile(user.uid);
     if(existing){
-      await syncLeaderboardProfile(user.uid, existing);
-      return existing;
+      const genericPseudo=!existing.pseudo||existing.pseudo==="Joueur ALLSTAR";
+      const pseudo=genericPseudo
+        ? cleanPseudo(fallbackPseudo||user.displayName, user.email)
+        : cleanPseudo(existing.pseudo, user.email);
+      const email=existing.email||user.email||"";
+      const profile={...existing,pseudo,email};
+      if(pseudo!==existing.pseudo||email!==existing.email){
+        firestoreTools().then(({db,doc,setDoc,serverTimestamp})=>setDoc(doc(db,"users",user.uid),{
+          pseudo,
+          email,
+          updatedAt:serverTimestamp()
+        },{merge:true})).catch(error=>console.warn("[PROFILE] Mise a jour du pseudo indisponible.",error));
+      }
+      void syncLeaderboardProfile(user.uid, profile);
+      return profile;
     }
     return createUserProfile(user.uid, user.email, fallbackPseudo || user.displayName);
   }

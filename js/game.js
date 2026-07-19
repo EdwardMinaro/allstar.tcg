@@ -2413,7 +2413,7 @@ function handleEscapeKey(event){
   openSessionModal();
 }
 
-const profileUiState={user:null,profile:null,loading:false,message:""};
+const profileUiState={user:null,profile:null,loading:false,message:"",requestId:0};
 function escapeHtml(value){
   return String(value ?? "").replace(/[&<>"']/g, char=>({
     "&":"&amp;",
@@ -2446,34 +2446,36 @@ async function renderProfileScreen(message=""){
   const root=document.getElementById("profileContent");
   if(!root)return;
   profileUiState.message=message;
-  root.innerHTML=`
-    <div class="profile-stats-shell">
-      <div class="profile-xp-card">
-        <div class="profile-level-row"><span>Profil</span><strong>Chargement...</strong></div>
-      </div>
-    </div>
-  `;
   if(!window.AllstarAuthService || !window.AllstarFirebaseService?.firebaseStatus?.().configured){
     renderProfileContent("Profil local");
     return;
   }
-  if(profileUiState.loading)return;
-  profileUiState.loading=true;
   try{
     const user=await window.AllstarAuthService.getCurrentUser();
     profileUiState.user=user;
-    try{
-      profileUiState.profile=user ? await window.AllstarProfileService.ensureUserProfile(user) : null;
-    }catch(error){
+    if(!user){
       profileUiState.profile=null;
-      renderProfileContent(profileErrorMessage(error), true);
+      renderProfileContent(message);
       return;
     }
+    const fallbackName=String(user.displayName||user.email||"Joueur ALLSTAR").trim().split("@")[0].slice(0,24)||"Joueur ALLSTAR";
+    profileUiState.profile={...localProfileProgress(),pseudo:fallbackName,email:user.email||""};
     renderProfileContent(message);
+    if(profileUiState.loading)return;
+    const requestId=++profileUiState.requestId;
+    profileUiState.loading=true;
+    void window.AllstarProfileService.ensureUserProfile(user).then(profile=>{
+      if(requestId!==profileUiState.requestId||profileUiState.user?.uid!==user.uid)return;
+      if(profile)profileUiState.profile=profile;
+      renderProfileContent(message);
+    }).catch(error=>{
+      if(requestId!==profileUiState.requestId)return;
+      console.warn("[PROFILE] Chargement cloud indisponible.",error);
+    }).finally(()=>{
+      if(requestId===profileUiState.requestId)profileUiState.loading=false;
+    });
   }catch(error){
     renderProfileContent(profileErrorMessage(error), true);
-  }finally{
-    profileUiState.loading=false;
   }
 }
 function localProfileProgress(){
