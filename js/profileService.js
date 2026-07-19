@@ -81,6 +81,7 @@
       getDocs: firestore.getDocs,
       setDoc: firestore.setDoc,
       updateDoc: firestore.updateDoc,
+      runTransaction: firestore.runTransaction,
       serverTimestamp: firestore.serverTimestamp
     };
   }
@@ -120,6 +121,79 @@
     cacheUserProfile(uid, profile);
     void syncLeaderboardProfile(uid, profile);
     return profile;
+  }
+
+  function collectLevelRewards(progress, rewards=[], titleRewards=[]){
+    progress.levelRewards=progress.levelRewards&&typeof progress.levelRewards==="object"?progress.levelRewards:{};
+    const unlocked=[];
+    rewards.forEach(reward=>{
+      const id=`level_${reward.level}`;
+      if(progress.level<reward.level||progress.levelRewards[id])return;
+      progress.levelRewards[id]=true;
+      unlocked.push({...reward,kind:"reward"});
+    });
+    titleRewards.forEach(reward=>{
+      const id=`title_${reward.level}`;
+      if(progress.level<reward.level||progress.levelRewards[id])return;
+      progress.levelRewards[id]=true;
+      progress.titles=Array.from(new Set([...(progress.titles||["Rookie"]),reward.title]));
+      unlocked.push({...reward,kind:"title",label:reward.title});
+    });
+    return unlocked;
+  }
+
+  async function settleMatchProgress(uid, match={}){
+    if(!uid||!match.id)throw new Error("Resultat de match incomplet.");
+    const {db,doc,runTransaction,serverTimestamp}=await firestoreTools();
+    const ranking=window.AllstarRankingService;
+    const result=await runTransaction(db,async transaction=>{
+      const ref=doc(db,"users",uid);
+      const snapshot=await transaction.get(ref);
+      let progress=ranking.normalizeProgress(snapshot.exists()?snapshot.data():{...DEFAULT_PROFILE,uid});
+      const settled={
+        ...(progress.onlineMatchSettlements&&typeof progress.onlineMatchSettlements==="object"?progress.onlineMatchSettlements:{}),
+        ...(progress.matchSettlements&&typeof progress.matchSettlements==="object"?progress.matchSettlements:{})
+      };
+      if(settled[match.id])return {profile:progress,applied:false,rewards:[],events:[],gain:0};
+
+      const won=Boolean(match.won);
+      const career=match.career&&typeof match.career==="object"?match.career:null;
+      const firstCareerWin=Boolean(career&&won&&career.key&&!progress.careerXpWins?.[career.key]);
+      const gain=firstCareerWin
+        ? ([100,200,300,400][Math.max(0,Math.min(3,Number(career.season)||0))]||100)
+        : (match.online ? (won?100:50) : (won?50:25));
+      progress=ranking.addXp(progress,gain);
+      progress[won?"wins":"losses"]+=1;
+      progress.currentStreak=won?Math.max(1,progress.currentStreak+1):Math.min(-1,progress.currentStreak-1);
+      progress.bestStreak=Math.max(progress.bestStreak,Math.max(0,progress.currentStreak));
+      let careerTitleUnlocked=false;
+      if(firstCareerWin)progress.careerXpWins={...(progress.careerXpWins||{}),[career.key]:true};
+      if(career&&won&&career.isFinal){
+        const hadTitle=(progress.titles||[]).includes("Vainqueur du mode carri\u00e8re");
+        progress.titles=Array.from(new Set([...(progress.titles||["Rookie"]),"Vainqueur du mode carri\u00e8re"]));
+        careerTitleUnlocked=!hadTitle;
+      }
+      let events=[];
+      if(match.ranked){
+        const update=await ranking.updateEloAfterMatch(progress,{
+          won,
+          opponentElo:Number(match.opponentElo||1000),
+          now:Number(match.now)||Date.now()
+        });
+        progress=update.progress;
+        events=update.events||[];
+      }
+      const rewards=collectLevelRewards(progress,match.levelRewards||[],match.titleRewards||[]);
+      settled[match.id]=Number(match.now)||Date.now();
+      progress.matchSettlements=Object.fromEntries(
+        Object.entries(settled).sort(([,a],[,b])=>Number(b)-Number(a)).slice(0,100)
+      );
+      transaction.set(ref,{...progress,updatedAt:serverTimestamp()},{merge:true});
+      return {profile:progress,applied:true,rewards,events,gain,careerTitleUnlocked};
+    });
+    cacheUserProfile(uid,result.profile);
+    void syncLeaderboardProfile(uid,result.profile);
+    return result;
   }
 
   function publicLeaderboardProfile(uid, profile={}){
@@ -213,6 +287,7 @@
     getUserProfile,
     getCachedUserProfile,
     updateUserProfile,
+    settleMatchProgress,
     listPublicProfiles,
     getCachedPublicProfiles,
     ensureUserProfile

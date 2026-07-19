@@ -2741,6 +2741,11 @@ async function hydrateCloudSaveForUser(user){
     localPlayer=JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)||"null");
   }catch{}
   const nextPlayer=mergePlayerStateForHydration(remotePlayer,localPlayer);
+  // The profile document is authoritative for stats; playerState only mirrors it for offline display.
+  const cloudProfile=profileUiState.user?.uid===user.uid ? profileUiState.profile : null;
+  if(nextPlayer&&cloudProfile){
+    nextPlayer.profileProgress=window.AllstarRankingService.normalizeProgress(cloudProfile);
+  }
   if(!nextPlayer && !nextDecks)return false;
   const needsCloudSync=Boolean(remotePlayer&&JSON.stringify(nextPlayer)!==JSON.stringify(remotePlayer));
   cloudSaveHydrating=true;
@@ -5457,7 +5462,7 @@ function showPin(name,success,chance,roll,winnerSide=null){
           return;
         }
         awardMatchCredits(playerWon);
-        void awardProfileProgress(playerWon);
+        void awardProfileProgress(playerWon,{matchId:profileMatchSettlementId()});
         if(playerWon&&G.mode==="career"&&Number.isInteger(G.careerIndex)){
           loadPlayerState();
           const opponents=careerOpponents();
@@ -5563,6 +5568,7 @@ let playerState = {
   profileProgress: null,
   loaded: false
 };
+const pendingOnlineMatchSettlements = new Set();
 
 function starterStandardCards(){
   const standards=CARD_DATA.filter(card=>card.rarity==="Standard");
@@ -5903,22 +5909,39 @@ function onlineMatchSettlementId(){
   return G?.matchOptions?.onlineMatchId||`${ctx.roomCode||"room"}:legacy:${G?.round||0}`;
 }
 
+function profileMatchSettlementId(){
+  if(isOnlineMatch())return onlineMatchSettlementId();
+  if(!G)return `match:${Date.now().toString(36)}`;
+  if(!G.profileSettlementId){
+    G.profileSettlementId=`${G.mode||"duel"}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2,8)}`;
+  }
+  return G.profileSettlementId;
+}
+
 function settleOnlineMatchRewards(){
-  if(!isOnlineMatch()||!G?.over||!G?.winner)return false;
+  if(!isOnlineMatch()||!G?.over||!G?.winner)return Promise.resolve(false);
   loadPlayerState();
   const matchId=onlineMatchSettlementId();
   playerState.settledOnlineMatches=playerState.settledOnlineMatches||{};
-  if(playerState.settledOnlineMatches[matchId])return false;
-  playerState.settledOnlineMatches[matchId]=Date.now();
-  playerState.settledOnlineMatches=Object.fromEntries(
-    Object.entries(playerState.settledOnlineMatches)
-      .sort(([,a],[,b])=>Number(b)-Number(a))
-      .slice(0,100)
-  );
+  if(playerState.settledOnlineMatches[matchId]||pendingOnlineMatchSettlements.has(matchId))return Promise.resolve(false);
+  pendingOnlineMatchSettlements.add(matchId);
   const playerWon=G.winner==="player";
-  awardMatchCredits(playerWon);
-  void awardProfileProgress(playerWon);
-  return true;
+  return awardProfileProgress(playerWon,{matchId}).then(applied=>{
+    if(!applied)return false;
+    awardMatchCredits(playerWon);
+    playerState.settledOnlineMatches[matchId]=Date.now();
+    playerState.settledOnlineMatches=Object.fromEntries(
+      Object.entries(playerState.settledOnlineMatches)
+        .sort(([,a],[,b])=>Number(b)-Number(a))
+        .slice(0,100)
+    );
+    savePlayerState();
+    return true;
+  }).catch(error=>{
+    log("<b>[PROFIL]</b> Resultat en attente de synchronisation.");
+    console.warn("[PROFILE] Reglement du match en ligne indisponible.",error);
+    return false;
+  }).finally(()=>pendingOnlineMatchSettlements.delete(matchId));
 }
 
 function profileXpGainForMatch(playerWon, progress){
@@ -5953,22 +5976,13 @@ function unlockCareerWinnerTitle(progress){
   return progress;
 }
 
-function claimLevelRewards(progress){
+function collectLevelRewards(progress){
   progress.levelRewards=progress.levelRewards&&typeof progress.levelRewards==="object"?progress.levelRewards:{};
   const rewards=[];
   LEVEL_REWARDS.forEach(reward=>{
     const id=`level_${reward.level}`;
     if(progress.level<reward.level||progress.levelRewards[id])return;
     progress.levelRewards[id]=true;
-    if(reward.type==="credits")playerState.credits+=reward.amount;
-    if(reward.type==="ticket"){
-      playerState.boosterTickets=playerState.boosterTickets||{};
-      playerState.boosterTickets[reward.booster]=(Number(playerState.boosterTickets[reward.booster])||0)+1;
-    }
-    if(reward.type==="card"){
-      const card=cardByKey(reward.card);
-      if(card)addCardsToCollection([cloneCard(card)]);
-    }
     rewards.push({...reward, kind:"reward"});
   });
   LEVEL_TITLE_REWARDS.forEach(reward=>{
@@ -5978,6 +5992,26 @@ function claimLevelRewards(progress){
     progress.titles=Array.from(new Set([...(progress.titles||["Rookie"]),reward.title]));
     rewards.push({...reward, kind:"title", label:reward.title});
   });
+  return rewards;
+}
+
+function applyLevelRewardsToInventory(rewards=[]){
+  rewards.filter(reward=>reward.kind==="reward").forEach(reward=>{
+    if(reward.type==="credits")playerState.credits+=reward.amount;
+    if(reward.type==="ticket"){
+      playerState.boosterTickets=playerState.boosterTickets||{};
+      playerState.boosterTickets[reward.booster]=(Number(playerState.boosterTickets[reward.booster])||0)+1;
+    }
+    if(reward.type==="card"){
+      const card=cardByKey(reward.card);
+      if(card)addCardsToCollection([cloneCard(card)]);
+    }
+  });
+}
+
+function claimLevelRewards(progress){
+  const rewards=collectLevelRewards(progress);
+  applyLevelRewardsToInventory(rewards);
   return rewards;
 }
 
@@ -5996,7 +6030,7 @@ function closeLevelRewards(){
   document.getElementById("levelRewardOverlay")?.classList.remove("active");
 }
 
-async function awardProfileProgress(playerWon){
+async function awardProfileProgress(playerWon, options={}){
   loadPlayerState();
   let user=null;
   let baseProfile=playerState.profileProgress||{};
@@ -6009,7 +6043,57 @@ async function awardProfileProgress(playerWon){
   }catch{
     user=null;
   }
-  let progress=window.AllstarRankingService.normalizeProgress(baseProfile);
+  let progress;
+  if(user&&options.matchId&&window.AllstarProfileService?.settleMatchProgress){
+    const careerOpponent=G?.mode==="career"&&Number.isInteger(G?.careerIndex)
+      ? careerOpponents()[G.careerIndex]
+      : null;
+    const lastCareerIndex=careerOpponents().findLastIndex(opponent=>opponent&&!opponent.missing);
+    const settled=await window.AllstarProfileService.settleMatchProgress(user.uid,{
+      id:options.matchId,
+      won:playerWon,
+      online:isOnlineMatch(),
+      ranked:Boolean(G?.matchOptions?.ranked),
+      opponentElo:Number(G?.matchOptions?.opponentElo||1000),
+      now:Date.now(),
+      career:careerOpponent ? {
+        key:`career_${G.careerIndex}_${careerOpponent.name||"adversaire"}`,
+        season:Number(careerOpponent.season)||0,
+        isFinal:G.careerIndex===lastCareerIndex
+      } : null,
+      levelRewards:LEVEL_REWARDS,
+      titleRewards:LEVEL_TITLE_REWARDS
+    });
+    progress=window.AllstarRankingService.normalizeProgress(settled.profile);
+    playerState.profileProgress=progress;
+    profileUiState.profile=progress;
+    applyLevelRewardsToInventory(settled.rewards);
+    savePlayerState();
+    if(settled.applied){
+      log(`<b>+${settled.gain} XP</b> Niveau ${progress.level} (${progress.xp}/${window.AllstarRankingService.xpForNextLevel(progress.level)}).`);
+      const labels={
+        "tryouts-start":"Debut des Try-outs : 10 matchs pour rejoindre le roster",
+        "tryouts-complete":event=>`Try-outs termines : ${event.rank}`,
+        promotion:event=>`Promotion : ${event.rank}`,
+        relegation:event=>`Relegation : ${event.rank}`,
+        protection:event=>`Relégation évitée : protection ${event.remaining}/3`,
+        "hall-of-fame":"Entree au Hall of Fame"
+      };
+      (settled.events||[]).filter(event=>event.type!=="protection-reset").forEach(event=>{
+        const label=labels[event.type];
+        if(label)log(`<b>[COMMUNIQUE]</b> ${typeof label==="function"?label(event):label}`);
+      });
+      if(settled.rewards?.length){
+        settled.rewards.forEach(reward=>log(`<b>[COMMUNIQUE]</b> ${reward.kind==="title"?"Titre debloque":`Recompense niveau ${reward.level}`} : ${reward.label}.`));
+        setTimeout(()=>showLevelRewards(settled.rewards),350);
+      }
+      if(settled.careerTitleUnlocked){
+        log("<b>[COMMUNIQUE]</b> Titre debloque : Vainqueur du mode carrière.");
+      }
+    }
+    return Boolean(settled.applied);
+  }
+  progress=window.AllstarRankingService.normalizeProgress(baseProfile);
   const gain=profileXpGainForMatch(playerWon,progress);
   progress=window.AllstarRankingService.addXp(progress,gain);
   progress[playerWon?"wins":"losses"]+=1;
@@ -6053,6 +6137,7 @@ async function awardProfileProgress(playerWon){
     levelRewards.forEach(reward=>log(`<b>[COMMUNIQUE]</b> ${reward.kind==="title"?"Titre debloque":`Recompense niveau ${reward.level}`} : ${reward.label}.`));
     setTimeout(()=>showLevelRewards(levelRewards),350);
   }
+  return true;
 }
 
 const CHALLENGE_LIFE_RECOVERY_MS = 24*60*60*1000;
