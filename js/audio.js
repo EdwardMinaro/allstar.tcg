@@ -245,6 +245,7 @@ class AudioManager {
     this.toastTimer = null;
     this.pendingMusicId = null;
     this.unlocked = false;
+    this.musicStoppedByUser = false;
     this.victorySfxFlip = false;
     this.wrestlerQueue = [];
     this.storageKey = "catchCardsAudio";
@@ -319,16 +320,18 @@ class AudioManager {
     return this.wrestlerQueue.shift() || null;
   }
 
-  playNextWrestlerMusic(duration = 1600) {
+  playNextWrestlerMusic(duration = 1600, manual = false) {
+    if (this.musicStoppedByUser && !manual) return null;
+    if (manual) this.musicStoppedByUser = false;
     const nextId = this.nextWrestlerMusicId();
     if (!nextId) return null;
-    this.fadeMusic(nextId, duration);
+    this.fadeMusic(nextId, duration, manual);
     return nextId;
   }
 
-  playWrestlerRadio() {
+  playWrestlerRadio(manual = false) {
     const firstId = this.currentMusicId || this.pendingMusicId || this.firstWrestlerMusicId();
-    if (firstId) this.playMusic(firstId);
+    if (firstId) this.playMusic(firstId, manual);
   }
 
   attachMusicEvents(audio, id, item) {
@@ -373,20 +376,23 @@ class AudioManager {
       });
   }
 
-  playMusic(id) {
+  playMusic(id, manual = false) {
     const item = this.library.music[id];
     if (!item) return;
+    if (this.musicStoppedByUser && !manual) return;
+    if (manual) this.musicStoppedByUser = false;
     if (this.currentMusicId === id && this.music && !this.music.paused) return;
 
     if (this.music && !this.music.paused) {
-      this.fadeMusic(id, 1400);
+      this.fadeMusic(id, 1400, manual);
       return;
     }
-    this.stopMusic();
+    this.stopMusic(false);
     this.startMusic(id, 500);
   }
 
   unlockAndPlay() {
+    if (this.musicStoppedByUser) return;
     if (this.music && !this.music.paused) {
       this.unlocked = true;
       return;
@@ -394,7 +400,8 @@ class AudioManager {
     this.playMusic(this.pendingMusicId || this.currentMusicId || this.firstWrestlerMusicId());
   }
 
-  stopMusic() {
+  stopMusic(manual = true) {
+    if (manual) this.musicStoppedByUser = true;
     clearInterval(this.fadeTimer);
     clearInterval(this.crossfadeTimer);
     this.fadeTimer = null;
@@ -409,11 +416,13 @@ class AudioManager {
     this.updateNowPlaying();
   }
 
-  fadeMusic(id, duration = 800) {
+  fadeMusic(id, duration = 800, manual = false) {
     const next = this.library.music[id];
     if (!next) return;
+    if (this.musicStoppedByUser && !manual) return;
+    if (manual) this.musicStoppedByUser = false;
     if (!this.music || this.music.paused) {
-      this.stopMusic();
+      this.stopMusic(false);
       this.startMusic(id, Math.min(700, duration));
       return;
     }
@@ -582,7 +591,7 @@ function initAudioOptions() {
   document.querySelectorAll(".music-play-control").forEach(button => {
     button.addEventListener("click", () => {
       const selected = document.querySelector(".music-select-control")?.value;
-      audioManager.playMusic(selected || audioManager.firstWrestlerMusicId());
+      audioManager.playMusic(selected || audioManager.firstWrestlerMusicId(), true);
     });
   });
 
@@ -620,7 +629,7 @@ function syncMusicSelects(value) {
 }
 
 function playNextTheme() {
-  const nextId = audioManager.playNextWrestlerMusic(500);
+  const nextId = audioManager.playNextWrestlerMusic(500, true);
   if (nextId) syncMusicSelects(nextId);
 }
 
