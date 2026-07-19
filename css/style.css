@@ -3086,6 +3086,10 @@ button{font-family:inherit;cursor:pointer}
 .match-search strong{color:#ffd35d;font-size:48px;font-weight:1000;letter-spacing:1px;text-shadow:3px 3px 0 #000}
 .match-search span{color:#e5dbc8;font-size:16px;font-weight:900;text-transform:uppercase}
 
+.level-reward-splash{width:min(540px,92vw);padding:28px}.level-reward-list{display:grid;gap:10px;margin:18px 0}.level-reward-item{padding:13px 16px;border:2px solid rgba(255,211,93,.65);border-radius:8px;background:linear-gradient(180deg,#242331,#111118);color:#fff;font-size:18px;font-weight:1000;text-transform:uppercase}.level-reward-item small{display:block;margin-top:4px;color:#f2d28b;font-size:13px}
+.level-reward-federation{margin:10px 0 0;color:#f2d28b;font-size:15px;font-weight:1000;letter-spacing:1px;text-transform:uppercase}
+.profile-title-picker{margin-top:14px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.profile-title-picker label{color:#ffd35d;font-weight:1000;text-transform:uppercase}.profile-title-picker select{min-width:210px;padding:9px 12px;border:2px solid #050508;border-radius:7px;background:#f5f2ea;color:#111;font:inherit;font-weight:900}
+
 .multi-join-panel input{
   width:min(260px,90%);
   height:44px;

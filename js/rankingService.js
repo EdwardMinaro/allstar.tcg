@@ -1,5 +1,8 @@
 (function(){
   const TRYOUT_MATCHES = 10;
+  const HALL_OF_FAME_MIN_RANK = "champion_3";
+  const HALL_OF_FAME_DAYS = 30;
+  const HALL_OF_FAME_WEEKLY_MATCHES = 5;
   const RANKS = [
     { id:"jobber", label:"Jobber", min:0 },
     { id:"lowcarder_2", label:"Lowcarder II", min:900 },
@@ -52,15 +55,54 @@
     progress.currentStreak = Number(progress.currentStreak) || 0;
     progress.bestStreak = Math.max(0, Number(progress.bestStreak) || 0);
     progress.bestRank = progress.bestRank || rankForElo(progress.elo, progress.rankedMatches).label;
+    progress.currentRankId = progress.currentRankId || "";
     progress.hallOfFame = Boolean(progress.hallOfFame);
+    progress.hallOfFameStartedAt = Math.max(0, Number(progress.hallOfFameStartedAt) || 0);
+    progress.hallOfFameWeeks = progress.hallOfFameWeeks && typeof progress.hallOfFameWeeks === "object" ? progress.hallOfFameWeeks : {};
     progress.title = progress.title || "Rookie";
     progress.titles = Array.isArray(progress.titles) && progress.titles.length ? progress.titles : ["Rookie"];
     progress.careerXpWins = progress.careerXpWins && typeof progress.careerXpWins === "object" ? progress.careerXpWins : {};
+    progress.levelRewards = progress.levelRewards && typeof progress.levelRewards === "object" ? progress.levelRewards : {};
     return progress;
   }
 
   function rankIndex(labelOrId){
     return RANKS.findIndex(rank=>rank.id === labelOrId || rank.label === labelOrId);
+  }
+
+  function rankFromId(id){
+    return RANKS.find(rank=>rank.id===id)||null;
+  }
+
+  function rankForProgress(profile={}){
+    const progress=normalizeProgress(profile);
+    const calculated=rankForElo(progress.elo,progress.rankedMatches);
+    if(calculated.id==="tryouts")return calculated;
+    const protectedRank=rankFromId(progress.currentRankId);
+    return protectedRank||calculated;
+  }
+
+  function isoWeekKey(timestamp){
+    const date=new Date(timestamp);
+    const day=(date.getUTCDay()+6)%7;
+    date.setUTCDate(date.getUTCDate()-day+3);
+    const firstThursday=new Date(Date.UTC(date.getUTCFullYear(),0,4));
+    const week=1+Math.round(((date-firstThursday)/86400000-3+((firstThursday.getUTCDay()+6)%7))/7);
+    return `${date.getUTCFullYear()}-${String(week).padStart(2,"0")}`;
+  }
+
+  function weekKeysBetween(start,end){
+    const keys=[];
+    const cursor=new Date(start);
+    cursor.setUTCHours(12,0,0,0);
+    while(cursor.getTime()<=end){
+      const key=isoWeekKey(cursor.getTime());
+      if(keys[keys.length-1]!==key)keys.push(key);
+      cursor.setUTCDate(cursor.getUTCDate()+7);
+    }
+    const finalKey=isoWeekKey(end);
+    if(keys[keys.length-1]!==finalKey)keys.push(finalKey);
+    return keys;
   }
 
   function winrate(wins=0, losses=0){
@@ -104,12 +146,70 @@
 
   async function updateEloAfterMatch(profile, match={}){
     const progress = normalizeProgress(profile);
+    const now=Number(match.now)||Date.now();
+    const before=rankForElo(progress.elo,progress.rankedMatches);
+    const beforeIndex=rankIndex(before.id);
+    const previousRankId=progress.currentRankId;
+    const isFirstRankedMatch=progress.rankedMatches===0;
     const delta = eloDelta(progress.elo, match.opponentElo, Boolean(match.won), progress.rankedMatches);
     progress.elo = Math.max(0, progress.elo + delta);
     progress.rankedMatches += 1;
-    const rank = rankForElo(progress.elo, progress.rankedMatches);
-    if(rankIndex(rank.label) > rankIndex(progress.bestRank))progress.bestRank = rank.label;
-    return {...progress, lastEloDelta:delta};
+    const calculated=rankForElo(progress.elo,progress.rankedMatches);
+    const calculatedIndex=rankIndex(calculated.id);
+    const events=[];
+
+    if(isFirstRankedMatch)events.push({type:"tryouts-start"});
+
+    if(before.id==="tryouts"&&calculated.id!=="tryouts"){
+      progress.currentRankId=calculated.id;
+      progress.rankProtection=3;
+      events.push({type:"tryouts-complete",rank:calculated.label});
+    }else if(calculated.id!=="tryouts"){
+      const current=rankFromId(progress.currentRankId)||before;
+      const currentIndex=rankIndex(current.id);
+      if(calculatedIndex>currentIndex){
+        progress.currentRankId=calculated.id;
+        progress.rankProtection=3;
+        events.push({type:"promotion",rank:calculated.label});
+      }else if(calculatedIndex<currentIndex){
+        if(progress.rankProtection>0){
+          progress.rankProtection-=1;
+          events.push({type:"protection",rank:current.label,remaining:progress.rankProtection});
+        }else{
+          progress.currentRankId=calculated.id;
+          events.push({type:"relegation",rank:calculated.label});
+        }
+      }else if(previousRankId&&beforeIndex<currentIndex&&calculatedIndex===currentIndex&&match.won){
+        progress.rankProtection=3;
+        events.push({type:"protection-reset",rank:current.label});
+      }else if(!progress.currentRankId){
+        progress.currentRankId=calculated.id;
+      }
+    }
+
+    const visibleRank=rankForProgress(progress);
+    if(rankIndex(visibleRank.id)>rankIndex(progress.bestRank))progress.bestRank=visibleRank.label;
+
+    if(!progress.hallOfFame){
+      const champion=rankIndex(calculated.id)>=rankIndex(HALL_OF_FAME_MIN_RANK);
+      if(!champion){
+        progress.hallOfFameStartedAt=0;
+        progress.hallOfFameWeeks={};
+      }else{
+        if(!progress.hallOfFameStartedAt)progress.hallOfFameStartedAt=now;
+        const week=isoWeekKey(now);
+        progress.hallOfFameWeeks[week]=(Number(progress.hallOfFameWeeks[week])||0)+1;
+        const requiredWeeks=weekKeysBetween(progress.hallOfFameStartedAt,now);
+        const sustained=now-progress.hallOfFameStartedAt>=HALL_OF_FAME_DAYS*86400000;
+        const activeEveryWeek=requiredWeeks.every(key=>Number(progress.hallOfFameWeeks[key])>=HALL_OF_FAME_WEEKLY_MATCHES);
+        if(sustained&&activeEveryWeek){
+          progress.hallOfFame=true;
+          progress.titles=Array.from(new Set([...(progress.titles||["Rookie"]),"Hall of Famer"]));
+          events.push({type:"hall-of-fame"});
+        }
+      }
+    }
+    return {progress,delta,events};
   }
 
   window.AllstarRankingService = {
@@ -120,6 +220,7 @@
     xpForNextLevel,
     normalizeProgress,
     rankForElo,
+    rankForProgress,
     winrate,
     addXp,
     eloDelta

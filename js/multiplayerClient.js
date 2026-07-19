@@ -151,8 +151,8 @@ async function localOnlineIdentity() {
     ? await window.AllstarProfileService.ensureUserProfile(user).catch(() => null)
     : null;
   const progress = window.AllstarRankingService.normalizeProgress(profile || localRankedProgress());
-  const rank = window.AllstarRankingService.rankForElo(progress.elo, progress.rankedMatches);
-  return { uid:user?.uid || "", name:profile?.pseudo || user?.displayName || "Joueur classé", elo:progress.elo, rankedMatches:progress.rankedMatches, wins:progress.wins, losses:progress.losses, hallOfFame:Boolean(progress.hallOfFame), rank:rank.label };
+  const rank = window.AllstarRankingService.rankForProgress(progress);
+  return { uid:user?.uid || "", name:profile?.pseudo || user?.displayName || "Joueur classé", title:progress.title, elo:progress.elo, rankedMatches:progress.rankedMatches, currentRankId:progress.currentRankId, rankProtection:progress.rankProtection, wins:progress.wins, losses:progress.losses, hallOfFame:Boolean(progress.hallOfFame), rank:rank.label };
 }
 
 let multiLeaderboardEntries = [];
@@ -173,7 +173,7 @@ async function showOnlineLeaderboard() {
     count.textContent = `${multiLeaderboardEntries.length} joueur${multiLeaderboardEntries.length > 1 ? "s" : ""}`;
     list.innerHTML = multiLeaderboardEntries.map((profile, index) => {
       const progress = window.AllstarRankingService.normalizeProgress(profile);
-      const rank = window.AllstarRankingService.rankForElo(progress.elo, progress.rankedMatches);
+      const rank = window.AllstarRankingService.rankForProgress(progress);
       const total = progress.wins + progress.losses;
       return `<button class="leaderboard-row" type="button" data-leaderboard-index="${index}"><span class="leaderboard-place">${index + 1}</span><span><span class="leaderboard-name">${escapeMultiHtml(profile.pseudo || "Joueur")}${progress.hallOfFame ? '<span class="hof-badge" title="Hall of Fame">★</span>' : ""}</span><span class="leaderboard-meta">${escapeMultiHtml(rank.label)} · ${progress.rankedMatches} classée${progress.rankedMatches > 1 ? "s" : ""} · ${window.AllstarRankingService.winrate(progress.wins, progress.losses)}</span></span><span class="leaderboard-elo">${progress.elo} ELO<br><small>${total} match${total > 1 ? "s" : ""}</small></span></button>`;
     }).join("") || "<p>Aucun joueur inscrit pour le moment.</p>";

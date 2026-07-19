@@ -2487,7 +2487,7 @@ function countUniqueOwnedCards(){
 }
 function profileProgressView(profile){
   const progress=window.AllstarRankingService.normalizeProgress(profile||{});
-  const rank=window.AllstarRankingService.rankForElo(progress.elo,progress.rankedMatches);
+  const rank=window.AllstarRankingService.rankForProgress(progress);
   const nextXp=window.AllstarRankingService.xpForNextLevel(progress.level);
   const xpPct=Math.max(0,Math.min(100,(progress.xp/nextXp)*100));
   const protection="★".repeat(progress.rankProtection)+"☆".repeat(Math.max(0,3-progress.rankProtection));
@@ -2498,6 +2498,7 @@ function renderProfileStats(profile, connected){
   const uniqueOwned=countUniqueOwnedCards();
   const tryoutText=rank.id==="tryouts" ? `${progress.rankedMatches}/${window.AllstarRankingService.TRYOUT_MATCHES} matchs` : `${progress.elo} ELO`;
   const totalMatches=Number(progress.wins||0)+Number(progress.losses||0);
+  const titleOptions=Array.from(new Set(progress.titles||["Rookie"])).map(title=>`<option value="${escapeHtml(title)}"${title===progress.title?" selected":""}>${escapeHtml(title)}</option>`).join("");
   return `
     <div class="profile-xp-card">
       <div class="profile-level-row">
@@ -2508,16 +2509,34 @@ function renderProfileStats(profile, connected){
       <div class="profile-small-note">${escapeHtml(progress.totalXp)} XP total</div>
     </div>
     <div class="profile-summary profile-summary-wide">
-      <div class="profile-stat"><span class="profile-stat-label">Titre</span><strong>${escapeHtml(progress.title || "Rookie")}</strong><em>Titre actif</em></div>
+      <div class="profile-stat"><span class="profile-stat-label">Titre</span><strong>${escapeHtml(progress.title || "Rookie")}</strong><em>Titre actif</em><div class="profile-title-picker"><label for="profileTitleSelect">Choisir</label><select id="profileTitleSelect" onchange="selectProfileTitle(this.value)">${titleOptions}</select></div></div>
       <div class="profile-stat"><span class="profile-stat-label">Classement</span><strong>${escapeHtml(rank.label)}</strong><em>${escapeHtml(tryoutText)}</em></div>
+      <div class="profile-stat"><span class="profile-stat-label">Meilleur rang</span><strong>${escapeHtml(progress.bestRank)}</strong><em>Classement atteint</em></div>
       <div class="profile-stat"><span class="profile-stat-label">Protection</span><strong>${escapeHtml(protection)}</strong><em>Relégation</em></div>
-      <div class="profile-stat"><span class="profile-stat-label">Hall of Fame</span><strong>${progress.hallOfFame?"Oui":"Non"}</strong><em>Carrière</em></div>
+      <div class="profile-stat"><span class="profile-stat-label">Hall of Fame</span><strong>${progress.hallOfFame?"Oui":"Non"}</strong><em>Prestige compétitif</em></div>
       <div class="profile-stat"><span class="profile-stat-label">Collection</span><strong>${escapeHtml(uniqueOwned)}</strong><em>/ ${escapeHtml(CARD_DATA.length)} cartes</em></div>
       <div class="profile-stat"><span class="profile-stat-label">Victoires</span><strong>${escapeHtml(progress.wins)}</strong><em>${escapeHtml(window.AllstarRankingService.winrate(progress.wins,progress.losses))}</em></div>
       <div class="profile-stat"><span class="profile-stat-label">Défaites</span><strong>${escapeHtml(progress.losses)}</strong><em>Série ${escapeHtml(progress.currentStreak)}</em></div>
       <div class="profile-stat"><span class="profile-stat-label">Matchs</span><strong>${escapeHtml(totalMatches)}</strong><em>${escapeHtml(progress.rankedMatches)} classés</em></div>
     </div>
   `;
+}
+
+async function selectProfileTitle(title){
+  loadPlayerState();
+  const progress=window.AllstarRankingService.normalizeProgress(playerState.profileProgress||profileUiState.profile||{});
+  if(!(progress.titles||[]).includes(title))return;
+  progress.title=title;
+  playerState.profileProgress=progress;
+  savePlayerState();
+  profileUiState.profile={...(profileUiState.profile||{}),...progress};
+  try{
+    const user=profileUiState.user||await window.AllstarAuthService?.getCurrentUser?.();
+    if(user)profileUiState.profile=await window.AllstarProfileService.updateUserProfile(user.uid,progress);
+  }catch(error){
+    showSystemToast("Titre sauvegardé localement.");
+  }
+  renderProfileContent();
 }
 function renderProfileContent(message="", isError=false){
   const root=document.getElementById("profileContent");
@@ -3174,7 +3193,7 @@ let onlineIntroTimer=null;
 let onlineIntroPending=false;
 function onlineProfileSummary(profile={},fallbackName="Joueur"){
   const progress=window.AllstarRankingService.normalizeProgress(profile||{});
-  const rank=window.AllstarRankingService.rankForElo(progress.elo,progress.rankedMatches);
+  const rank=window.AllstarRankingService.rankForProgress(progress);
   return {name:profile.name||profile.pseudo||fallbackName,rank:profile.rank||rank.label,wins:progress.wins,losses:progress.losses,hallOfFame:Boolean(progress.hallOfFame)};
 }
 function showOnlineMatchIntro(room,playerSlot,onDone){
@@ -3202,9 +3221,9 @@ function openOnlineProfile(profile={}){
   const card=document.getElementById("onlineProfileCard");
   if(!overlay||!card)return;
   const progress=window.AllstarRankingService.normalizeProgress(profile);
-  const rank=window.AllstarRankingService.rankForElo(progress.elo,progress.rankedMatches);
+  const rank=window.AllstarRankingService.rankForProgress(progress);
   const total=progress.wins+progress.losses;
-  card.innerHTML=`<h2>${escapeHtml(profile.pseudo||profile.name||"Joueur")}${progress.hallOfFame?' <span class="hof-badge" title="Hall of Fame">★</span>':""}</h2><p>${escapeHtml(rank.label)} · ${progress.elo} ELO</p><p>${total} partie${total>1?"s":""} · ${progress.wins} victoire${progress.wins>1?"s":""} / ${progress.losses} défaite${progress.losses>1?"s":""}</p><p>Win rate : ${window.AllstarRankingService.winrate(progress.wins,progress.losses)}</p><button class="small-btn dark" type="button" onclick="closeOnlineProfile()">Retour</button>`;
+  card.innerHTML=`<h2>${escapeHtml(profile.pseudo||profile.name||"Joueur")}${progress.hallOfFame?' <span class="hof-badge" title="Hall of Fame">★</span>':""}</h2><p>Titre : ${escapeHtml(progress.title||"Rookie")}</p><p>${escapeHtml(rank.label)} · ${progress.elo} ELO</p><p>Meilleur rang : ${escapeHtml(progress.bestRank||"Try-outs")}</p><p>${total} partie${total>1?"s":""} · ${progress.wins} victoire${progress.wins>1?"s":""} / ${progress.losses} défaite${progress.losses>1?"s":""}</p><p>Win rate : ${window.AllstarRankingService.winrate(progress.wins,progress.losses)}</p><button class="small-btn dark" type="button" onclick="closeOnlineProfile()">Retour</button>`;
   overlay.classList.add("active");
 }
 function closeOnlineProfile(){document.getElementById("onlineProfileOverlay")?.classList.remove("active")}
@@ -5462,6 +5481,38 @@ const BOOSTERS = {
   }
 };
 
+const LEVEL_REWARDS = [
+  { level:5, type:"ticket", booster:"classic", label:"Booster Classique" },
+  { level:10, type:"card", card:"rare_catcheurs_kevin_avanti", label:"Kevin Avanti (Rare)" },
+  { level:15, type:"ticket", booster:"classic", label:"Booster Classique" },
+  { level:20, type:"ticket", booster:"premium", label:"Booster Premium" },
+  { level:25, type:"credits", amount:500, label:"500 credits" },
+  { level:30, type:"card", card:"legende_catcheurs_jet_kid", label:"Jet Kid (Legende)" },
+  { level:35, type:"ticket", booster:"premium", label:"Booster Premium" },
+  { level:40, type:"credits", amount:750, label:"750 credits" },
+  { level:45, type:"ticket", booster:"champion", label:"Booster Champion" },
+  { level:50, type:"card", card:"legende_catcheurs_baadshah_pehalwan_khan", label:"Baadshah Pehalwan Khan (Legende)" },
+  { level:55, type:"ticket", booster:"champion", label:"Booster Champion" },
+  { level:60, type:"credits", amount:1000, label:"1000 credits" },
+  { level:65, type:"ticket", booster:"champion", label:"Booster Champion" },
+  { level:70, type:"ticket", booster:"champion", label:"Booster Champion" },
+  { level:75, type:"card", card:"legende_catcheurs_shawn_olsen", label:"Shawn Olsen (Legende)" },
+  { level:80, type:"ticket", booster:"champion", label:"Booster Champion" },
+  { level:85, type:"credits", amount:1500, label:"1500 credits" },
+  { level:90, type:"ticket", booster:"champion", label:"Booster Champion" },
+  { level:95, type:"ticket", booster:"champion", label:"Booster Champion" },
+  { level:100, type:"card", card:"ultime_catcheurs_tom_la_ruffa", label:"Tom La Ruffa (Ultime)" }
+];
+
+const LEVEL_TITLE_REWARDS = [
+  { level:5, title:"Rookie" },
+  { level:25, title:"Espoir" },
+  { level:50, title:"Catcheur confirm\u00e9" },
+  { level:100, title:"V\u00e9t\u00e9ran" },
+  { level:150, title:"L\u00e9gende vivante" },
+  { level:300, title:"ALLSTAR" }
+];
+
 let playerState = {
   credits: 0,
   collection: {},
@@ -5857,13 +5908,55 @@ function markCareerXpWin(progress){
   return progress;
 }
 
-function markHallOfFameCareerWin(progress){
+function unlockCareerWinnerTitle(progress){
   if(G?.mode!=="career"||!Number.isInteger(G?.careerIndex))return progress;
   const lastIndex=careerOpponents().findLastIndex(opponent=>opponent&&!opponent.missing);
   if(G.careerIndex<lastIndex)return progress;
-  progress.hallOfFame=true;
-  progress.titles=Array.from(new Set([...(progress.titles||["Rookie"]),"Hall of Famer"]));
+  progress.titles=Array.from(new Set([...(progress.titles||["Rookie"]),"Vainqueur du mode carri\u00e8re"]));
   return progress;
+}
+
+function claimLevelRewards(progress){
+  progress.levelRewards=progress.levelRewards&&typeof progress.levelRewards==="object"?progress.levelRewards:{};
+  const rewards=[];
+  LEVEL_REWARDS.forEach(reward=>{
+    const id=`level_${reward.level}`;
+    if(progress.level<reward.level||progress.levelRewards[id])return;
+    progress.levelRewards[id]=true;
+    if(reward.type==="credits")playerState.credits+=reward.amount;
+    if(reward.type==="ticket"){
+      playerState.boosterTickets=playerState.boosterTickets||{};
+      playerState.boosterTickets[reward.booster]=(Number(playerState.boosterTickets[reward.booster])||0)+1;
+    }
+    if(reward.type==="card"){
+      const card=cardByKey(reward.card);
+      if(card)addCardsToCollection([cloneCard(card)]);
+    }
+    rewards.push({...reward, kind:"reward"});
+  });
+  LEVEL_TITLE_REWARDS.forEach(reward=>{
+    const id=`title_${reward.level}`;
+    if(progress.level<reward.level||progress.levelRewards[id])return;
+    progress.levelRewards[id]=true;
+    progress.titles=Array.from(new Set([...(progress.titles||["Rookie"]),reward.title]));
+    rewards.push({...reward, kind:"title", label:reward.title});
+  });
+  return rewards;
+}
+
+function showLevelRewards(rewards=[]){
+  if(!rewards.length)return;
+  const overlay=document.getElementById("levelRewardOverlay");
+  const subtitle=document.getElementById("levelRewardSubtitle");
+  const list=document.getElementById("levelRewardList");
+  if(!overlay||!subtitle||!list)return;
+  subtitle.textContent=rewards.some(reward=>reward.kind==="title")?"Nouveau titre ou recompense debloque." : "Recompense de niveau attribuee.";
+  list.innerHTML=rewards.map(reward=>`<div class="level-reward-item">${escapeHtml(reward.kind==="title"?"Titre debloque":`Niveau ${reward.level}`)}<small>${escapeHtml(reward.label)}</small></div>`).join("");
+  overlay.classList.add("active");
+}
+
+function closeLevelRewards(){
+  document.getElementById("levelRewardOverlay")?.classList.remove("active");
 }
 
 async function awardProfileProgress(playerWon){
@@ -5885,12 +5978,30 @@ async function awardProfileProgress(playerWon){
   progress[playerWon?"wins":"losses"]+=1;
   progress.currentStreak=playerWon ? Math.max(1,progress.currentStreak+1) : Math.min(-1,progress.currentStreak-1);
   progress.bestStreak=Math.max(progress.bestStreak,Math.max(0,progress.currentStreak));
+  let careerTitleUnlocked=false;
   if(playerWon){
     progress=markCareerXpWin(progress);
-    progress=markHallOfFameCareerWin(progress);
+    const hadCareerTitle=(progress.titles||[]).includes("Vainqueur du mode carri\u00e8re");
+    progress=unlockCareerWinnerTitle(progress);
+    careerTitleUnlocked=!hadCareerTitle&&(progress.titles||[]).includes("Vainqueur du mode carri\u00e8re");
   }
+  const levelRewards=claimLevelRewards(progress);
+  if(careerTitleUnlocked)levelRewards.push({kind:"title",label:"Vainqueur du mode carri\u00e8re"});
   if(G?.mode==="ranked"||G?.matchOptions?.ranked){
-    progress=await window.AllstarRankingService.updateEloAfterMatch(progress,{won:playerWon,opponentElo:Number(G?.matchOptions?.opponentElo||1000)});
+    const rankingUpdate=await window.AllstarRankingService.updateEloAfterMatch(progress,{won:playerWon,opponentElo:Number(G?.matchOptions?.opponentElo||1000)});
+    progress=rankingUpdate.progress;
+    rankingUpdate.events.forEach(event=>{
+      const labels={
+        "tryouts-start":"Debut des Try-outs : 10 matchs pour rejoindre le roster",
+        "tryouts-complete":`Try-outs termines : ${event.rank}`,
+        promotion:`Promotion : ${event.rank}`,
+        relegation:`Relegation : ${event.rank}`,
+        protection:`Protection de rang : ${event.remaining}/3`,
+        "protection-reset":`Protection restauree : ${event.rank}`,
+        "hall-of-fame":"Entree au Hall of Fame"
+      };
+      levelRewards.push({kind:"ranking",label:labels[event.type]||"Classement mis a jour"});
+    });
   }
   playerState.profileProgress=progress;
   savePlayerState();
@@ -5901,6 +6012,10 @@ async function awardProfileProgress(playerWon){
     }catch(error){
       log(`<b>[PROFIL]</b> Sauvegarde cloud indisponible, progression conservée en local.`);
     }
+  }
+  if(levelRewards.length){
+    levelRewards.forEach(reward=>log(`<b>[COMMUNIQUE]</b> ${reward.kind==="title"?"Titre debloque":`Recompense niveau ${reward.level}`} : ${reward.label}.`));
+    setTimeout(()=>showLevelRewards(levelRewards),350);
   }
 }
 
@@ -6962,6 +7077,8 @@ Object.assign(window,{
   applyOnlineRoomSnapshot,
   openOnlineProfile,
   closeOnlineProfile,
+  closeLevelRewards,
+  selectProfileTitle,
   showDeckSelect,
   selectLaunchDeck,
   confirmDeckReady,

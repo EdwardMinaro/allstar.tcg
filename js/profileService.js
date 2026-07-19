@@ -15,6 +15,7 @@
     title: "Rookie",
     titles: ["Rookie"],
     careerXpWins: {},
+    levelRewards: {},
     collection: {},
     decks: {},
     settings: {}
@@ -84,6 +85,9 @@
       wins: Number(profile.wins) || 0,
       losses: Number(profile.losses) || 0,
       rankedMatches: Number(profile.rankedMatches) || 0,
+      currentRankId: profile.currentRankId || "",
+      rankProtection: Number(profile.rankProtection) || 0,
+      bestRank: profile.bestRank || "Try-outs",
       hallOfFame: Boolean(profile.hallOfFame),
       title: profile.title || "Rookie"
     };
