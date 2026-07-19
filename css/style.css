@@ -4567,6 +4567,51 @@ button{font-family:inherit;cursor:pointer}
   }
 }
 
+/* Ring 0.1.15: the mat is the full playable surface; ropes sit over it
+   as a compact frame instead of consuming the board's interior. */
+#game .ring-frame{
+  border-width:8px;
+  outline-width:2px;
+}
+
+#game .ring-mat{
+  inset:12px;
+  border-width:2px;
+}
+
+#game .rope-h,
+#game .rope-v{
+  width:auto;
+  height:4px;
+  border-width:1px;
+}
+
+#game .rope-h{
+  left:8px;
+  right:8px;
+}
+
+#game .rh1{top:14px}
+#game .rh2{top:30px}
+#game .rh3{top:46px}
+#game .rh4{bottom:14px}
+#game .rh5{bottom:30px}
+#game .rh6{bottom:46px}
+
+#game .rope-v{
+  top:8px;
+  bottom:8px;
+  width:4px;
+  height:auto;
+}
+
+#game .rv1{left:14px}
+#game .rv2{left:30px}
+#game .rv3{left:46px}
+#game .rv4{right:14px}
+#game .rv5{right:30px}
+#game .rv6{right:46px}
+
 /* Home crowd camera flashes, subtle and intermittent. */
 .crowd-flashes{
   position:absolute;
