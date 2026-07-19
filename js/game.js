@@ -2490,34 +2490,50 @@ function profileProgressView(profile){
   const rank=window.AllstarRankingService.rankForProgress(progress);
   const nextXp=window.AllstarRankingService.xpForNextLevel(progress.level);
   const xpPct=Math.max(0,Math.min(100,(progress.xp/nextXp)*100));
-  const protection="★".repeat(progress.rankProtection)+"☆".repeat(Math.max(0,3-progress.rankProtection));
-  return {progress,rank,nextXp,xpPct,protection};
+  return {progress,rank,nextXp,xpPct};
 }
 function renderProfileStats(profile, connected){
-  const {progress,rank,nextXp,xpPct,protection}=profileProgressView(profile);
+  const {progress,rank,nextXp,xpPct}=profileProgressView(profile);
   const uniqueOwned=countUniqueOwnedCards();
   const tryoutText=rank.id==="tryouts" ? `${progress.rankedMatches}/${window.AllstarRankingService.TRYOUT_MATCHES} matchs` : `${progress.elo} ELO`;
   const totalMatches=Number(progress.wins||0)+Number(progress.losses||0);
+  const pseudo=escapeHtml(progress.pseudo||profileUiState.user?.displayName||"Joueur ALLSTAR");
+  const hallOfFame=progress.hallOfFame ? '<span class="profile-hof-badge" title="Hall of Fame">Hall of Fame</span>' : "";
   const titleOptions=Array.from(new Set(progress.titles||["Rookie"])).map(title=>`<option value="${escapeHtml(title)}"${title===progress.title?" selected":""}>${escapeHtml(title)}</option>`).join("");
   return `
-    <div class="profile-xp-card">
-      <div class="profile-level-row">
-        <span>Niveau ${escapeHtml(progress.level)}</span>
-        <strong>${escapeHtml(progress.xp)} / ${escapeHtml(nextXp)} XP</strong>
-      </div>
-      <div class="profile-xp-track"><div class="profile-xp-fill" style="width:${xpPct.toFixed(1)}%"></div></div>
-      <div class="profile-small-note">${escapeHtml(progress.totalXp)} XP total</div>
+    <div class="profile-showcase">
+      <section class="profile-identity-panel">
+        <span class="profile-eyebrow">Fiche officielle</span>
+        <h2>${pseudo}${hallOfFame}</h2>
+        <div class="profile-active-title">${escapeHtml(progress.title || "Rookie")}</div>
+        <div class="profile-title-picker"><label for="profileTitleSelect">Titre</label><select id="profileTitleSelect" onchange="selectProfileTitle(this.value)">${titleOptions}</select></div>
+      </section>
+      <section class="profile-level-panel">
+        <div class="profile-panel-heading"><span>Niveau</span><strong>${escapeHtml(progress.level)}</strong></div>
+        <div class="profile-xp-track"><div class="profile-xp-fill" style="width:${xpPct.toFixed(1)}%"></div></div>
+        <div class="profile-level-detail">${escapeHtml(progress.xp)} / ${escapeHtml(nextXp)} XP</div>
+        <div class="profile-small-note">${escapeHtml(progress.totalXp)} XP total</div>
+      </section>
+      <section class="profile-rank-panel">
+        <span class="profile-eyebrow">Classement</span>
+        <strong>${escapeHtml(rank.label)}</strong>
+        <em>${escapeHtml(tryoutText)}</em>
+        <small>${rank.id==="tryouts" ? "Évaluation en cours" : "Classement compétitif"}</small>
+      </section>
     </div>
-    <div class="profile-summary profile-summary-wide">
-      <div class="profile-stat"><span class="profile-stat-label">Titre</span><strong>${escapeHtml(progress.title || "Rookie")}</strong><em>Titre actif</em><div class="profile-title-picker"><label for="profileTitleSelect">Choisir</label><select id="profileTitleSelect" onchange="selectProfileTitle(this.value)">${titleOptions}</select></div></div>
-      <div class="profile-stat"><span class="profile-stat-label">Classement</span><strong>${escapeHtml(rank.label)}</strong><em>${escapeHtml(tryoutText)}</em></div>
-      <div class="profile-stat"><span class="profile-stat-label">Meilleur rang</span><strong>${escapeHtml(progress.bestRank)}</strong><em>Classement atteint</em></div>
-      <div class="profile-stat"><span class="profile-stat-label">Protection</span><strong>${escapeHtml(protection)}</strong><em>Relégation</em></div>
-      <div class="profile-stat"><span class="profile-stat-label">Hall of Fame</span><strong>${progress.hallOfFame?"Oui":"Non"}</strong><em>Prestige compétitif</em></div>
-      <div class="profile-stat"><span class="profile-stat-label">Collection</span><strong>${escapeHtml(uniqueOwned)}</strong><em>/ ${escapeHtml(CARD_DATA.length)} cartes</em></div>
-      <div class="profile-stat"><span class="profile-stat-label">Victoires</span><strong>${escapeHtml(progress.wins)}</strong><em>${escapeHtml(window.AllstarRankingService.winrate(progress.wins,progress.losses))}</em></div>
-      <div class="profile-stat"><span class="profile-stat-label">Défaites</span><strong>${escapeHtml(progress.losses)}</strong><em>Série ${escapeHtml(progress.currentStreak)}</em></div>
-      <div class="profile-stat"><span class="profile-stat-label">Matchs</span><strong>${escapeHtml(totalMatches)}</strong><em>${escapeHtml(progress.rankedMatches)} classés</em></div>
+    <div class="profile-record-grid">
+      <div class="profile-record"><span>Victoires</span><strong>${escapeHtml(progress.wins)}</strong></div>
+      <div class="profile-record"><span>Défaites</span><strong>${escapeHtml(progress.losses)}</strong></div>
+      <div class="profile-record"><span>Matchs</span><strong>${escapeHtml(totalMatches)}</strong></div>
+      <div class="profile-record"><span>Win rate</span><strong>${escapeHtml(window.AllstarRankingService.winrate(progress.wins,progress.losses))}</strong></div>
+      <div class="profile-record"><span>Série</span><strong>${escapeHtml(progress.currentStreak)}</strong></div>
+      <div class="profile-record"><span>Meilleure série</span><strong>${escapeHtml(progress.bestStreak)}</strong></div>
+    </div>
+    <div class="profile-highlights">
+      <div><span>Meilleur rang</span><strong>${escapeHtml(progress.bestRank)}</strong></div>
+      <div><span>Hall of Fame</span><strong>${progress.hallOfFame?"Oui":"Non"}</strong></div>
+      <div><span>Collection</span><strong>${escapeHtml(uniqueOwned)} <small>/ ${escapeHtml(CARD_DATA.length)} cartes</small></strong></div>
+      <div><span>Classé</span><strong>${escapeHtml(progress.rankedMatches)} match${progress.rankedMatches>1?"s":""}</strong></div>
     </div>
   `;
 }
@@ -5990,14 +6006,13 @@ async function awardProfileProgress(playerWon){
   if(G?.mode==="ranked"||G?.matchOptions?.ranked){
     const rankingUpdate=await window.AllstarRankingService.updateEloAfterMatch(progress,{won:playerWon,opponentElo:Number(G?.matchOptions?.opponentElo||1000)});
     progress=rankingUpdate.progress;
-    rankingUpdate.events.forEach(event=>{
+    rankingUpdate.events.filter(event=>event.type!=="protection-reset").forEach(event=>{
       const labels={
         "tryouts-start":"Debut des Try-outs : 10 matchs pour rejoindre le roster",
         "tryouts-complete":`Try-outs termines : ${event.rank}`,
         promotion:`Promotion : ${event.rank}`,
         relegation:`Relegation : ${event.rank}`,
-        protection:`Protection de rang : ${event.remaining}/3`,
-        "protection-reset":`Protection restauree : ${event.rank}`,
+        protection:`Relégation évitée : protection ${event.remaining}/3`,
         "hall-of-fame":"Entree au Hall of Fame"
       };
       levelRewards.push({kind:"ranking",label:labels[event.type]||"Classement mis a jour"});
