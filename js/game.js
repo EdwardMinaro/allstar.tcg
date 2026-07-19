@@ -2556,8 +2556,9 @@ function setAccountView(viewId){
 function showAccountChoice(){
   setAccountView("accountChoiceView");
 }
-function showAccountLogin(){
+async function showAccountLogin(){
   setAccountView("accountLoginView");
+  await restoreRememberedCredentials();
 }
 function showAccountCreate(){
   setAccountView("accountCreateView");
@@ -2575,6 +2576,28 @@ function profileCredentials(mode="login"){
     email:document.getElementById("loginEmail")?.value || "",
     password:document.getElementById("loginPassword")?.value || ""
   };
+}
+async function restoreRememberedCredentials(){
+  const desktop=window.AllstarDesktop;
+  if(!desktop?.getRememberedCredentials)return;
+  try{
+    const credentials=await desktop.getRememberedCredentials();
+    if(!credentials?.remember)return;
+    const email=document.getElementById("loginEmail");
+    const password=document.getElementById("loginPassword");
+    const remember=document.getElementById("rememberCredentials");
+    if(email)email.value=credentials.email||"";
+    if(password)password.value=credentials.password||"";
+    if(remember)remember.checked=true;
+  }catch{}
+}
+function loginRememberChoice(){
+  return Boolean(document.getElementById("rememberCredentials")?.checked);
+}
+async function saveRememberedCredentials({email="",password="",remember=false}={}){
+  const desktop=window.AllstarDesktop;
+  if(!desktop?.setRememberedCredentials)return;
+  try{await desktop.setRememberedCredentials({email,password,remember})}catch{}
 }
 function profileResultMessage(action,result){
   if(result?.profileError)return `${action}. ${profileErrorMessage(result.profileError)}`;
@@ -2722,6 +2745,7 @@ async function loginAccountFromStart(){
     const result=await window.AllstarAuthService.loginUser(email,password);
     profileUiState.user=result.user;
     profileUiState.profile=result.profile;
+    await saveRememberedCredentials({email,password,remember:loginRememberChoice()});
     setSaveStatus("Connexion reussie. Chargement du profil cloud...");
     const cloudLoaded=await hydrateCloudSaveForUser(result.user);
     setSaveStatus(profileResultMessage(cloudLoaded ? "Sauvegarde cloud chargee" : "Connecté", result));
@@ -6464,6 +6488,7 @@ function wireSaveScreen(){
   const createButton=document.getElementById("createAccountButton");
   const guestButton=document.getElementById("guestModeButton");
   const resetButton=document.getElementById("resetPasswordButton");
+  const rememberCredentials=document.getElementById("rememberCredentials");
   const backFromLoginButton=document.getElementById("backFromLoginButton");
   const backFromCreateButton=document.getElementById("backFromCreateButton");
   if(openLoginButton)openLoginButton.onclick=showAccountLogin;
@@ -6472,6 +6497,9 @@ function wireSaveScreen(){
   if(createButton)createButton.onclick=createAccountFromStart;
   if(guestButton)guestButton.onclick=startGuestMode;
   if(resetButton)resetButton.onclick=sendPasswordResetFromStart;
+  if(rememberCredentials)rememberCredentials.onchange=()=>{
+    if(!rememberCredentials.checked)void saveRememberedCredentials({remember:false});
+  };
   if(backFromLoginButton)backFromLoginButton.onclick=showAccountChoice;
   if(backFromCreateButton)backFromCreateButton.onclick=showAccountChoice;
 }
@@ -6890,6 +6918,7 @@ Object.assign(window,{
   showAccountChoice,
   showAccountLogin,
   showAccountCreate,
+  restoreRememberedCredentials,
   startGuestMode,
   requestProfileLogout,
   requestQuitGame,

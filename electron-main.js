@@ -1,5 +1,6 @@
 const path = require("path");
-const { app, BrowserWindow, Menu, shell, ipcMain } = require("electron");
+const fs = require("fs");
+const { app, BrowserWindow, Menu, shell, ipcMain, safeStorage } = require("electron");
 
 let mainWindow = null;
 let splashWindow = null;
@@ -96,6 +97,47 @@ ipcMain.handle("allstar:quit-app", () => {
 });
 
 ipcMain.handle("allstar:get-app-version", () => app.getVersion());
+
+function rememberedCredentialsPath() {
+  return path.join(app.getPath("userData"), "remembered-credentials.json");
+}
+
+ipcMain.handle("allstar:get-remembered-credentials", () => {
+  try {
+    if (!safeStorage.isEncryptionAvailable()) return { remember: false };
+    const saved = JSON.parse(fs.readFileSync(rememberedCredentialsPath(), "utf8"));
+    const decrypted = safeStorage.decryptString(Buffer.from(saved.data, "base64"));
+    const credentials = JSON.parse(decrypted);
+    return {
+      remember: Boolean(credentials.remember),
+      email: String(credentials.email || ""),
+      password: String(credentials.password || "")
+    };
+  } catch {
+    return { remember: false };
+  }
+});
+
+ipcMain.handle("allstar:set-remembered-credentials", (_event, credentials = {}) => {
+  const filePath = rememberedCredentialsPath();
+  try {
+    if (!credentials.remember) {
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      return true;
+    }
+    if (!safeStorage.isEncryptionAvailable()) return false;
+    const payload = JSON.stringify({
+      remember: true,
+      email: String(credentials.email || "").trim().slice(0, 254),
+      password: String(credentials.password || "").slice(0, 512)
+    });
+    const encrypted = safeStorage.encryptString(payload).toString("base64");
+    fs.writeFileSync(filePath, JSON.stringify({ data: encrypted }), "utf8");
+    return true;
+  } catch {
+    return false;
+  }
+});
 
 function setupAutoUpdater() {
   if (!app.isPackaged) {
