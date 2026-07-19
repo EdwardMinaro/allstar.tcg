@@ -147,15 +147,33 @@ async function localOnlineIdentity() {
   const user = window.AllstarAuthService?.getCurrentUser
     ? await window.AllstarAuthService.getCurrentUser().catch(() => null)
     : null;
-  const profile = user && window.AllstarProfileService?.ensureUserProfile
-    ? await window.AllstarProfileService.ensureUserProfile(user).catch(() => null)
+  const profile = user && window.AllstarProfileService?.getCachedUserProfile
+    ? window.AllstarProfileService.getCachedUserProfile(user.uid)
     : null;
+  if(user&&window.AllstarProfileService?.ensureUserProfile){
+    void window.AllstarProfileService.ensureUserProfile(user).catch(() => {});
+  }
   const progress = window.AllstarRankingService.normalizeProgress(profile || localRankedProgress());
   const rank = window.AllstarRankingService.rankForProgress(progress);
   return { uid:user?.uid || "", name:profile?.pseudo || user?.displayName || "Joueur classé", title:progress.title, elo:progress.elo, rankedMatches:progress.rankedMatches, currentRankId:progress.currentRankId, rankProtection:progress.rankProtection, wins:progress.wins, losses:progress.losses, hallOfFame:Boolean(progress.hallOfFame), rank:rank.label };
 }
 
 let multiLeaderboardEntries = [];
+function renderCachedLeaderboard(entries, detail="") {
+  const list = document.getElementById("leaderboardList");
+  const count = document.getElementById("leaderboardPlayerCount");
+  if (!list || !count) return;
+  multiLeaderboardEntries = entries;
+  count.textContent = `${entries.length} joueur${entries.length > 1 ? "s" : ""}${detail}`;
+  list.innerHTML = entries.map((profile, index) => {
+    const progress = window.AllstarRankingService.normalizeProgress(profile);
+    const rank = window.AllstarRankingService.rankForProgress(progress);
+    const total = progress.wins + progress.losses;
+    return `<button class="leaderboard-row" type="button" data-leaderboard-index="${index}"><span class="leaderboard-place">${index + 1}</span><span><span class="leaderboard-name">${escapeMultiHtml(profile.pseudo || "Joueur")}${progress.hallOfFame ? '<span class="hof-badge" title="Hall of Fame">&#9733;</span>' : ""}</span><span class="leaderboard-meta">${escapeMultiHtml(rank.label)} &middot; ${progress.rankedMatches} classée${progress.rankedMatches > 1 ? "s" : ""} &middot; ${window.AllstarRankingService.winrate(progress.wins, progress.losses)}</span></span><span class="leaderboard-elo">${progress.elo} ELO<br><small>${total} match${total > 1 ? "s" : ""}</small></span></button>`;
+  }).join("") || "<p>Aucun joueur inscrit pour le moment.</p>";
+  list.querySelectorAll("[data-leaderboard-index]").forEach(button => button.addEventListener("click", () => window.openOnlineProfile?.(multiLeaderboardEntries[Number(button.dataset.leaderboardIndex)])));
+}
+
 async function showOnlineLeaderboard() {
   const panel = document.getElementById("multiLeaderboardPanel");
   const list = document.getElementById("leaderboardList");
@@ -167,7 +185,9 @@ async function showOnlineLeaderboard() {
   document.getElementById("multiJoinPanel")?.classList.remove("active");
   document.getElementById("multiExitButton")?.setAttribute("hidden", "");
   panel.classList.add("active");
-  list.innerHTML = "<p>Chargement des joueurs...</p>";
+  const cached = window.AllstarRankingService.getCachedLeaderboard?.() || [];
+  if(cached.length)renderCachedLeaderboard(cached, " · actualisation...");
+  else list.innerHTML = "<p>Chargement des joueurs...</p>";
   try {
     multiLeaderboardEntries = await window.AllstarRankingService.getLeaderboard();
     count.textContent = `${multiLeaderboardEntries.length} joueur${multiLeaderboardEntries.length > 1 ? "s" : ""}`;
@@ -180,6 +200,10 @@ async function showOnlineLeaderboard() {
     list.querySelectorAll("[data-leaderboard-index]").forEach(button => button.addEventListener("click", () => window.openOnlineProfile?.(multiLeaderboardEntries[Number(button.dataset.leaderboardIndex)])));
   } catch (error) {
     console.error("[LEADERBOARD] Chargement impossible", error);
+    if(cached.length){
+      renderCachedLeaderboard(cached, " · hors ligne");
+      return;
+    }
     list.innerHTML = "<p>Classement indisponible : vérifie les droits de lecture Firestore sur la collection users.</p>";
     list.innerHTML = "<p>Classement indisponible : vérifie les droits de lecture Firestore sur la collection leaderboard.</p>";
     count.textContent = "indisponible";

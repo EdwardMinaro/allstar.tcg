@@ -136,12 +136,20 @@
     return Math.round(k * ((won ? 1 : 0) - expected));
   }
 
-  async function getLeaderboard(){
-    if(!window.AllstarProfileService?.listPublicProfiles)return [];
-    const profiles=await window.AllstarProfileService.listPublicProfiles();
+  function sortLeaderboard(profiles=[]){
     return profiles
       .map(profile=>({...profile,...normalizeProgress(profile)}))
       .sort((a,b)=>Number(b.elo)-Number(a.elo)||Number(b.wins)-Number(a.wins)||String(a.pseudo||"").localeCompare(String(b.pseudo||""),"fr"));
+  }
+
+  function getCachedLeaderboard(){
+    if(!window.AllstarProfileService?.getCachedPublicProfiles)return [];
+    return sortLeaderboard(window.AllstarProfileService.getCachedPublicProfiles());
+  }
+
+  async function getLeaderboard(){
+    if(!window.AllstarProfileService?.listPublicProfiles)return getCachedLeaderboard();
+    return sortLeaderboard(await window.AllstarProfileService.listPublicProfiles());
   }
 
   async function updateEloAfterMatch(profile, match={}){
@@ -216,6 +224,7 @@
     TRYOUT_MATCHES,
     RANKS,
     getLeaderboard,
+    getCachedLeaderboard,
     updateEloAfterMatch,
     xpForNextLevel,
     normalizeProgress,

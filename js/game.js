@@ -7132,6 +7132,10 @@ document.addEventListener("DOMContentLoaded", ()=>{
   wireSaveScreen();
   wireDisplayOptions();
   showInstalledVersion();
+  void window.AllstarFirebaseService?.warmup?.().then(services=>{
+    const user=services.auth?.currentUser;
+    if(user)void window.AllstarProfileService?.ensureUserProfile?.(user);
+  }).catch(()=>{});
   window.AllstarDesktop?.onDesktopEvent?.(({type})=>{
     if(type==="update-checking")showSystemToast("Recherche d'une mise a jour...");
     if(type==="update-available")showSystemToast("Mise a jour trouvee : telechargement en cours...",5000);

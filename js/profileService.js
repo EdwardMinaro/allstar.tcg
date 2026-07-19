@@ -20,6 +20,49 @@
     decks: {},
     settings: {}
   };
+  const PROFILE_CACHE_PREFIX = "allstarProfileCacheV2:";
+  const LEADERBOARD_CACHE_KEY = "allstarLeaderboardCacheV2";
+  const profileRequests = new Map();
+  const leaderboardState = {request:null, profiles:[]};
+  const leaderboardSyncState = new Map();
+
+  function readCache(key){
+    try{return JSON.parse(localStorage.getItem(key)||"null");}catch{return null;}
+  }
+
+  function writeCache(key, value){
+    try{localStorage.setItem(key,JSON.stringify(value));}catch{}
+  }
+
+  function networkDeadline(promise, message, timeout=8000){
+    let timer=null;
+    return Promise.race([
+      promise,
+      new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(message)),timeout);})
+    ]).finally(()=>clearTimeout(timer));
+  }
+
+  function getCachedUserProfile(uid){
+    if(!uid)return null;
+    return readCache(`${PROFILE_CACHE_PREFIX}${uid}`)?.profile||null;
+  }
+
+  function cacheUserProfile(uid, profile){
+    if(uid&&profile)writeCache(`${PROFILE_CACHE_PREFIX}${uid}`,{savedAt:Date.now(),profile});
+    return profile;
+  }
+
+  function getCachedPublicProfiles(){
+    const cached=readCache(LEADERBOARD_CACHE_KEY);
+    return Array.isArray(cached?.profiles) ? cached.profiles : [];
+  }
+
+  function cachePublicProfiles(profiles){
+    const safe=Array.isArray(profiles)?profiles:[];
+    leaderboardState.profiles=safe;
+    writeCache(LEADERBOARD_CACHE_KEY,{savedAt:Date.now(),profiles:safe});
+    return safe;
+  }
 
   function cleanPseudo(pseudo, email){
     const value = String(pseudo || "").trim();
@@ -54,6 +97,7 @@
       updatedAt: now
     };
     await setDoc(doc(db, "users", uid), profile, {merge: true});
+    cacheUserProfile(uid, profile);
     void syncLeaderboardProfile(uid, profile);
     return profile;
   }
@@ -62,7 +106,7 @@
     if(!uid)return null;
     const {db, doc, getDoc} = await firestoreTools();
     const snap = await getDoc(doc(db, "users", uid));
-    return snap.exists() ? snap.data() : null;
+    return snap.exists() ? cacheUserProfile(uid, snap.data()) : null;
   }
 
   async function updateUserProfile(uid, data){
@@ -73,6 +117,7 @@
       updatedAt: serverTimestamp()
     });
     const profile=await getUserProfile(uid);
+    cacheUserProfile(uid, profile);
     void syncLeaderboardProfile(uid, profile);
     return profile;
   }
@@ -95,51 +140,81 @@
 
   async function syncLeaderboardProfile(uid, profile){
     if(!uid||!profile)return;
-    try{
+    const publicProfile=publicLeaderboardProfile(uid, profile);
+    const fingerprint=JSON.stringify(publicProfile);
+    const previous=leaderboardSyncState.get(uid);
+    if(previous?.fingerprint===fingerprint)return previous.promise||Promise.resolve();
+    const task=(async()=>{
       const {db, doc, setDoc, serverTimestamp} = await firestoreTools();
       await setDoc(doc(db, "leaderboard", uid), {
-        ...publicLeaderboardProfile(uid, profile),
+        ...publicProfile,
         updatedAt: serverTimestamp()
       }, {merge: true});
-    }catch(error){
+    })().catch(error=>{
+      leaderboardSyncState.delete(uid);
       console.warn("[LEADERBOARD] Synchronisation du profil indisponible.", error);
-    }
+    });
+    leaderboardSyncState.set(uid,{fingerprint,promise:task});
+    return task;
   }
 
   async function listPublicProfiles(){
-    const {db, collection, getDocs} = await firestoreTools();
-    const snapshot = await getDocs(collection(db, "leaderboard"));
-    return snapshot.docs.map(entry=>({uid:entry.id,...entry.data()}));
+    if(leaderboardState.request)return leaderboardState.request;
+    leaderboardState.request=(async()=>{
+      const {db, collection, getDocs} = await firestoreTools();
+      const snapshot = await networkDeadline(
+        getDocs(collection(db, "leaderboard")),
+        "Le classement met trop de temps a repondre."
+      );
+      return cachePublicProfiles(snapshot.docs.map(entry=>({uid:entry.id,...entry.data()})));
+    })().finally(()=>{leaderboardState.request=null;});
+    return leaderboardState.request;
   }
 
-  async function ensureUserProfile(user, fallbackPseudo){
+  async function loadUserProfile(user, fallbackPseudo){
     if(!user)return null;
-    const existing = await getUserProfile(user.uid);
-    if(existing){
-      const genericPseudo=!existing.pseudo||existing.pseudo==="Joueur ALLSTAR";
-      const pseudo=genericPseudo
-        ? cleanPseudo(fallbackPseudo||user.displayName, user.email)
-        : cleanPseudo(existing.pseudo, user.email);
-      const email=existing.email||user.email||"";
-      const profile={...existing,pseudo,email};
-      if(pseudo!==existing.pseudo||email!==existing.email){
-        firestoreTools().then(({db,doc,setDoc,serverTimestamp})=>setDoc(doc(db,"users",user.uid),{
-          pseudo,
-          email,
-          updatedAt:serverTimestamp()
-        },{merge:true})).catch(error=>console.warn("[PROFILE] Mise a jour du pseudo indisponible.",error));
+    const cached=getCachedUserProfile(user.uid);
+    try{
+      const existing = await getUserProfile(user.uid);
+      if(existing){
+        const genericPseudo=!existing.pseudo||existing.pseudo==="Joueur ALLSTAR";
+        const pseudo=genericPseudo
+          ? cleanPseudo(fallbackPseudo||user.displayName, user.email)
+          : cleanPseudo(existing.pseudo, user.email);
+        const email=existing.email||user.email||"";
+        const profile=cacheUserProfile(user.uid,{...existing,pseudo,email});
+        if(pseudo!==existing.pseudo||email!==existing.email){
+          firestoreTools().then(({db,doc,setDoc,serverTimestamp})=>setDoc(doc(db,"users",user.uid),{
+            pseudo,
+            email,
+            updatedAt:serverTimestamp()
+          },{merge:true})).catch(error=>console.warn("[PROFILE] Mise a jour du pseudo indisponible.",error));
+        }
+        void syncLeaderboardProfile(user.uid, profile);
+        return profile;
       }
-      void syncLeaderboardProfile(user.uid, profile);
-      return profile;
+      return createUserProfile(user.uid, user.email, fallbackPseudo || user.displayName);
+    }catch(error){
+      if(cached)return cached;
+      throw error;
     }
-    return createUserProfile(user.uid, user.email, fallbackPseudo || user.displayName);
+  }
+
+  function ensureUserProfile(user, fallbackPseudo){
+    if(!user)return Promise.resolve(null);
+    if(profileRequests.has(user.uid))return profileRequests.get(user.uid);
+    const request=loadUserProfile(user,fallbackPseudo).finally(()=>profileRequests.delete(user.uid));
+    profileRequests.set(user.uid,request);
+    return request;
   }
 
   window.AllstarProfileService = {
     createUserProfile,
     getUserProfile,
+    getCachedUserProfile,
     updateUserProfile,
     listPublicProfiles,
+    getCachedPublicProfiles,
     ensureUserProfile
   };
 })();

@@ -37,7 +37,14 @@
         : appModule.initializeApp(window.ALLSTAR_FIREBASE_CONFIG);
       state.app = app;
       state.auth = authModule.getAuth(app);
-      state.firestore = firestoreModule.getFirestore(app);
+      try{
+        state.firestore = firestoreModule.initializeFirestore(app, {
+          localCache: firestoreModule.persistentLocalCache()
+        });
+      }catch(error){
+        // A previously initialized app can only fall back to the existing instance.
+        state.firestore = firestoreModule.getFirestore(app);
+      }
       state.database = databaseModule.getDatabase(app);
       state.modules = {
         app: appModule,
@@ -68,6 +75,13 @@
     return loadFirebase();
   }
 
+  function warmup(){
+    return loadFirebase().then(async services=>{
+      await services.auth?.authStateReady?.();
+      return services;
+    });
+  }
+
   function firebaseStatus(){
     return {
       configured: configured(),
@@ -85,6 +99,7 @@
   window.AllstarFirebaseService = {
     configured,
     loadFirebase,
+    warmup,
     firebaseServices,
     firebaseStatus,
     currentUser
