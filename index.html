@@ -487,6 +487,7 @@
         <button class="small-btn" type="button" onclick="quickMatch()">Partie rapide</button>
         <button class="small-btn" type="button" onclick="quickRankedMatch()">Partie class&eacute;e</button>
         <button class="small-btn" type="button" onclick="showCustomMatchOptions()">Partie personnalis&eacute;e</button>
+        <button class="small-btn" type="button" onclick="showOnlineLeaderboard()">Classements</button>
       </div>
       <div class="multi-actions" id="multiCustomActions" hidden>
         <button class="small-btn" type="button" onclick="quickRankedMatch()">Match rapide classé</button>
@@ -504,6 +505,11 @@
         <label for="roomCodeInput">Entrer un code</label>
         <input id="roomCodeInput" type="text" maxlength="10" placeholder="RING-4821">
         <button class="small-btn" type="button" onclick="joinOnlineRoom()">Rejoindre</button>
+      </div>
+      <div class="multi-leaderboard-panel" id="multiLeaderboardPanel">
+        <div class="leaderboard-head"><span>Classement ELO</span><strong id="leaderboardPlayerCount">0 joueurs</strong></div>
+        <div class="leaderboard-list" id="leaderboardList"></div>
+        <button class="small-btn dark" type="button" onclick="showOnlineModes()">Retour</button>
       </div>
       <div class="multi-log" id="multiLog"></div>
       <button class="small-btn dark" id="multiExitButton" type="button" onclick="showMenu()">Retour</button>
@@ -526,6 +532,16 @@
 </div>
 
 <div class="overlay" id="roundOverlay"><div class="splash"><p class="big-text" id="roundText">ROUND 1</p><p class="sub-text">La cloche sonne.</p></div></div>
+<div class="overlay" id="onlineMatchIntroOverlay">
+  <div class="splash online-match-intro">
+    <div class="online-intro-player" id="onlineIntroPlayer"></div>
+    <div class="online-intro-vs">VS</div>
+    <div class="online-intro-player" id="onlineIntroOpponent"></div>
+  </div>
+</div>
+<div class="overlay" id="onlineProfileOverlay">
+  <div class="splash online-profile-card" id="onlineProfileCard"></div>
+</div>
 <div class="overlay" id="effectChoiceOverlay">
   <div class="splash effect-choice-splash">
     <p class="big-text effect-choice-title" id="effectChoiceTitle">Choix d'effet</p>

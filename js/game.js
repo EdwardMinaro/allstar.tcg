@@ -3145,7 +3145,7 @@ function startOnlineMatchFromRoom(room, playerSlot){
     enterOnlineMatchFromSnapshot(room, ownSlot);
     return;
   }
-  startMatch({
+  const launch=()=>startMatch({
     mode:"online",
     roomCode:room.roomCode,
     onlineMatchId:`${room.roomCode}-${Date.now().toString(36)}`,
@@ -3159,10 +3159,55 @@ function startOnlineMatchFromRoom(room, playerSlot){
       roomCode:room.roomCode,
       playerSlot:ownSlot,
       opponentSlot
-    }
+    },
+    onlinePlayerProfile:room.players?.[ownSlot]?.profile||null,
+    onlineOpponentProfile:room.players?.[opponentSlot]?.profile||null
   });
-  publishOnlineSnapshotNow();
+  showOnlineMatchIntro(room,ownSlot,()=>{
+    launch();
+    publishOnlineSnapshotNow();
+  });
 }
+
+let onlineIntroRoomCode="";
+let onlineIntroTimer=null;
+let onlineIntroPending=false;
+function onlineProfileSummary(profile={},fallbackName="Joueur"){
+  const progress=window.AllstarRankingService.normalizeProgress(profile||{});
+  const rank=window.AllstarRankingService.rankForElo(progress.elo,progress.rankedMatches);
+  return {name:profile.name||profile.pseudo||fallbackName,rank:profile.rank||rank.label,wins:progress.wins,losses:progress.losses,hallOfFame:Boolean(progress.hallOfFame)};
+}
+function showOnlineMatchIntro(room,playerSlot,onDone){
+  const overlay=document.getElementById("onlineMatchIntroOverlay");
+  const ownSlot=playerSlot==="p2"?"p2":"p1";
+  const opponentSlot=ownSlot==="p1"?"p2":"p1";
+  const player=onlineProfileSummary(room?.players?.[ownSlot]?.profile,room?.players?.[ownSlot]?.name||"Joueur");
+  const opponent=onlineProfileSummary(room?.players?.[opponentSlot]?.profile,room?.players?.[opponentSlot]?.name||"Adversaire");
+  const renderProfile=profile=>`<div class="online-intro-name">${escapeHtml(profile.name)}${profile.hallOfFame?'<span class="hof-badge" title="Hall of Fame">★</span>':""}</div><div class="online-intro-rank">${escapeHtml(profile.rank)}</div><div class="online-intro-record">${profile.wins} victoire${profile.wins>1?"s":""} · ${profile.losses} défaite${profile.losses>1?"s":""}</div>`;
+  document.getElementById("onlineIntroPlayer").innerHTML=renderProfile(player);
+  document.getElementById("onlineIntroOpponent").innerHTML=renderProfile(opponent);
+  onlineIntroRoomCode=room?.roomCode||"";
+  onlineIntroPending=true;
+  overlay?.classList.add("active");
+  clearTimeout(onlineIntroTimer);
+  onlineIntroTimer=setTimeout(()=>{
+    overlay?.classList.remove("active");
+    onlineIntroPending=false;
+    if(onDone)onDone();
+  },2600);
+}
+
+function openOnlineProfile(profile={}){
+  const overlay=document.getElementById("onlineProfileOverlay");
+  const card=document.getElementById("onlineProfileCard");
+  if(!overlay||!card)return;
+  const progress=window.AllstarRankingService.normalizeProgress(profile);
+  const rank=window.AllstarRankingService.rankForElo(progress.elo,progress.rankedMatches);
+  const total=progress.wins+progress.losses;
+  card.innerHTML=`<h2>${escapeHtml(profile.pseudo||profile.name||"Joueur")}${progress.hallOfFame?' <span class="hof-badge" title="Hall of Fame">★</span>':""}</h2><p>${escapeHtml(rank.label)} · ${progress.elo} ELO</p><p>${total} partie${total>1?"s":""} · ${progress.wins} victoire${progress.wins>1?"s":""} / ${progress.losses} défaite${progress.losses>1?"s":""}</p><p>Win rate : ${window.AllstarRankingService.winrate(progress.wins,progress.losses)}</p><button class="small-btn dark" type="button" onclick="closeOnlineProfile()">Retour</button>`;
+  overlay.classList.add("active");
+}
+function closeOnlineProfile(){document.getElementById("onlineProfileOverlay")?.classList.remove("active")}
 
 function onlineContext(){
   const options=G?.matchOptions?.onlineRoom;
@@ -3310,6 +3355,11 @@ function applyOnlineSnapshot(snapshot, playerSlot){
 
 function enterOnlineMatchFromSnapshot(room, playerSlot){
   onlineLastAppliedVersion=Number(room?.matchState?.version||room?.matchState?.updatedAt||0);
+  if(!isOnlineMatch()&&!onlineIntroPending&&onlineIntroRoomCode!==room?.roomCode){
+    showOnlineMatchIntro(room,playerSlot,()=>applyOnlineSnapshot(room?.matchState,playerSlot));
+    return;
+  }
+  if(onlineIntroPending)return;
   applyOnlineSnapshot(room?.matchState, playerSlot);
 }
 
@@ -5807,6 +5857,15 @@ function markCareerXpWin(progress){
   return progress;
 }
 
+function markHallOfFameCareerWin(progress){
+  if(G?.mode!=="career"||!Number.isInteger(G?.careerIndex))return progress;
+  const lastIndex=careerOpponents().findLastIndex(opponent=>opponent&&!opponent.missing);
+  if(G.careerIndex<lastIndex)return progress;
+  progress.hallOfFame=true;
+  progress.titles=Array.from(new Set([...(progress.titles||["Rookie"]),"Hall of Famer"]));
+  return progress;
+}
+
 async function awardProfileProgress(playerWon){
   loadPlayerState();
   let user=null;
@@ -5826,7 +5885,10 @@ async function awardProfileProgress(playerWon){
   progress[playerWon?"wins":"losses"]+=1;
   progress.currentStreak=playerWon ? Math.max(1,progress.currentStreak+1) : Math.min(-1,progress.currentStreak-1);
   progress.bestStreak=Math.max(progress.bestStreak,Math.max(0,progress.currentStreak));
-  if(playerWon)progress=markCareerXpWin(progress);
+  if(playerWon){
+    progress=markCareerXpWin(progress);
+    progress=markHallOfFameCareerWin(progress);
+  }
   if(G?.mode==="ranked"||G?.matchOptions?.ranked){
     progress=await window.AllstarRankingService.updateEloAfterMatch(progress,{won:playerWon,opponentElo:Number(G?.matchOptions?.opponentElo||1000)});
   }
@@ -6898,6 +6960,8 @@ Object.assign(window,{
   startNextCareerMatch,
   startOnlineMatchFromRoom,
   applyOnlineRoomSnapshot,
+  openOnlineProfile,
+  closeOnlineProfile,
   showDeckSelect,
   selectLaunchDeck,
   confirmDeckReady,

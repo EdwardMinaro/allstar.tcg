@@ -54,6 +54,7 @@
     const ranked = mode === "ranked";
     const name = options.name || "Joueur classé";
     const elo = Math.round(Number(options.elo) || 1000);
+    const profile = options.profile || {name, elo};
     const service = new RoomService(new NetworkRoomAdapter());
     const snap = await tools.get(tools.ref(tools.database, queuePath(mode)));
     const entries = snap.exists() ? snap.val() : {};
@@ -72,6 +73,8 @@
       room.players.p2.elo = elo;
       room.players.p1.profileId = entry.playerId;
       room.players.p2.profileId = id;
+      room.players.p1.profile = entry.profile || {name:entry.name, elo:Number(entry.elo || 1000)};
+      room.players.p2.profile = profile;
       room = await service.adapter.writeRoom(room);
       await tools.remove(tools.ref(tools.database, queuePath(mode, queueKey))).catch(() => {});
       currentQueueKey = null;
@@ -83,12 +86,14 @@
     room.matchmaking = { mode, queue: "quick", createdAt: Date.now() };
     room.players.p1.elo = elo;
     room.players.p1.profileId = id;
+    room.players.p1.profile = profile;
     room = await service.adapter.writeRoom(room);
     currentQueueKey = `${mode}:${id}`;
     await tools.set(tools.ref(tools.database, queuePath(mode, id)), {
       playerId: id,
       name,
       elo,
+      profile,
       roomCode: room.roomCode,
       createdAt: Date.now(),
       mode

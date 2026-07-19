@@ -32,7 +32,9 @@
     return {
       db: services.firestore,
       doc: firestore.doc,
+      collection: firestore.collection,
       getDoc: firestore.getDoc,
+      getDocs: firestore.getDocs,
       setDoc: firestore.setDoc,
       updateDoc: firestore.updateDoc,
       serverTimestamp: firestore.serverTimestamp
@@ -51,6 +53,7 @@
       updatedAt: now
     };
     await setDoc(doc(db, "users", uid), profile, {merge: true});
+    await syncLeaderboardProfile(uid, profile);
     return profile;
   }
 
@@ -68,13 +71,50 @@
       ...data,
       updatedAt: serverTimestamp()
     });
-    return getUserProfile(uid);
+    const profile=await getUserProfile(uid);
+    await syncLeaderboardProfile(uid, profile);
+    return profile;
+  }
+
+  function publicLeaderboardProfile(uid, profile={}){
+    return {
+      uid,
+      pseudo: cleanPseudo(profile.pseudo, profile.email),
+      elo: Number(profile.elo) || 1000,
+      wins: Number(profile.wins) || 0,
+      losses: Number(profile.losses) || 0,
+      rankedMatches: Number(profile.rankedMatches) || 0,
+      hallOfFame: Boolean(profile.hallOfFame),
+      title: profile.title || "Rookie"
+    };
+  }
+
+  async function syncLeaderboardProfile(uid, profile){
+    if(!uid||!profile)return;
+    try{
+      const {db, doc, setDoc, serverTimestamp} = await firestoreTools();
+      await setDoc(doc(db, "leaderboard", uid), {
+        ...publicLeaderboardProfile(uid, profile),
+        updatedAt: serverTimestamp()
+      }, {merge: true});
+    }catch(error){
+      console.warn("[LEADERBOARD] Synchronisation du profil indisponible.", error);
+    }
+  }
+
+  async function listPublicProfiles(){
+    const {db, collection, getDocs} = await firestoreTools();
+    const snapshot = await getDocs(collection(db, "leaderboard"));
+    return snapshot.docs.map(entry=>({uid:entry.id,...entry.data()}));
   }
 
   async function ensureUserProfile(user, fallbackPseudo){
     if(!user)return null;
     const existing = await getUserProfile(user.uid);
-    if(existing)return existing;
+    if(existing){
+      await syncLeaderboardProfile(user.uid, existing);
+      return existing;
+    }
     return createUserProfile(user.uid, user.email, fallbackPseudo || user.displayName);
   }
 
@@ -82,6 +122,7 @@
     createUserProfile,
     getUserProfile,
     updateUserProfile,
+    listPublicProfiles,
     ensureUserProfile
   };
 })();

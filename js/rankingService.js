@@ -95,7 +95,11 @@
   }
 
   async function getLeaderboard(){
-    return [];
+    if(!window.AllstarProfileService?.listPublicProfiles)return [];
+    const profiles=await window.AllstarProfileService.listPublicProfiles();
+    return profiles
+      .map(profile=>({...profile,...normalizeProgress(profile)}))
+      .sort((a,b)=>Number(b.elo)-Number(a.elo)||Number(b.wins)-Number(a.wins)||String(a.pseudo||"").localeCompare(String(b.pseudo||""),"fr"));
   }
 
   async function updateEloAfterMatch(profile, match={}){

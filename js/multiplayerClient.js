@@ -60,6 +60,7 @@ function showOnlineModes() {
   document.getElementById("multiCustomActions")?.setAttribute("hidden", "");
   document.getElementById("multiExitButton")?.removeAttribute("hidden");
   document.getElementById("multiJoinPanel")?.classList.remove("active");
+  document.getElementById("multiLeaderboardPanel")?.classList.remove("active");
   if (!multiplayer.room) document.getElementById("multiRoomPanel")?.classList.remove("active");
   setMultiStatus("");
 }
@@ -70,6 +71,7 @@ function resetMultiplayerScreen() {
   document.getElementById("multiExitButton")?.removeAttribute("hidden");
   document.getElementById("multiRoomPanel")?.classList.remove("active");
   document.getElementById("multiJoinPanel")?.classList.remove("active");
+  document.getElementById("multiLeaderboardPanel")?.classList.remove("active");
   const code = document.getElementById("roomCodeDisplay");
   const state = document.getElementById("roomStateDisplay");
   const log = document.getElementById("multiLog");
@@ -87,6 +89,53 @@ function localRankedProgress() {
     return window.AllstarRankingService?.normalizeProgress?.(saved?.profileProgress || {}) || {};
   } catch {
     return {};
+  }
+}
+
+function escapeMultiHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char]));
+}
+
+async function localOnlineIdentity() {
+  const user = window.AllstarAuthService?.getCurrentUser
+    ? await window.AllstarAuthService.getCurrentUser().catch(() => null)
+    : null;
+  const profile = user && window.AllstarProfileService?.ensureUserProfile
+    ? await window.AllstarProfileService.ensureUserProfile(user).catch(() => null)
+    : null;
+  const progress = window.AllstarRankingService.normalizeProgress(profile || localRankedProgress());
+  const rank = window.AllstarRankingService.rankForElo(progress.elo, progress.rankedMatches);
+  return { uid:user?.uid || "", name:profile?.pseudo || user?.displayName || "Joueur classé", elo:progress.elo, rankedMatches:progress.rankedMatches, wins:progress.wins, losses:progress.losses, hallOfFame:Boolean(progress.hallOfFame), rank:rank.label };
+}
+
+let multiLeaderboardEntries = [];
+async function showOnlineLeaderboard() {
+  const panel = document.getElementById("multiLeaderboardPanel");
+  const list = document.getElementById("leaderboardList");
+  const count = document.getElementById("leaderboardPlayerCount");
+  if (!panel || !list || !count) return;
+  document.getElementById("multiMainActions")?.setAttribute("hidden", "");
+  document.getElementById("multiCustomActions")?.setAttribute("hidden", "");
+  document.getElementById("multiRoomPanel")?.classList.remove("active");
+  document.getElementById("multiJoinPanel")?.classList.remove("active");
+  document.getElementById("multiExitButton")?.setAttribute("hidden", "");
+  panel.classList.add("active");
+  list.innerHTML = "<p>Chargement des joueurs...</p>";
+  try {
+    multiLeaderboardEntries = await window.AllstarRankingService.getLeaderboard();
+    count.textContent = `${multiLeaderboardEntries.length} joueur${multiLeaderboardEntries.length > 1 ? "s" : ""}`;
+    list.innerHTML = multiLeaderboardEntries.map((profile, index) => {
+      const progress = window.AllstarRankingService.normalizeProgress(profile);
+      const rank = window.AllstarRankingService.rankForElo(progress.elo, progress.rankedMatches);
+      const total = progress.wins + progress.losses;
+      return `<button class="leaderboard-row" type="button" data-leaderboard-index="${index}"><span class="leaderboard-place">${index + 1}</span><span><span class="leaderboard-name">${escapeMultiHtml(profile.pseudo || "Joueur")}${progress.hallOfFame ? '<span class="hof-badge" title="Hall of Fame">★</span>' : ""}</span><span class="leaderboard-meta">${escapeMultiHtml(rank.label)} · ${progress.rankedMatches} classée${progress.rankedMatches > 1 ? "s" : ""} · ${window.AllstarRankingService.winrate(progress.wins, progress.losses)}</span></span><span class="leaderboard-elo">${progress.elo} ELO<br><small>${total} match${total > 1 ? "s" : ""}</small></span></button>`;
+    }).join("") || "<p>Aucun joueur inscrit pour le moment.</p>";
+    list.querySelectorAll("[data-leaderboard-index]").forEach(button => button.addEventListener("click", () => window.openOnlineProfile?.(multiLeaderboardEntries[Number(button.dataset.leaderboardIndex)])));
+  } catch (error) {
+    console.error("[LEADERBOARD] Chargement impossible", error);
+    list.innerHTML = "<p>Classement indisponible : vérifie les droits de lecture Firestore sur la collection users.</p>";
+    list.innerHTML = "<p>Classement indisponible : vérifie les droits de lecture Firestore sur la collection leaderboard.</p>";
+    count.textContent = "indisponible";
   }
 }
 
@@ -234,8 +283,13 @@ async function createOnlineRoom() {
     setMultiStatus("Cr\u00e9ation de la partie en ligne...");
     openMultiRoomPanel("Cr\u00e9ation de la partie en ligne...");
     initMultiplayerStatus();
-    const room = await multiplayerService().createRoom("Joueur 1");
+    const identity = await localOnlineIdentity();
+    let room = await multiplayerService().createRoom(identity.name);
     multiplayer.playerSlot = "p1";
+    room.players.p1.profile = identity;
+    room.players.p1.elo = identity.elo;
+    room.players.p1.profileId = identity.uid || room.players.p1.id;
+    room = await multiplayerService().adapter.writeRoom(room);
     renderMultiRoom(room);
     setMultiStatus("Partie créée. Donne ce code à ton adversaire.");
     multiplayer.unsubscribe?.();
@@ -252,14 +306,15 @@ async function enterQuickQueue(deck, mode = "ranked") {
     forceNetworkMultiplayerService();
     setMultiStatus("Recherche d'un match classé...");
     openMultiRoomPanel("Recherche d'un adversaire classé...", { canChooseDeck: false });
-    const progress = localRankedProgress();
+    const identity = await localOnlineIdentity();
     const label = mode === "ranked" ? "class\u00e9" : "rapide";
     setMultiStatus(`Recherche d'un match ${label}...`);
     openMultiRoomPanel(`Recherche d'un adversaire ${label}...`, { canChooseDeck: false });
     const result = await window.AllstarMatchmakingService.findMatch({
       name: "Joueur classé",
       deck: deck.cards,
-      elo: progress.elo || 1000,
+      elo: identity.elo || 1000,
+      profile: identity,
       mode
     });
     multiplayer.room = result.room;
@@ -323,8 +378,13 @@ async function joinOnlineRoom() {
     multiplayer.launchedRoomCode = null;
     initMultiplayerStatus();
     const input = document.getElementById("roomCodeInput");
-    const room = await multiplayerService().joinRoom(input?.value, "Joueur 2");
+    const identity = await localOnlineIdentity();
+    let room = await multiplayerService().joinRoom(input?.value, identity.name);
     multiplayer.playerSlot = "p2";
+    room.players.p2.profile = identity;
+    room.players.p2.elo = identity.elo;
+    room.players.p2.profileId = identity.uid || room.players.p2.id;
+    room = await multiplayerService().adapter.writeRoom(room);
     document.getElementById("multiRoomPanel")?.classList.add("active");
     document.getElementById("multiJoinPanel")?.classList.remove("active");
     multiplayer.unsubscribe?.();
@@ -377,6 +437,7 @@ window.quickRankedMatch = quickRankedMatch;
 window.showCustomMatchOptions = showCustomMatchOptions;
 window.showOnlineModes = showOnlineModes;
 window.showJoinRoom = showJoinRoom;
+window.showOnlineLeaderboard = showOnlineLeaderboard;
 window.showOnlineDeckReady = showOnlineDeckReady;
 window.closeOnlineSession = closeOnlineSession;
 window.initMultiplayerStatus = initMultiplayerStatus;
