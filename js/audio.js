@@ -151,7 +151,7 @@ const AUDIO_LIBRARY = {
       src: "assets/audio/music/tom_la_ruffa.mp3"
     },
     the_butcher_zerk: {
-      label: "The Butcher Zerk",
+      label: "Oeil de L'ascension",
       wrestler: "The Butcher Zerk",
       src: "assets/audio/music/the_butcher_zerk.mp3"
     },
