@@ -4591,6 +4591,20 @@ button{font-family:inherit;cursor:pointer}
   }
 }
 
+/* The three home controls stay one aligned toolbar, including short screens. */
+#menu .home-settings,
+#menu .home-profile-button,
+#menu .home-next-track-button{
+  box-sizing:border-box;
+}
+
+@media (max-width:1180px), (max-height:760px){
+  #menu .home-next-track-button{
+    width:54px !important;
+    height:54px !important;
+  }
+}
+
 /* Ring 0.1.15: the mat is the full playable surface; ropes sit over it
    as a compact frame instead of consuming the board's interior. */
 #game .ring-frame{
