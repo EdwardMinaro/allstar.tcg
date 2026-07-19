@@ -5632,6 +5632,44 @@ button:disabled,
   }
 }
 
+/* Keep deck scrolling available without the default browser chrome taking over. */
+#decks .deck-selected-grid,
+#decks .deck-card-pool{
+  scrollbar-width:thin;
+  scrollbar-color:#a57a16 #0a0b10;
+  scrollbar-gutter:stable;
+}
+
+#decks .deck-selected-grid::-webkit-scrollbar,
+#decks .deck-card-pool::-webkit-scrollbar{
+  width:9px;
+  height:9px;
+}
+
+#decks .deck-selected-grid::-webkit-scrollbar-track,
+#decks .deck-card-pool::-webkit-scrollbar-track{
+  border:2px solid #08090d;
+  border-radius:999px;
+  background:#14151c;
+}
+
+#decks .deck-selected-grid::-webkit-scrollbar-thumb,
+#decks .deck-card-pool::-webkit-scrollbar-thumb{
+  border:2px solid #08090d;
+  border-radius:999px;
+  background:linear-gradient(180deg,#d9ac35,#805e13);
+}
+
+#decks .deck-selected-grid::-webkit-scrollbar-thumb:hover,
+#decks .deck-card-pool::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,#ffe071,#a97817);
+}
+
+#decks .deck-selected-grid::-webkit-scrollbar-corner,
+#decks .deck-card-pool::-webkit-scrollbar-corner{
+  background:#0a0b10;
+}
+
 #challenge .challenge-menu-card{
   width:min(1440px,96vw);
 }
