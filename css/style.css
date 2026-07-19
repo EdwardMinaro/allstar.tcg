@@ -5711,55 +5711,22 @@ button:disabled,
   clip-path:inset(0 round 12px) !important;
 }
 
-/* Board geometry: use one compact card silhouette for both sides of the ring. */
+/* ALLSTAR uses the standard board geometry; only its compact boss bar is added. */
 @media (min-width:901px){
-  #game.allstar-match .ring{
-    width:min(100%,880px) !important;
-    aspect-ratio:760 / 600 !important;
-  }
-
-  #game.allstar-match .zone{
-    width:clamp(104px,6.65vw,126px) !important;
-    height:auto !important;
-    aspect-ratio:112 / 148 !important;
-    padding:0 !important;
-  }
-
-  #game.allstar-match .zone .game-card{
-    width:100% !important;
-    height:100% !important;
-    min-width:0 !important;
-    min-height:0 !important;
-    transform:none !important;
-  }
-
-  #game.allstar-match .zone.man.enemy,
-  #game.allstar-match .zone.cat.enemy,
-  #game.allstar-match .zone.obj.enemy{
-    top:clamp(132px,14.5vh,164px) !important;
-  }
-
-  #game.allstar-match .zone.man.player,
-  #game.allstar-match .zone.cat.player,
-  #game.allstar-match .zone.obj.player{
-    bottom:clamp(96px,10.5vh,124px) !important;
-  }
-
   #game.allstar-match .ring .challenge-match-hud{
-    top:64px;
-    width:min(430px,56%);
-    padding:6px 10px 8px;
-    z-index:11;
+    top:4px;
+    width:min(320px,44%);
+    padding:4px 8px 5px;
+    z-index:12;
   }
 
   #game.allstar-match .ring .challenge-hp-bar{
-    height:11px;
-    margin:5px 0;
+    height:8px;
+    margin:3px 0;
   }
-}
 
-#game.allstar-match .slot-empty,
-#game.allstar-match .game-card.rendered{
-  border-radius:10px !important;
-  clip-path:inset(0 round 10px) !important;
+  #game.allstar-match .challenge-hud-head,
+  #game.allstar-match .challenge-hud-meta{
+    font-size:13px;
+  }
 }
