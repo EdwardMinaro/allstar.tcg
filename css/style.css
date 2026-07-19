@@ -5726,7 +5726,43 @@ button:disabled,
   }
 
   #game.allstar-match .challenge-hud-head,
-  #game.allstar-match .challenge-hud-meta{
+#game.allstar-match .challenge-hud-meta{
     font-size:13px;
+  }
+}
+
+/* One desktop board composition: grow the ring to the available space instead
+   of capping it at a fixed pixel width, then keep the outer card columns clear
+   of the ropes on every supported resolution. */
+@media (min-width:901px){
+  #game .ring{
+    width:min(100%,140vh) !important;
+    height:auto !important;
+    aspect-ratio:760 / 540;
+    max-height:100% !important;
+  }
+
+  #game .preview-panel{
+    width:min(100%,clamp(180px,19vw,374px)) !important;
+  }
+
+  #game .zone.man.enemy,
+  #game .zone.man.player{
+    left:23% !important;
+  }
+
+  #game .zone.obj.enemy,
+  #game .zone.obj.player{
+    left:77% !important;
+  }
+
+  #game .zt-en-man,
+  #game .zt-pl-man{
+    left:23% !important;
+  }
+
+  #game .zt-en-obj,
+  #game .zt-pl-obj{
+    left:77% !important;
   }
 }
