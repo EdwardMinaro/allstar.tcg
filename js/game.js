@@ -2591,6 +2591,7 @@ function serializedPlayerState(){
     starterGranted:Boolean(playerState.starterGranted),
     welcomeClaimed:Boolean(playerState.welcomeClaimed),
     careerUnlocked:playerState.careerUnlocked||0,
+    settledOnlineMatches:playerState.settledOnlineMatches||{},
     profileProgress:playerState.profileProgress||{}
   };
 }
@@ -2629,6 +2630,7 @@ function remotePlayerState(remote){
       starterGranted:Boolean(remote.starterGranted),
       welcomeClaimed:Boolean(remote.welcomeClaimed),
       careerUnlocked:Number(remote.careerUnlocked)||0,
+      settledOnlineMatches:remote.settledOnlineMatches||{},
       profileProgress:remote.profileProgress||{}
     };
   }
@@ -3085,6 +3087,7 @@ function startOnlineMatchFromRoom(room, playerSlot){
   startMatch({
     mode:"online",
     roomCode:room.roomCode,
+    onlineMatchId:`${room.roomCode}-${Date.now().toString(36)}`,
     onlinePlayerSlot:ownSlot,
     ranked:Boolean(room.ranked),
     opponentElo:Number(room.players?.[opponentSlot]?.elo||1000),
@@ -3166,6 +3169,7 @@ function onlineSnapshotFromGame(){
     round:G.round,
     stat:G.stat,
     wheelSpinId:G.resolving&&G.stat ? `${G.round}:${G.stat}:${G.turnsTaken}` : null,
+    matchId:G.matchOptions?.onlineMatchId||`${ctx.roomCode}:legacy`,
     lockedStat:G.lockedStat||null,
     over:Boolean(G.over),
     resolving:Boolean(G.resolving),
@@ -3209,6 +3213,7 @@ function applyOnlineSnapshot(snapshot, playerSlot){
       ...(G?.matchOptions||{}),
       mode:"online",
       roomCode:snapshot.roomCode,
+      onlineMatchId:snapshot.matchId||G?.matchOptions?.onlineMatchId||`${snapshot.roomCode||"room"}:legacy`,
       onlinePlayerSlot:ownSlot,
       ranked:Boolean(snapshot.ranked),
       opponentElo:Number(snapshot.rankedElos?.[opponentSlot]||snapshot.opponentElo||G?.matchOptions?.opponentElo||1000),
@@ -3235,7 +3240,10 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     onlineLastWheelSpinId=incomingWheelId;
     showRemoteWheel(snapshot.stat);
   }
-  if(G.over)showOnlineFinalResult();
+  if(G.over){
+    settleOnlineMatchRewards();
+    showOnlineFinalResult();
+  }
   onlineApplyingRemote=false;
 }
 
@@ -5272,6 +5280,12 @@ function showPin(name,success,chance,roll,winnerSide=null){
         markOnlineDirty();
         queueOnlineSnapshotPublish();
         const playerWon=winnerSide==="player";
+        if(G.mode==="online"){
+          settleOnlineMatchRewards();
+          fadeMusic(playerWon ? "victoire" : "defaite",900);
+          showOnlineFinalResult();
+          return;
+        }
         awardMatchCredits(playerWon);
         void awardProfileProgress(playerWon);
         if(playerWon&&G.mode==="career"&&Number.isInteger(G.careerIndex)){
@@ -5291,10 +5305,6 @@ function showPin(name,success,chance,roll,winnerSide=null){
           }
         }
         fadeMusic(playerWon ? "victoire" : "defaite",900);
-        if(G.mode==="online"){
-          showOnlineFinalResult();
-          return;
-        }
         actions.classList.add("active");
       }else{
         fadeMusic("match",600);
@@ -5342,6 +5352,7 @@ let playerState = {
   starterGranted: false,
   welcomeClaimed: false,
   careerUnlocked: 0,
+  settledOnlineMatches: {},
   profileProgress: null,
   loaded: false
 };
@@ -5388,6 +5399,7 @@ function loadPlayerState(){
         starterGranted:Boolean(saved.starterGranted),
         welcomeClaimed:Boolean(saved.welcomeClaimed),
         careerUnlocked:Number(saved.careerUnlocked)||0,
+        settledOnlineMatches:saved.settledOnlineMatches||{},
         profileProgress:window.AllstarRankingService.normalizeProgress(saved.profileProgress||{}),
         loaded:true
       };
@@ -5395,10 +5407,11 @@ function loadPlayerState(){
   }catch{
     // Progression remains playable without localStorage.
   }
-  if(!playerState.loaded)playerState={credits:0,collection:{},boosterTickets:{},challenge:null,starterGranted:false,welcomeClaimed:false,careerUnlocked:0,profileProgress:window.AllstarRankingService.normalizeProgress({}),loaded:true};
+  if(!playerState.loaded)playerState={credits:0,collection:{},boosterTickets:{},challenge:null,starterGranted:false,welcomeClaimed:false,careerUnlocked:0,settledOnlineMatches:{},profileProgress:window.AllstarRankingService.normalizeProgress({}),loaded:true};
   playerState.profileProgress=window.AllstarRankingService.normalizeProgress(playerState.profileProgress||{});
   playerState.boosterTickets=playerState.boosterTickets||{};
   playerState.challenge=playerState.challenge||null;
+  playerState.settledOnlineMatches=playerState.settledOnlineMatches||{};
   if(!playerState.starterGranted){
     playerState.starterGranted=true;
     playerState.credits=Math.max(playerState.credits,1000);
@@ -5427,6 +5440,7 @@ function savePlayerState(){
       starterGranted:playerState.starterGranted,
       welcomeClaimed:playerState.welcomeClaimed,
       careerUnlocked:playerState.careerUnlocked||0,
+      settledOnlineMatches:playerState.settledOnlineMatches||{},
       profileProgress:playerState.profileProgress||{}
     }));
   }catch{
@@ -5671,6 +5685,29 @@ function awardMatchCredits(playerWon){
   playerState.credits+=gain;
   savePlayerState();
   log(`<b>${gain} crédits gagnés.</b> Total : ${playerState.credits}.`);
+}
+
+function onlineMatchSettlementId(){
+  const ctx=onlineContext();
+  return G?.matchOptions?.onlineMatchId||`${ctx.roomCode||"room"}:legacy:${G?.round||0}`;
+}
+
+function settleOnlineMatchRewards(){
+  if(!isOnlineMatch()||!G?.over||!G?.winner)return false;
+  loadPlayerState();
+  const matchId=onlineMatchSettlementId();
+  playerState.settledOnlineMatches=playerState.settledOnlineMatches||{};
+  if(playerState.settledOnlineMatches[matchId])return false;
+  playerState.settledOnlineMatches[matchId]=Date.now();
+  playerState.settledOnlineMatches=Object.fromEntries(
+    Object.entries(playerState.settledOnlineMatches)
+      .sort(([,a],[,b])=>Number(b)-Number(a))
+      .slice(0,100)
+  );
+  const playerWon=G.winner==="player";
+  awardMatchCredits(playerWon);
+  void awardProfileProgress(playerWon);
+  return true;
 }
 
 function profileXpGainForMatch(playerWon, progress){
