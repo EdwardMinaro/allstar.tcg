@@ -536,7 +536,7 @@ class AudioManager {
     if (!toast || !name || !item?.wrestler) return;
 
     clearTimeout(this.toastTimer);
-    name.textContent = item.wrestler;
+    name.textContent = item.label || item.wrestler;
     toast.classList.add("active");
     this.toastTimer = setTimeout(() => {
       toast.classList.remove("active");
