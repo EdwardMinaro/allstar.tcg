@@ -64,6 +64,23 @@ function showOnlineModes() {
   setMultiStatus("");
 }
 
+function resetMultiplayerScreen() {
+  document.getElementById("multiMainActions")?.removeAttribute("hidden");
+  document.getElementById("multiCustomActions")?.setAttribute("hidden", "");
+  document.getElementById("multiExitButton")?.removeAttribute("hidden");
+  document.getElementById("multiRoomPanel")?.classList.remove("active");
+  document.getElementById("multiJoinPanel")?.classList.remove("active");
+  const code = document.getElementById("roomCodeDisplay");
+  const state = document.getElementById("roomStateDisplay");
+  const log = document.getElementById("multiLog");
+  const input = document.getElementById("roomCodeInput");
+  if (code) code.textContent = "----";
+  if (state) state.textContent = "En attente...";
+  if (log) log.innerHTML = "";
+  if (input) input.value = "";
+  setMultiStatus("");
+}
+
 function localRankedProgress() {
   try {
     const saved = JSON.parse(localStorage.getItem("allstarsPlayerV1") || "null");
@@ -350,6 +367,7 @@ function closeOnlineSession() {
   multiplayer.playerSlot = null;
   multiplayer.launchedRoomCode = null;
   setMultiDeckReadyAvailable(false);
+  resetMultiplayerScreen();
 }
 
 window.createOnlineRoom = createOnlineRoom;
