@@ -5937,12 +5937,12 @@ button:disabled,
 
   #game .zone.man.enemy,
   #game .zone.man.player{
-    left:28% !important;
+    left:25% !important;
   }
 
   #game .zone.obj.enemy,
   #game .zone.obj.player{
-    left:72% !important;
+    left:75% !important;
   }
 
   #game .zone.cat.enemy,
@@ -5952,12 +5952,12 @@ button:disabled,
 
   #game .zt-en-man,
   #game .zt-pl-man{
-    left:28% !important;
+    left:25% !important;
   }
 
   #game .zt-en-obj,
   #game .zt-pl-obj{
-    left:72% !important;
+    left:75% !important;
   }
 
   #game .zt-en-cat,
