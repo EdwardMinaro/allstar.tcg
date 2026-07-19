@@ -5938,6 +5938,22 @@ button:disabled,
   clip-path:inset(0 round 12px) !important;
 }
 
+/* Card renders have a subtle native corner radius. Match the ring slots to it
+   and stretch each full render to its frame so every rarity lands identically. */
+#game .slot-empty,
+#game .game-card.rendered,
+#game .game-card.rendered .full-card-art{
+  border-radius:6px !important;
+}
+
+#game .game-card.rendered{
+  clip-path:inset(0 round 6px) !important;
+}
+
+#game .game-card.rendered .full-card-art{
+  object-fit:fill !important;
+}
+
 /* ALLSTAR uses the standard board geometry; only its compact boss bar is added. */
 @media (min-width:901px){
   #game.allstar-match .ring .challenge-match-hud{
