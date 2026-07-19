@@ -321,7 +321,9 @@ class AudioManager {
 
   playNextWrestlerMusic(duration = 1600) {
     const nextId = this.nextWrestlerMusicId();
-    if (nextId) this.fadeMusic(nextId, duration);
+    if (!nextId) return null;
+    this.fadeMusic(nextId, duration);
+    return nextId;
   }
 
   playWrestlerRadio() {
@@ -615,6 +617,11 @@ function syncMusicSelects(value) {
   document.querySelectorAll(".music-select-control").forEach(select => {
     select.value = value;
   });
+}
+
+function playNextTheme() {
+  const nextId = audioManager.playNextWrestlerMusic(500);
+  if (nextId) syncMusicSelects(nextId);
 }
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -61,6 +61,7 @@
   <div class="home-stage">
     <button class="settings home-settings" onclick="showHomeOptions()" aria-label="Options">&#9881;</button>
     <button class="settings home-profile-button" onclick="showProfile()" aria-label="Profil"><span class="profile-icon" aria-hidden="true"></span></button>
+    <button class="next-track-button home-next-track-button" type="button" onclick="playNextTheme()" aria-label="Musique suivante" title="Musique suivante">&#9835;&#9654;</button>
     <div class="home-light red"></div>
     <div class="home-light blue"></div>
     <div class="stage-spotlight spot-left"></div>
@@ -208,6 +209,7 @@
 <section id="game" class="screen">
   <div class="crowd"></div>
   <button class="settings" onclick="toggleOptions()" aria-label="Options">&#9881;</button>
+  <button class="next-track-button game-next-track-button" type="button" onclick="playNextTheme()" aria-label="Musique suivante" title="Musique suivante">&#9835;&#9654;</button>
   <div class="options-menu" id="optionsMenu">
     <button onclick="toggleOptions()">Revenir à la partie</button>
     <button class="danger" onclick="startGame()">Abandonner</button>

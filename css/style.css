@@ -5575,6 +5575,37 @@ button:disabled,
     0 0 20px rgba(246,194,51,.30) !important;
 }
 
+.next-track-button{
+  position:absolute;
+  z-index:31;
+  width:48px;
+  height:48px;
+  border:3px solid #050508;
+  border-radius:12px;
+  background:linear-gradient(180deg,#3a3b48,#171821);
+  color:#f7ce55;
+  box-shadow:4px 4px 0 rgba(0,0,0,.5);
+  font-size:19px;
+  font-weight:900;
+  line-height:1;
+  letter-spacing:1px;
+}
+
+.next-track-button:hover{
+  filter:brightness(1.18);
+  transform:translateY(-1px);
+}
+
+#menu .home-next-track-button{
+  left:calc(5% + 172px);
+  top:calc(1% + 44px);
+}
+
+#game .game-next-track-button{
+  left:108px;
+  top:32px;
+}
+
 #challenge .challenge-menu-card{
   width:min(1440px,96vw);
 }
