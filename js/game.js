@@ -2592,6 +2592,7 @@ function serializedPlayerState(){
     welcomeClaimed:Boolean(playerState.welcomeClaimed),
     careerUnlocked:playerState.careerUnlocked||0,
     settledOnlineMatches:playerState.settledOnlineMatches||{},
+    savedAt:Number(playerState.savedAt)||0,
     profileProgress:playerState.profileProgress||{}
   };
 }
@@ -2631,6 +2632,7 @@ function remotePlayerState(remote){
       welcomeClaimed:Boolean(remote.welcomeClaimed),
       careerUnlocked:Number(remote.careerUnlocked)||0,
       settledOnlineMatches:remote.settledOnlineMatches||{},
+      savedAt:Number(remote.savedAt)||0,
       profileProgress:remote.profileProgress||{}
     };
   }
@@ -2641,21 +2643,46 @@ function remoteDeckState(remote){
   if(remote?.decks?.decks?.length)return remote.decks;
   return null;
 }
+
+function mergeSavedCounts(remoteCounts={},localCounts={}){
+  const merged={...remoteCounts};
+  Object.entries(localCounts||{}).forEach(([key,value])=>{
+    merged[key]=Math.max(Number(merged[key])||0,Number(value)||0);
+  });
+  return merged;
+}
+
+function mergePlayerStateForHydration(remotePlayer,localPlayer){
+  if(!remotePlayer)return localPlayer||null;
+  if(!localPlayer)return remotePlayer;
+  const localIsNewer=Number(localPlayer.savedAt||0)>Number(remotePlayer.savedAt||0);
+  return {
+    ...remotePlayer,
+    credits:localIsNewer ? Number(localPlayer.credits)||0 : Number(remotePlayer.credits)||0,
+    collection:mergeSavedCounts(remotePlayer.collection,localPlayer.collection),
+    boosterTickets:mergeSavedCounts(remotePlayer.boosterTickets,localPlayer.boosterTickets),
+    challenge:localIsNewer ? (localPlayer.challenge||null) : (remotePlayer.challenge||null),
+    starterGranted:Boolean(remotePlayer.starterGranted||localPlayer.starterGranted),
+    welcomeClaimed:Boolean(remotePlayer.welcomeClaimed||localPlayer.welcomeClaimed),
+    careerUnlocked:Math.max(Number(remotePlayer.careerUnlocked)||0,Number(localPlayer.careerUnlocked)||0),
+    settledOnlineMatches:{...(remotePlayer.settledOnlineMatches||{}),...(localPlayer.settledOnlineMatches||{})},
+    savedAt:Math.max(Number(remotePlayer.savedAt)||0,Number(localPlayer.savedAt)||0),
+    profileProgress:localIsNewer ? (localPlayer.profileProgress||{}) : (remotePlayer.profileProgress||{})
+  };
+}
+
 async function hydrateCloudSaveForUser(user){
   if(!user || !window.AllstarSaveService)return false;
   const remote=await window.AllstarSaveService.loadPlayerData(user.uid);
-  let nextPlayer=remotePlayerState(remote);
+  const remotePlayer=remotePlayerState(remote);
   const nextDecks=remoteDeckState(remote);
-  if(!nextPlayer && !nextDecks)return false;
-  let needsCloudSync=false;
+  let localPlayer=null;
   try{
-    const local=JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)||"null");
-    const localCareerUnlocked=Number(local?.careerUnlocked)||0;
-    if(nextPlayer&&localCareerUnlocked>Number(nextPlayer.careerUnlocked||0)){
-      nextPlayer={...nextPlayer,careerUnlocked:localCareerUnlocked};
-      needsCloudSync=true;
-    }
+    localPlayer=JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)||"null");
   }catch{}
+  const nextPlayer=mergePlayerStateForHydration(remotePlayer,localPlayer);
+  if(!nextPlayer && !nextDecks)return false;
+  const needsCloudSync=Boolean(remotePlayer&&JSON.stringify(nextPlayer)!==JSON.stringify(remotePlayer));
   cloudSaveHydrating=true;
   try{
     if(nextPlayer)localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(nextPlayer));
@@ -5367,6 +5394,7 @@ let playerState = {
   welcomeClaimed: false,
   careerUnlocked: 0,
   settledOnlineMatches: {},
+  savedAt: 0,
   profileProgress: null,
   loaded: false
 };
@@ -5414,6 +5442,7 @@ function loadPlayerState(){
         welcomeClaimed:Boolean(saved.welcomeClaimed),
         careerUnlocked:Number(saved.careerUnlocked)||0,
         settledOnlineMatches:saved.settledOnlineMatches||{},
+        savedAt:Number(saved.savedAt)||0,
         profileProgress:window.AllstarRankingService.normalizeProgress(saved.profileProgress||{}),
         loaded:true
       };
@@ -5421,11 +5450,12 @@ function loadPlayerState(){
   }catch{
     // Progression remains playable without localStorage.
   }
-  if(!playerState.loaded)playerState={credits:0,collection:{},boosterTickets:{},challenge:null,starterGranted:false,welcomeClaimed:false,careerUnlocked:0,settledOnlineMatches:{},profileProgress:window.AllstarRankingService.normalizeProgress({}),loaded:true};
+  if(!playerState.loaded)playerState={credits:0,collection:{},boosterTickets:{},challenge:null,starterGranted:false,welcomeClaimed:false,careerUnlocked:0,settledOnlineMatches:{},savedAt:0,profileProgress:window.AllstarRankingService.normalizeProgress({}),loaded:true};
   playerState.profileProgress=window.AllstarRankingService.normalizeProgress(playerState.profileProgress||{});
   playerState.boosterTickets=playerState.boosterTickets||{};
   playerState.challenge=playerState.challenge||null;
   playerState.settledOnlineMatches=playerState.settledOnlineMatches||{};
+  playerState.savedAt=Number(playerState.savedAt)||0;
   if(!playerState.starterGranted){
     playerState.starterGranted=true;
     playerState.credits=Math.max(playerState.credits,1000);
@@ -5445,6 +5475,7 @@ function loadPlayerState(){
 }
 
 function savePlayerState(){
+  playerState.savedAt=Date.now();
   try{
     localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify({
       credits:playerState.credits,
@@ -5455,6 +5486,7 @@ function savePlayerState(){
       welcomeClaimed:playerState.welcomeClaimed,
       careerUnlocked:playerState.careerUnlocked||0,
       settledOnlineMatches:playerState.settledOnlineMatches||{},
+      savedAt:playerState.savedAt,
       profileProgress:playerState.profileProgress||{}
     }));
   }catch{
