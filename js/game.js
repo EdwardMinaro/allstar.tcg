@@ -4695,7 +4695,10 @@ function consumeRoundObjects(){
       p.objTurnsRemaining-=1;
       if(p.objTurnsRemaining<=0){
         log(`${p.obj.name} quitte le terrain : ses bonus s'arrêtent.`);
-        revertActiveObject(p,true,Boolean(p.objExtraDrawQueued));
+        // Caddie leaves after the round it was played, but its draw belongs
+        // to the following round and must not be cleared with the object.
+        const preserveQueuedDraw=p.obj?.ability==="drawNext1"||Boolean(p.objExtraDrawQueued);
+        revertActiveObject(p,true,preserveQueuedDraw);
       }else{
         log(`${p.obj.name} reste actif (${p.objTurnsRemaining} tour${p.objTurnsRemaining>1?"s":""}).`);
       }
