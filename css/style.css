@@ -5748,21 +5748,31 @@ button:disabled,
 
   #game .zone.man.enemy,
   #game .zone.man.player{
-    left:23% !important;
+    left:28% !important;
   }
 
   #game .zone.obj.enemy,
   #game .zone.obj.player{
-    left:77% !important;
+    left:72% !important;
+  }
+
+  #game .zone.cat.enemy,
+  #game .zone.cat.player{
+    left:50% !important;
   }
 
   #game .zt-en-man,
   #game .zt-pl-man{
-    left:23% !important;
+    left:28% !important;
   }
 
   #game .zt-en-obj,
   #game .zt-pl-obj{
-    left:77% !important;
+    left:72% !important;
+  }
+
+  #game .zt-en-cat,
+  #game .zt-pl-cat{
+    left:50% !important;
   }
 }
