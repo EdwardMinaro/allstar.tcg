@@ -2195,6 +2195,16 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_managers_tommy_rauzy.png"
   },
   {
+    "key": "rare_managers_the_world",
+    "type": "Manager",
+    "rarity": "Rare",
+    "name": "The World",
+    "stats": {},
+    "effect": "Chaque tour, votre adversaire défausse une carte. Si votre catcheur actif est Kyle Hoxton, Drix ou Saitovic, l'adversaire perd aussi -1 Charisme.",
+    "ability": "turnOpponentDiscardWorldCharisma",
+    "renderArt": "assets/card_renders/rare_managers_the_world.png"
+  },
+  {
     "key": "rare_managers_yann_le_kersaudec",
     "type": "Manager",
     "rarity": "Rare",
@@ -2523,6 +2533,7 @@ const EFFECT_REGISTRY = {
   turnEnemyForceMinus2: { timing:"round", text:"Chaque tour : -2 Force adverse." },
   turnEnemySpeedMinus1: { timing:"round", text:"Chaque tour : -1 Vitesse adverse." },
   turnEnemyPinMinus10: { timing:"round", text:"Chaque tour : prochain tombé adverse -10." },
+  turnOpponentDiscardWorldCharisma: { timing:"round", text:"Chaque tour : l'adversaire défausse une carte. Avec Kyle Hoxton, Drix ou Saitovic actif, l'adversaire perd aussi -1 Charisme." },
   turnRandomPermanent10: { timing:"round", text:"Chaque tour : 10% de chance de +1 stat permanent." },
   turnRandomPermanent20: { timing:"round", text:"Chaque tour : 20% de chance de +1 stat permanent." },
   turnRandomPermanent30: { timing:"round", text:"Chaque tour : 30% de chance de +1 stat permanent." },
@@ -4434,6 +4445,20 @@ function applyRoundManagerEffects(){
       opp.pinShield=(opp.pinShield||0)+10;
       log(`[EFFET] ${owner.man.name} protège le prochain tombé adverse : -10.`);
       showEffectFeedback(owner.cat?.card||owner.man,owner.man.name,"Tombé adverse -10","block");
+    }
+    if(owner.man?.ability==="turnOpponentDiscardWorldCharisma"){
+      const discardIndex=opp.hand.length ? Math.floor(Math.random()*opp.hand.length) : -1;
+      if(discardIndex>=0){
+        const [discarded]=opp.hand.splice(discardIndex,1);
+        opp.grave.push(discarded);
+        log(`[EFFET] ${owner.man.name} force ${opp.label} à défausser ${discarded.name}.`);
+        showEffectFeedback(owner.cat?.card||owner.man,owner.man.name,"Défausse adverse","malus");
+      }
+      if(["Kyle Hoxton","Drix","Saitovic"].includes(owner.cat?.card?.name)&&opp.cat){
+        opp.cat.mods.Charisme-=1;
+        log(`[EFFET] ${owner.man.name} affaiblit ${opp.cat.card.name} : -1 Charisme.`);
+        showEffectFeedback(opp.cat.card,owner.man.name,"-1 Charisme","malus");
+      }
     }
 
     const permanentChanceByAbility={turnRandomPermanent10:0.1,turnRandomPermanent20:0.2,turnRandomPermanent30:0.3};

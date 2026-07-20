@@ -2187,6 +2187,16 @@
       "renderArt": "assets/card_renders/rare_managers_tommy_rauzy.png"
     },
     {
+      "key": "rare_managers_the_world",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "The World",
+      "stats": {},
+      "effect": "Chaque tour, votre adversaire défausse une carte. Si votre catcheur actif est Kyle Hoxton, Drix ou Saitovic, l'adversaire perd aussi -1 Charisme.",
+      "ability": "turnOpponentDiscardWorldCharisma",
+      "renderArt": "assets/card_renders/rare_managers_the_world.png"
+    },
+    {
       "key": "rare_managers_yann_le_kersaudec",
       "type": "Manager",
       "rarity": "Rare",
