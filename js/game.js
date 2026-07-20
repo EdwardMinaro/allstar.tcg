@@ -3767,6 +3767,7 @@ function onlineSnapshotFromGame(){
     over:Boolean(G.over),
     resolving:Boolean(G.resolving),
     turnsTaken:Number(G.turnsTaken||0),
+    matchPhase:["player","ai"].includes(G.matchPhase) ? localSideToOnlineSlot(G.matchPhase) : (G.matchPhase||null),
     currentTurn:localSideToOnlineSlot(G.currentTurn),
     roundStarter:G.roundStarter ? localSideToOnlineSlot(G.roundStarter) : null,
     nextStarter:G.nextStarter ? localSideToOnlineSlot(G.nextStarter) : null,
@@ -3823,6 +3824,7 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     roundStarter:snapshot.roundStarter ? (snapshot.roundStarter===ownSlot ? "player" : "ai") : null,
     nextStarter:snapshot.nextStarter ? (snapshot.nextStarter===ownSlot ? "player" : "ai") : null,
     turnsTaken:Number(snapshot.turnsTaken||0),
+    matchPhase:snapshot.matchPhase ? (snapshot.matchPhase===ownSlot ? "player" : snapshot.matchPhase===opponentSlot ? "ai" : snapshot.matchPhase) : null,
     resolving:Boolean(snapshot.resolving),
     winner:snapshot.winner ? (snapshot.winner===ownSlot ? "player" : "ai") : null,
     effectMarks:G?.effectMarks||{}
@@ -3921,6 +3923,7 @@ function startRound(){
   G.currentTurn=G.nextStarter || "player";
   G.roundStarter=G.currentTurn;
   G.nextStarter=G.currentTurn==="player" ? "ai" : "player";
+  G.matchPhase=G.currentTurn;
 
   markOnlineDirty();
   render();
@@ -3928,7 +3931,7 @@ function startRound(){
   playSound("cloche");
   announceTurn();
 
-  if(G.currentTurn==="ai"&&G.mode!=="online") setTimeout(aiTurnSequence,650);
+  if(G.currentTurn==="ai"&&G.mode!=="online") setTimeout(aiTurnSequence,1300);
 }
 
 function activePlayer(){return G.currentTurn==="player"?G.player:G.ai}
@@ -5024,12 +5027,12 @@ function aiTurnSequence(){
   let i=0;
   const run=()=>{
     if(i>=steps.length){
-      setTimeout(endTurn,450);
+      setTimeout(endTurn,800);
       return;
     }
     steps[i++]();
     render();
-    setTimeout(run,450);
+    setTimeout(run,700);
   };
   run();
 }
@@ -5103,6 +5106,7 @@ function beginDiscardPhase(p){
     return;
   }
   G.discarding="player";
+  G.matchPhase="discard";
   const excess=p.hand.length-MAX_HAND_SIZE;
   log("Main limitée à "+MAX_HAND_SIZE+" cartes : choisis "+excess+" carte"+(excess>1?"s":"")+" à envoyer au vestiaire.");
   markOnlineDirty();
@@ -5131,16 +5135,18 @@ function finishEndTurn(){
   G.turnsTaken++;
 
   if(G.turnsTaken>=2){
+    G.matchPhase="roulette";
     resolveBattle();
     return;
   }
 
   G.currentTurn=G.currentTurn==="player"?"ai":"player";
+  G.matchPhase=G.currentTurn;
   markOnlineDirty();
   render();
   announceTurn();
 
-  if(G.currentTurn==="ai"&&G.mode!=="online")setTimeout(aiTurnSequence,650);
+  if(G.currentTurn==="ai"&&G.mode!=="online")setTimeout(aiTurnSequence,1000);
 }
 
 function resolveBattle(){
@@ -5241,6 +5247,8 @@ function statAbilityFeedback(s,stat){
 }
 
 function duel(){
+  G.matchPhase="duel";
+  render();
   const stat=G.stat;
   const ps=score(G.player.cat,stat),as=score(G.ai.cat,stat);
   log(`<b>${stat}</b> : ${ps} / ${as}.`);
@@ -5265,7 +5273,7 @@ function duel(){
     if(wrestlerAbility(G.ai.cat)==="winsTie"&&wrestlerAbility(G.player.cat)!=="winsTie")return win(G.ai,G.player,"égalité");
     log("Égalité.");
     consumeRoundObjects();
-    setTimeout(startRound,800);
+    setTimeout(startRound,1100);
     return;
   }
   if(G.mode==="challenge"&&G.challenge){
@@ -5473,6 +5481,8 @@ function win(winner,loser,reason){
 }
 
 function attemptPin(p,target){
+  G.matchPhase="pin";
+  render();
   markOnlineDirty();
   fadeMusic("tension",500);
   const base=(target?.koSuffered||0)*10;
@@ -5505,13 +5515,23 @@ function updateTagButton(){
   }
 }
 
+function updateMatchPhaseDisplay(){
+  const phaseRoot=document.getElementById("matchPhase");
+  if(!phaseRoot)return;
+  const activePhase=G?.discarding==="player" ? "player" : (G?.matchPhase||G?.currentTurn||"player");
+  phaseRoot.querySelectorAll("[data-phase]").forEach(step=>{
+    step.classList.toggle("active",step.dataset.phase===activePhase);
+  });
+}
+
 function render(){
   document.getElementById("game")?.classList.toggle("allstar-match",G?.mode==="challenge");
   renderChallengeMatchHud();
   updateTagButton();
+  updateMatchPhaseDisplay();
   document.getElementById("roundNum").textContent=G.round||1;
   const turnLabel=G.discarding==="player"
-    ?"DEFAUSSE"
+    ?"DÉFAUSSE"
     :G.mode==="online"
       ?(G.currentTurn==="player"?"A VOUS":"ADVERSAIRE")
       :G.currentTurn==="player"?"TOUR JOUEUR":G.currentTurn==="ai"?"TOUR IA":"MAIN EVENT";
@@ -5531,6 +5551,15 @@ function render(){
   document.getElementById("enemyHand").innerHTML=Array.from({length:G.ai.hand.length}).map(()=>`<div class="card-back"></div>`).join("");
   const playerHand=document.getElementById("playerHand");
   playerHand.classList.toggle("discarding",G.discarding==="player");
+  const discardPrompt=document.getElementById("discardPrompt");
+  const discardPromptText=document.getElementById("discardPromptText");
+  const playerVestiaire=document.querySelector(".player-vestiaire-pile");
+  const discardCount=Math.max(0,G.player.hand.length-MAX_HAND_SIZE);
+  discardPrompt?.classList.toggle("active",G.discarding==="player");
+  playerVestiaire?.classList.toggle("discard-target",G.discarding==="player");
+  if(discardPromptText&&G.discarding==="player"){
+    discardPromptText.textContent=`Choisis ${discardCount} carte${discardCount>1?"s":""} dans ta main. Elle sera envoyée au Vestiaire.`;
+  }
   playerHand.innerHTML=G.player.hand.map((c,i)=>{
     const click=G.discarding==="player" ? `discardPlayerCard(${i})` : `playPlayer(${i})`;
     return cardHTML(c,`onclick="${click}" onmouseenter="previewCard('${c.id}')"`,c.id);
@@ -5665,7 +5694,7 @@ function showRound(){
   const ov=document.getElementById("roundOverlay");
   document.getElementById("roundText").textContent="ROUND "+G.round;
   ov.classList.add("active");
-  setTimeout(()=>ov.classList.remove("active"),850);
+  setTimeout(()=>ov.classList.remove("active"),1150);
 }
 
 function rollRoundStat(){
@@ -5787,6 +5816,7 @@ function showWheel(cb){
     splash?.classList.add(`stat-${G.stat.toLowerCase()}`);
     t.textContent=G.stat.toUpperCase()+" !";
     if(sub)sub.textContent=`Duel en ${G.stat}.`;
+    G.matchPhase="duel";
     render();
       onDone?.();
     },1750);
@@ -5794,7 +5824,7 @@ function showWheel(cb){
   const resolveRerollChoice=()=>{
     const reroller=getRoundReroller();
     if(!reroller){
-      setTimeout(closeWheel,1250);
+      setTimeout(closeWheel,1500);
       return;
     }
     const source=reroller.man?.ability==="rerollStat" ? reroller.man : reroller.cat.card;
@@ -5804,19 +5834,19 @@ function showWheel(cb){
       if(rerollButton)rerollButton.onclick=()=>{
         rerollActions?.classList.remove("active");
         const next=rerollRoundStatFor(reroller,G.stat);
-        spinTo(next,()=>setTimeout(closeWheel,1050));
+        spinTo(next,()=>setTimeout(closeWheel,1300));
       };
       if(keepButton)keepButton.onclick=()=>{
         rerollActions?.classList.remove("active");
         log(`[EFFET] ${source.name} : relance conservée.`);
-        setTimeout(closeWheel,550);
+        setTimeout(closeWheel,800);
       };
       return;
       }
     setTimeout(()=>{
       const next=rerollRoundStatFor(reroller,G.stat);
-      spinTo(next,()=>setTimeout(closeWheel,1050));
-    },700);
+      spinTo(next,()=>setTimeout(closeWheel,1300));
+    },900);
   };
   spinTo(finalStat,resolveRerollChoice);
 }
@@ -5863,7 +5893,7 @@ function showRemoteWheel(finalStat){
     splash?.classList.add(`stat-${String(finalStat).toLowerCase()}`);
     t.textContent=String(finalStat).toUpperCase()+" !";
     if(sub)sub.textContent=`Duel en ${finalStat}.`;
-    setTimeout(()=>ov.classList.remove("active"),1250);
+    setTimeout(()=>ov.classList.remove("active"),1500);
   },1750);
 }
 
@@ -5989,7 +6019,7 @@ function showPin(name,success,chance,roll,winnerSide=null){
         setTimeout(()=>{hidePin();startRound()},800);
       }
     }
-  },620);
+  },760);
 }
 
 function hidePin(){
