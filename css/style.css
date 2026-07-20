@@ -4851,6 +4851,13 @@ button{font-family:inherit;cursor:pointer}
   }
 }
 
+/* Shared page frames keep their black depth with a restrained ALLSTAR gold edge. */
+.menu-card{
+  box-shadow:
+    inset 0 0 0 1px rgba(255,211,93,.68),
+    16px 16px 0 rgba(0,0,0,.45);
+}
+
 /* Ring 0.1.15: the mat is the full playable surface; ropes sit over it
    as a compact frame instead of consuming the board's interior. */
 #game .ring-frame{
