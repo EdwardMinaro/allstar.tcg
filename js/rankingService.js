@@ -51,6 +51,7 @@
     progress.wins = Math.max(0, Number(progress.wins) || 0);
     progress.losses = Math.max(0, Number(progress.losses) || 0);
     progress.rankedMatches = Math.max(0, Number(progress.rankedMatches) || 0);
+    progress.rankedLossStreak = Math.max(0, Number(progress.rankedLossStreak) || 0);
     progress.rankProtection = Math.max(0, Math.min(3, Number(progress.rankProtection) || 0));
     progress.currentStreak = Number(progress.currentStreak) || 0;
     progress.bestStreak = Math.max(0, Number(progress.bestStreak) || 0);
@@ -130,10 +131,21 @@
     return progress;
   }
 
-  function eloDelta(playerElo=1000, opponentElo=1000, won=false, rankedMatches=0){
+  function eloDelta(playerElo=1000, opponentElo=1000, won=false, rankedMatches=0, rankedLossStreak=0){
     const k = Number(rankedMatches) < TRYOUT_MATCHES ? 48 : 32;
     const expected = 1 / (1 + Math.pow(10, ((Number(opponentElo) || 1000) - (Number(playerElo) || 1000)) / 400));
-    return Math.round(k * ((won ? 1 : 0) - expected));
+    const classicDelta = k * ((won ? 1 : 0) - expected);
+    if(won){
+      // Ranked progression stays encouraging around a normal win rate.
+      return Math.max(1, Math.round(classicDelta * 1.25));
+    }
+    // A loss is softened until a sustained ranked losing streak calls for the
+    // classic ELO penalty again. Other game modes never affect this streak.
+    const lossesInARow = Math.max(0, Number(rankedLossStreak) || 0);
+    const lossMultiplier = lossesInARow < 3
+      ? 0.65
+      : Math.min(1, 0.65 + (lossesInARow - 2) * 0.12);
+    return -Math.max(1, Math.round(Math.abs(classicDelta) * lossMultiplier));
   }
 
   function sortLeaderboard(profiles=[]){
@@ -159,9 +171,11 @@
     const beforeIndex=rankIndex(before.id);
     const previousRankId=progress.currentRankId;
     const isFirstRankedMatch=progress.rankedMatches===0;
-    const delta = eloDelta(progress.elo, match.opponentElo, Boolean(match.won), progress.rankedMatches);
+    const won=Boolean(match.won);
+    const delta = eloDelta(progress.elo, match.opponentElo, won, progress.rankedMatches, progress.rankedLossStreak);
     progress.elo = Math.max(0, progress.elo + delta);
     progress.rankedMatches += 1;
+    progress.rankedLossStreak=won ? 0 : progress.rankedLossStreak+1;
     const calculated=rankForElo(progress.elo,progress.rankedMatches);
     const calculatedIndex=rankIndex(calculated.id);
     const events=[];

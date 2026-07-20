@@ -7,6 +7,7 @@
     wins: 0,
     losses: 0,
     rankedMatches: 0,
+    rankedLossStreak: 0,
     rankProtection: 0,
     currentStreak: 0,
     bestStreak: 0,
