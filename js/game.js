@@ -2998,7 +2998,8 @@ function serializedPlayerState(){
 function serializedDeckState(){
   return {
     decks:deckState.decks||[],
-    selectedId:deckState.selectedId||null
+    selectedId:deckState.selectedId||null,
+    savedAt:Number(deckState.savedAt)||0
   };
 }
 async function pushCloudSaveNow(){
@@ -3043,6 +3044,17 @@ function remoteDeckState(remote){
   return null;
 }
 
+function mergeDeckStateForHydration(remoteDecks,localDecks){
+  if(!remoteDecks)return localDecks||null;
+  if(!localDecks)return remoteDecks;
+  const remoteSavedAt=Number(remoteDecks.savedAt)||0;
+  const localSavedAt=Number(localDecks.savedAt)||0;
+  // Legacy saves did not have a deck timestamp. In that case preserve the
+  // machine's current deck rather than risking an overwrite from stale cloud data.
+  if(!remoteSavedAt&&!localSavedAt)return localDecks;
+  return localSavedAt>=remoteSavedAt ? localDecks : remoteDecks;
+}
+
 function mergeSavedCounts(remoteCounts={},localCounts={}){
   const merged={...remoteCounts};
   Object.entries(localCounts||{}).forEach(([key,value])=>{
@@ -3074,11 +3086,16 @@ async function hydrateCloudSaveForUser(user){
   if(!user || !window.AllstarSaveService)return false;
   const remote=await window.AllstarSaveService.loadPlayerData(user.uid);
   const remotePlayer=remotePlayerState(remote);
-  const nextDecks=remoteDeckState(remote);
+  const remoteDecks=remoteDeckState(remote);
   let localPlayer=null;
+  let localDecks=null;
   try{
     localPlayer=JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)||"null");
   }catch{}
+  try{
+    localDecks=JSON.parse(localStorage.getItem(DECK_STORAGE_KEY)||"null");
+  }catch{}
+  const nextDecks=mergeDeckStateForHydration(remoteDecks,localDecks);
   const nextPlayer=mergePlayerStateForHydration(remotePlayer,localPlayer);
   // The profile document is authoritative for stats; playerState only mirrors it for offline display.
   const cloudProfile=profileUiState.user?.uid===user.uid ? profileUiState.profile : null;
@@ -3087,6 +3104,7 @@ async function hydrateCloudSaveForUser(user){
   }
   if(!nextPlayer && !nextDecks)return false;
   const needsCloudSync=Boolean(remotePlayer&&JSON.stringify(nextPlayer)!==JSON.stringify(remotePlayer));
+  const needsDeckSync=Boolean(nextDecks&&JSON.stringify(nextDecks)!==JSON.stringify(remoteDecks));
   cloudSaveHydrating=true;
   try{
     if(nextPlayer)localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(nextPlayer));
@@ -3095,7 +3113,7 @@ async function hydrateCloudSaveForUser(user){
   }finally{
     cloudSaveHydrating=false;
   }
-  if(needsCloudSync)queueCloudSave();
+  if(needsCloudSync||needsDeckSync)queueCloudSave();
   return true;
 }
 async function createProfileAccount(){
@@ -7081,6 +7099,7 @@ let deckState = {
   decks: [],
   selectedId: null,
   editingId: null,
+  savedAt: 0,
   loaded: false
 };
 
@@ -7097,6 +7116,7 @@ function resetRuntimeProgress(){
     decks: [],
     selectedId: null,
     editingId: null,
+    savedAt: 0,
     loaded: false
   };
 }
@@ -7224,9 +7244,9 @@ function loadDeckState(){
         decks,
         selectedId: saved.selectedId && decks.some(deck => deck.id === saved.selectedId) ? saved.selectedId : decks[0].id,
         editingId: null,
+        savedAt: Number(saved.savedAt)||0,
         loaded: true
       };
-      saveDeckState();
       return;
     }
   } catch {
@@ -7235,15 +7255,18 @@ function loadDeckState(){
   deckState.decks = [defaultDeck()];
   deckState.selectedId = deckState.decks[0].id;
   deckState.editingId = null;
+  deckState.savedAt = 0;
   deckState.loaded = true;
   saveDeckState();
 }
 
 function saveDeckState(){
+  deckState.savedAt=Date.now();
   try {
     localStorage.setItem(DECK_STORAGE_KEY, JSON.stringify({
       decks: deckState.decks,
-      selectedId: deckState.selectedId
+      selectedId: deckState.selectedId,
+      savedAt: deckState.savedAt
     }));
   } catch {
     // The game remains usable without localStorage.
