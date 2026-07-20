@@ -3585,7 +3585,23 @@ function openOnlineProfile(profile={}){
   const progress=window.AllstarRankingService.normalizeProgress(profile);
   const rank=window.AllstarRankingService.rankForProgress(progress);
   const total=progress.wins+progress.losses;
-  card.innerHTML=`<h2>${escapeHtml(profile.pseudo||profile.name||"Joueur")}${progress.hallOfFame?' <span class="hof-badge" title="Hall of Fame">★</span>':""}</h2><p>Titre : ${escapeHtml(progress.title||"Rookie")}</p><p>${escapeHtml(rank.label)} · ${progress.elo} ELO</p><p>Meilleur rang : ${escapeHtml(progress.bestRank||"Try-outs")}</p><p>${total} partie${total>1?"s":""} · ${progress.wins} victoire${progress.wins>1?"s":""} / ${progress.losses} défaite${progress.losses>1?"s":""}</p><p>Win rate : ${window.AllstarRankingService.winrate(progress.wins,progress.losses)}</p><button class="small-btn dark" type="button" onclick="closeOnlineProfile()">Retour</button>`;
+  card.innerHTML=`
+    <header class="online-profile-identity">
+      <h2>${escapeHtml(profile.pseudo||profile.name||"Joueur")}${progress.hallOfFame?' <span class="hof-badge" title="Hall of Fame">★</span>':""}</h2>
+      <p class="online-profile-title">${escapeHtml(progress.title||"Rookie")}</p>
+    </header>
+    <section class="online-profile-rank">
+      <strong>${escapeHtml(rank.label)}</strong>
+      <span>${progress.elo} ELO</span>
+    </section>
+    <section class="online-profile-stats" aria-label="Statistiques du joueur">
+      <div><span>Matchs</span><strong>${total}</strong></div>
+      <div><span>Victoires</span><strong>${progress.wins}</strong></div>
+      <div><span>Défaites</span><strong>${progress.losses}</strong></div>
+      <div><span>Win rate</span><strong>${window.AllstarRankingService.winrate(progress.wins,progress.losses)}</strong></div>
+    </section>
+    <p class="online-profile-best">Meilleur rang : <strong>${escapeHtml(progress.bestRank||"Try-outs")}</strong></p>
+    <button class="small-btn dark" type="button" onclick="closeOnlineProfile()">Retour</button>`;
   overlay.classList.add("active");
 }
 function closeOnlineProfile(){document.getElementById("onlineProfileOverlay")?.classList.remove("active")}
