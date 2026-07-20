@@ -166,10 +166,24 @@ function leaderboardTotalMatches(profile){
   return progress.wins + progress.losses;
 }
 
+function leaderboardCreatedAt(profile){
+  const value=profile?.createdAt;
+  if(typeof value === "number")return value;
+  if(typeof value?.toMillis === "function")return value.toMillis();
+  if(Number.isFinite(Number(value?.seconds)))return Number(value.seconds)*1000+Math.floor(Number(value.nanoseconds||0)/1e6);
+  return Number.MAX_SAFE_INTEGER;
+}
+
 function sortMultiLeaderboard(entries=[]){
   return [...entries].sort((a,b)=>{
     const progressA = window.AllstarRankingService.normalizeProgress(a);
     const progressB = window.AllstarRankingService.normalizeProgress(b);
+    const tryoutsA=progressA.rankedMatches<window.AllstarRankingService.TRYOUT_MATCHES;
+    const tryoutsB=progressB.rankedMatches<window.AllstarRankingService.TRYOUT_MATCHES;
+    if(tryoutsA||tryoutsB){
+      if(tryoutsA!==tryoutsB)return tryoutsA ? 1 : -1;
+      return leaderboardCreatedAt(a)-leaderboardCreatedAt(b)||String(a.pseudo||"").localeCompare(String(b.pseudo||""),"fr");
+    }
     const totalA = leaderboardTotalMatches(a);
     const totalB = leaderboardTotalMatches(b);
     const rateA = totalA ? progressA.wins / totalA : 0;
@@ -200,9 +214,11 @@ function renderCachedLeaderboard(entries, detail="") {
     const progress = window.AllstarRankingService.normalizeProgress(profile);
     const rank = window.AllstarRankingService.rankForProgress(progress);
     const total = progress.wins + progress.losses;
-    const shownElo=multiLeaderboardSort==="record" ? progress.bestElo : progress.elo;
-    const shownLabel=multiLeaderboardSort==="record" ? "record" : `${total} match${total > 1 ? "s" : ""}`;
-    return `<button class="leaderboard-row" type="button" data-leaderboard-index="${index}"><span class="leaderboard-place">${index + 1}</span><span><span class="leaderboard-name">${escapeMultiHtml(profile.pseudo || "Joueur")}${progress.hallOfFame ? '<span class="hof-badge" title="Hall of Fame">&#9733;</span>' : ""}</span><span class="leaderboard-meta">${escapeMultiHtml(rank.label)} &middot; ${progress.rankedMatches} classée${progress.rankedMatches > 1 ? "s" : ""} &middot; ${window.AllstarRankingService.winrate(progress.wins, progress.losses)}</span></span><span class="leaderboard-elo">${shownElo} ELO<br><small>${shownLabel}</small></span></button>`;
+    const inTryouts=progress.rankedMatches<window.AllstarRankingService.TRYOUT_MATCHES;
+    const shownElo=inTryouts ? "?" : (multiLeaderboardSort==="record" ? progress.bestElo : progress.elo);
+    const shownLabel=inTryouts ? `${progress.rankedMatches}/10 try-outs` : (multiLeaderboardSort==="record" ? "record" : `${total} match${total > 1 ? "s" : ""}`);
+    const shownWinrate=inTryouts ? "?" : window.AllstarRankingService.winrate(progress.wins, progress.losses);
+    return `<button class="leaderboard-row" type="button" data-leaderboard-index="${index}"><span class="leaderboard-place">${index + 1}</span><span><span class="leaderboard-name">${escapeMultiHtml(profile.pseudo || "Joueur")}${progress.hallOfFame ? '<span class="hof-badge" title="Hall of Fame">&#9733;</span>' : ""}</span><span class="leaderboard-meta">${escapeMultiHtml(rank.label)} &middot; ${progress.rankedMatches} classée${progress.rankedMatches > 1 ? "s" : ""} &middot; ${shownWinrate}</span></span><span class="leaderboard-elo">${shownElo}${inTryouts ? "" : " ELO"}<br><small>${shownLabel}</small></span></button>`;
   }).join("") || "<p>Aucun joueur inscrit pour le moment.</p>";
   list.querySelectorAll("[data-leaderboard-index]").forEach(button => button.addEventListener("click", () => window.openOnlineProfile?.(multiLeaderboardEntries[Number(button.dataset.leaderboardIndex)])));
 }

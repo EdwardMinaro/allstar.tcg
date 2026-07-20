@@ -202,6 +202,7 @@
     return {
       uid,
       pseudo: cleanPseudo(profile.pseudo, profile.email),
+      createdAt: profile.createdAt || null,
       elo: Number(profile.elo) || 1000,
       bestElo: Math.max(Number(profile.elo) || 1000, Number(profile.bestElo) || 0),
       wins: Number(profile.wins) || 0,
