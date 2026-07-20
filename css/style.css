@@ -6256,3 +6256,26 @@ button:disabled,
     left:50% !important;
   }
 }
+
+/* Keep the in-match utility controls centered over the left player column. */
+#game .settings{
+  left:calc(10vw - 67px) !important;
+  top:26px !important;
+}
+
+#game .game-next-track-button{
+  left:calc(10vw + 7px) !important;
+  top:26px !important;
+}
+
+@media (max-width:1180px), (max-height:760px){
+  #game .settings{
+    left:calc(10vw - 59px) !important;
+    top:12px !important;
+  }
+
+  #game .game-next-track-button{
+    left:calc(10vw + 5px) !important;
+    top:12px !important;
+  }
+}
