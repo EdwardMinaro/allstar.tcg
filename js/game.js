@@ -4706,12 +4706,11 @@ function applyEffect(owner,opp,c){
     case"mAll2IfGrave3":{
       const wrestlersInGrave=owner.grave.filter(card=>card.type==="Catcheur").length;
       if(wrestlersInGrave>=3){
-        addAllStats(s,2);
         feedback="+2 partout";
       }else{
-        feedback="Condition non remplie";
+        feedback="Actif à 3 catcheurs au vestiaire";
         kind="block";
-        log(`${c.name} attend 3 catcheurs au vestiaire (${wrestlersInGrave}/3).`);
+        log(`${c.name} attend 3 catcheurs au vestiaire (${wrestlersInGrave}/3) : le bonus s'activera automatiquement.`);
       }
       break;
     }
@@ -5090,6 +5089,8 @@ function score(s,stat){
   let v=s.card.stats[stat]+s.mods[stat];
   const alexKissInGrave=s.card.name==="El Amnesico"&&s.owner?.grave?.some(card=>card.ability==="graveElAmnesicoAll1");
   if(alexKissInGrave)v+=1;
+  const rManLegendaryActive=s.owner?.man?.ability==="mAll2IfGrave3"&&s.owner.grave.filter(card=>card.type==="Catcheur").length>=3;
+  if(rManLegendaryActive)v+=2;
   const ability=wrestlerAbility(s);
   if(!ability)return v;
   const firstRound=isRoundEffectActive(s);
@@ -5123,6 +5124,8 @@ function statAbilityFeedback(s,stat){
   if(!s)return null;
   const alexKissInGrave=s.card.name==="El Amnesico"&&s.owner?.grave?.some(card=>card.ability==="graveElAmnesicoAll1");
   if(alexKissInGrave)return `Alex Kiss +1 ${stat}`;
+  const rManLegendaryActive=s.owner?.man?.ability==="mAll2IfGrave3"&&s.owner.grave.filter(card=>card.type==="Catcheur").length>=3;
+  if(rManLegendaryActive)return `R-MAN +2 ${stat}`;
   const ability=wrestlerAbility(s);
   if(!ability)return null;
   const firstRound=isRoundEffectActive(s);
