@@ -2283,7 +2283,7 @@
       "name": "Cloche",
       "stats": {},
       "effect": "+1 dans deux stats aléatoires.",
-      "ability": "mRandom2",
+      "ability": "bellRandomStats2",
       "renderArt": "assets/card_renders/rare_objets_cloche.png"
     },
     {

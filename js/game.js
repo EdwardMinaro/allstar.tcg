@@ -2291,7 +2291,7 @@ const CARD_DATA = [
     "name": "Cloche",
     "stats": {},
     "effect": "+1 dans deux stats aléatoires.",
-    "ability": "mRandom2",
+    "ability": "bellRandomStats2",
     "renderArt": "assets/card_renders/rare_objets_cloche.png"
   },
   {
@@ -2429,6 +2429,7 @@ const EFFECT_REGISTRY = {
   bonusOdysseeTechForceTeam: { timing:"manager", text:"+1 Technique et +1 Force. Doublé avec Charlie Bergson ou Trevor Mayden." },
   bonusPassionForceCharTeam: { timing:"manager", text:"+1 Force et +1 Charisme. Doublé avec Black Sam ou Angelo Folena." },
   bonusPfiCharSpeedTeam: { timing:"manager", text:"+1 Charisme et +1 Vitesse. Doublé avec Ethan Riley ou Maxime Cuadrado." },
+  bellRandomStats2: { timing:"object", text:"+1 dans deux stats aléatoires." },
   cancelObjectsManagers: { timing:"entry", text:"Annule objets et bonus adverses." },
   drawNext1: { timing:"object", text:"La prochaine pioche gagne +1 carte." },
   drawOnEntry1: { timing:"entry", text:"Pioche 1 carte à l'arrivée." },
@@ -4495,6 +4496,11 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
       break;
     }
     case"mRandom2":{
+      const stats=addTrackedRandomStats(effect,s,2);
+      feedback=stats.map(stat=>`+1 ${stat}`).join(" / ");
+      break;
+    }
+    case"bellRandomStats2":{
       const stats=addTrackedRandomStats(effect,s,2);
       feedback=stats.map(stat=>`+1 ${stat}`).join(" / ");
       break;
