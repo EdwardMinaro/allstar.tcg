@@ -265,7 +265,7 @@
         "Technique": 6,
         "Charisme": 9
       },
-      "effect": "S'il est joue au premier round : +2 Vitesse et +2 Force.",
+      "effect": "S'il est joué au premier round : +2 Vitesse et +2 Force.",
       "ability": "firstRoundForceSpeed2",
       "musicId": "matheo_navarro",
       "renderArt": "assets/card_renders/legende_catcheurs_matheo_navarro.png"
@@ -425,7 +425,7 @@
         "Technique": 6,
         "Charisme": 4
       },
-      "effect": "Apparition : revelez un objet dans votre main, gagnez +2 Charisme et +1 Vitesse.",
+      "effect": "Apparition : révélez un objet dans votre main, gagnez +2 Charisme et +1 Vitesse.",
       "ability": "revealObjectHandCharSpeed",
       "musicId": "ace_angel",
       "renderArt": "assets/card_renders/rare_catcheurs_ace_angel.png"
@@ -1013,7 +1013,7 @@
         "Technique": 5,
         "Charisme": 8
       },
-      "effect": "S'il est joue au premier round : +3 Vitesse.",
+      "effect": "S'il est joué au premier round : +3 Vitesse.",
       "ability": "firstRoundSpeed3",
       "musicId": "matheo_navarro",
       "renderArt": "assets/card_renders/rare_catcheurs_matheo_navarro.png"
@@ -1301,7 +1301,7 @@
         "Technique": 5,
         "Charisme": 4
       },
-      "effect": "Apparition : recuperez un Jaydon Ross ou un Fenrir Strom depuis votre deck ou vestiaire.",
+      "effect": "Apparition : récupérez un Jaydon Ross ou un Fenrir Strom depuis votre deck ou vestiaire.",
       "ability": "recoverJaydonOrFenrir",
       "musicId": "tom_evans",
       "renderArt": "assets/card_renders/rare_catcheurs_tom_evans.png"
@@ -1965,7 +1965,7 @@
         "Technique": 7,
         "Charisme": 8
       },
-      "effect": "Apparition : piochez jusqu'a avoir 6 cartes en main. Gagnez un point aleatoire par carte bonus tiree par cet effet.",
+      "effect": "Apparition : piochez jusqu'à avoir 6 cartes en main. Gagnez un point aléatoire par carte bonus tirée par cet effet.",
       "ability": "drawToSixBonusStats",
       "musicId": "princesse_lauriana",
       "renderArt": "assets/card_renders/ultime_catcheurs_princesse_lauriana.png"

@@ -13,7 +13,7 @@ Contenu :
 - quarantine/cards/ : cartes refusees lors de l'import si les stats ne respectent pas les regles
 - assets/cards/ : images extraites des cartes JSON
 - assets/audio/ : musiques et bruitages
-- Sauvegarde : pre-ecran Nouvelle Partie / Charger Partie / Effacer Partie, puis auto-save localStorage
+- Sauvegarde : pré-écran Nouvelle Partie / Charger Partie / Effacer Partie, puis auto-save localStorage
 - Boutique : credits de match, boosters Classique/Premium/Champion, collection locale
 - Multi experimental : js/networkAdapter.js, js/roomService.js, js/multiplayerClient.js
 
@@ -23,6 +23,6 @@ Backend multi :
 - NetworkRoomAdapter est utilise par defaut pour le vrai multijoueur.
 - Configurer window.ALLSTAR_MULTIPLAYER_CONFIG = { backendUrl: "https://..." } avant les scripts, ou allstarsMultiplayerBackendUrl dans localStorage.
 - Contrat HTTP attendu : GET /rooms/:code, PUT /rooms/:code avec la room JSON en body.
-- Sans backend configure, l'ecran indique "Multijoueur en ligne non configure" au lieu de faire croire qu'un code est invalide.
+- Sans backend configuré, l'écran indique "Multijoueur en ligne non configuré" au lieu de faire croire qu'un code est invalide.
 - LocalRoomAdapter reste disponible uniquement pour test local avec ?multi=local ou localStorage allstarsMultiplayerMode=local.
-- La room reste l'autorite logique : le client envoie une intention, le service valide, puis renvoie un etat JSON.
+- La room reste l'autorité logique : le client envoie une intention, le service valide, puis renvoie un état JSON.

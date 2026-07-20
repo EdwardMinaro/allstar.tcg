@@ -266,7 +266,7 @@
             pseudo,
             email,
             updatedAt:serverTimestamp()
-          },{merge:true})).catch(error=>console.warn("[PROFILE] Mise a jour du pseudo indisponible.",error));
+          },{merge:true})).catch(error=>console.warn("[PROFILE] Mise à jour du pseudo indisponible.",error));
         }
         void syncLeaderboardProfile(user.uid, profile);
         return profile;

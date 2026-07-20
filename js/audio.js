@@ -4,7 +4,7 @@ const AUDIO_LIBRARY = {
     match: { label: "Match", src: "assets/audio/music/match.mp3" },
     tension: { label: "Tension", src: "assets/audio/music/tension.mp3" },
     victoire: { label: "Victoire", src: "assets/audio/music/victoire.mp3" },
-    defaite: { label: "Defaite", src: "assets/audio/music/defaite.mp3" },
+    defaite: { label: "Défaite", src: "assets/audio/music/defaite.mp3" },
     matheo_navarro: {
       label: "Matheo Navarro",
       wrestler: "Matheo Navarro",

@@ -11,7 +11,7 @@ npm install
 npm start
 ```
 
-Si Electron est deja installe localement dans le projet, `npm start` suffit. Sinon `npm install` recuperera Electron, Electron Builder et l'outil de mise a jour.
+Si Electron est déjà installé localement dans le projet, `npm start` suffit. Sinon `npm install` récupérera Electron, Electron Builder et l'outil de mise à jour.
 
 ## Generer un installateur Windows
 
@@ -23,7 +23,7 @@ Le resultat arrive dans `dist/`.
 
 ## Mises a jour
 
-Le projet est prepare pour `electron-updater` avec GitHub Releases.
+Le projet est préparé pour `electron-updater` avec GitHub Releases.
 
 Avant de publier, remplace dans `package.json` :
 
@@ -37,7 +37,7 @@ npm version patch
 npm run publish
 ```
 
-Important : l'auto-update ne s'active que dans l'application packagee. En mode `npm start`, le jeu se lance sans chercher de mise a jour.
+Important : l'auto-update ne s'active que dans l'application packagée. En mode `npm start`, le jeu se lance sans chercher de mise à jour.
 
 ## Icone
 

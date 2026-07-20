@@ -232,8 +232,8 @@
         <div class="options-block">
           <div class="home-options-title">Affichage / session</div>
           <div class="display-options">
-            <label class="display-check"><input id="homeFullscreenToggle" class="fullscreen-control" type="checkbox"> Plein ecran</label>
-            <label for="homeResolutionSelect">Resolution</label>
+            <label class="display-check"><input id="homeFullscreenToggle" class="fullscreen-control" type="checkbox"> Plein écran</label>
+            <label for="homeResolutionSelect">Résolution</label>
             <select id="homeResolutionSelect" class="resolution-control">
               <option value="1280x720">1280 x 720</option>
               <option value="1366x768">1366 x 768</option>
@@ -241,7 +241,7 @@
               <option value="1920x1080">1920 x 1080</option>
             </select>
             <div class="profile-actions">
-              <button class="profile-action dark" type="button" onclick="requestProfileLogout()">Se deconnecter</button>
+              <button class="profile-action dark" type="button" onclick="requestProfileLogout()">Se déconnecter</button>
               <button class="profile-action danger" type="button" onclick="requestQuitGame()">Quitter le jeu</button>
             </div>
           </div>
@@ -257,7 +257,7 @@
   <div class="options-menu" id="optionsMenu">
     <button onclick="toggleOptions()">Revenir à la partie</button>
     <button class="danger" onclick="startGame()">Abandonner</button>
-    <button class="dark" onclick="requestProfileLogout()">Se deconnecter</button>
+    <button class="dark" onclick="requestProfileLogout()">Se déconnecter</button>
     <button class="danger" onclick="requestQuitGame()">Quitter le jeu</button>
     <button onclick="hideOptions();showMenu()">Retour menu principal</button>
 
@@ -279,8 +279,8 @@
       <div class="current-track">Thème : <span id="currentMusic" class="current-music-label">aucun</span></div>
     </div>
     <div class="display-options compact-display-options">
-      <label class="display-check"><input id="gameFullscreenToggle" class="fullscreen-control" type="checkbox"> Plein ecran</label>
-      <label for="gameResolutionSelect">Resolution</label>
+      <label class="display-check"><input id="gameFullscreenToggle" class="fullscreen-control" type="checkbox"> Plein écran</label>
+      <label for="gameResolutionSelect">Résolution</label>
       <select id="gameResolutionSelect" class="resolution-control">
         <option value="1280x720">1280 x 720</option>
         <option value="1366x768">1366 x 768</option>
@@ -668,7 +668,7 @@
     <div class="deck-modal-actions session-modal-actions" id="sessionModalActions">
       <button class="small-btn" type="button" onclick="closeSessionModal()">Continuer</button>
       <button class="small-btn dark" type="button" onclick="closeSessionModal();showHomeOptions()">Options</button>
-      <button class="small-btn dark" type="button" onclick="confirmProfileLogout()">Se deconnecter</button>
+      <button class="small-btn dark" type="button" onclick="confirmProfileLogout()">Se déconnecter</button>
       <button class="small-btn danger" type="button" onclick="confirmQuitGame()">Quitter le jeu</button>
     </div>
   </div>

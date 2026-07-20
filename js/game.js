@@ -273,7 +273,7 @@ const CARD_DATA = [
       "Technique": 6,
       "Charisme": 9
     },
-    "effect": "S'il est joue au premier round : +2 Vitesse et +2 Force.",
+    "effect": "S'il est joué au premier round : +2 Vitesse et +2 Force.",
     "ability": "firstRoundForceSpeed2",
     "musicId": "matheo_navarro",
     "renderArt": "assets/card_renders/legende_catcheurs_matheo_navarro.png"
@@ -433,7 +433,7 @@ const CARD_DATA = [
       "Technique": 6,
       "Charisme": 4
     },
-    "effect": "Apparition : revelez un objet dans votre main, gagnez +2 Charisme et +1 Vitesse.",
+    "effect": "Apparition : révélez un objet dans votre main, gagnez +2 Charisme et +1 Vitesse.",
     "ability": "revealObjectHandCharSpeed",
     "musicId": "ace_angel",
     "renderArt": "assets/card_renders/rare_catcheurs_ace_angel.png"
@@ -1021,7 +1021,7 @@ const CARD_DATA = [
       "Technique": 5,
       "Charisme": 8
     },
-    "effect": "S'il est joue au premier round : +3 Vitesse.",
+    "effect": "S'il est joué au premier round : +3 Vitesse.",
     "ability": "firstRoundSpeed3",
     "musicId": "matheo_navarro",
     "renderArt": "assets/card_renders/rare_catcheurs_matheo_navarro.png"
@@ -1309,7 +1309,7 @@ const CARD_DATA = [
       "Technique": 5,
       "Charisme": 4
     },
-    "effect": "Apparition : recuperez un Jaydon Ross ou un Fenrir Strom depuis votre deck ou vestiaire.",
+    "effect": "Apparition : récupérez un Jaydon Ross ou un Fenrir Strom depuis votre deck ou vestiaire.",
     "ability": "recoverJaydonOrFenrir",
     "musicId": "tom_evans",
     "renderArt": "assets/card_renders/rare_catcheurs_tom_evans.png"
@@ -1973,7 +1973,7 @@ const CARD_DATA = [
       "Technique": 7,
       "Charisme": 8
     },
-    "effect": "Apparition : piochez jusqu'a avoir 6 cartes en main. Gagnez un point aleatoire par carte bonus tiree par cet effet.",
+    "effect": "Apparition : piochez jusqu'à avoir 6 cartes en main. Gagnez un point aléatoire par carte bonus tirée par cet effet.",
     "ability": "drawToSixBonusStats",
     "musicId": "princesse_lauriana",
     "renderArt": "assets/card_renders/ultime_catcheurs_princesse_lauriana.png"
@@ -2456,7 +2456,7 @@ const EFFECT_REGISTRY = {
   firstRoundForceTechnique: { timing:"round1", text:"+1 Force et +1 Technique au premier round." },
   firstRoundForceSpeed1: { timing:"firstRound", text:"+1 Force et +1 Vitesse au premier round de la carte." },
   firstRoundForceSpeed2: { timing:"firstRound", text:"+2 Force et +2 Vitesse au premier round de la carte." },
-  firstRoundRandomStats5: { timing:"firstRound", text:"Au premier round : +5 points repartis aleatoirement." },
+  firstRoundRandomStats5: { timing:"firstRound", text:"Au premier round : +5 points répartis aléatoirement." },
   firstRoundOpponentMill1: { timing:"entry", text:"Envoie la carte au-dessus du deck adverse au vestiaire." },
   firstRoundSpeed2: { timing:"firstRound", text:"+2 Vitesse au premier round de la carte." },
   firstRoundSpeed3: { timing:"firstRound", text:"+3 Vitesse au premier round de la carte." },
@@ -2745,7 +2745,7 @@ function openSessionModal(title="Pause", body="Que veux-tu faire ?"){
   modal?.classList.add("active");
 }
 function closeSessionModal(){document.getElementById("sessionModal")?.classList.remove("active")}
-function requestProfileLogout(){openSessionModal("Deconnexion","Se deconnecter du compte ALLSTAR et revenir a l'ecran de connexion ?")}
+function requestProfileLogout(){openSessionModal("Déconnexion","Se déconnecter du compte ALLSTAR et revenir à l'écran de connexion ?")}
 function requestQuitGame(){openSessionModal("Quitter le jeu","Fermer ALLSTAR maintenant ?")}
 async function confirmProfileLogout(){
   closeSessionModal();
@@ -3168,9 +3168,9 @@ async function loginAccountFromStart(){
     profileUiState.user=result.user;
     profileUiState.profile=result.profile;
     await saveRememberedCredentials({email,password,remember:loginRememberChoice()});
-    setSaveStatus("Connexion reussie. Chargement du profil cloud...");
+    setSaveStatus("Connexion réussie. Chargement du profil cloud...");
     const cloudLoaded=await hydrateCloudSaveForUser(result.user);
-    setSaveStatus(profileResultMessage(cloudLoaded ? "Sauvegarde cloud chargee" : "Connecté", result));
+    setSaveStatus(profileResultMessage(cloudLoaded ? "Sauvegarde cloud chargée" : "Connecté", result));
     resetRuntimeProgress();
     enterSavedGame();
     if(!cloudLoaded)queueCloudSave();
@@ -5326,7 +5326,7 @@ function clearWrestler(p){
   const speedBonusOnNext={nextSpeedOnFirstLoss1:1,nextSpeedOnFirstLoss2:2}[lostAbility]||0;
   if(speedBonusOnNext&&isFirstRoundForWrestler(lost)){
     p.nextEntryMods={...(p.nextEntryMods||{}),Vitesse:Math.max(Number(p.nextEntryMods?.Vitesse||0),speedBonusOnNext)};
-    log(`${lost.card.name} prepare le prochain catcheur : +${speedBonusOnNext} en Vitesse sur son arrivee.`);
+    log(`${lost.card.name} prépare le prochain catcheur : +${speedBonusOnNext} en Vitesse sur son arrivée.`);
     showEffectFeedback(lost.card,lost.card.name,`Prochain +${speedBonusOnNext} Vitesse`,"buff");
   }
 
@@ -6468,7 +6468,7 @@ function settleOnlineMatchRewards(){
     return true;
   }).catch(error=>{
     log("<b>[PROFIL]</b> Resultat en attente de synchronisation.");
-    console.warn("[PROFILE] Reglement du match en ligne indisponible.",error);
+    console.warn("[PROFILE] Règlement du match en ligne indisponible.",error);
     return false;
   }).finally(()=>pendingOnlineMatchSettlements.delete(matchId));
 }
@@ -6550,8 +6550,8 @@ function showLevelRewards(rewards=[]){
   const subtitle=document.getElementById("levelRewardSubtitle");
   const list=document.getElementById("levelRewardList");
   if(!overlay||!subtitle||!list)return;
-  subtitle.textContent=rewards.some(reward=>reward.kind==="title")?"Nouveau titre ou recompense debloque." : "Recompense de niveau attribuee.";
-  list.innerHTML=rewards.map(reward=>`<div class="level-reward-item">${escapeHtml(reward.kind==="title"?"Titre debloque":`Niveau ${reward.level}`)}<small>${escapeHtml(reward.label)}</small></div>`).join("");
+  subtitle.textContent=rewards.some(reward=>reward.kind==="title")?"Nouveau titre ou récompense débloqué." : "Récompense de niveau attribuée.";
+  list.innerHTML=rewards.map(reward=>`<div class="level-reward-item">${escapeHtml(reward.kind==="title"?"Titre débloqué":`Niveau ${reward.level}`)}<small>${escapeHtml(reward.label)}</small></div>`).join("");
   overlay.classList.add("active");
 }
 
@@ -6601,23 +6601,23 @@ async function awardProfileProgress(playerWon, options={}){
     if(settled.applied){
       log(`<b>+${settled.gain} XP</b> Niveau ${progress.level} (${progress.xp}/${window.AllstarRankingService.xpForNextLevel(progress.level)}).`);
       const labels={
-        "tryouts-start":"Debut des Try-outs : 10 matchs pour rejoindre le roster",
-        "tryouts-complete":event=>`Try-outs termines : ${event.rank}`,
+        "tryouts-start":"Début des Try-outs : 10 matchs pour rejoindre le roster",
+        "tryouts-complete":event=>`Try-outs terminés : ${event.rank}`,
         promotion:event=>`Promotion : ${event.rank}`,
-        relegation:event=>`Relegation : ${event.rank}`,
+        relegation:event=>`Relégation : ${event.rank}`,
         protection:event=>`Relégation évitée : protection ${event.remaining}/3`,
-        "hall-of-fame":"Entree au Hall of Fame"
+        "hall-of-fame":"Entrée au Hall of Fame"
       };
       (settled.events||[]).filter(event=>event.type!=="protection-reset").forEach(event=>{
         const label=labels[event.type];
-        if(label)log(`<b>[COMMUNIQUE]</b> ${typeof label==="function"?label(event):label}`);
+        if(label)log(`<b>[COMMUNIQUÉ]</b> ${typeof label==="function"?label(event):label}`);
       });
       if(settled.rewards?.length){
-        settled.rewards.forEach(reward=>log(`<b>[COMMUNIQUE]</b> ${reward.kind==="title"?"Titre debloque":`Recompense niveau ${reward.level}`} : ${reward.label}.`));
+        settled.rewards.forEach(reward=>log(`<b>[COMMUNIQUÉ]</b> ${reward.kind==="title"?"Titre débloqué":`Récompense niveau ${reward.level}`} : ${reward.label}.`));
         setTimeout(()=>showLevelRewards(settled.rewards),350);
       }
       if(settled.careerTitleUnlocked){
-        log("<b>[COMMUNIQUE]</b> Titre debloque : Vainqueur du mode carrière.");
+        log("<b>[COMMUNIQUÉ]</b> Titre débloqué : Vainqueur du mode carrière.");
       }
     }
     return Boolean(settled.applied);
@@ -6642,14 +6642,14 @@ async function awardProfileProgress(playerWon, options={}){
     progress=rankingUpdate.progress;
     rankingUpdate.events.filter(event=>event.type!=="protection-reset").forEach(event=>{
       const labels={
-        "tryouts-start":"Debut des Try-outs : 10 matchs pour rejoindre le roster",
-        "tryouts-complete":`Try-outs termines : ${event.rank}`,
+        "tryouts-start":"Début des Try-outs : 10 matchs pour rejoindre le roster",
+        "tryouts-complete":`Try-outs terminés : ${event.rank}`,
         promotion:`Promotion : ${event.rank}`,
-        relegation:`Relegation : ${event.rank}`,
+        relegation:`Relégation : ${event.rank}`,
         protection:`Relégation évitée : protection ${event.remaining}/3`,
-        "hall-of-fame":"Entree au Hall of Fame"
+        "hall-of-fame":"Entrée au Hall of Fame"
       };
-      levelRewards.push({kind:"ranking",label:labels[event.type]||"Classement mis a jour"});
+      levelRewards.push({kind:"ranking",label:labels[event.type]||"Classement mis à jour"});
     });
   }
   playerState.profileProgress=progress;
@@ -6663,7 +6663,7 @@ async function awardProfileProgress(playerWon, options={}){
     }
   }
   if(levelRewards.length){
-    levelRewards.forEach(reward=>log(`<b>[COMMUNIQUE]</b> ${reward.kind==="title"?"Titre debloque":`Recompense niveau ${reward.level}`} : ${reward.label}.`));
+    levelRewards.forEach(reward=>log(`<b>[COMMUNIQUÉ]</b> ${reward.kind==="title"?"Titre débloqué":`Récompense niveau ${reward.level}`} : ${reward.label}.`));
     setTimeout(()=>showLevelRewards(levelRewards),350);
   }
   return true;
@@ -7777,11 +7777,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
     if(user)void window.AllstarProfileService?.ensureUserProfile?.(user);
   }).catch(()=>{});
   window.AllstarDesktop?.onDesktopEvent?.(({type})=>{
-    if(type==="update-checking")showSystemToast("Recherche d'une mise a jour...");
-    if(type==="update-available")showSystemToast("Mise a jour trouvee : telechargement en cours...",5000);
-    if(type==="update-not-available")showSystemToast("Jeu deja a jour.",3000);
-    if(type==="update-downloaded")showSystemToast("Mise a jour prete : redemarrage automatique...",5000);
-    if(type==="update-error")showSystemToast("Verification de mise a jour impossible.",4000);
+    if(type==="update-checking")showSystemToast("Recherche d'une mise à jour...");
+    if(type==="update-available")showSystemToast("Mise à jour trouvée : téléchargement en cours...",5000);
+    if(type==="update-not-available")showSystemToast("Jeu déjà à jour.",3000);
+    if(type==="update-downloaded")showSystemToast("Mise à jour prête : redémarrage automatique...",5000);
+    if(type==="update-error")showSystemToast("Vérification de mise à jour impossible.",4000);
   });
   document.addEventListener("keydown",handleEscapeKey);
 });
