@@ -75,6 +75,16 @@ const AUDIO_LIBRARY = {
       wrestler: "Alex Ezio",
       src: "assets/audio/music/alex_ezio.mp3"
     },
+    alex_kiss: {
+      label: "Alex Kiss",
+      wrestler: "Alex Kiss",
+      src: "assets/audio/music/alex_kiss.mp3"
+    },
+    el_amnesico: {
+      label: "El Amnesico",
+      wrestler: "El Amnesico",
+      src: "assets/audio/music/el_amnesico.mp3"
+    },
     jet_kid: {
       label: "Jet Kid",
       wrestler: "JET KID",

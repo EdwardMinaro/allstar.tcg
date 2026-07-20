@@ -25,6 +25,8 @@ const TYPE_MAP = {
 };
 
 const MUSIC_TARGETS = {
+  "El Amnesico.mp3": "el_amnesico.mp3",
+  "1-LOVE IN THE FIELD.mp3": "alex_kiss.mp3",
   "Thème Officiel Eddy Marston.mp3": "eddy_marston.mp3",
   "Jafar Jordan Street.mp3": "jafar_jordan.mp3",
   "Koro new thème song.mp3": "koro.mp3",
@@ -34,6 +36,7 @@ const MUSIC_TARGETS = {
 };
 
 const MUSIC_BY_FOLDER = {
+  "alex_kiss": "alex_kiss.mp3",
   "eddy_marston": "eddy_marston.mp3",
   "jafar_jordan": "jafar_jordan.mp3",
   "koro": "koro.mp3",
@@ -45,6 +48,11 @@ const MUSIC_BY_FOLDER = {
 };
 
 const ABILITY_BY_KEY = {
+  "Rare|Catcheur|Alex Kiss": "graveElAmnesicoAll1",
+  "Legende|Catcheur|NILS'N": "firstRoundRandomStats5",
+  "Rare|Catcheur|Yann Skoric": "drawOnEntry1",
+  "Legende|Catcheur|Yann Skoric": "drawOnEntry3",
+  "Rare|Catcheur|Queen Phoenixia": "recoverBonusDeck",
   "Rare|Catcheur|Eddy Marston": "objectExtra1",
   "Rare|Catcheur|Fenrir Strom": "round4All1",
   "Rare|Catcheur|Jafar Jordan": "firstRoundCharTech2",
@@ -57,6 +65,11 @@ const ABILITY_BY_KEY = {
   "Legende|Catcheur|TLB": "winNextEnemySpeedMinus3",
   "Rare|Catcheur|Maffa": "entryPinBonus20",
   "Rare|Manager|PURE TRADITION": "bonusPureTraditionDrawTeam",
+};
+
+const STATS_BY_KEY = {
+  "Legende|Catcheur|NILS'N": { Force: 5, Vitesse: 9, Technique: 6, Charisme: 8 },
+  "Legende|Catcheur|Yann Skoric": { Force: 6, Vitesse: 7, Technique: 6, Charisme: 9 },
 };
 
 function walk(dir, out = []) {
@@ -142,7 +155,8 @@ function readCard(jsonPath) {
   const name = cleanText(data.name || data.nom || data.title || path.basename(jsonPath, ".json"));
   const stats = type === "Catcheur" ? normalizeStats(data.stats || data.Stats) : {};
   const group = type === "Catcheur" ? "catcheurs" : type === "Manager" ? "managers" : "objets";
-  const key = `${slug(rarity)}_${group}_${slug(name)}`;
+  const nameKey = slug(name).replace(/^nils_n$/, "nilsn");
+  const key = `${slug(rarity)}_${group}_${nameKey}`;
   const pngPath = findSiblingPng(jsonPath);
   const card = {
     key,
@@ -158,6 +172,8 @@ function readCard(jsonPath) {
     card.musicId = musicId;
   }
   const ability = ABILITY_BY_KEY[`${rarity}|${type}|${name}`];
+  const statsOverride = STATS_BY_KEY[`${rarity}|${type}|${name}`];
+  if (statsOverride) card.stats = statsOverride;
   if (ability && !(type === "Catcheur" && rarity === "Standard")) {
     card.ability = ability;
   }

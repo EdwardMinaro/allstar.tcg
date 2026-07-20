@@ -1,11 +1,11 @@
 {
   "imported": [
     {
-      "key": "rare_managers_pierreluck",
-      "name": "PierreLuck",
+      "key": "rare_catcheurs_queen_phoenixia",
+      "name": "Queen Phoenixia",
       "rarity": "Rare",
-      "type": "Manager",
-      "ability": null
+      "type": "Catcheur",
+      "ability": "recoverBonusDeck"
     }
   ],
   "updated": [],

@@ -145,6 +145,21 @@
       "musicId": "ethan_riley"
     },
     {
+      "key": "legende_catcheurs_heracles",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Héraclès",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "À l'arrivée : choisissez un bonus et un objet dans le deck et ajoutez-les à votre main.",
+      "ability": "tutorManagerObjectFromDeck",
+      "renderArt": "assets/card_renders/legende_catcheurs_heracles.png"
+    },
+    {
       "key": "legende_catcheurs_jaydon_ross",
       "type": "Catcheur",
       "rarity": "Legende",
@@ -209,6 +224,22 @@
       "musicId": "kyle_hoxton"
     },
     {
+      "key": "legende_catcheurs_lucas_menil",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Lucas Menil",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 6,
+        "Technique": 8,
+        "Charisme": 7
+      },
+      "effect": "Chaque tour : +2 dans une stat aléatoire, cumulable 3 fois.",
+      "ability": "turnCatRandomPermanent2Max3",
+      "musicId": "lucas_menil",
+      "renderArt": "assets/card_renders/legende_catcheurs_lucas_menil.png"
+    },
+    {
       "key": "legende_catcheurs_mareck",
       "type": "Catcheur",
       "rarity": "Legende",
@@ -222,6 +253,22 @@
       "effect": "Apparition : Récupérez dans votre main ou jouez une carte objet depuis votre vestiaire.",
       "renderArt": "assets/card_renders/legende_catcheurs_mareck.png",
       "musicId": "mareck"
+    },
+    {
+      "key": "legende_catcheurs_matheo_navarro",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Matheo Navarro",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 9
+      },
+      "effect": "S'il est joue au premier round : +2 Vitesse et +2 Force.",
+      "ability": "firstRoundForceSpeed2",
+      "musicId": "matheo_navarro",
+      "renderArt": "assets/card_renders/legende_catcheurs_matheo_navarro.png"
     },
     {
       "key": "legende_catcheurs_maxime_cuadrado",
@@ -243,17 +290,17 @@
       "key": "legende_catcheurs_nilsn",
       "type": "Catcheur",
       "rarity": "Legende",
-      "name": "Nils'N",
+      "name": "NILS'N",
       "stats": {
         "Force": 5,
         "Vitesse": 9,
         "Technique": 6,
         "Charisme": 8
       },
-      "effect": "Premier round : +3 Vitesse.",
-      "ability": "firstRoundSpeed3",
+      "effect": "Premier round : Gagnez 5 points de stats aléatoire.",
       "renderArt": "assets/card_renders/legende_catcheurs_nilsn.png",
-      "musicId": "nilsn"
+      "musicId": "nilsn",
+      "ability": "firstRoundRandomStats5"
     },
     {
       "key": "legende_catcheurs_s_m_s",
@@ -336,6 +383,22 @@
       "musicId": "tyson_briggs"
     },
     {
+      "key": "legende_catcheurs_yann_skoric",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Yann Skoric",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 7,
+        "Technique": 6,
+        "Charisme": 9
+      },
+      "effect": "Apparition : Piochez 3 cartes.",
+      "renderArt": "assets/card_renders/legende_catcheurs_yann_skoric.png",
+      "musicId": "yann_skoric",
+      "ability": "drawOnEntry3"
+    },
+    {
       "key": "legende_catcheurs_zaeken",
       "type": "Catcheur",
       "rarity": "Legende",
@@ -352,6 +415,22 @@
       "musicId": "zaeken"
     },
     {
+      "key": "rare_catcheurs_ace_angel",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Ace Angel",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 4
+      },
+      "effect": "Apparition : revelez un objet dans votre main, gagnez +2 Charisme et +1 Vitesse.",
+      "ability": "revealObjectHandCharSpeed",
+      "musicId": "ace_angel",
+      "renderArt": "assets/card_renders/rare_catcheurs_ace_angel.png"
+    },
+    {
       "key": "rare_catcheurs_alex_ezio",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -366,6 +445,22 @@
       "ability": "firstRoundCharTech",
       "renderArt": "assets/card_renders/rare_catcheurs_alex_ezio.png",
       "musicId": "alex_ezio"
+    },
+    {
+      "key": "rare_catcheurs_alex_kiss",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Alex Kiss",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 9,
+        "Technique": 4,
+        "Charisme": 6
+      },
+      "effect": "Si cette carte est dans votre vestiaire, vos cartes El Amnesico gagne +1 à toutes les stats. Cet effet ne peut pas se cumuler.",
+      "renderArt": "assets/card_renders/rare_catcheurs_alex_kiss.png",
+      "musicId": "alex_kiss",
+      "ability": "graveElAmnesicoAll1"
     },
     {
       "key": "rare_catcheurs_andre_levissieux",
@@ -446,6 +541,21 @@
       "ability": "pinShield",
       "renderArt": "assets/card_renders/rare_catcheurs_black_sam.png",
       "musicId": "black_sam"
+    },
+    {
+      "key": "rare_catcheurs_caiman_jr",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Caïman Jr",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 7,
+        "Technique": 6,
+        "Charisme": 3
+      },
+      "effect": "Chaque tour : -1 Vitesse adverse.",
+      "ability": "turnEnemySpeedMinus1",
+      "renderArt": "assets/card_renders/rare_catcheurs_caiman_jr.png"
     },
     {
       "key": "rare_catcheurs_cameron_merchant",
@@ -544,6 +654,36 @@
       "musicId": "dadou_bazooka"
     },
     {
+      "key": "rare_catcheurs_dan_nocas",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Dan Nocas",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 8
+      },
+      "effect": "À l'arrivée, si The Butcher Zerk est en main : l'adversaire défausse 1 carte.",
+      "ability": "entryIfZerkInHandDiscard1",
+      "renderArt": "assets/card_renders/rare_catcheurs_dan_nocas.png"
+    },
+    {
+      "key": "rare_catcheurs_dario_murro",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Dario Murro",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 5
+      },
+      "effect": "À l'arrivée : piochez 1 carte.",
+      "ability": "drawOnEntry1",
+      "renderArt": "assets/card_renders/rare_catcheurs_dario_murro.png"
+    },
+    {
       "key": "rare_catcheurs_dorian_garcia",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -590,6 +730,22 @@
       "renderArt": "assets/card_renders/rare_catcheurs_eddy_marston.png",
       "musicId": "eddy_marston",
       "ability": "objectExtra1"
+    },
+    {
+      "key": "rare_catcheurs_el_amnesico",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "El Amnesico",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Tant que cette carte est sur le terrain, 20% de chance que la roulette se relance automatiquement.",
+      "ability": "wheelAutoReroll20",
+      "musicId": "el_amnesico",
+      "renderArt": "assets/card_renders/rare_catcheurs_el_amnesico.png"
     },
     {
       "key": "rare_catcheurs_elionis",
@@ -640,6 +796,21 @@
       "ability": "round4All1"
     },
     {
+      "key": "rare_catcheurs_heracles",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Héraclès",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 4,
+        "Technique": 5,
+        "Charisme": 5
+      },
+      "effect": "À l'arrivée : choisissez un bonus dans le deck et ajoutez-le à votre main.",
+      "ability": "tutorManagerFromDeck",
+      "renderArt": "assets/card_renders/rare_catcheurs_heracles.png"
+    },
+    {
       "key": "rare_catcheurs_jafar_jordan",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -686,6 +857,22 @@
       "ability": "speedWheel25",
       "renderArt": "assets/card_renders/rare_catcheurs_jet_kid.png",
       "musicId": "jet_kid"
+    },
+    {
+      "key": "rare_catcheurs_jose_moreno",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Jose Moreno",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 9,
+        "Technique": 4,
+        "Charisme": 7
+      },
+      "effect": "Premier tour : votre adversaire envoie la carte au-dessus de son deck au vestiaire.",
+      "ability": "firstRoundOpponentMill1",
+      "musicId": "jose_moreno",
+      "renderArt": "assets/card_renders/rare_catcheurs_jose_moreno.png"
     },
     {
       "key": "rare_catcheurs_kevin_avanti",
@@ -752,6 +939,38 @@
       "musicId": "kyle_hoxton"
     },
     {
+      "key": "rare_catcheurs_leon",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Léon",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "À l'arrivée : récupérez un objet depuis votre vestiaire.",
+      "ability": "recoverObjectGrave",
+      "musicId": "leon",
+      "renderArt": "assets/card_renders/rare_catcheurs_leon.png"
+    },
+    {
+      "key": "rare_catcheurs_lucas_menil",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Lucas Menil",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Chaque tour : +1 dans une stat aléatoire, cumulable 5 fois.",
+      "ability": "turnCatRandomPermanent1Max5",
+      "musicId": "lucas_menil",
+      "renderArt": "assets/card_renders/rare_catcheurs_lucas_menil.png"
+    },
+    {
       "key": "rare_catcheurs_maffa",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -782,6 +1001,22 @@
       "renderArt": "assets/card_renders/rare_catcheurs_mareck.png",
       "musicId": "mareck",
       "ability": "recoverGraveDiscard1"
+    },
+    {
+      "key": "rare_catcheurs_matheo_navarro",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Matheo Navarro",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "S'il est joue au premier round : +3 Vitesse.",
+      "ability": "firstRoundSpeed3",
+      "musicId": "matheo_navarro",
+      "renderArt": "assets/card_renders/rare_catcheurs_matheo_navarro.png"
     },
     {
       "key": "rare_catcheurs_max_corleone",
@@ -832,6 +1067,22 @@
       "musicId": "nilsn"
     },
     {
+      "key": "rare_catcheurs_osvaldo",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Osvaldo",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Premier round : +1 Vitesse et +1 Force.",
+      "ability": "firstRoundForceSpeed1",
+      "musicId": "osvaldo",
+      "renderArt": "assets/card_renders/rare_catcheurs_osvaldo.png"
+    },
+    {
       "key": "rare_catcheurs_paul_meunier",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -846,6 +1097,22 @@
       "ability": "rerollStat",
       "renderArt": "assets/card_renders/rare_catcheurs_paul_meunier.png",
       "musicId": "paul_meunier"
+    },
+    {
+      "key": "rare_catcheurs_queen_phoenixia",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Queen Phoenixia",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "Apparition : Récupérez une carte bonus depuis votre deck.",
+      "renderArt": "assets/card_renders/rare_catcheurs_queen_phoenixia.png",
+      "musicId": "queen_phoenixia",
+      "ability": "recoverBonusDeck"
     },
     {
       "key": "rare_catcheurs_r_man",
@@ -976,6 +1243,22 @@
       "ability": "secondPlayerTechnique2"
     },
     {
+      "key": "rare_catcheurs_the_butcher_zerk",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "The Butcher Zerk",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 2,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Chaque tour, si Dan Nocas est en main : +2 Technique et +2 Vitesse.",
+      "ability": "revealDanEachRoundTechSpeed2",
+      "musicId": "the_butcher_zerk",
+      "renderArt": "assets/card_renders/rare_catcheurs_the_butcher_zerk.png"
+    },
+    {
       "key": "rare_catcheurs_thomas_sabia",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -1008,6 +1291,22 @@
       "ability": "winNextEnemySpeedMinus2"
     },
     {
+      "key": "rare_catcheurs_tom_evans",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Tom Evans",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 8,
+        "Technique": 5,
+        "Charisme": 4
+      },
+      "effect": "Apparition : recuperez un Jaydon Ross ou un Fenrir Strom depuis votre deck ou vestiaire.",
+      "ability": "recoverJaydonOrFenrir",
+      "musicId": "tom_evans",
+      "renderArt": "assets/card_renders/rare_catcheurs_tom_evans.png"
+    },
+    {
       "key": "rare_catcheurs_trevor_mayden",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -1038,6 +1337,22 @@
       "ability": "firstWinAll1",
       "renderArt": "assets/card_renders/rare_catcheurs_tyson_briggs.png",
       "musicId": "tyson_briggs"
+    },
+    {
+      "key": "rare_catcheurs_yann_skoric",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Yann Skoric",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "Apparition : Piochez 1 carte.",
+      "renderArt": "assets/card_renders/rare_catcheurs_yann_skoric.png",
+      "musicId": "yann_skoric",
+      "ability": "drawOnEntry1"
     },
     {
       "key": "rare_catcheurs_zaeken",
@@ -1101,6 +1416,20 @@
       "musicId": "black_sam"
     },
     {
+      "key": "standard_catcheurs_boume",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Boumé",
+      "stats": {
+        "Force": 3,
+        "Vitesse": 5,
+        "Technique": 10,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_boume.png"
+    },
+    {
       "key": "standard_catcheurs_car_crash_gonzo",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -1131,6 +1460,20 @@
       "musicId": "christophe_cassagne"
     },
     {
+      "key": "standard_catcheurs_dario_murro",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Dario Murro",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 5
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_dario_murro.png"
+    },
+    {
       "key": "standard_catcheurs_dorian_garcia",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -1159,6 +1502,21 @@
       "effect": "Aucun effet.",
       "renderArt": "assets/card_renders/standard_catcheurs_drix.png",
       "musicId": "drix"
+    },
+    {
+      "key": "standard_catcheurs_el_amnesico",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "El Amnesico",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "musicId": "el_amnesico",
+      "renderArt": "assets/card_renders/standard_catcheurs_el_amnesico.png"
     },
     {
       "key": "standard_catcheurs_elionis",
@@ -1296,6 +1654,21 @@
       "musicId": "kyle_hoxton"
     },
     {
+      "key": "standard_catcheurs_lucas_menil",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Lucas Menil",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "musicId": "lucas_menil",
+      "renderArt": "assets/card_renders/standard_catcheurs_lucas_menil.png"
+    },
+    {
       "key": "standard_catcheurs_luke_kane",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -1384,6 +1757,21 @@
       "effect": "Aucun effet.",
       "renderArt": "assets/card_renders/standard_catcheurs_nocif.png",
       "musicId": "nocif"
+    },
+    {
+      "key": "standard_catcheurs_osvaldo",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Osvaldo",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Aucun effet.",
+      "musicId": "osvaldo",
+      "renderArt": "assets/card_renders/standard_catcheurs_osvaldo.png"
     },
     {
       "key": "standard_catcheurs_paul_meunier",
@@ -1491,6 +1879,21 @@
       "musicId": "terry_robinson"
     },
     {
+      "key": "standard_catcheurs_the_butcher_zerk",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "The Butcher Zerk",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 2,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Aucun effet.",
+      "musicId": "the_butcher_zerk",
+      "renderArt": "assets/card_renders/standard_catcheurs_the_butcher_zerk.png"
+    },
+    {
       "key": "standard_catcheurs_tom_desavoy",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -1506,6 +1909,21 @@
       "musicId": "tom_desavoy"
     },
     {
+      "key": "standard_catcheurs_tom_evans",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Tom Evans",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 8,
+        "Technique": 5,
+        "Charisme": 4
+      },
+      "effect": "Aucun effet.",
+      "musicId": "tom_evans",
+      "renderArt": "assets/card_renders/standard_catcheurs_tom_evans.png"
+    },
+    {
       "key": "standard_catcheurs_zaeken",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -1519,6 +1937,38 @@
       "effect": "Aucun effet.",
       "renderArt": "assets/card_renders/standard_catcheurs_zaeken.png",
       "musicId": "zaeken"
+    },
+    {
+      "key": "ultime_catcheurs_heddi_karaoui",
+      "type": "Catcheur",
+      "rarity": "Ultime",
+      "name": "Heddi Karaoui",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 4,
+        "Technique": 10,
+        "Charisme": 7
+      },
+      "effect": "Tant que cette carte est sur le terrain, 75% de chance en plus que la roulette s'arrete sur Technique.",
+      "ability": "techniqueWheel75",
+      "musicId": "heddi_karaoui",
+      "renderArt": "assets/card_renders/ultime_catcheurs_heddi_karaoui.png"
+    },
+    {
+      "key": "ultime_catcheurs_princesse_lauriana",
+      "type": "Catcheur",
+      "rarity": "Ultime",
+      "name": "Princesse Lauriana",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 8
+      },
+      "effect": "Apparition : piochez jusqu'a avoir 6 cartes en main. Gagnez un point aleatoire par carte bonus tiree par cet effet.",
+      "ability": "drawToSixBonusStats",
+      "musicId": "princesse_lauriana",
+      "renderArt": "assets/card_renders/ultime_catcheurs_princesse_lauriana.png"
     },
     {
       "key": "ultime_catcheurs_tom_la_ruffa",
@@ -1665,6 +2115,16 @@
       "effect": "Premier tour : +1 dans 2 stats aléatoires.",
       "ability": "mRandom2",
       "renderArt": "assets/card_renders/rare_managers_loic_bloodykilt.png"
+    },
+    {
+      "key": "rare_managers_ludovic_vaillant",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "Ludovic Vaillant",
+      "stats": {},
+      "effect": "Tant qu'il est actif, jouer un bonus ou un objet force l'adversaire à défausser 1 carte.",
+      "ability": "opponentDiscardOnSupport",
+      "renderArt": "assets/card_renders/rare_managers_ludovic_vaillant.png"
     },
     {
       "key": "rare_managers_mr_ringsider",
@@ -1857,6 +2317,16 @@
       "renderArt": "assets/card_renders/rare_objets_poubelle.png"
     },
     {
+      "key": "rare_objets_ringside_apparel",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Ringside Apparel",
+      "stats": {},
+      "effect": "+2 Charisme, -1 Vitesse.",
+      "ability": "mCharisma2SpeedMinus1",
+      "renderArt": "assets/card_renders/rare_objets_ringside_apparel.png"
+    },
+    {
       "key": "standard_objets_barriere",
       "type": "Objet",
       "rarity": "Standard",
@@ -1895,218 +2365,6 @@
       "effect": "Victoire : Tombé +5.",
       "ability": "pinObject5",
       "renderArt": "assets/card_renders/standard_objets_table.png"
-    },
-    {
-      "key": "standard_catcheurs_boume",
-      "type": "Catcheur",
-      "rarity": "Standard",
-      "name": "Boumé",
-      "stats": { "Force": 3, "Vitesse": 5, "Technique": 10, "Charisme": 6 },
-      "effect": "",
-      "renderArt": "assets/card_renders/standard_catcheurs_boume.png"
-    },
-    {
-      "key": "rare_catcheurs_caiman_jr",
-      "type": "Catcheur",
-      "rarity": "Rare",
-      "name": "Caïman Jr",
-      "stats": { "Force": 8, "Vitesse": 7, "Technique": 6, "Charisme": 3 },
-      "effect": "Chaque tour : -1 Vitesse adverse.",
-      "ability": "turnEnemySpeedMinus1",
-      "renderArt": "assets/card_renders/rare_catcheurs_caiman_jr.png"
-    },
-    {
-      "key": "rare_catcheurs_dan_nocas",
-      "type": "Catcheur",
-      "rarity": "Rare",
-      "name": "Dan Nocas",
-      "stats": { "Force": 5, "Vitesse": 4, "Technique": 7, "Charisme": 8 },
-      "effect": "À l'arrivée, si The Butcher Zerk est en main : l'adversaire défausse 1 carte.",
-      "ability": "entryIfZerkInHandDiscard1",
-      "renderArt": "assets/card_renders/rare_catcheurs_dan_nocas.png"
-    },
-    {
-      "key": "standard_catcheurs_dario_murro",
-      "type": "Catcheur",
-      "rarity": "Standard",
-      "name": "Dario Murro",
-      "stats": { "Force": 8, "Vitesse": 6, "Technique": 5, "Charisme": 5 },
-      "effect": "",
-      "renderArt": "assets/card_renders/standard_catcheurs_dario_murro.png"
-    },
-    {
-      "key": "rare_catcheurs_dario_murro",
-      "type": "Catcheur",
-      "rarity": "Rare",
-      "name": "Dario Murro",
-      "stats": { "Force": 8, "Vitesse": 6, "Technique": 5, "Charisme": 5 },
-      "effect": "À l'arrivée : piochez 1 carte.",
-      "ability": "drawOnEntry1",
-      "renderArt": "assets/card_renders/rare_catcheurs_dario_murro.png"
-    },
-    {
-      "key": "rare_catcheurs_heracles",
-      "type": "Catcheur",
-      "rarity": "Rare",
-      "name": "Héraclès",
-      "stats": { "Force": 10, "Vitesse": 4, "Technique": 5, "Charisme": 5 },
-      "effect": "À l'arrivée : choisissez un bonus dans le deck et ajoutez-le à votre main.",
-      "ability": "tutorManagerFromDeck",
-      "renderArt": "assets/card_renders/rare_catcheurs_heracles.png"
-    },
-    {
-      "key": "legende_catcheurs_heracles",
-      "type": "Catcheur",
-      "rarity": "Legende",
-      "name": "Héraclès",
-      "stats": { "Force": 10, "Vitesse": 5, "Technique": 6, "Charisme": 7 },
-      "effect": "À l'arrivée : choisissez un bonus et un objet dans le deck et ajoutez-les à votre main.",
-      "ability": "tutorManagerObjectFromDeck",
-      "renderArt": "assets/card_renders/legende_catcheurs_heracles.png"
-    },
-    {
-      "key": "standard_catcheurs_lucas_menil",
-      "type": "Catcheur",
-      "rarity": "Standard",
-      "name": "Lucas Menil",
-      "stats": { "Force": 6, "Vitesse": 5, "Technique": 7, "Charisme": 6 },
-      "effect": "",
-      "musicId": "lucas_menil",
-      "renderArt": "assets/card_renders/standard_catcheurs_lucas_menil.png"
-    },
-    {
-      "key": "rare_catcheurs_lucas_menil",
-      "type": "Catcheur",
-      "rarity": "Rare",
-      "name": "Lucas Menil",
-      "stats": { "Force": 6, "Vitesse": 5, "Technique": 7, "Charisme": 6 },
-      "effect": "Chaque tour : +1 dans une stat aléatoire, cumulable 5 fois.",
-      "ability": "turnCatRandomPermanent1Max5",
-      "musicId": "lucas_menil",
-      "renderArt": "assets/card_renders/rare_catcheurs_lucas_menil.png"
-    },
-    {
-      "key": "legende_catcheurs_lucas_menil",
-      "type": "Catcheur",
-      "rarity": "Legende",
-      "name": "Lucas Menil",
-      "stats": { "Force": 7, "Vitesse": 6, "Technique": 8, "Charisme": 7 },
-      "effect": "Chaque tour : +2 dans une stat aléatoire, cumulable 3 fois.",
-      "ability": "turnCatRandomPermanent2Max3",
-      "musicId": "lucas_menil",
-      "renderArt": "assets/card_renders/legende_catcheurs_lucas_menil.png"
-    },
-    {
-      "key": "rare_managers_ludovic_vaillant",
-      "type": "Manager",
-      "rarity": "Rare",
-      "name": "Ludovic Vaillant",
-      "stats": {},
-      "effect": "Tant qu'il est actif, jouer un bonus ou un objet force l'adversaire à défausser 1 carte.",
-      "ability": "opponentDiscardOnSupport",
-      "renderArt": "assets/card_renders/rare_managers_ludovic_vaillant.png"
-    },
-    {
-      "key": "rare_catcheurs_leon",
-      "type": "Catcheur",
-      "rarity": "Rare",
-      "name": "Léon",
-      "stats": { "Force": 8, "Vitesse": 4, "Technique": 6, "Charisme": 6 },
-      "effect": "À l'arrivée : récupérez un objet depuis votre vestiaire.",
-      "ability": "recoverObjectGrave",
-      "musicId": "leon",
-      "renderArt": "assets/card_renders/rare_catcheurs_leon.png"
-    },
-    {
-      "key": "rare_objets_ringside_apparel",
-      "type": "Objet",
-      "rarity": "Rare",
-      "name": "Ringside Apparel",
-      "stats": {},
-      "effect": "+2 Charisme, -1 Vitesse.",
-      "ability": "mCharisma2SpeedMinus1",
-      "renderArt": "assets/card_renders/rare_objets_ringside_apparel.png"
-    },
-    {
-      "key": "standard_catcheurs_the_butcher_zerk",
-      "type": "Catcheur",
-      "rarity": "Standard",
-      "name": "The Butcher Zerk",
-      "stats": { "Force": 10, "Vitesse": 2, "Technique": 7, "Charisme": 5 },
-      "effect": "",
-      "musicId": "the_butcher_zerk",
-      "renderArt": "assets/card_renders/standard_catcheurs_the_butcher_zerk.png"
-    },
-    {
-      "key": "rare_catcheurs_the_butcher_zerk",
-      "type": "Catcheur",
-      "rarity": "Rare",
-      "name": "The Butcher Zerk",
-      "stats": { "Force": 10, "Vitesse": 2, "Technique": 7, "Charisme": 5 },
-      "effect": "Chaque tour, si Dan Nocas est en main : +2 Technique et +2 Vitesse.",
-      "ability": "revealDanEachRoundTechSpeed2",
-      "musicId": "the_butcher_zerk",
-      "renderArt": "assets/card_renders/rare_catcheurs_the_butcher_zerk.png"
-    },
-    {
-      "key": "rare_catcheurs_matheo_navarro", "type": "Catcheur", "rarity": "Rare", "name": "Matheo Navarro",
-      "stats": { "Force": 4, "Vitesse": 7, "Technique": 5, "Charisme": 8 }, "effect": "S'il est joue au premier round : +3 Vitesse.", "ability": "firstRoundSpeed3", "musicId": "matheo_navarro",
-      "renderArt": "assets/card_renders/rare_catcheurs_matheo_navarro.png"
-    },
-    {
-      "key": "legende_catcheurs_matheo_navarro", "type": "Catcheur", "rarity": "Legende", "name": "Matheo Navarro",
-      "stats": { "Force": 5, "Vitesse": 8, "Technique": 6, "Charisme": 9 }, "effect": "S'il est joue au premier round : +2 Vitesse et +2 Force.", "ability": "firstRoundForceSpeed2", "musicId": "matheo_navarro",
-      "renderArt": "assets/card_renders/legende_catcheurs_matheo_navarro.png"
-    },
-    {
-      "key": "rare_catcheurs_osvaldo", "type": "Catcheur", "rarity": "Rare", "name": "Osvaldo",
-      "stats": { "Force": 5, "Vitesse": 7, "Technique": 7, "Charisme": 5 }, "effect": "Premier round : +1 Vitesse et +1 Force.", "ability": "firstRoundForceSpeed1", "musicId": "osvaldo",
-      "renderArt": "assets/card_renders/rare_catcheurs_osvaldo.png"
-    },
-    {
-      "key": "standard_catcheurs_osvaldo", "type": "Catcheur", "rarity": "Standard", "name": "Osvaldo",
-      "stats": { "Force": 5, "Vitesse": 7, "Technique": 7, "Charisme": 5 }, "effect": "", "musicId": "osvaldo",
-      "renderArt": "assets/card_renders/standard_catcheurs_osvaldo.png"
-    },
-    {
-      "key": "ultime_catcheurs_princesse_lauriana", "type": "Catcheur", "rarity": "Ultime", "name": "Princesse Lauriana",
-      "stats": { "Force": 9, "Vitesse": 4, "Technique": 7, "Charisme": 8 }, "effect": "Apparition : piochez jusqu'a avoir 6 cartes en main. Gagnez un point aleatoire par carte bonus tiree par cet effet.", "ability": "drawToSixBonusStats", "musicId": "princesse_lauriana",
-      "renderArt": "assets/card_renders/ultime_catcheurs_princesse_lauriana.png"
-    },
-    {
-      "key": "rare_catcheurs_tom_evans", "type": "Catcheur", "rarity": "Rare", "name": "Tom Evans",
-      "stats": { "Force": 7, "Vitesse": 8, "Technique": 5, "Charisme": 4 }, "effect": "Apparition : recuperez un Jaydon Ross ou un Fenrir Strom depuis votre deck ou vestiaire.", "ability": "recoverJaydonOrFenrir", "musicId": "tom_evans",
-      "renderArt": "assets/card_renders/rare_catcheurs_tom_evans.png"
-    },
-    {
-      "key": "standard_catcheurs_tom_evans", "type": "Catcheur", "rarity": "Standard", "name": "Tom Evans",
-      "stats": { "Force": 7, "Vitesse": 8, "Technique": 5, "Charisme": 4 }, "effect": "", "musicId": "tom_evans",
-      "renderArt": "assets/card_renders/standard_catcheurs_tom_evans.png"
-    },
-    {
-      "key": "rare_catcheurs_ace_angel", "type": "Catcheur", "rarity": "Rare", "name": "Ace Angel",
-      "stats": { "Force": 6, "Vitesse": 8, "Technique": 6, "Charisme": 4 }, "effect": "Apparition : revelez un objet dans votre main, gagnez +2 Charisme et +1 Vitesse.", "ability": "revealObjectHandCharSpeed", "musicId": "ace_angel",
-      "renderArt": "assets/card_renders/rare_catcheurs_ace_angel.png"
-    },
-    {
-      "key": "standard_catcheurs_el_amnesico", "type": "Catcheur", "rarity": "Standard", "name": "El Amnesico",
-      "stats": { "Force": 4, "Vitesse": 8, "Technique": 6, "Charisme": 6 }, "effect": "", "musicId": "el_amnesico",
-      "renderArt": "assets/card_renders/standard_catcheurs_el_amnesico.png"
-    },
-    {
-      "key": "rare_catcheurs_el_amnesico", "type": "Catcheur", "rarity": "Rare", "name": "El Amnesico",
-      "stats": { "Force": 4, "Vitesse": 8, "Technique": 6, "Charisme": 6 }, "effect": "Tant que cette carte est sur le terrain, 20% de chance que la roulette se relance automatiquement.", "ability": "wheelAutoReroll20", "musicId": "el_amnesico",
-      "renderArt": "assets/card_renders/rare_catcheurs_el_amnesico.png"
-    },
-    {
-      "key": "ultime_catcheurs_heddi_karaoui", "type": "Catcheur", "rarity": "Ultime", "name": "Heddi Karaoui",
-      "stats": { "Force": 7, "Vitesse": 4, "Technique": 10, "Charisme": 7 }, "effect": "Tant que cette carte est sur le terrain, 75% de chance en plus que la roulette s'arrete sur Technique.", "ability": "techniqueWheel75", "musicId": "heddi_karaoui",
-      "renderArt": "assets/card_renders/ultime_catcheurs_heddi_karaoui.png"
-    },
-    {
-      "key": "rare_catcheurs_jose_moreno", "type": "Catcheur", "rarity": "Rare", "name": "Jose Moreno",
-      "stats": { "Force": 4, "Vitesse": 9, "Technique": 4, "Charisme": 7 }, "effect": "Premier tour : votre adversaire envoie la carte au-dessus de son deck au vestiaire.", "ability": "firstRoundOpponentMill1", "musicId": "jose_moreno",
-      "renderArt": "assets/card_renders/rare_catcheurs_jose_moreno.png"
     }
   ]
 }
