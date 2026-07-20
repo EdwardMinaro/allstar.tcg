@@ -72,8 +72,10 @@ function showMatchmakingSearch(found = false) {
   if (found) {
     stopMatchmakingTimer();
     if (state) state.textContent = "Adversaire trouvé !";
+    document.getElementById("matchSearchActions")?.setAttribute("hidden", "");
     return;
   }
+  document.getElementById("matchSearchActions")?.removeAttribute("hidden");
   if (!matchmakingStartedAt) matchmakingStartedAt = Date.now();
   renderMatchmakingTimer();
   if (state) state.textContent = "Recherche d'adversaire en cours";
@@ -308,6 +310,9 @@ function renderMultiRoom(room) {
     if (room.status === "finished") state.textContent = "Partie termin\u00e9e";
   }
   if (log) log.innerHTML = (room.log || []).slice(-8).map(line => `<p>${line}</p>`).join("");
+  if (automatic && room.status === "playing" && room.players?.p2 && !room.matchState) {
+    window.announceOnlineMatchFound?.(room);
+  }
   maybeLaunchOnlineMatch(room);
 }
 
@@ -456,6 +461,28 @@ async function enterQuickQueue(deck, mode = "ranked") {
   }
 }
 
+function leaveMatchmakingScreen() {
+  if (!multiplayer.room || !isMatchmakingRoom(multiplayer.room)) {
+    showMenu?.();
+    return;
+  }
+  showMenu?.();
+  showSystemToast?.("Recherche maintenue en arrière-plan.");
+}
+
+async function cancelOnlineMatchmaking() {
+  if (!multiplayer.room || !isMatchmakingRoom(multiplayer.room)) return;
+  try {
+    await window.AllstarMatchmakingService?.cancelMatchmaking?.();
+    closeOnlineSession();
+    showMulti?.();
+    setMultiStatus("Recherche annulée.");
+  } catch (error) {
+    console.error("[MATCHMAKING] Annulation impossible", error);
+    displayMultiplayerError(error, "Impossible d'annuler la recherche.");
+  }
+}
+
 function quickMatch() {
   try {
     forceNetworkMultiplayerService();
@@ -559,6 +586,8 @@ window.createOnlineRoom = createOnlineRoom;
 window.joinOnlineRoom = joinOnlineRoom;
 window.quickMatch = quickMatch;
 window.quickRankedMatch = quickRankedMatch;
+window.leaveMatchmakingScreen = leaveMatchmakingScreen;
+window.cancelOnlineMatchmaking = cancelOnlineMatchmaking;
 window.showCustomMatchOptions = showCustomMatchOptions;
 window.showOnlineModes = showOnlineModes;
 window.showJoinRoom = showJoinRoom;

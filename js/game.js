@@ -3590,15 +3590,59 @@ function startOnlineMatchFromRoom(room, playerSlot){
     onlinePlayerProfile:room.players?.[ownSlot]?.profile||null,
     onlineOpponentProfile:room.players?.[opponentSlot]?.profile||null
   });
-  showOnlineMatchIntro(room,ownSlot,()=>{
+  const showIntroAndLaunch=()=>showOnlineMatchIntro(room,ownSlot,()=>{
     launch();
     publishOnlineSnapshotNow();
   });
+  if(room?.matchmaking?.mode==="quick"||room?.matchmaking?.mode==="ranked"){
+    showOnlineMatchFoundCountdown(room,showIntroAndLaunch);
+    return;
+  }
+  showIntroAndLaunch();
 }
 
 let onlineIntroRoomCode="";
 let onlineIntroTimer=null;
 let onlineIntroPending=false;
+let onlineMatchFoundRoomCode="";
+let onlineMatchFoundTimer=null;
+let onlineMatchFoundPending=false;
+let onlineMatchFoundCallbacks=[];
+function showOnlineMatchFoundCountdown(room,onDone){
+  if(!room?.roomCode){if(onDone)onDone();return;}
+  if(onlineMatchFoundPending&&onlineMatchFoundRoomCode===room.roomCode){
+    if(onDone)onlineMatchFoundCallbacks.push(onDone);
+    return;
+  }
+  clearInterval(onlineMatchFoundTimer);
+  onlineMatchFoundRoomCode=room.roomCode;
+  onlineMatchFoundPending=true;
+  onlineMatchFoundCallbacks=onDone?[onDone]:[];
+  const overlay=document.getElementById("onlineMatchFoundOverlay");
+  const countdown=document.getElementById("onlineMatchFoundCountdown");
+  let remaining=3;
+  if(countdown)countdown.textContent=remaining;
+  overlay?.classList.add("active");
+  playSound("cloche");
+  onlineMatchFoundTimer=setInterval(()=>{
+    remaining-=1;
+    if(remaining>0){
+      if(countdown)countdown.textContent=remaining;
+      playSound("cloche");
+      return;
+    }
+    clearInterval(onlineMatchFoundTimer);
+    onlineMatchFoundTimer=null;
+    overlay?.classList.remove("active");
+    onlineMatchFoundPending=false;
+    const callbacks=onlineMatchFoundCallbacks.splice(0);
+    callbacks.forEach(callback=>callback());
+  },1000);
+}
+function announceOnlineMatchFound(room){
+  if(room?.matchmaking?.mode!=="quick"&&room?.matchmaking?.mode!=="ranked")return;
+  showOnlineMatchFoundCountdown(room);
+}
 function onlineProfileSummary(profile={},fallbackName="Joueur"){
   const progress=window.AllstarRankingService.normalizeProgress(profile||{});
   const rank=window.AllstarRankingService.rankForProgress(progress);
@@ -7655,6 +7699,7 @@ Object.assign(window,{
   restartCurrentMatch,
   startNextCareerMatch,
   startOnlineMatchFromRoom,
+  announceOnlineMatchFound,
   applyOnlineRoomSnapshot,
   openOnlineProfile,
   closeOnlineProfile,
