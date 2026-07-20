@@ -159,13 +159,43 @@ async function localOnlineIdentity() {
 }
 
 let multiLeaderboardEntries = [];
+let multiLeaderboardSort = "elo";
+
+function leaderboardTotalMatches(profile){
+  const progress = window.AllstarRankingService.normalizeProgress(profile);
+  return progress.wins + progress.losses;
+}
+
+function sortMultiLeaderboard(entries=[]){
+  return [...entries].sort((a,b)=>{
+    const progressA = window.AllstarRankingService.normalizeProgress(a);
+    const progressB = window.AllstarRankingService.normalizeProgress(b);
+    const totalA = leaderboardTotalMatches(a);
+    const totalB = leaderboardTotalMatches(b);
+    const rateA = totalA ? progressA.wins / totalA : 0;
+    const rateB = totalB ? progressB.wins / totalB : 0;
+    if(multiLeaderboardSort === "matches")return totalB-totalA || progressB.elo-progressA.elo;
+    if(multiLeaderboardSort === "winrate")return rateB-rateA || totalB-totalA || progressB.elo-progressA.elo;
+    return progressB.elo-progressA.elo || totalB-totalA;
+  });
+}
+
+function setOnlineLeaderboardSort(sort){
+  if(!["elo","matches","winrate"].includes(sort))return;
+  multiLeaderboardSort = sort;
+  const titles = {elo:"Classement ELO",matches:"Classement par matchs",winrate:"Classement par win rate"};
+  const title = document.getElementById("leaderboardTitle");
+  if(title)title.textContent = titles[sort];
+  document.querySelectorAll("[data-leaderboard-sort]").forEach(button => button.classList.toggle("active", button.dataset.leaderboardSort === sort));
+  renderCachedLeaderboard(multiLeaderboardEntries);
+}
 function renderCachedLeaderboard(entries, detail="") {
   const list = document.getElementById("leaderboardList");
   const count = document.getElementById("leaderboardPlayerCount");
   if (!list || !count) return;
-  multiLeaderboardEntries = entries;
+  multiLeaderboardEntries = sortMultiLeaderboard(entries);
   count.textContent = `${entries.length} joueur${entries.length > 1 ? "s" : ""}${detail}`;
-  list.innerHTML = entries.map((profile, index) => {
+  list.innerHTML = multiLeaderboardEntries.map((profile, index) => {
     const progress = window.AllstarRankingService.normalizeProgress(profile);
     const rank = window.AllstarRankingService.rankForProgress(progress);
     const total = progress.wins + progress.losses;
@@ -190,6 +220,8 @@ async function showOnlineLeaderboard() {
   else list.innerHTML = "<p>Chargement des joueurs...</p>";
   try {
     multiLeaderboardEntries = await window.AllstarRankingService.getLeaderboard();
+    renderCachedLeaderboard(multiLeaderboardEntries);
+    return;
     count.textContent = `${multiLeaderboardEntries.length} joueur${multiLeaderboardEntries.length > 1 ? "s" : ""}`;
     list.innerHTML = multiLeaderboardEntries.map((profile, index) => {
       const progress = window.AllstarRankingService.normalizeProgress(profile);
@@ -512,6 +544,11 @@ window.showCustomMatchOptions = showCustomMatchOptions;
 window.showOnlineModes = showOnlineModes;
 window.showJoinRoom = showJoinRoom;
 window.showOnlineLeaderboard = showOnlineLeaderboard;
+window.setOnlineLeaderboardSort = setOnlineLeaderboardSort;
+document.addEventListener("click", event => {
+  const button = event.target.closest("[data-leaderboard-sort]");
+  if(button)setOnlineLeaderboardSort(button.dataset.leaderboardSort);
+});
 window.showOnlineDeckReady = showOnlineDeckReady;
 window.closeOnlineSession = closeOnlineSession;
 window.initMultiplayerStatus = initMultiplayerStatus;

@@ -513,7 +513,12 @@
         <button class="small-btn" type="button" onclick="joinOnlineRoom()">Rejoindre</button>
       </div>
       <div class="multi-leaderboard-panel" id="multiLeaderboardPanel">
-        <div class="leaderboard-head"><span>Classement ELO</span><strong id="leaderboardPlayerCount">0 joueurs</strong></div>
+        <div class="leaderboard-head"><span id="leaderboardTitle">Classement ELO</span><strong id="leaderboardPlayerCount">0 joueurs</strong></div>
+        <div class="leaderboard-tabs" role="tablist" aria-label="Tri du classement">
+          <button class="leaderboard-tab active" type="button" data-leaderboard-sort="elo">ELO</button>
+          <button class="leaderboard-tab" type="button" data-leaderboard-sort="matches">Matchs</button>
+          <button class="leaderboard-tab" type="button" data-leaderboard-sort="winrate">Win rate</button>
+        </div>
         <div class="leaderboard-list" id="leaderboardList"></div>
         <button class="small-btn dark" type="button" onclick="showOnlineModes()">Retour</button>
       </div>
