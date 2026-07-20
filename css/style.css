@@ -3246,7 +3246,7 @@ button{font-family:inherit;cursor:pointer}
 
 .leaderboard-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;color:#ffd35d;font-size:18px;font-weight:1000;text-transform:uppercase}
 .leaderboard-head strong{color:#d8cfb6;font-size:13px}
-.leaderboard-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:-2px 0 11px}
+.leaderboard-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:-2px 0 11px}
 .leaderboard-tab{min-height:34px;border:1px solid rgba(45,130,220,.7);border-radius:5px;background:rgba(9,24,37,.86);color:#d8cfb6;font-size:12px;font-weight:1000;text-transform:uppercase}
 .leaderboard-tab:hover,.leaderboard-tab.active{border-color:#ffd35d;background:rgba(133,87,10,.48);color:#fff}
 .leaderboard-list{max-height:min(48vh,370px);overflow:auto;display:grid;gap:8px;margin-bottom:14px;padding-right:4px}
@@ -4827,6 +4827,15 @@ button{font-family:inherit;cursor:pointer}
     transform:translateX(-50%) !important;
   }
 }
+
+.duel-menu-card,
+.tutorial-menu-card{width:min(760px,92vw);text-align:center}
+.duel-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:24px 0}
+.duel-choice{min-height:176px;padding:22px;border:2px solid rgba(45,130,220,.72);border-radius:8px;background:linear-gradient(180deg,rgba(18,41,59,.96),rgba(7,14,23,.98));color:#fff;text-align:left}
+.duel-choice:hover{border-color:#ffd35d;filter:brightness(1.08)}
+.duel-choice strong,.duel-choice span{display:block}.duel-choice strong{color:#ffd35d;font-size:24px;font-weight:1000;text-transform:uppercase}.duel-choice span{margin-top:12px;color:#e6dcc7;font-size:15px;font-weight:800;line-height:1.35}.tutorial-choice{border-color:rgba(255,211,93,.76)}
+.tutorial-steps{display:grid;gap:8px;margin:20px 0 24px;text-align:left}.tutorial-steps article{display:grid;grid-template-columns:minmax(174px,.72fr) minmax(0,1.8fr);gap:16px;align-items:center;padding:13px 16px;border:1px solid rgba(255,211,93,.48);border-radius:7px;background:rgba(8,10,17,.74)}.tutorial-steps b{color:#ffd35d;font-size:15px;text-transform:uppercase}.tutorial-steps span{color:#eee5d3;font-size:14px;font-weight:700;line-height:1.35}
+@media (max-width:700px){.duel-choice-grid{grid-template-columns:1fr}.tutorial-steps article{grid-template-columns:1fr;gap:6px}}
 
 /* The three home controls stay one aligned toolbar, including short screens. */
 #menu .home-settings,

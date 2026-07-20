@@ -2625,6 +2625,17 @@ function showMenu(){
   show("menu");
   playMusic("menu");
 }
+function showDuelMenu(){show("duel")}
+function showTutorial(){show("tutorial")}
+function startTutorialMatch(){
+  const starterDeck=defaultDeck();
+  return startMatch({
+    mode:"tutorial",
+    tutorial:true,
+    aiLabel:"Partenaire d'entrainement",
+    playerDeckKeys:starterDeck.cards
+  });
+}
 function showCareer(){show("career");renderCareer()}
 function showDecks(){
   show("decks");
@@ -3419,6 +3430,7 @@ function cancelDeckSelect(){
   if(target==="career")return showCareer();
   if(target==="multi")return showMulti();
   if(target==="challenge")return showAllstarChallenge();
+  if(target==="tutorial")return showTutorial();
   return showMenu();
 }
 
@@ -3509,6 +3521,10 @@ function startMatch(options={}){
   document.getElementById("log").innerHTML="";
   show("game");
   render();
+
+  if(options.tutorial){
+    log("<b>[TUTORIEL]</b> Pose un catcheur, utilise les emplacements Bonus, Manager et Objet, puis observe le journal pendant les duels.");
+  }
 
   // Le PFC n'a lieu qu'une seule fois : au début du match.
   if(G.mode==="online"){
@@ -5867,6 +5883,12 @@ function showPin(name,success,chance,roll,winnerSide=null){
           settleOnlineMatchRewards();
           fadeMusic(playerWon ? "victoire" : "defaite",900);
           showOnlineFinalResult();
+          return;
+        }
+        if(G.mode==="tutorial"){
+          log("<b>[TUTORIEL]</b> Match d'entraînement terminé. Aucun crédit, XP ou statistique n'a été modifié.");
+          fadeMusic(playerWon ? "victoire" : "defaite",900);
+          actions.classList.add("active");
           return;
         }
         awardMatchCredits(playerWon);

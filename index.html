@@ -77,7 +77,7 @@
 
       <div class="home-main-actions">
         <button class="home-action primary" onclick="showCareer()">Carrière</button>
-        <button class="home-action" onclick="startGame()">Duel Libre</button>
+        <button class="home-action" onclick="showDuelMenu()">Duel Libre</button>
         <button class="home-action" onclick="showMulti()">Jouer en ligne</button>
         <button class="home-action" onclick="showAllstarChallenge()">Défi ALLSTAR</button>
         <button class="home-action" onclick="showDecks()">Decks</button>
@@ -87,6 +87,46 @@
     </div>
     <div id="appVersion" class="home-version">Version du jeu</div>
 
+  </div>
+</section>
+
+<section id="duel" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-card duel-menu-card">
+      <h1 class="logo small-logo">Duel libre</h1>
+      <p class="subtitle">Choisis comment tu veux monter sur le ring.</p>
+      <div class="duel-choice-grid">
+        <button class="duel-choice tutorial-choice" type="button" onclick="showTutorial()">
+          <strong>Tutoriel</strong>
+          <span>Apprendre les r&egrave;gles avant son premier match.</span>
+        </button>
+        <button class="duel-choice" type="button" onclick="startGame()">
+          <strong>Duel contre IA</strong>
+          <span>Affronte un adversaire et teste ton deck librement.</span>
+        </button>
+      </div>
+      <button class="small-btn dark" type="button" onclick="showMenu()">Retour</button>
+    </div>
+  </div>
+</section>
+
+<section id="tutorial" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-card tutorial-menu-card">
+      <h1 class="logo small-logo">Tutoriel</h1>
+      <p class="subtitle">Les bases d'ALLSTAR, pr&ecirc;tes &agrave; utiliser dans le ring.</p>
+      <div class="tutorial-steps">
+        <article><b>1. Le but du match</b><span>Gagne les duels pour infliger des tomb&eacute;s. Trois tomb&eacute;s et le match est gagn&eacute;.</span></article>
+        <article><b>2. Tes catcheurs</b><span>Pose un catcheur puis compare Force, Vitesse, Technique ou Charisme avec l'adversaire.</span></article>
+        <article><b>3. Les emplacements</b><span>Les cartes Bonus, Manager et Objet renforcent ton catcheur ou modifient le prochain duel.</span></article>
+        <article><b>4. Les effets</b><span>Lis la zone d'effet de chaque carte. Le journal raconte chaque d&eacute;clenchement.</span></article>
+        <article><b>5. Ton tour</b><span>Joue tes cartes, choisis ta statistique, puis termine ton tour pour laisser jouer l'IA.</span></article>
+      </div>
+      <div class="shop-actions">
+        <button class="small-btn" type="button" onclick="startTutorialMatch()">Lancer le tutoriel</button>
+        <button class="small-btn dark" type="button" onclick="showDuelMenu()">Retour</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -518,6 +558,7 @@
           <button class="leaderboard-tab active" type="button" data-leaderboard-sort="elo">ELO</button>
           <button class="leaderboard-tab" type="button" data-leaderboard-sort="matches">Matchs</button>
           <button class="leaderboard-tab" type="button" data-leaderboard-sort="winrate">Win rate</button>
+          <button class="leaderboard-tab" type="button" data-leaderboard-sort="record">Record ELO</button>
         </div>
         <div class="leaderboard-list" id="leaderboardList"></div>
         <button class="small-btn dark" type="button" onclick="showOnlineModes()">Retour</button>

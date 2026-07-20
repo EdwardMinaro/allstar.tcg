@@ -48,6 +48,7 @@
     progress.xp = Math.max(0, Number(progress.xp) || 0);
     progress.totalXp = Math.max(0, Number(progress.totalXp) || 0);
     progress.elo = Math.round(Number(progress.elo) || 1000);
+    progress.bestElo = Math.max(progress.elo, Math.round(Number(progress.bestElo) || 0));
     progress.wins = Math.max(0, Number(progress.wins) || 0);
     progress.losses = Math.max(0, Number(progress.losses) || 0);
     progress.rankedMatches = Math.max(0, Number(progress.rankedMatches) || 0);
@@ -174,6 +175,7 @@
     const won=Boolean(match.won);
     const delta = eloDelta(progress.elo, match.opponentElo, won, progress.rankedMatches, progress.rankedLossStreak);
     progress.elo = Math.max(0, progress.elo + delta);
+    progress.bestElo=Math.max(progress.bestElo,progress.elo);
     progress.rankedMatches += 1;
     progress.rankedLossStreak=won ? 0 : progress.rankedLossStreak+1;
     const calculated=rankForElo(progress.elo,progress.rankedMatches);
