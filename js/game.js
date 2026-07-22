@@ -6728,10 +6728,14 @@ function challengeLifeRecoveryText(state){
 }
 
 function challengeWeekKey(date=new Date()){
-  const start=new Date(date.getFullYear(),0,1);
-  const dayMs=24*60*60*1000;
-  const week=Math.floor((date-start)/dayMs/7)+1;
-  return `${date.getFullYear()}-W${String(week).padStart(2,"0")}`;
+  // ISO weeks make the challenge rotate on calendar Mondays, not seven-day slices from January 1.
+  const day=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
+  const weekDay=day.getUTCDay()||7;
+  day.setUTCDate(day.getUTCDate()+4-weekDay);
+  const year=day.getUTCFullYear();
+  const yearStart=new Date(Date.UTC(year,0,1));
+  const week=Math.ceil((((day-yearStart)/86400000)+1)/7);
+  return `${year}-W${String(week).padStart(2,"0")}`;
 }
 
 function hashString(value){
@@ -6831,6 +6835,7 @@ function setupChallengeBossOnRing(){
   const bossCard=cardByKey(G.challenge.bossKey);
   if(!bossCard)return;
   const boss=cloneCard(bossCard);
+  boss.id=`challenge_boss_${G.challenge.weekKey}_${Math.random().toString(36).slice(2)}`;
   G.ai.cat=state(boss);
   G.ai.cat.owner=G.ai;
   const index=G.ai.deck.findIndex(card=>cardKey(card)===G.challenge.bossKey);

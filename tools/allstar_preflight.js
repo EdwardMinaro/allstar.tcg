@@ -78,6 +78,7 @@ function verifyRecentEffects() {
   const game = read("js/game.js");
   assert(game.includes('winnerAbility==="charismaWinRandom3"&&G.stat==="Charisme"'), "Effet Bernardot execute sur Charisme gagne");
   assert(game.includes('forceWheel50:{stat:"Force",chance:.5}'), "Effet Tony Trivaldo force Force au premier round");
+  assert(game.includes("ISO weeks make the challenge rotate") && game.includes("challenge_boss_${G.challenge.weekKey}_"), "Boss ALLSTAR previsualisable et rotation hebdomadaire");
 }
 
 verifyRanking();
