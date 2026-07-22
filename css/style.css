@@ -6471,7 +6471,11 @@ button:disabled,
   width:min(620px,calc(100vw - 32px)) !important;
   height:auto !important;
   max-height:calc(100vh - 32px) !important;
-  overflow:auto;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#b9871a transparent;
   inset:50% auto auto 50% !important;
   transform:translate(-50%,-50%);
   border:3px solid rgba(245,196,50,.76) !important;
@@ -6484,6 +6488,10 @@ button:disabled,
 #game .options-menu.active{
   display:grid !important;
 }
+
+#game .options-menu::-webkit-scrollbar{width:7px;height:0}
+#game .options-menu::-webkit-scrollbar-track{background:transparent}
+#game .options-menu::-webkit-scrollbar-thumb{border-radius:8px;background:#b9871a}
 
 #game .options-menu::before{
   content:"";
@@ -6565,9 +6573,18 @@ button:disabled,
   background:rgba(4,5,9,.48);
 }
 
+#game .options-menu .audio-options{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:12px;
+  row-gap:4px;
+  align-items:end;
+}
+
 #game .options-menu .audio-options:before,
 #game .options-menu .display-options:before{
   display:block;
+  grid-column:1 / -1;
   margin-bottom:8px;
   color:#f4d48c;
   font-size:12px;
@@ -6588,12 +6605,27 @@ button:disabled,
 
 #game .options-menu .audio-options input{
   margin:0 0 5px;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
 }
 
 #game .options-menu .audio-options select,
 #game .options-menu .display-options select{
   margin-bottom:7px;
+  max-width:100%;
+  box-sizing:border-box;
 }
+
+#game .options-menu .audio-options label[for="musicVolume"]{grid-area:2 / 1}
+#game .options-menu #musicVolume{grid-area:3 / 1}
+#game .options-menu .audio-options label[for="sfxVolume"]{grid-area:2 / 2}
+#game .options-menu #sfxVolume{grid-area:3 / 2}
+#game .options-menu #muteButton{grid-area:4 / 1 / auto / -1}
+#game .options-menu .audio-options label[for="musicSelect"]{grid-area:5 / 1 / auto / -1}
+#game .options-menu #musicSelect{grid-area:6 / 1 / auto / -1;width:100%}
+#game .options-menu .audio-controls{grid-area:7 / 1 / auto / -1}
+#game .options-menu .current-track{grid-area:8 / 1 / auto / -1}
 
 #game .options-menu .audio-controls{
   margin-top:4px;
@@ -6602,6 +6634,28 @@ button:disabled,
 #game .options-menu .current-track{
   margin:8px 0 0;
   text-align:center;
+}
+
+#game .options-menu .display-options{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:center;
+  column-gap:12px;
+  row-gap:5px;
+}
+
+#game .options-menu .display-options:before,
+#game .options-menu .display-check{
+  grid-column:1 / -1;
+}
+
+#game .options-menu .display-options label[for="gameResolutionSelect"]{
+  margin:0;
+}
+
+#game .options-menu .display-options select{
+  width:100%;
+  margin:0;
 }
 
 @media (max-width:560px), (max-height:620px){
@@ -6615,4 +6669,30 @@ button:disabled,
   #game .options-menu > button:nth-of-type(1){
     grid-column:auto;
   }
+
+  #game .options-menu .audio-options{
+    grid-template-columns:1fr;
+  }
+
+  #game .options-menu .audio-options label[for="musicVolume"],
+  #game .options-menu #musicVolume,
+  #game .options-menu .audio-options label[for="sfxVolume"],
+  #game .options-menu #sfxVolume,
+  #game .options-menu #muteButton,
+  #game .options-menu .audio-options label[for="musicSelect"],
+  #game .options-menu #musicSelect,
+  #game .options-menu .audio-controls,
+  #game .options-menu .current-track{
+    grid-column:1;
+  }
+
+  #game .options-menu .audio-options label[for="musicVolume"]{grid-row:2}
+  #game .options-menu #musicVolume{grid-row:3}
+  #game .options-menu .audio-options label[for="sfxVolume"]{grid-row:4}
+  #game .options-menu #sfxVolume{grid-row:5}
+  #game .options-menu #muteButton{grid-row:6}
+  #game .options-menu .audio-options label[for="musicSelect"]{grid-row:7}
+  #game .options-menu #musicSelect{grid-row:8}
+  #game .options-menu .audio-controls{grid-row:9}
+  #game .options-menu .current-track{grid-row:10}
 }
