@@ -6462,6 +6462,14 @@ button:disabled,
   }
 }
 
+/* Restore the generous desktop card preview without reintroducing the
+   pile overlap that occurs in compact 720px-high windows. */
+@media (min-width:901px) and (min-height:761px){
+  #game .left-panel > .preview-panel{
+    width:clamp(250px,31vh,344px) !important;
+  }
+}
+
 /* In-match settings use a centered modal instead of covering the left side. */
 #game .options-menu{
   position:fixed !important;
