@@ -4841,18 +4841,12 @@ button{font-family:inherit;cursor:pointer}
 .tutorial-steps{display:grid;gap:8px;margin:20px 0 24px;text-align:left}.tutorial-steps article{display:grid;grid-template-columns:minmax(174px,.72fr) minmax(0,1.8fr);gap:16px;align-items:center;padding:13px 16px;border:1px solid rgba(255,211,93,.48);border-radius:7px;background:rgba(8,10,17,.74)}.tutorial-steps b{color:#ffd35d;font-size:15px;text-transform:uppercase}.tutorial-steps span{color:#eee5d3;font-size:14px;font-weight:700;line-height:1.35}
 @media (max-width:700px){.duel-choice-grid{grid-template-columns:1fr}.tutorial-steps article{grid-template-columns:1fr;gap:6px}}
 
-/* The three home controls stay one aligned toolbar, including short screens. */
+/* The home controls stay one aligned toolbar, including short screens. */
 #menu .home-settings,
 #menu .home-profile-button,
+#menu .home-pause-track-button,
 #menu .home-next-track-button{
   box-sizing:border-box;
-}
-
-@media (max-width:1180px), (max-height:760px){
-  #menu .home-next-track-button{
-    width:54px !important;
-    height:54px !important;
-  }
 }
 
 /* Match readability: the existing Vestiaire is the discard pile. These cues
@@ -6085,8 +6079,8 @@ button:disabled,
   transform:translateY(-1px);
 }
 
-#menu .home-pause-track-button{
-  left:calc(5% + 172px);
+#menu .home-pause-track-button,
+#menu .home-next-track-button{
   top:calc(1% + 38px);
   width:60px;
   height:60px;
@@ -6098,8 +6092,28 @@ button:disabled,
   font-size:22px;
 }
 
+#menu .home-pause-track-button{
+  left:calc(5% + 172px);
+}
+
 #menu .home-next-track-button{
   left:calc(5% + 246px);
+}
+
+#menu .home-pause-track-button:hover,
+#menu .home-next-track-button:hover{
+  box-shadow:0 0 0 3px rgba(255,222,120,.52) inset,6px 6px 0 rgba(0,0,0,.52),0 0 20px rgba(246,194,51,.32);
+}
+
+@media (max-width:1180px), (max-height:760px){
+  #menu .home-pause-track-button,
+  #menu .home-next-track-button{
+    width:54px !important;
+    height:54px !important;
+    font-size:20px;
+  }
+
+  #menu .home-next-track-button{left:calc(5% + 238px)}
 }
 
 #game .game-pause-track-button{
