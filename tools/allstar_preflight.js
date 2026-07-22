@@ -68,6 +68,7 @@ function verifyInterfaceFiles() {
   assert(scripts.indexOf("js/rankingService.js") < scripts.indexOf("js/game.js"), "Ordre classement puis jeu");
   assert(css.includes("@media (max-width: 900px)") && css.includes("@media (max-height: 760px)"), "Adaptation petite largeur et petite hauteur");
   assert(css.includes("Short desktop windows need a dedicated left rail"), "Rail gauche protege sur ecran 720p");
+  assert(html.includes("game-options-head") && css.includes("In-match settings use a centered modal"), "Options de partie en fenetre modale");
   const audio = read("js/audio.js");
   assert(html.includes("music-pause-toggle") && audio.includes("toggleMusicPause()"), "Bouton pause/reprendre de musique");
   assert(audio.includes("musicPausedByUser") && audio.includes("music-stop-control,.music-pause-toggle"), "Pause manuelle preservee entre les clics");

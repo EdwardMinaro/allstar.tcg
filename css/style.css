@@ -6435,3 +6435,170 @@ button:disabled,
     width:min(100%,170px) !important;
   }
 }
+
+/* In-match settings use a centered modal instead of covering the left side. */
+#game .options-menu{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:70 !important;
+  width:auto !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:16px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:rgba(3,4,8,.74) !important;
+  box-shadow:none !important;
+  display:none;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-content:start;
+  gap:9px;
+  width:min(620px,calc(100vw - 32px)) !important;
+  height:auto !important;
+  max-height:calc(100vh - 32px) !important;
+  overflow:auto;
+  inset:50% auto auto 50% !important;
+  transform:translate(-50%,-50%);
+  border:3px solid rgba(245,196,50,.76) !important;
+  border-radius:14px !important;
+  background:linear-gradient(155deg,#20212d,#0a0b11 68%) !important;
+  isolation:isolate;
+  box-shadow:0 0 0 4px rgba(0,0,0,.62),12px 14px 0 rgba(0,0,0,.46) !important;
+}
+
+#game .options-menu.active{
+  display:grid !important;
+}
+
+#game .options-menu::before{
+  content:"";
+  position:fixed;
+  inset:-100vmax;
+  z-index:-1;
+  background:rgba(3,4,8,.74);
+}
+
+#game .game-options-head{
+  grid-column:1 / -1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 2px 12px;
+  border-bottom:1px solid rgba(245,196,50,.35);
+}
+
+#game .game-options-head small,
+#game .game-options-head strong{
+  display:block;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+
+#game .game-options-head small{
+  color:#f2d28b;
+  font-size:10px;
+  letter-spacing:.15em;
+}
+
+#game .game-options-head strong{
+  margin-top:2px;
+  color:#ffd35d;
+  font-size:clamp(28px,4vw,40px);
+  font-style:italic;
+  line-height:.9;
+  text-shadow:3px 3px 0 #000;
+}
+
+#game .options-menu .game-options-close{
+  width:40px !important;
+  height:40px;
+  min-height:40px;
+  margin:0 !important;
+  padding:0 !important;
+  border:2px solid #505463 !important;
+  border-radius:8px !important;
+  background:linear-gradient(180deg,#30323e,#16171f) !important;
+  color:#fff !important;
+  font-size:28px !important;
+  font-weight:400 !important;
+  line-height:1;
+}
+
+#game .options-menu > button:not(.game-options-close){
+  width:100% !important;
+  min-height:46px;
+  margin:0 !important;
+  padding:8px 10px !important;
+  font-size:13px !important;
+}
+
+#game .options-menu > button:nth-of-type(1){
+  grid-column:1 / -1;
+  border-color:#267fba !important;
+  background:linear-gradient(180deg,#1d6fa8,#0a2d49) !important;
+  color:#fff !important;
+}
+
+#game .options-menu .audio-options,
+#game .options-menu .display-options{
+  grid-column:1 / -1;
+  margin:4px 0 0;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:9px;
+  background:rgba(4,5,9,.48);
+}
+
+#game .options-menu .audio-options:before,
+#game .options-menu .display-options:before{
+  display:block;
+  margin-bottom:8px;
+  color:#f4d48c;
+  font-size:12px;
+  font-weight:1000;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+
+#game .options-menu .audio-options:before{content:"Audio";}
+#game .options-menu .display-options:before{content:"Affichage";}
+
+#game .options-menu .audio-options label,
+#game .options-menu .display-options label{
+  margin:6px 0 3px;
+  color:#eee4d0;
+  font-size:11px;
+}
+
+#game .options-menu .audio-options input{
+  margin:0 0 5px;
+}
+
+#game .options-menu .audio-options select,
+#game .options-menu .display-options select{
+  margin-bottom:7px;
+}
+
+#game .options-menu .audio-controls{
+  margin-top:4px;
+}
+
+#game .options-menu .current-track{
+  margin:8px 0 0;
+  text-align:center;
+}
+
+@media (max-width:560px), (max-height:620px){
+  #game .options-menu{
+    width:min(440px,calc(100vw - 20px)) !important;
+    max-height:calc(100vh - 20px) !important;
+    padding:12px !important;
+    grid-template-columns:1fr;
+  }
+
+  #game .options-menu > button:nth-of-type(1){
+    grid-column:auto;
+  }
+}
