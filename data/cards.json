@@ -367,6 +367,22 @@
       "ability": "winNextEnemySpeedMinus3"
     },
     {
+      "key": "legende_catcheurs_tony_trivaldo",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Tony Trivaldo",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 8
+      },
+      "effect": "Sur son premier round, la roulette a 50% de chance de tomber sur Force.",
+      "renderArt": "assets/card_renders/legende_catcheurs_tony_trivaldo.png",
+      "musicId": "tony_trivaldo",
+      "ability": "forceWheel50"
+    },
+    {
       "key": "legende_catcheurs_tyson_briggs",
       "type": "Catcheur",
       "rarity": "Legende",
@@ -509,6 +525,22 @@
       "ability": "drawOnWin1",
       "renderArt": "assets/card_renders/rare_catcheurs_baadshah_pehalwan_khan.png",
       "musicId": "baadshah_pehalwan_khan"
+    },
+    {
+      "key": "rare_catcheurs_bernardot",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Bernardot",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "Une fois par tour, si la roulette s'arrête sur Charisme, il gagne +3 dans une statistique aléatoire en cas de victoire.",
+      "renderArt": "assets/card_renders/rare_catcheurs_bernardot.png",
+      "musicId": "bernardot",
+      "ability": "charismaWinRandom3"
     },
     {
       "key": "rare_catcheurs_big_sam",
@@ -2177,16 +2209,6 @@
       "ability": "bonusPureTraditionDrawTeam"
     },
     {
-      "key": "rare_managers_tommy_rauzy",
-      "type": "Manager",
-      "rarity": "Rare",
-      "name": "TOMMY RAUZY",
-      "stats": {},
-      "effect": "Permet d'utiliser un objet une fois supplémentaire",
-      "ability": "objectExtra1",
-      "renderArt": "assets/card_renders/rare_managers_tommy_rauzy.png"
-    },
-    {
       "key": "rare_managers_the_world",
       "type": "Manager",
       "rarity": "Rare",
@@ -2195,6 +2217,16 @@
       "effect": "Chaque tour, votre adversaire défausse une carte. Si votre catcheur actif est Kyle Hoxton, Drix ou Saitovic, l'adversaire perd aussi -1 Charisme.",
       "ability": "turnOpponentDiscardWorldCharisma",
       "renderArt": "assets/card_renders/rare_managers_the_world.png"
+    },
+    {
+      "key": "rare_managers_tommy_rauzy",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "TOMMY RAUZY",
+      "stats": {},
+      "effect": "Permet d'utiliser un objet une fois supplémentaire",
+      "ability": "objectExtra1",
+      "renderArt": "assets/card_renders/rare_managers_tommy_rauzy.png"
     },
     {
       "key": "rare_managers_yann_le_kersaudec",

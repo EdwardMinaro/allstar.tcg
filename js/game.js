@@ -375,6 +375,22 @@ const CARD_DATA = [
     "ability": "winNextEnemySpeedMinus3"
   },
   {
+    "key": "legende_catcheurs_tony_trivaldo",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Tony Trivaldo",
+    "stats": {
+      "Force": 10,
+      "Vitesse": 4,
+      "Technique": 6,
+      "Charisme": 8
+    },
+    "effect": "Sur son premier round, la roulette a 50% de chance de tomber sur Force.",
+    "renderArt": "assets/card_renders/legende_catcheurs_tony_trivaldo.png",
+    "musicId": "tony_trivaldo",
+    "ability": "forceWheel50"
+  },
+  {
     "key": "legende_catcheurs_tyson_briggs",
     "type": "Catcheur",
     "rarity": "Legende",
@@ -517,6 +533,22 @@ const CARD_DATA = [
     "ability": "drawOnWin1",
     "renderArt": "assets/card_renders/rare_catcheurs_baadshah_pehalwan_khan.png",
     "musicId": "baadshah_pehalwan_khan"
+  },
+  {
+    "key": "rare_catcheurs_bernardot",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Bernardot",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 5,
+      "Technique": 6,
+      "Charisme": 7
+    },
+    "effect": "Une fois par tour, si la roulette s'arrête sur Charisme, il gagne +3 dans une statistique aléatoire en cas de victoire.",
+    "renderArt": "assets/card_renders/rare_catcheurs_bernardot.png",
+    "musicId": "bernardot",
+    "ability": "charismaWinRandom3"
   },
   {
     "key": "rare_catcheurs_big_sam",
@@ -2185,16 +2217,6 @@ const CARD_DATA = [
     "ability": "bonusPureTraditionDrawTeam"
   },
   {
-    "key": "rare_managers_tommy_rauzy",
-    "type": "Manager",
-    "rarity": "Rare",
-    "name": "TOMMY RAUZY",
-    "stats": {},
-    "effect": "Permet d'utiliser un objet une fois supplémentaire",
-    "ability": "objectExtra1",
-    "renderArt": "assets/card_renders/rare_managers_tommy_rauzy.png"
-  },
-  {
     "key": "rare_managers_the_world",
     "type": "Manager",
     "rarity": "Rare",
@@ -2203,6 +2225,16 @@ const CARD_DATA = [
     "effect": "Chaque tour, votre adversaire défausse une carte. Si votre catcheur actif est Kyle Hoxton, Drix ou Saitovic, l'adversaire perd aussi -1 Charisme.",
     "ability": "turnOpponentDiscardWorldCharisma",
     "renderArt": "assets/card_renders/rare_managers_the_world.png"
+  },
+  {
+    "key": "rare_managers_tommy_rauzy",
+    "type": "Manager",
+    "rarity": "Rare",
+    "name": "TOMMY RAUZY",
+    "stats": {},
+    "effect": "Permet d'utiliser un objet une fois supplémentaire",
+    "ability": "objectExtra1",
+    "renderArt": "assets/card_renders/rare_managers_tommy_rauzy.png"
   },
   {
     "key": "rare_managers_yann_le_kersaudec",
@@ -2519,6 +2551,8 @@ const EFFECT_REGISTRY = {
   smsRecoverTags2: { timing:"entry", text:"Une fois par match : regagne jusqu'à 2 TAG." },
   speedWheel25: { timing:"roulette", text:"Premier round : 25% de chance de forcer Vitesse." },
   speedWheel50: { timing:"roulette", text:"Premier round : 50% de chance de forcer Vitesse." },
+  forceWheel50: { timing:"roulette", text:"Premier round : 50% de chance de forcer Force." },
+  charismaWinRandom3: { timing:"win", text:"Une fois par tour, si Charisme est tiré : victoire +3 dans une statistique aléatoire." },
   techniqueWheel75: { timing:"roulette", text:"75% de chance de forcer Technique." },
   wheelAutoReroll20: { timing:"roulette", text:"20% de chance de relancer automatiquement la roulette." },
   starterTechniqueCharisma1: { timing:"entry", text:"Si joué en premier ce tour : +1 Technique et +1 Charisme." },
@@ -5421,6 +5455,12 @@ function win(winner,loser,reason){
     showEffectFeedback(winner.cat.card,winner.cat.card.name,"Première victoire +1 partout","buff");
   }
   if(winnerAbility==="growForce")winner.cat.mods.Force++;
+  if(winnerAbility==="charismaWinRandom3"&&G.stat==="Charisme"){
+    const stat=STATS[Math.floor(Math.random()*STATS.length)];
+    winner.cat.mods[stat]+=3;
+    log(`[EFFET] ${winner.cat.card.name} : victoire en Charisme, +3 ${stat}.`);
+    showEffectFeedback(winner.cat.card,winner.cat.card.name,`+3 ${stat}`,"buff");
+  }
   const nextEnemyTechniqueMalus={
     winNextEnemyTechniqueMinus2:-2,
     winNextEnemyTechniqueMinus3:-3
@@ -5704,15 +5744,20 @@ function rollRoundStat(){
     showEffectFeedback(techniqueSource.card,techniqueSource.card.name,"Roulette : Technique","special",2200);
     return "Technique";
   }
-  const speedWeights={speedWheel25:.25,speedWheel50:.5};
+  const forcedStatWeights={
+    speedWheel25:{stat:"Vitesse",chance:.25},
+    speedWheel50:{stat:"Vitesse",chance:.5},
+    forceWheel50:{stat:"Force",chance:.5}
+  };
   const active=[G.player,G.ai]
     .map(p=>p.cat)
-    .filter(s=>s&&isFirstRoundForWrestler(s)&&speedWeights[wrestlerAbility(s)]);
-  const best=active.sort((a,b)=>speedWeights[wrestlerAbility(b)]-speedWeights[wrestlerAbility(a)])[0];
-  if(best&&Math.random()<speedWeights[wrestlerAbility(best)]){
-    log(`[EFFET] ${best.card.name} influence la roulette : Vitesse.`);
-    showEffectFeedback(best.card,best.card.name,"Roulette : Vitesse","special",2200);
-    return "Vitesse";
+    .filter(s=>s&&isFirstRoundForWrestler(s)&&forcedStatWeights[wrestlerAbility(s)]);
+  const best=active.sort((a,b)=>forcedStatWeights[wrestlerAbility(b)].chance-forcedStatWeights[wrestlerAbility(a)].chance)[0];
+  const forced=best&&forcedStatWeights[wrestlerAbility(best)];
+  if(forced&&Math.random()<forced.chance){
+    log(`[EFFET] ${best.card.name} influence la roulette : ${forced.stat}.`);
+    showEffectFeedback(best.card,best.card.name,`Roulette : ${forced.stat}`,"special",2200);
+    return forced.stat;
   }
   return STATS[Math.floor(Math.random()*4)];
 }

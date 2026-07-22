@@ -5,6 +5,11 @@ const AUDIO_LIBRARY = {
     tension: { label: "Tension", src: "assets/audio/music/tension.mp3" },
     victoire: { label: "Victoire", src: "assets/audio/music/victoire.mp3" },
     defaite: { label: "Défaite", src: "assets/audio/music/defaite.mp3" },
+    bernardot: {
+      label: "Bernardot",
+      wrestler: "Bernardot",
+      src: "assets/audio/music/bernardot.mp3"
+    },
     matheo_navarro: {
       label: "Matheo Navarro",
       wrestler: "Matheo Navarro",

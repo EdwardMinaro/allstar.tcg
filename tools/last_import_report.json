@@ -1,11 +1,18 @@
 {
   "imported": [
     {
-      "key": "rare_catcheurs_queen_phoenixia",
-      "name": "Queen Phoenixia",
+      "key": "rare_catcheurs_bernardot",
+      "name": "Bernardot",
       "rarity": "Rare",
       "type": "Catcheur",
-      "ability": "recoverBonusDeck"
+      "ability": "charismaWinRandom3"
+    },
+    {
+      "key": "legende_catcheurs_tony_trivaldo",
+      "name": "Tony Trivaldo",
+      "rarity": "Legende",
+      "type": "Catcheur",
+      "ability": "forceWheel50"
     }
   ],
   "updated": [],

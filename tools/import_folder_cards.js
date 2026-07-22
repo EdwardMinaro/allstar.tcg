@@ -64,12 +64,15 @@ const ABILITY_BY_KEY = {
   "Rare|Catcheur|TLB": "winNextEnemySpeedMinus2",
   "Legende|Catcheur|TLB": "winNextEnemySpeedMinus3",
   "Rare|Catcheur|Maffa": "entryPinBonus20",
+  "Rare|Catcheur|Bernardot": "charismaWinRandom3",
+  "Legende|Catcheur|Tony Trivaldo": "forceWheel50",
   "Rare|Manager|PURE TRADITION": "bonusPureTraditionDrawTeam",
 };
 
 const STATS_BY_KEY = {
   "Legende|Catcheur|NILS'N": { Force: 5, Vitesse: 9, Technique: 6, Charisme: 8 },
   "Legende|Catcheur|Yann Skoric": { Force: 6, Vitesse: 7, Technique: 6, Charisme: 9 },
+  "Legende|Catcheur|Tony Trivaldo": { Force: 10, Vitesse: 4, Technique: 6, Charisme: 8 },
 };
 
 function walk(dir, out = []) {
