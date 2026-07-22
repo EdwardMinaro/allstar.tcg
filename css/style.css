@@ -6466,7 +6466,7 @@ button:disabled,
    pile overlap that occurs in compact 720px-high windows. */
 @media (min-width:901px) and (min-height:761px){
   #game .left-panel > .preview-panel{
-    width:clamp(250px,31vh,344px) !important;
+    width:min(374px,calc(100% - 16px)) !important;
   }
 }
 
