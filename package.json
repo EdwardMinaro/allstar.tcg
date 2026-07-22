@@ -7,6 +7,7 @@
   "main": "electron-main.js",
   "scripts": {
     "start": "electron .",
+    "verify": "node tools/allstar_audit.js && node tools/allstar_preflight.js && node tools/allstar_balance_sim.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder --win nsis",
     "publish": "electron-builder --win nsis --publish always"
