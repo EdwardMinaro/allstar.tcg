@@ -6399,3 +6399,19 @@ button:disabled,
     top:12px !important;
   }
 }
+
+/* Short desktop windows need a dedicated left rail: the full preview card and
+   the two discard/deck piles must remain separate at 1280x720. */
+@media (min-width:901px) and (max-height:760px){
+  #game .left-panel{
+    --left-bottom:8px;
+    --pile-gap:8px;
+    --pile-h:116px;
+    --pile-w:150px;
+  }
+
+  #game .left-panel > .preview-panel{
+    top:74px !important;
+    width:min(100%,170px) !important;
+  }
+}

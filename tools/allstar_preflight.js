@@ -67,6 +67,7 @@ function verifyInterfaceFiles() {
   assert(scripts.indexOf("js/firebaseService.js") < scripts.indexOf("js/profileService.js"), "Ordre Firebase puis profil");
   assert(scripts.indexOf("js/rankingService.js") < scripts.indexOf("js/game.js"), "Ordre classement puis jeu");
   assert(css.includes("@media (max-width: 900px)") && css.includes("@media (max-height: 760px)"), "Adaptation petite largeur et petite hauteur");
+  assert(css.includes("Short desktop windows need a dedicated left rail"), "Rail gauche protege sur ecran 720p");
 }
 
 function verifyRecentEffects() {
