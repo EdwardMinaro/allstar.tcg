@@ -261,6 +261,7 @@ class AudioManager {
     this.pendingMusicId = null;
     this.unlocked = false;
     this.musicStoppedByUser = false;
+    this.musicPausedByUser = false;
     this.victorySfxFlip = false;
     this.wrestlerQueue = [];
     this.storageKey = "catchCardsAudio";
@@ -337,7 +338,10 @@ class AudioManager {
 
   playNextWrestlerMusic(duration = 1600, manual = false) {
     if (this.musicStoppedByUser && !manual) return null;
-    if (manual) this.musicStoppedByUser = false;
+    if (manual) {
+      this.musicStoppedByUser = false;
+      this.musicPausedByUser = false;
+    }
     const nextId = this.nextWrestlerMusicId();
     if (!nextId) return null;
     this.fadeMusic(nextId, duration, manual);
@@ -395,7 +399,10 @@ class AudioManager {
     const item = this.library.music[id];
     if (!item) return;
     if (this.musicStoppedByUser && !manual) return;
-    if (manual) this.musicStoppedByUser = false;
+    if (manual) {
+      this.musicStoppedByUser = false;
+      this.musicPausedByUser = false;
+    }
     if (this.currentMusicId === id && this.music && !this.music.paused) return;
 
     if (this.music && !this.music.paused) {
@@ -407,7 +414,7 @@ class AudioManager {
   }
 
   unlockAndPlay() {
-    if (this.musicStoppedByUser) return;
+    if (this.musicStoppedByUser || this.musicPausedByUser) return;
     if (this.music && !this.music.paused) {
       this.unlocked = true;
       return;
@@ -416,7 +423,10 @@ class AudioManager {
   }
 
   stopMusic(manual = true) {
-    if (manual) this.musicStoppedByUser = true;
+    if (manual) {
+      this.musicStoppedByUser = true;
+      this.musicPausedByUser = false;
+    }
     clearInterval(this.fadeTimer);
     clearInterval(this.crossfadeTimer);
     this.fadeTimer = null;
@@ -429,6 +439,37 @@ class AudioManager {
     this.music = null;
     this.currentMusicId = null;
     this.updateNowPlaying();
+  }
+
+  toggleMusicPause() {
+    if (this.music && !this.music.paused) {
+      clearInterval(this.fadeTimer);
+      clearInterval(this.crossfadeTimer);
+      this.fadeTimer = null;
+      this.crossfadeTimer = null;
+      this.music.pause();
+      this.musicPausedByUser = true;
+      this.updateNowPlaying();
+      return;
+    }
+
+    if (this.music && this.music.paused) {
+      this.musicStoppedByUser = false;
+      this.musicPausedByUser = false;
+      this.music.play().then(() => {
+        this.unlocked = true;
+        this.updateNowPlaying();
+      }).catch(() => {
+        this.musicPausedByUser = true;
+        this.updateNowPlaying();
+      });
+      this.updateNowPlaying();
+      return;
+    }
+
+    this.musicStoppedByUser = false;
+    this.musicPausedByUser = false;
+    this.playMusic(this.pendingMusicId || this.currentMusicId || this.firstWrestlerMusicId(), true);
   }
 
   fadeMusic(id, duration = 800, manual = false) {
@@ -549,6 +590,12 @@ class AudioManager {
     document.querySelectorAll(".current-music-label").forEach(current => {
       current.textContent = this.settings.muted ? `${label} (muet)` : label;
     });
+    document.querySelectorAll(".music-pause-toggle").forEach(button => {
+      const paused = this.musicPausedByUser || !this.music || this.music.paused;
+      button.innerHTML = paused ? "&#9654;" : "&#10074;&#10074;";
+      button.setAttribute("aria-label", paused ? "Reprendre la musique" : "Mettre la musique en pause");
+      button.title = paused ? "Reprendre la musique" : "Mettre la musique en pause";
+    });
     document.querySelectorAll(".mute-button-control").forEach(button => {
       button.textContent = this.settings.muted ? "Remettre le son" : "Couper le son";
     });
@@ -620,7 +667,7 @@ function initAudioOptions() {
 
   document.addEventListener("click", (event) => {
     if (event.target.closest("button,.choice")) audioManager.playSfx("clic");
-    if (event.target.closest(".music-stop-control")) return;
+    if (event.target.closest(".music-stop-control,.music-pause-toggle")) return;
     audioManager.unlockAndPlay();
   });
 
@@ -646,6 +693,10 @@ function syncMusicSelects(value) {
 function playNextTheme() {
   const nextId = audioManager.playNextWrestlerMusic(500, true);
   if (nextId) syncMusicSelects(nextId);
+}
+
+function toggleThemePause() {
+  audioManager.toggleMusicPause();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

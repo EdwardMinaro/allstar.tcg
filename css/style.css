@@ -6085,7 +6085,7 @@ button:disabled,
   transform:translateY(-1px);
 }
 
-#menu .home-next-track-button{
+#menu .home-pause-track-button{
   left:calc(5% + 172px);
   top:calc(1% + 38px);
   width:60px;
@@ -6098,7 +6098,11 @@ button:disabled,
   font-size:22px;
 }
 
-#game .game-next-track-button{
+#menu .home-next-track-button{
+  left:calc(5% + 246px);
+}
+
+#game .game-pause-track-button{
   left:108px;
   top:26px;
   width:60px;
@@ -6111,13 +6115,21 @@ button:disabled,
   font-size:22px;
 }
 
+#game .game-next-track-button{
+  left:182px;
+}
+
 @media (max-width:1180px), (max-height:760px){
-  #game .game-next-track-button{
+  #game .game-pause-track-button{
     left:78px;
     top:12px;
     width:54px;
     height:54px;
     font-size:20px;
+  }
+
+  #game .game-next-track-button{
+    left:140px;
   }
 }
 
@@ -6383,9 +6395,13 @@ button:disabled,
   top:26px !important;
 }
 
-#game .game-next-track-button{
+#game .game-pause-track-button{
   left:calc(10vw + 7px) !important;
   top:26px !important;
+}
+
+#game .game-next-track-button{
+  left:calc(10vw + 79px) !important;
 }
 
 @media (max-width:1180px), (max-height:760px){
@@ -6394,9 +6410,13 @@ button:disabled,
     top:12px !important;
   }
 
-  #game .game-next-track-button{
+  #game .game-pause-track-button{
     left:calc(10vw + 5px) !important;
     top:12px !important;
+  }
+
+  #game .game-next-track-button{
+    left:calc(10vw + 69px) !important;
   }
 }
 
