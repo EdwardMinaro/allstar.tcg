@@ -6046,7 +6046,8 @@ function showPin(name,success,chance,roll,winnerSide=null){
           const previousUnlocked=Number(playerState.careerUnlocked)||0;
           playerState.careerUnlocked=Math.max(previousUnlocked,nextUnlocked);
           savePlayerState();
-          if(playerState.careerUnlocked>previousUnlocked){
+          const unlockedNewOpponent=playerState.careerUnlocked>previousUnlocked;
+          if(unlockedNewOpponent){
             void pushCloudSaveNow().catch(()=>{});
           }
           renderCareer();
@@ -6054,7 +6055,7 @@ function showPin(name,success,chance,roll,winnerSide=null){
             nextButton.hidden=false;
             nextButton.disabled=false;
             nextButton.style.display="inline-flex";
-            sub.textContent=`${finalSub} Nouvel adversaire débloqué.`;
+            if(unlockedNewOpponent)sub.textContent=`${finalSub} Nouvel adversaire débloqué.`;
           }
         }
         fadeMusic(playerWon ? "victoire" : "defaite",900);
