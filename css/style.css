@@ -6716,3 +6716,131 @@ button:disabled,
   #game .options-menu .audio-controls{grid-row:9}
   #game .options-menu .current-track{grid-row:10}
 }
+
+/* The in-match controls behave as one centered toolbar instead of three
+   independent elements positioned with viewport calculations. */
+#game .game-utility-controls{
+  position:absolute;
+  z-index:30;
+  top:26px;
+  left:0;
+  width:clamp(314px,19vw,374px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+}
+
+#game .game-utility-controls > button{
+  position:static !important;
+  top:auto !important;
+  left:auto !important;
+  flex:0 0 60px;
+  width:60px !important;
+  height:60px !important;
+  margin:0 !important;
+}
+
+@media (max-width:1180px), (max-height:760px){
+  #game .game-utility-controls{
+    top:12px;
+    width:314px;
+    gap:8px;
+  }
+
+  #game .game-utility-controls > button{
+    flex-basis:54px;
+    width:54px !important;
+    height:54px !important;
+    font-size:20px !important;
+  }
+}
+
+/* Keep the pause menu dense and scannable, with no unused display section. */
+#game .game-options-actions{
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+#game .game-options-actions button{
+  width:100%;
+  min-height:40px;
+  margin:0;
+  padding:7px 9px;
+  font-size:12px;
+}
+
+#game .options-menu .audio-options,
+#game .options-menu .display-options{
+  margin-top:0;
+  padding:10px 12px;
+}
+
+#game .options-menu .audio-options{
+  row-gap:2px;
+}
+
+#game .options-menu .audio-options:before{
+  margin-bottom:3px;
+}
+
+#game .options-menu .audio-options label{
+  margin:3px 0 1px;
+}
+
+#game .options-menu .audio-options input{
+  margin:0 0 2px;
+}
+
+#game .options-menu .audio-options select{
+  margin-bottom:3px;
+}
+
+#game .options-menu .current-track{
+  margin:4px 0 0;
+}
+
+#game .options-menu .display-options{
+  grid-template-columns:minmax(0,1fr) auto;
+  row-gap:7px;
+}
+
+#game .options-menu .display-options:before{
+  grid-column:1;
+  grid-row:1;
+  margin:0;
+  align-self:center;
+}
+
+#game .options-menu .display-options .display-check{
+  grid-column:2;
+  grid-row:1;
+  margin:0;
+  white-space:nowrap;
+}
+
+#game .options-menu .display-options label[for="gameResolutionSelect"]{
+  grid-column:1;
+  grid-row:2;
+}
+
+#game .options-menu .display-options select{
+  grid-column:2;
+  grid-row:2;
+  width:178px;
+}
+
+@media (max-width:560px), (max-height:620px){
+  #game .game-options-actions{grid-template-columns:1fr}
+  #game .options-menu .display-options{grid-template-columns:1fr}
+  #game .options-menu .display-options:before,
+  #game .options-menu .display-options .display-check,
+  #game .options-menu .display-options label[for="gameResolutionSelect"],
+  #game .options-menu .display-options select{
+    grid-column:1;
+    grid-row:auto;
+    width:100%;
+  }
+}

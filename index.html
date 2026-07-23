@@ -253,19 +253,23 @@
 </section>
 <section id="game" class="screen">
   <div class="crowd"></div>
-  <button class="settings" onclick="toggleOptions()" aria-label="Options">&#9881;</button>
-  <button class="next-track-button music-pause-toggle game-pause-track-button" type="button" onclick="toggleThemePause()" aria-label="Mettre la musique en pause" title="Mettre la musique en pause">&#10074;&#10074;</button>
-  <button class="next-track-button game-next-track-button" type="button" onclick="playNextTheme()" aria-label="Musique suivante" title="Musique suivante">&#9197;</button>
+  <div class="game-utility-controls" aria-label="Contrôles rapides">
+    <button class="settings" onclick="toggleOptions()" aria-label="Options">&#9881;</button>
+    <button class="next-track-button music-pause-toggle game-pause-track-button" type="button" onclick="toggleThemePause()" aria-label="Mettre la musique en pause" title="Mettre la musique en pause">&#10074;&#10074;</button>
+    <button class="next-track-button game-next-track-button" type="button" onclick="playNextTheme()" aria-label="Musique suivante" title="Musique suivante">&#9197;</button>
+  </div>
   <div class="options-menu" id="optionsMenu" onclick="if(event.target===this)hideOptions()">
     <div class="game-options-head">
       <div><small>PAUSE</small><strong>OPTIONS</strong></div>
       <button class="game-options-close" type="button" onclick="hideOptions()" aria-label="Fermer les options" title="Fermer">&#215;</button>
     </div>
     <button onclick="toggleOptions()">Revenir à la partie</button>
-    <button class="danger" onclick="startGame()">Abandonner</button>
-    <button class="dark" onclick="requestProfileLogout()">Se déconnecter</button>
-    <button class="danger" onclick="requestQuitGame()">Quitter le jeu</button>
-    <button onclick="hideOptions();showMenu()">Retour menu principal</button>
+    <div class="game-options-actions">
+      <button class="danger" onclick="startGame()">Abandonner</button>
+      <button onclick="hideOptions();showMenu()">Retour menu principal</button>
+      <button class="dark" onclick="requestProfileLogout()">Se déconnecter</button>
+      <button class="danger" onclick="requestQuitGame()">Quitter le jeu</button>
+    </div>
 
     <div class="audio-options">
       <label for="musicVolume">Volume musique</label>
