@@ -6457,8 +6457,8 @@ button:disabled,
   }
 
   #game .left-panel > .preview-panel{
-    top:74px !important;
-    width:min(100%,220px) !important;
+    top:100px !important;
+    width:min(100%,224px) !important;
   }
 }
 
