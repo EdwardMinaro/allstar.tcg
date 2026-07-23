@@ -6458,7 +6458,8 @@ button:disabled,
 
   #game .left-panel > .preview-panel{
     top:100px !important;
-    width:min(100%,224px) !important;
+    width:246px !important;
+    max-width:calc(100% + 8px) !important;
   }
 }
 
@@ -6492,7 +6493,7 @@ button:disabled,
   height:auto !important;
   max-height:calc(100vh - 32px) !important;
   overflow-x:hidden;
-  overflow-y:auto;
+  overflow-y:hidden;
   overscroll-behavior:contain;
   scrollbar-width:thin;
   scrollbar-color:#b9871a transparent;
@@ -6682,6 +6683,7 @@ button:disabled,
   #game .options-menu{
     width:min(440px,calc(100vw - 20px)) !important;
     max-height:calc(100vh - 20px) !important;
+    overflow-y:auto;
     padding:12px !important;
     grid-template-columns:1fr;
   }
