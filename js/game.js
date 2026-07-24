@@ -4448,6 +4448,20 @@ function applyWrestlerEntryEffect(owner,c){
 function applyRoundManagerEffects(){
   [G.player,G.ai].forEach(owner=>{
     const opp=owner.side==="player"?G.ai:G.player;
+    // Les annulations de Yann restent actives tant que son bonus occupe le terrain.
+    switch(owner.man?.ability){
+      case "cancelObjects":
+        opp.objectsBlocked=true;
+        break;
+      case "cancelAllObjects":
+        owner.objectsBlocked=true;
+        opp.objectsBlocked=true;
+        break;
+      case "cancelObjectsManagers":
+        opp.objectsBlocked=true;
+        opp.managersBlocked=true;
+        break;
+    }
     const catAbility=wrestlerAbility(owner.cat);
     if(catAbility==="turnCatRandom2"||catAbility==="turnCatRandom3"){
       const value=catAbility==="turnCatRandom3"?3:2;
