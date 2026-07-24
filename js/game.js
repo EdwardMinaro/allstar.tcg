@@ -6730,7 +6730,7 @@ async function awardProfileProgress(playerWon, options={}){
 }
 
 const CHALLENGE_LIFE_RECOVERY_MS = 24*60*60*1000;
-const CHALLENGE_HP_BY_RARITY = { Standard:10, Rare:20, Legende:50, Ultime:100 };
+const CHALLENGE_HP_BY_RARITY = { Standard:10, Rare:20, Legende:35, Ultime:100 };
 
 function challengeLifeRecoveryText(state){
   const remaining=Math.max(0,(Number(state?.livesRefreshAt)||0)-Date.now());
@@ -6806,7 +6806,8 @@ function ensureAllstarChallengeState(){
     savePlayerState();
     return playerState.challenge;
   }
-  current.maxHp=Number(current.maxHp)||maxHp;
+  // Migration des défis légendaires commencés avant le rééquilibrage 0.1.47.
+  current.maxHp=Number(current.maxHp)===50&&boss?.rarity==="Legende" ? maxHp : (Number(current.maxHp)||maxHp);
   current.bossHp=Math.max(0,Math.min(current.maxHp,Number(current.bossHp ?? current.maxHp)));
   current.lives=Math.max(0,Math.min(3,Number(current.lives ?? 3)));
   current.livesRefreshAt=Number(current.livesRefreshAt)||0;
@@ -6992,7 +6993,9 @@ function challengeDeckForBoss(boss){
   };
   addCareerKey(keys,boss,boss.rarity==="Ultime"?1:2);
   addCareerPool(keys, careerSupportPool(entry,boss.rarity==="Standard"?"Standard":"Rare"), 8);
-  if(boss.rarity==="Legende"||boss.rarity==="Ultime")addCareerPool(keys, careerSupportPool(entry,"Legende"), boss.rarity==="Ultime"?3:2);
+  // Le catcheur légendaire est déjà le pic de difficulté du défi : son appui
+  // reste volontairement Standard/Rare pour éviter un cumul impraticable.
+  if(boss.rarity==="Ultime")addCareerPool(keys, careerSupportPool(entry,"Legende"), 3);
   addCareerPool(keys, careerSupportPool(entry,"Standard"), 20);
   return legalDeckKeys(keys);
 }
