@@ -5259,6 +5259,22 @@ function score(s,stat){
   return v;
 }
 
+function scoreBreakdown(s,stat){
+  const base=Number(s?.card?.stats?.[stat]||0);
+  const storedMods=Number(s?.mods?.[stat]||0);
+  const total=score(s,stat);
+  const temporaryMods=total-base-storedMods;
+  const parts=[String(base)];
+
+  if(storedMods)parts.push(`${storedMods>0?"+":""}${storedMods} mod.`);
+  if(temporaryMods){
+    const label=statAbilityFeedback(s,stat);
+    parts.push(`${temporaryMods>0?"+":""}${temporaryMods} ${label||"effet actif"}`);
+  }
+
+  return {base,storedMods,temporaryMods,total,text:`${parts.join(" ")} = ${total}`};
+}
+
 function statAbilityFeedback(s,stat){
   if(!s)return null;
   const alexKissInGrave=s.card.name==="El Amnesico"&&s.owner?.grave?.some(card=>card.ability==="graveElAmnesicoAll1");
@@ -5298,8 +5314,10 @@ function duel(){
   G.matchPhase="duel";
   render();
   const stat=G.stat;
-  const ps=score(G.player.cat,stat),as=score(G.ai.cat,stat);
-  log(`<b>${stat}</b> : ${ps} / ${as}.`);
+  const playerScore=scoreBreakdown(G.player.cat,stat);
+  const aiScore=scoreBreakdown(G.ai.cat,stat);
+  const ps=playerScore.total,as=aiScore.total;
+  log(`<b>${stat}</b> : ${G.player.cat.card.name} (${playerScore.text}) / ${G.ai.cat.card.name} (${aiScore.text}).`);
 
   const playerStatFx=statAbilityFeedback(G.player.cat,stat);
   const aiStatFx=statAbilityFeedback(G.ai.cat,stat);
