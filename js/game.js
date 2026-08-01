@@ -7001,6 +7001,7 @@ function showChallengeResult(title,detail,won=false){
 
 function challengePlayerWinsRound(damage,stat){
   const dealt=Math.max(1,Number(damage)||1);
+  applyChallengeWinEffects(G.player,G.ai,stat);
   G.challenge.hp=Math.max(0,(Number(G.challenge.hp)||0)-dealt);
   playSound("victoire_duel");
   log(`[DÉFI] ${G.player.cat.card.name} blesse ${G.challenge.bossName} : -${dealt} PV en ${stat}.`);
@@ -7016,6 +7017,7 @@ function challengePlayerWinsRound(damage,stat){
 }
 
 function challengeBossWinsRound(){
+  applyChallengeWinEffects(G.ai,G.player,G.stat);
   log(`[DÉFI] ${G.challenge.bossName} gagne le round : tentative de tombé.`);
   clearWrestler(G.player);
   consumeRoundObjects();
@@ -7048,6 +7050,49 @@ function handleChallengePinSuccess(winnerSide){
   if(sub)sub.textContent=`${G.challenge.lives} vie${G.challenge.lives>1?"s":""} restante${G.challenge.lives>1?"s":""}.`;
   fadeMusic("match",600);
   setTimeout(()=>{hidePin();startRound()},950);
+}
+
+function applyChallengeWinEffects(winner,loser,stat){
+  const ability=wrestlerAbility(winner?.cat);
+  if(!ability)return;
+
+  if(ability==="drawOnWin1"||ability==="drawOnWin2"){
+    const amount=ability==="drawOnWin2"?2:1;
+    const before=winner.hand.length;
+    draw(winner,amount);
+    const drawn=winner.hand.length-before;
+    if(drawn){
+      log(`[EFFET] ${winner.cat.card.name} : victoire, pioche ${drawn} carte${drawn>1?"s":""}.`);
+      showEffectFeedback(winner.cat.card,winner.cat.card.name,`Victoire : pioche +${drawn}`,"special");
+    }
+  }
+  if(ability==="winSpeedCharisma1"){
+    winner.cat.mods.Vitesse+=1;
+    winner.cat.mods.Charisme+=1;
+    log(`[EFFET] ${winner.cat.card.name} : victoire, +1 Vitesse et +1 Charisme.`);
+    showEffectFeedback(winner.cat.card,winner.cat.card.name,"Victoire +1 Vitesse / Charisme","buff");
+  }
+  if(ability==="firstWinAll1"&&!winner.cat.firstWinAll1Used){
+    winner.cat.firstWinAll1Used=true;
+    addAllStats(winner.cat,1);
+    log(`[EFFET] ${winner.cat.card.name} : première victoire, +1 partout.`);
+    showEffectFeedback(winner.cat.card,winner.cat.card.name,"Première victoire +1 partout","buff");
+  }
+  if(ability==="growForce"){
+    winner.cat.mods.Force+=1;
+    log(`[EFFET] ${winner.cat.card.name} : victoire, +1 Force.`);
+    showEffectFeedback(winner.cat.card,winner.cat.card.name,"Victoire +1 Force","buff");
+  }
+  if(ability==="charismaWinRandom3"&&stat==="Charisme"){
+    const boosted=STATS[Math.floor(Math.random()*STATS.length)];
+    winner.cat.mods[boosted]+=3;
+    log(`[EFFET] ${winner.cat.card.name} : victoire en Charisme, +3 ${boosted}.`);
+    showEffectFeedback(winner.cat.card,winner.cat.card.name,`Victoire +3 ${boosted}`,"buff");
+  }
+  if(ability==="sameStatNextFixed"){
+    G.lockedStat=stat;
+    log(`[EFFET] ${winner.cat.card.name} : prochaine statistique verrouillée sur ${stat}.`);
+  }
 }
 
 function completeAllstarChallenge(){
