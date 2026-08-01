@@ -740,6 +740,22 @@ const CARD_DATA = [
     "musicId": "dorian_garcia"
   },
   {
+    "key": "rare_catcheurs_dirty_dau_si",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Dirty Dau Si",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 4,
+      "Technique": 7,
+      "Charisme": 7
+    },
+    "effect": "Apparition : -2 Technique adverse.",
+    "ability": "entryEnemyTechniqueMinus2",
+    "renderArt": "assets/card_renders/rare_catcheurs_dirty_dau_si.png",
+    "musicId": "dirty_dau_si"
+  },
+  {
     "key": "rare_catcheurs_drix",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -802,6 +818,21 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_catcheurs_elionis.png",
     "musicId": "elionis",
     "ability": "opponentDiscardChoice1"
+  },
+  {
+    "key": "rare_catcheurs_erik_inoa",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Erik Inoa",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 3,
+      "Technique": 6,
+      "Charisme": 9
+    },
+    "effect": "Round 1 : +1 dans toutes les statistiques.",
+    "ability": "matchRoundOneAll1",
+    "renderArt": "assets/card_renders/rare_catcheurs_erik_inoa.png"
   },
   {
     "key": "rare_catcheurs_ethan_riley",
@@ -1514,6 +1545,21 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/standard_catcheurs_dario_murro.png"
   },
   {
+    "key": "standard_catcheurs_dirty_dau_si",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Dirty Dau Si",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 4,
+      "Technique": 7,
+      "Charisme": 7
+    },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_dirty_dau_si.png",
+    "musicId": "dirty_dau_si"
+  },
+  {
     "key": "standard_catcheurs_dorian_garcia",
     "type": "Catcheur",
     "rarity": "Standard",
@@ -1572,6 +1618,20 @@ const CARD_DATA = [
     "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_catcheurs_elionis.png",
     "musicId": "elionis"
+  },
+  {
+    "key": "standard_catcheurs_erik_inoa",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Erik Inoa",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 3,
+      "Technique": 6,
+      "Charisme": 9
+    },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_erik_inoa.png"
   },
   {
     "key": "standard_catcheurs_ethan_riley",
@@ -2484,6 +2544,7 @@ const EFFECT_REGISTRY = {
   firstLossDeck: { timing:"defeat", text:"Une fois par match, annule la première défaite et retourne dans le deck." },
   firstRoundCharTech: { timing:"round1", text:"+1 Charisme et +1 Technique au round 1." },
   firstRoundCharTech2: { timing:"round1", text:"+2 Charisme et +2 Technique au round 1." },
+  entryEnemyTechniqueMinus2: { timing:"entry", text:"À l'arrivée : -2 Technique au catcheur adverse." },
   firstRoundForceCharTech: { timing:"round1", text:"+1 Force, Technique et Charisme au round 1." },
   firstRoundForceTechnique: { timing:"round1", text:"+1 Force et +1 Technique au premier round." },
   firstRoundForceSpeed1: { timing:"firstRound", text:"+1 Force et +1 Vitesse au premier round de la carte." },
@@ -2511,6 +2572,7 @@ const EFFECT_REGISTRY = {
   mRandom: { timing:"manager", text:"+1 dans une stat aléatoire." },
   mRandom2: { timing:"manager", text:"+2 dans une stat aléatoire." },
   mVitesse1: { timing:"manager", text:"+1 Vitesse." },
+  matchRoundOneAll1: { timing:"round1", text:"Round 1 : +1 dans toutes les statistiques." },
   graveElAmnesicoAll1: { timing:"grave", text:"Au vestiaire : El Amnesico gagne +1 partout." },
   managerOwnedForceSpeed1: { timing:"duel", text:"Si un bonus est actif : +1 Force et +1 Vitesse." },
   managerOwnedTechForceSpeed1: { timing:"duel", text:"Si un bonus est actif : +1 Technique, Force et Vitesse." },
@@ -4085,6 +4147,7 @@ function isMatchRoundOneAbility(ability){
     "firstRoundSpeedTechnique2",
     "firstRoundCharTech",
     "firstRoundCharTech2",
+    "matchRoundOneAll1",
     "firstRoundForceCharTech",
     "firstRoundSpeedCharisma3",
     "techniqueRound1"
@@ -4129,6 +4192,7 @@ function openingRoundEffectLabel(s){
     firstRoundForceTechnique2:"+2 Force / +2 Technique",
     firstRoundCharTech:"+1 Charisme / +1 Technique",
     firstRoundCharTech2:"+2 Charisme / +2 Technique",
+    matchRoundOneAll1:"+1 à toutes les statistiques",
     firstRoundForceCharTech:"+1 Force / +1 Technique / +1 Charisme",
     firstRoundSpeedCharisma3:"+3 Vitesse / +3 Charisme",
     techniqueRound1:"+3 Technique",
@@ -4289,6 +4353,14 @@ function applyWrestlerEntryEffect(owner,c){
       log(`[EFFET] ${c.name} envoie ${milled.name}, au-dessus du deck de ${enemy.label}, au vestiaire.`);
       showEffectFeedback(c,c.name,"Carte adverse au vestiaire","malus");
     }else log(`[EFFET] ${c.name} : deck adverse vide.`);
+  }
+  if(c.ability==="entryEnemyTechniqueMinus2"){
+    const enemy=owner.side==="player"?G.ai:G.player;
+    if(enemy?.cat){
+      enemy.cat.mods.Technique-=2;
+      log(`[EFFET] ${c.name} : ${enemy.cat.card.name} perd 2 Technique.`);
+      showEffectFeedback(c,c.name,"Technique adverse -2","malus");
+    }else log(`[EFFET] ${c.name} : aucun catcheur adverse sur le ring.`);
   }
   if(c.ability==="drawOnEntry1"||c.ability==="drawOnEntry2"||c.ability==="drawOnEntry3"){
     const amount=c.ability==="drawOnEntry3"?3:c.ability==="drawOnEntry2"?2:1;
@@ -5244,6 +5316,7 @@ function score(s,stat){
   if(ability==="firstRoundForceSpeed2"&&firstRound&&(stat==="Force"||stat==="Vitesse"))v+=2;
   if(ability==="firstRoundCharTech"&&firstRound&&(stat==="Charisme"||stat==="Technique"))v+=1;
   if(ability==="firstRoundCharTech2"&&firstRound&&(stat==="Charisme"||stat==="Technique"))v+=2;
+  if(ability==="matchRoundOneAll1"&&firstRound)v+=1;
   if(ability==="firstRoundForceCharTech"&&firstRound&&(stat==="Force"||stat==="Charisme"||stat==="Technique"))v+=1;
   if(ability==="firstRoundSpeedCharisma3"&&firstRound&&(stat==="Vitesse"||stat==="Charisme"))v+=3;
   if(ability==="techniqueRound1"&&firstRound&&stat==="Technique")v+=3;
@@ -5295,6 +5368,7 @@ function statAbilityFeedback(s,stat){
   if(ability==="firstRoundForceSpeed2"&&firstRound&&(stat==="Force"||stat==="Vitesse"))return `+2 ${stat}`;
   if(ability==="firstRoundCharTech"&&firstRound&&(stat==="Charisme"||stat==="Technique"))return `+1 ${stat}`;
   if(ability==="firstRoundCharTech2"&&firstRound&&(stat==="Charisme"||stat==="Technique"))return `+2 ${stat}`;
+  if(ability==="matchRoundOneAll1"&&firstRound)return `Round 1 +1 ${stat}`;
   if(ability==="firstRoundForceCharTech"&&firstRound&&(stat==="Force"||stat==="Charisme"||stat==="Technique"))return `+1 ${stat}`;
   if(ability==="firstRoundSpeedCharisma3"&&firstRound&&(stat==="Vitesse"||stat==="Charisme"))return `+3 ${stat}`;
   if(ability==="techniqueRound1"&&firstRound&&stat==="Technique")return "+3 Technique";

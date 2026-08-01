@@ -732,6 +732,22 @@
       "musicId": "dorian_garcia"
     },
     {
+      "key": "rare_catcheurs_dirty_dau_si",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Dirty Dau Si",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 7
+      },
+      "effect": "Apparition : -2 Technique adverse.",
+      "ability": "entryEnemyTechniqueMinus2",
+      "renderArt": "assets/card_renders/rare_catcheurs_dirty_dau_si.png",
+      "musicId": "dirty_dau_si"
+    },
+    {
       "key": "rare_catcheurs_drix",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -794,6 +810,21 @@
       "renderArt": "assets/card_renders/rare_catcheurs_elionis.png",
       "musicId": "elionis",
       "ability": "opponentDiscardChoice1"
+    },
+    {
+      "key": "rare_catcheurs_erik_inoa",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Erik Inoa",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 3,
+        "Technique": 6,
+        "Charisme": 9
+      },
+      "effect": "Round 1 : +1 dans toutes les statistiques.",
+      "ability": "matchRoundOneAll1",
+      "renderArt": "assets/card_renders/rare_catcheurs_erik_inoa.png"
     },
     {
       "key": "rare_catcheurs_ethan_riley",
@@ -1506,6 +1537,21 @@
       "renderArt": "assets/card_renders/standard_catcheurs_dario_murro.png"
     },
     {
+      "key": "standard_catcheurs_dirty_dau_si",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Dirty Dau Si",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 7
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_dirty_dau_si.png",
+      "musicId": "dirty_dau_si"
+    },
+    {
       "key": "standard_catcheurs_dorian_garcia",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -1564,6 +1610,20 @@
       "effect": "Aucun effet.",
       "renderArt": "assets/card_renders/standard_catcheurs_elionis.png",
       "musicId": "elionis"
+    },
+    {
+      "key": "standard_catcheurs_erik_inoa",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Erik Inoa",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 3,
+        "Technique": 6,
+        "Charisme": 9
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_erik_inoa.png"
     },
     {
       "key": "standard_catcheurs_ethan_riley",

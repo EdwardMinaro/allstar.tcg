@@ -10,6 +10,11 @@ const AUDIO_LIBRARY = {
       wrestler: "Bernardot",
       src: "assets/audio/music/bernardot.mp3"
     },
+    dirty_dau_si: {
+      label: "Dirty Dau Si",
+      wrestler: "Dirty Dau Si",
+      src: "assets/audio/music/dirty_dau_si.mp3"
+    },
     matheo_navarro: {
       label: "Matheo Navarro",
       wrestler: "Matheo Navarro",
