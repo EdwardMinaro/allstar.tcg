@@ -5205,6 +5205,32 @@ button{font-family:inherit;cursor:pointer}
   gap:14px;
   margin:22px auto 26px;
   max-width:780px;
+  max-height:386px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:0 14px 0 2px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--gold) #070b12;
+}
+
+.deck-select-list::-webkit-scrollbar{
+  width:10px;
+}
+
+.deck-select-list::-webkit-scrollbar-track{
+  background:#070b12;
+  border-radius:999px;
+  border:1px solid #25384b;
+}
+
+.deck-select-list::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#ffd85f,#b97808);
+  border-radius:999px;
+  border:2px solid #070b12;
+}
+
+.deck-select-list::-webkit-scrollbar-thumb:hover{
+  background:#ffe68e;
 }
 
 .deck-select-row{
