@@ -3992,6 +3992,7 @@ button{font-family:inherit;cursor:pointer}
 .booster-reveal{
   position:relative;
   isolation:isolate;
+  overflow:visible;
   animation:cardReveal .42s ease both;
   filter:drop-shadow(0 12px 18px rgba(0,0,0,.55));
 }
@@ -4022,7 +4023,8 @@ button{font-family:inherit;cursor:pointer}
   position:relative;
   z-index:1;
   width:clamp(190px,17.2vw,260px) !important;
-  height:clamp(253px,22.7vw,346px) !important;
+  height:auto !important;
+  aspect-ratio:1102 / 1498;
 }
 
 .booster-new-label{
