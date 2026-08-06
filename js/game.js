@@ -7905,6 +7905,7 @@ function openDeckModal(title,body,actions){
   modalTitle.textContent=title;
   modalBody.innerHTML=body;
   modalActions.innerHTML=actions;
+  modal.classList.remove("deck-chooser");
   modal.classList.add("active");
 }
 
@@ -7938,8 +7939,9 @@ function confirmNewDeck(){
 
 function openDeckSelectModal(){
   loadDeckState();
-  const body=`<div class="deck-modal-list">${deckState.decks.map(deck=>`<button class="deck-modal-row ${deck.id===deckState.selectedId?"active":""}" onclick="selectDeck('${escapeAttr(deck.id)}')"><span>${deck.name}</span><b>${deck.cards.length} cartes</b></button>`).join("")}</div>`;
-  openDeckModal("Modifier Deck",body,`<button class="small-btn dark" onclick="closeDeckModal()">Retour</button>`);
+  const body=`<p class="deck-chooser-intro">Choisis le deck que tu veux modifier.</p><div class="deck-modal-list">${deckState.decks.map(deck=>`<button class="deck-modal-row ${deck.id===deckState.selectedId?"active":""}" onclick="selectDeck('${escapeAttr(deck.id)}')"><span>${deck.name}</span><b>${deck.cards.length}/20 cartes</b></button>`).join("")}</div>`;
+  openDeckModal("Choisir un deck",body,`<button class="small-btn dark" onclick="closeDeckModal()">Retour</button>`);
+  document.getElementById("deckModal")?.classList.add("deck-chooser");
 }
 
 function openDeckSelectFromHub(){
