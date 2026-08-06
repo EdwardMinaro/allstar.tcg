@@ -160,6 +160,37 @@
       "renderArt": "assets/card_renders/legende_catcheurs_heracles.png"
     },
     {
+      "key": "legende_catcheurs_georges_chevalier",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Georges Chevalier",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 10
+      },
+      "effect": "Chaque tour : perd 1 Charisme et gagne +3 dans une statistique aléatoire.",
+      "ability": "turnCharismaMinus1Random3",
+      "renderArt": "assets/card_renders/legende_catcheurs_georges_chevalier.png",
+      "musicId": "georges_chevalier"
+    },
+    {
+      "key": "legende_catcheurs_griff",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Griff",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 8,
+        "Technique": 8,
+        "Charisme": 6
+      },
+      "effect": "Si un objet lui est équipé : +2 Vitesse et +2 Charisme.",
+      "ability": "objectOwnedSpeedCharisma2",
+      "renderArt": "assets/card_renders/legende_catcheurs_griff.png"
+    },
+    {
       "key": "legende_catcheurs_jaydon_ross",
       "type": "Catcheur",
       "rarity": "Legende",
@@ -716,6 +747,22 @@
       "renderArt": "assets/card_renders/rare_catcheurs_dario_murro.png"
     },
     {
+      "key": "rare_catcheurs_delacroix",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Delacroix",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Apparition : l'adversaire choisit une carte de sa main et la défausse.",
+      "ability": "opponentDiscardChoice1",
+      "renderArt": "assets/card_renders/rare_catcheurs_delacroix.png",
+      "musicId": "delacroix"
+    },
+    {
       "key": "rare_catcheurs_dorian_garcia",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -857,6 +904,37 @@
       "renderArt": "assets/card_renders/rare_catcheurs_fenrir_strom.png",
       "musicId": "fenrir_strom",
       "ability": "round4All1"
+    },
+    {
+      "key": "rare_catcheurs_georges_chevalier",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Georges Chevalier",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 4,
+        "Technique": 5,
+        "Charisme": 10
+      },
+      "effect": "Chaque tour : perd 1 Charisme et gagne +2 dans une statistique aléatoire.",
+      "ability": "turnCharismaMinus1Random2",
+      "renderArt": "assets/card_renders/rare_catcheurs_georges_chevalier.png",
+      "musicId": "georges_chevalier"
+    },
+    {
+      "key": "rare_catcheurs_griff",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Griff",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Si un objet lui est équipé : +2 Vitesse.",
+      "ability": "objectOwnedSpeed2",
+      "renderArt": "assets/card_renders/rare_catcheurs_griff.png"
     },
     {
       "key": "rare_catcheurs_heracles",
@@ -1002,6 +1080,22 @@
       "musicId": "kyle_hoxton"
     },
     {
+      "key": "rare_catcheurs_kyler_o_connor",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Kyler O'Connor",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 4,
+        "Technique": 4,
+        "Charisme": 8
+      },
+      "effect": "Insensible aux effets des autres cartes.",
+      "ability": "immuneOtherCardEffects",
+      "renderArt": "assets/card_renders/rare_catcheurs_kyler_o_connor.png",
+      "musicId": "kyler_o_connor"
+    },
+    {
       "key": "rare_catcheurs_leon",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -1032,6 +1126,21 @@
       "ability": "turnCatRandomPermanent1Max5",
       "musicId": "lucas_menil",
       "renderArt": "assets/card_renders/rare_catcheurs_lucas_menil.png"
+    },
+    {
+      "key": "rare_catcheurs_lux_strahl",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Lux Strahl",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 5,
+        "Technique": 4,
+        "Charisme": 7
+      },
+      "effect": "Chaque tour : l'adversaire défausse 1 carte.",
+      "ability": "turnOpponentDiscard1",
+      "renderArt": "assets/card_renders/rare_catcheurs_lux_strahl.png"
     },
     {
       "key": "rare_catcheurs_maffa",
@@ -1537,6 +1646,21 @@
       "renderArt": "assets/card_renders/standard_catcheurs_dario_murro.png"
     },
     {
+      "key": "standard_catcheurs_delacroix",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Delacroix",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_delacroix.png",
+      "musicId": "delacroix"
+    },
+    {
       "key": "standard_catcheurs_dirty_dau_si",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -1774,6 +1898,20 @@
       "effect": "Aucun effet.",
       "renderArt": "assets/card_renders/standard_catcheurs_luke_kane.png",
       "musicId": "luke_kane"
+    },
+    {
+      "key": "standard_catcheurs_lux_strahl",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Lux Strahl",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 5,
+        "Technique": 4,
+        "Charisme": 7
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_lux_strahl.png"
     },
     {
       "key": "standard_catcheurs_maffa",

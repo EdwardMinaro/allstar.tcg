@@ -10,10 +10,25 @@ const AUDIO_LIBRARY = {
       wrestler: "Bernardot",
       src: "assets/audio/music/bernardot.mp3"
     },
+    delacroix: {
+      label: "Delacroix",
+      wrestler: "Delacroix",
+      src: "assets/audio/music/delacroix.mp3"
+    },
     dirty_dau_si: {
       label: "Dirty Dau Si",
       wrestler: "Dirty Dau Si",
       src: "assets/audio/music/dirty_dau_si.mp3"
+    },
+    georges_chevalier: {
+      label: "Georges Chevalier",
+      wrestler: "Georges Chevalier",
+      src: "assets/audio/music/georges_chevalier.mp3"
+    },
+    kyler_o_connor: {
+      label: "Kyler O'Connor",
+      wrestler: "Kyler O'Connor",
+      src: "assets/audio/music/kyler_o_connor.mp3"
     },
     matheo_navarro: {
       label: "Matheo Navarro",

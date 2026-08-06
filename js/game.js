@@ -168,6 +168,27 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/legende_catcheurs_heracles.png"
   },
   {
+    "key": "legende_catcheurs_georges_chevalier",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Georges Chevalier",
+    "stats": { "Force": 7, "Vitesse": 5, "Technique": 6, "Charisme": 10 },
+    "effect": "Chaque tour : perd 1 Charisme et gagne +3 dans une statistique aléatoire.",
+    "ability": "turnCharismaMinus1Random3",
+    "renderArt": "assets/card_renders/legende_catcheurs_georges_chevalier.png",
+    "musicId": "georges_chevalier"
+  },
+  {
+    "key": "legende_catcheurs_griff",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Griff",
+    "stats": { "Force": 6, "Vitesse": 8, "Technique": 8, "Charisme": 6 },
+    "effect": "Si un objet lui est équipé : +2 Vitesse et +2 Charisme.",
+    "ability": "objectOwnedSpeedCharisma2",
+    "renderArt": "assets/card_renders/legende_catcheurs_griff.png"
+  },
+  {
     "key": "legende_catcheurs_jaydon_ross",
     "type": "Catcheur",
     "rarity": "Legende",
@@ -724,6 +745,17 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_catcheurs_dario_murro.png"
   },
   {
+    "key": "rare_catcheurs_delacroix",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Delacroix",
+    "stats": { "Force": 7, "Vitesse": 5, "Technique": 7, "Charisme": 5 },
+    "effect": "Apparition : l'adversaire choisit une carte de sa main et la défausse.",
+    "ability": "opponentDiscardChoice1",
+    "renderArt": "assets/card_renders/rare_catcheurs_delacroix.png",
+    "musicId": "delacroix"
+  },
+  {
     "key": "rare_catcheurs_dorian_garcia",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -865,6 +897,27 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_catcheurs_fenrir_strom.png",
     "musicId": "fenrir_strom",
     "ability": "round4All1"
+  },
+  {
+    "key": "rare_catcheurs_georges_chevalier",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Georges Chevalier",
+    "stats": { "Force": 5, "Vitesse": 4, "Technique": 5, "Charisme": 10 },
+    "effect": "Chaque tour : perd 1 Charisme et gagne +2 dans une statistique aléatoire.",
+    "ability": "turnCharismaMinus1Random2",
+    "renderArt": "assets/card_renders/rare_catcheurs_georges_chevalier.png",
+    "musicId": "georges_chevalier"
+  },
+  {
+    "key": "rare_catcheurs_griff",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Griff",
+    "stats": { "Force": 5, "Vitesse": 7, "Technique": 7, "Charisme": 5 },
+    "effect": "Si un objet lui est équipé : +2 Vitesse.",
+    "ability": "objectOwnedSpeed2",
+    "renderArt": "assets/card_renders/rare_catcheurs_griff.png"
   },
   {
     "key": "rare_catcheurs_heracles",
@@ -1010,6 +1063,17 @@ const CARD_DATA = [
     "musicId": "kyle_hoxton"
   },
   {
+    "key": "rare_catcheurs_kyler_o_connor",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Kyler O'Connor",
+    "stats": { "Force": 8, "Vitesse": 4, "Technique": 4, "Charisme": 8 },
+    "effect": "Insensible aux effets des autres cartes.",
+    "ability": "immuneOtherCardEffects",
+    "renderArt": "assets/card_renders/rare_catcheurs_kyler_o_connor.png",
+    "musicId": "kyler_o_connor"
+  },
+  {
     "key": "rare_catcheurs_leon",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -1040,6 +1104,16 @@ const CARD_DATA = [
     "ability": "turnCatRandomPermanent1Max5",
     "musicId": "lucas_menil",
     "renderArt": "assets/card_renders/rare_catcheurs_lucas_menil.png"
+  },
+  {
+    "key": "rare_catcheurs_lux_strahl",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Lux Strahl",
+    "stats": { "Force": 8, "Vitesse": 5, "Technique": 4, "Charisme": 7 },
+    "effect": "Chaque tour : l'adversaire défausse 1 carte.",
+    "ability": "turnOpponentDiscard1",
+    "renderArt": "assets/card_renders/rare_catcheurs_lux_strahl.png"
   },
   {
     "key": "rare_catcheurs_maffa",
@@ -1545,6 +1619,16 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/standard_catcheurs_dario_murro.png"
   },
   {
+    "key": "standard_catcheurs_delacroix",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Delacroix",
+    "stats": { "Force": 7, "Vitesse": 5, "Technique": 7, "Charisme": 5 },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_delacroix.png",
+    "musicId": "delacroix"
+  },
+  {
     "key": "standard_catcheurs_dirty_dau_si",
     "type": "Catcheur",
     "rarity": "Standard",
@@ -1782,6 +1866,15 @@ const CARD_DATA = [
     "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_catcheurs_luke_kane.png",
     "musicId": "luke_kane"
+  },
+  {
+    "key": "standard_catcheurs_lux_strahl",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Lux Strahl",
+    "stats": { "Force": 8, "Vitesse": 5, "Technique": 4, "Charisme": 7 },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_lux_strahl.png"
   },
   {
     "key": "standard_catcheurs_maffa",
@@ -2584,6 +2677,9 @@ const EFFECT_REGISTRY = {
   opponentDiscard1: { timing:"object", text:"L'adversaire défausse 1 carte." },
   opponentDiscardChoice1: { timing:"entry", text:"L'adversaire défausse 1 carte de son choix.", choice:true },
   opponentDiscardOnSupport: { timing:"manager", text:"Chaque bonus ou objet adverse force une défausse." },
+  objectOwnedSpeed2: { timing:"duel", text:"Si un objet est équipé : +2 Vitesse." },
+  objectOwnedSpeedCharisma2: { timing:"duel", text:"Si un objet est équipé : +2 Vitesse et +2 Charisme." },
+  immuneOtherCardEffects: { timing:"passive", text:"Insensible aux effets des autres cartes." },
   pinBonus: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +20." },
   pinBonus40: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +40." },
   pinDual20Shield10: { timing:"entry", text:"+20 Tombé et -10 au prochain tombé adverse." },
@@ -2623,6 +2719,8 @@ const EFFECT_REGISTRY = {
   techniqueRound1: { timing:"round1", text:"Round 1 : +3 Technique." },
   turnCatRandom2: { timing:"round", text:"Chaque tour : +2 dans une stat aléatoire, non cumulatif." },
   turnCatRandom3: { timing:"round", text:"Chaque tour : +3 dans une stat aléatoire, non cumulatif." },
+  turnCharismaMinus1Random2: { timing:"round", text:"Chaque tour : -1 Charisme et +2 dans une stat aléatoire." },
+  turnCharismaMinus1Random3: { timing:"round", text:"Chaque tour : -1 Charisme et +3 dans une stat aléatoire." },
   turnCatRandomPermanent1Max5: { timing:"round", text:"Chaque tour : +1 dans une stat aléatoire, cumulable 5 fois." },
   turnCatRandomPermanent2Max3: { timing:"round", text:"Chaque tour : +2 dans une stat aléatoire, cumulable 3 fois." },
   turnEnemyForceMinus1: { timing:"round", text:"Chaque tour : -1 Force adverse." },
@@ -2630,6 +2728,7 @@ const EFFECT_REGISTRY = {
   turnEnemySpeedMinus1: { timing:"round", text:"Chaque tour : -1 Vitesse adverse." },
   turnEnemyPinMinus10: { timing:"round", text:"Chaque tour : prochain tombé adverse -10." },
   turnOpponentDiscardWorldCharisma: { timing:"round", text:"Chaque tour : l'adversaire défausse une carte. Avec Kyle Hoxton, Drix ou Saitovic actif, l'adversaire perd aussi -1 Charisme." },
+  turnOpponentDiscard1: { timing:"round", text:"Chaque tour : l'adversaire défausse 1 carte." },
   turnRandomPermanent10: { timing:"round", text:"Chaque tour : 10% de chance de +1 stat permanent." },
   turnRandomPermanent20: { timing:"round", text:"Chaque tour : 20% de chance de +1 stat permanent." },
   turnRandomPermanent30: { timing:"round", text:"Chaque tour : 30% de chance de +1 stat permanent." },
@@ -2656,9 +2755,12 @@ function runAllstarAudit(){
     keys.set(key,card);
     if(card.ability&&!EFFECT_REGISTRY[card.ability])errors.push(`${card.name} ${card.rarity} : effet introuvable "${card.ability}".`);
     if(card.type==="Catcheur"&&card.rarity==="Standard"&&card.ability)errors.push(`${card.name} Standard : un catcheur standard ne doit pas avoir d'effet réel.`);
-    if(card.type==="Catcheur"&&(card.rarity==="Standard"||card.rarity==="Rare")){
+    if(card.type==="Catcheur"&&(card.rarity==="Standard"||card.rarity==="Rare"||card.rarity==="Legende")){
       const total=STATS.reduce((sum,stat)=>sum+Number(card.stats?.[stat]||0),0);
-      if(total!==24)errors.push(`${card.name} ${card.rarity} : ${total} points de stats au lieu de 24.`);
+      const expected=card.rarity==="Legende"?28:24;
+      if(total!==expected)errors.push(`${card.name} ${card.rarity} : ${total} points de stats au lieu de ${expected}.`);
+      const invalidStat=STATS.find(stat=>Number(card.stats?.[stat]||0)<0||Number(card.stats?.[stat]||0)>10);
+      if(invalidStat)errors.push(`${card.name} ${card.rarity} : ${invalidStat} doit rester entre 0 et 10.`);
     }
     if(card.renderArt&&!String(card.renderArt).trim())warnings.push(`${card.name} ${card.rarity} : renderArt vide.`);
     const text=String(card.effect||"").toLowerCase();
@@ -4356,11 +4458,11 @@ function applyWrestlerEntryEffect(owner,c){
   }
   if(c.ability==="entryEnemyTechniqueMinus2"){
     const enemy=owner.side==="player"?G.ai:G.player;
-    if(enemy?.cat){
+    if(enemy?.cat&&!isCardEffectImmune(enemy.cat)){
       enemy.cat.mods.Technique-=2;
       log(`[EFFET] ${c.name} : ${enemy.cat.card.name} perd 2 Technique.`);
       showEffectFeedback(c,c.name,"Technique adverse -2","malus");
-    }else log(`[EFFET] ${c.name} : aucun catcheur adverse sur le ring.`);
+    }else log(`[EFFET] ${c.name} : aucun catcheur adverse vulnérable sur le ring.`);
   }
   if(c.ability==="drawOnEntry1"||c.ability==="drawOnEntry2"||c.ability==="drawOnEntry3"){
     const amount=c.ability==="drawOnEntry3"?3:c.ability==="drawOnEntry2"?2:1;
@@ -4535,19 +4637,22 @@ function applyRoundManagerEffects(){
         break;
     }
     const catAbility=wrestlerAbility(owner.cat);
-    if(catAbility==="turnCatRandom2"||catAbility==="turnCatRandom3"){
-      const value=catAbility==="turnCatRandom3"?3:2;
+    if(["turnCatRandom2","turnCatRandom3","turnCharismaMinus1Random2","turnCharismaMinus1Random3"].includes(catAbility)){
+      const value=(catAbility==="turnCatRandom3"||catAbility==="turnCharismaMinus1Random3")?3:2;
+      const charismaPenalty=catAbility.startsWith("turnCharismaMinus1");
+      if(charismaPenalty)owner.cat.mods.Charisme-=1;
       const [stat]=replaceRoundRandomBonus(owner.cat,value);
-      log(`[EFFET] ${owner.cat.card.name} relance son bonus : +${value} ${stat}.`);
-      showEffectFeedback(owner.cat.card,owner.cat.card.name,`+${value} ${stat}`,"buff");
+      const feedback=charismaPenalty?`-1 Charisme / +${value} ${stat}`:`+${value} ${stat}`;
+      log(`[EFFET] ${owner.cat.card.name} relance son bonus : ${feedback}.`);
+      showEffectFeedback(owner.cat.card,owner.cat.card.name,feedback,charismaPenalty?"special":"buff");
     }
-    if((catAbility==="turnEnemyForceMinus1"||catAbility==="turnEnemyForceMinus2")&&opp.cat){
+    if((catAbility==="turnEnemyForceMinus1"||catAbility==="turnEnemyForceMinus2")&&opp.cat&&!isCardEffectImmune(opp.cat)){
       const value=catAbility==="turnEnemyForceMinus2"?2:1;
       opp.cat.mods.Force-=value;
       log(`${owner.cat.card.name} affaiblit ${opp.cat.card.name} : -${value} Force.`);
       showEffectFeedback(opp.cat.card,owner.cat.card.name,`-${value} Force`,"malus");
     }
-    if(catAbility==="turnEnemySpeedMinus1"&&opp.cat){
+    if(catAbility==="turnEnemySpeedMinus1"&&opp.cat&&!isCardEffectImmune(opp.cat)){
       opp.cat.mods.Vitesse-=1;
       log(`${owner.cat.card.name} affaiblit ${opp.cat.card.name} : -1 Vitesse.`);
       showEffectFeedback(opp.cat.card,owner.cat.card.name,"-1 Vitesse","malus");
@@ -4621,11 +4726,18 @@ function applyRoundManagerEffects(){
         log(`[EFFET] ${owner.man.name} force ${opp.label} à défausser ${discarded.name}.`);
         showEffectFeedback(owner.cat?.card||owner.man,owner.man.name,"Défausse adverse","malus");
       }
-      if(["Kyle Hoxton","Drix","Saitovic"].includes(owner.cat?.card?.name)&&opp.cat){
+      if(["Kyle Hoxton","Drix","Saitovic"].includes(owner.cat?.card?.name)&&opp.cat&&!isCardEffectImmune(opp.cat)){
         opp.cat.mods.Charisme-=1;
         log(`[EFFET] ${owner.man.name} affaiblit ${opp.cat.card.name} : -1 Charisme.`);
         showEffectFeedback(opp.cat.card,owner.man.name,"-1 Charisme","malus");
       }
+    }
+    if(catAbility==="turnOpponentDiscard1"&&opp.hand.length){
+      const discardIndex=Math.floor(Math.random()*opp.hand.length);
+      const [discarded]=opp.hand.splice(discardIndex,1);
+      opp.grave.push(discarded);
+      log(`[EFFET] ${owner.cat.card.name} force ${opp.label} à défausser ${discarded.name}.`);
+      showEffectFeedback(owner.cat.card,owner.cat.card.name,"Défausse adverse","malus");
     }
 
     const permanentChanceByAbility={turnRandomPermanent10:0.1,turnRandomPermanent20:0.2,turnRandomPermanent30:0.3};
@@ -4664,6 +4776,11 @@ function addTrackedRandomStats(effect,s,count,value=1){
 function applyTrackedObjectEffect(owner,opp,c,choice=null){
   const s=owner.cat;
   if(!s)return;
+  if(isCardEffectImmune(s)){
+    log(`[EFFET] ${c.name} n'a aucun effet sur ${s.card.name}.`);
+    showEffectFeedback(s.card,c.name,"Effet annulé","block");
+    return;
+  }
   const effect={targetSide:owner.side,mods:{},pin:0,pinShield:0,save:false};
   let feedback="";
   let kind="buff";
@@ -4822,6 +4939,10 @@ function releaseSupportEffects(owner,opp){
 function wrestlerAbility(s){
   if(!s||s.owner?.wrestlerEffectsBlocked)return null;
   return s.card?.ability || null;
+}
+
+function isCardEffectImmune(s){
+  return wrestlerAbility(s)==="immuneOtherCardEffects";
 }
 
 function cardFromTaggedState(catState){
@@ -5298,9 +5419,10 @@ function resolveBattle(){
 
 function score(s,stat){
   let v=s.card.stats[stat]+s.mods[stat];
-  const alexKissInGrave=s.card.name==="El Amnesico"&&s.owner?.grave?.some(card=>card.ability==="graveElAmnesicoAll1");
+  const immune=isCardEffectImmune(s);
+  const alexKissInGrave=!immune&&s.card.name==="El Amnesico"&&s.owner?.grave?.some(card=>card.ability==="graveElAmnesicoAll1");
   if(alexKissInGrave)v+=1;
-  const rManLegendaryActive=s.owner?.man?.ability==="mAll2IfGrave3"&&s.owner.grave.filter(card=>card.type==="Catcheur").length>=3;
+  const rManLegendaryActive=!immune&&s.owner?.man?.ability==="mAll2IfGrave3"&&s.owner.grave.filter(card=>card.type==="Catcheur").length>=3;
   if(rManLegendaryActive)v+=2;
   const ability=wrestlerAbility(s);
   if(!ability)return v;
@@ -5329,6 +5451,8 @@ function score(s,stat){
   if(ability==="secondPlayerTechniqueCharisma2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Technique"||stat==="Charisme"))v+=2;
   if(ability==="forcePlus"&&!s.forcePlusUsed&&stat==="Force")v+=2;
   if(ability==="charismaPlus"&&stat==="Charisme")v++;
+  if(ability==="objectOwnedSpeed2"&&s.owner?.obj&&stat==="Vitesse")v+=2;
+  if(ability==="objectOwnedSpeedCharisma2"&&s.owner?.obj&&(stat==="Vitesse"||stat==="Charisme"))v+=2;
   return v;
 }
 
@@ -5381,6 +5505,8 @@ function statAbilityFeedback(s,stat){
   if(ability==="secondPlayerTechniqueCharisma2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Technique"||stat==="Charisme"))return `Second +2 ${stat}`;
   if(ability==="forcePlus"&&!s.forcePlusUsed&&stat==="Force")return "+2 Force";
   if(ability==="charismaPlus"&&stat==="Charisme")return "+1 Charisme";
+  if(ability==="objectOwnedSpeed2"&&s.owner?.obj&&stat==="Vitesse")return "+2 Vitesse";
+  if(ability==="objectOwnedSpeedCharisma2"&&s.owner?.obj&&(stat==="Vitesse"||stat==="Charisme"))return `+2 ${stat}`;
   return null;
 }
 
