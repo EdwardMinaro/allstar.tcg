@@ -694,7 +694,7 @@ const CARD_DATA = [
       "Charisme": 6
     },
     "effect": "Apparition : -2 Force adverse.",
-    "ability": "turnEnemyForceMinus2",
+    "ability": "entryEnemyForceMinus2",
     "renderArt": "assets/card_renders/rare_catcheurs_christophe_cassagne.png",
     "musicId": "christophe_cassagne"
   },
@@ -2638,6 +2638,7 @@ const EFFECT_REGISTRY = {
   firstRoundCharTech: { timing:"round1", text:"+1 Charisme et +1 Technique au round 1." },
   firstRoundCharTech2: { timing:"round1", text:"+2 Charisme et +2 Technique au round 1." },
   entryEnemyTechniqueMinus2: { timing:"entry", text:"À l'arrivée : -2 Technique au catcheur adverse." },
+  entryEnemyForceMinus2: { timing:"entry", text:"À l'arrivée : -2 Force au catcheur adverse." },
   firstRoundForceCharTech: { timing:"round1", text:"+1 Force, Technique et Charisme au round 1." },
   firstRoundForceTechnique: { timing:"round1", text:"+1 Force et +1 Technique au premier round." },
   firstRoundForceSpeed1: { timing:"firstRound", text:"+1 Force et +1 Vitesse au premier round de la carte." },
@@ -4462,6 +4463,14 @@ function applyWrestlerEntryEffect(owner,c){
       enemy.cat.mods.Technique-=2;
       log(`[EFFET] ${c.name} : ${enemy.cat.card.name} perd 2 Technique.`);
       showEffectFeedback(c,c.name,"Technique adverse -2","malus");
+    }else log(`[EFFET] ${c.name} : aucun catcheur adverse vulnérable sur le ring.`);
+  }
+  if(c.ability==="entryEnemyForceMinus2"){
+    const enemy=owner.side==="player"?G.ai:G.player;
+    if(enemy?.cat&&!isCardEffectImmune(enemy.cat)){
+      enemy.cat.mods.Force-=2;
+      log(`[EFFET] ${c.name} : ${enemy.cat.card.name} perd 2 Force.`);
+      showEffectFeedback(c,c.name,"Force adverse -2","malus");
     }else log(`[EFFET] ${c.name} : aucun catcheur adverse vulnérable sur le ring.`);
   }
   if(c.ability==="drawOnEntry1"||c.ability==="drawOnEntry2"||c.ability==="drawOnEntry3"){

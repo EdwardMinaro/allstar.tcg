@@ -191,6 +191,7 @@ function playCards(player, opponent, game, rng, stat) {
       player.cat = makeState(cat, player);
       if (cat.ability === "drawOnEntry1") draw(player, 1, rng);
       if (cat.ability === "drawOnEntry2") draw(player, 2, rng);
+      if (cat.ability === "entryEnemyForceMinus2" && opponent.cat) opponent.cat.mods.Force -= 2;
       if (cat.ability === "pinShield") player.pinShield += 10;
       if (cat.ability === "pinShield20") player.pinShield += 20;
       if (cat.ability === "pinDual20Shield10") {

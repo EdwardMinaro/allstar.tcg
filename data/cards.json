@@ -696,7 +696,7 @@
         "Charisme": 6
       },
       "effect": "Apparition : -2 Force adverse.",
-      "ability": "turnEnemyForceMinus2",
+      "ability": "entryEnemyForceMinus2",
       "renderArt": "assets/card_renders/rare_catcheurs_christophe_cassagne.png",
       "musicId": "christophe_cassagne"
     },
