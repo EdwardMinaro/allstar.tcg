@@ -2872,8 +2872,21 @@ function showMulti(){
     window.displayMultiplayerError?.(error, "Multijoueur indisponible.");
   }
 }
-function showHomeOptions(){show("homeOptionsScreen")}
-function showProfile(){show("profileScreen");renderProfileScreen()}
+function closeHomeQuickPanel(){
+  const panel=document.getElementById("homeQuickPanel");
+  const trigger=document.querySelector(".home-control-trigger");
+  panel?.classList.remove("active");
+  trigger?.setAttribute("aria-expanded","false");
+}
+function toggleHomeQuickPanel(){
+  const panel=document.getElementById("homeQuickPanel");
+  const trigger=document.querySelector(".home-control-trigger");
+  const opening=!panel?.classList.contains("active");
+  panel?.classList.toggle("active",opening);
+  trigger?.setAttribute("aria-expanded",opening?"true":"false");
+}
+function showHomeOptions(){closeHomeQuickPanel();show("homeOptionsScreen")}
+function showProfile(){closeHomeQuickPanel();show("profileScreen");renderProfileScreen()}
 function toggleOptions(){document.getElementById("optionsMenu").classList.toggle("active")}
 function hideOptions(){document.getElementById("optionsMenu")?.classList.remove("active")}
 

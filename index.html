@@ -63,11 +63,20 @@
 
 <section id="menu" class="screen">
   <div class="home-stage">
-    <div class="home-utility-controls" aria-label="Contrôles rapides">
-      <button class="settings home-settings" onclick="showHomeOptions()" aria-label="Options">&#9881;</button>
-      <button class="settings home-profile-button" onclick="showProfile()" aria-label="Profil"><span class="profile-icon" aria-hidden="true"></span></button>
-      <button class="next-track-button music-pause-toggle home-pause-track-button" type="button" onclick="toggleThemePause()" aria-label="Mettre la musique en pause" title="Mettre la musique en pause">&#10074;&#10074;</button>
-      <button class="next-track-button home-next-track-button" type="button" onclick="playNextTheme()" aria-label="Musique suivante" title="Musique suivante">&#9197;</button>
+    <button class="home-control-trigger" type="button" onclick="toggleHomeQuickPanel()" aria-label="Ouvrir le menu rapide" aria-expanded="false">&#9881;</button>
+    <div class="home-quick-overlay" id="homeQuickPanel" onclick="if(event.target===this)closeHomeQuickPanel()">
+      <section class="home-quick-panel" role="dialog" aria-modal="true" aria-label="Menu rapide">
+        <div class="home-quick-panel-head">
+          <span>MENU RAPIDE</span>
+          <button class="home-quick-close" type="button" onclick="closeHomeQuickPanel()" aria-label="Fermer">&times;</button>
+        </div>
+        <div class="home-quick-actions">
+          <button type="button" onclick="showProfile()"><b>&#9679;</b><span>Profil</span></button>
+          <button type="button" onclick="showHomeOptions()"><b>&#9881;</b><span>Options</span></button>
+          <button class="music-pause-toggle" type="button" onclick="toggleThemePause()"><b>&#10074;&#10074;</b><span>Pause musique</span></button>
+          <button type="button" onclick="playNextTheme()"><b>&#9197;</b><span>Musique suivante</span></button>
+        </div>
+      </section>
     </div>
     <div class="home-light red"></div>
     <div class="home-light blue"></div>
