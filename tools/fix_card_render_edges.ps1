@@ -1,5 +1,6 @@
 param(
   [string]$CardRenderDir = "..\assets\card_renders",
+  [string[]]$FileName = @(),
   [byte]$WhiteThreshold = 245
 )
 
@@ -161,6 +162,7 @@ Add-Type -TypeDefinition $code -ReferencedAssemblies System.Drawing
 
 $files = Get-ChildItem -LiteralPath $resolvedDir -File -Filter *.png |
   Where-Object { $_.Name -notlike "*.tmp.png" } |
+  Where-Object { $FileName.Count -eq 0 -or $FileName -contains $_.Name } |
   Sort-Object Name
 $changed = foreach ($file in $files) {
   $result = [AllstarCardEdgeFixer]::Fix($file.FullName, $WhiteThreshold)
