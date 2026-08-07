@@ -7084,6 +7084,116 @@ button:disabled,
   }
 }
 
+/* Global ALLSTAR scroll treatment: the same dark rail and gold handle are
+   used everywhere a screen genuinely needs to scroll. */
+:root,
+*{
+  scrollbar-width:thin;
+  scrollbar-color:#e8b52a #08090e;
+}
+
+::-webkit-scrollbar{
+  width:12px;
+  height:12px;
+}
+
+::-webkit-scrollbar-track{
+  background:#08090e;
+  border:3px solid #08090e;
+  border-radius:999px;
+}
+
+::-webkit-scrollbar-thumb{
+  min-height:34px;
+  min-width:34px;
+  border:3px solid #08090e;
+  border-radius:999px;
+  background:linear-gradient(180deg,#ffd65a,#d39512);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,#ffe58a,#e3a91b);
+}
+
+::-webkit-scrollbar-corner{
+  background:#08090e;
+}
+
+::-webkit-scrollbar-button:single-button{
+  display:block;
+  width:12px;
+  height:14px;
+  background-color:#08090e;
+  background-repeat:no-repeat;
+}
+
+::-webkit-scrollbar-button:single-button:vertical:decrement{
+  background-image:
+    linear-gradient(45deg,transparent 50%,#ffd65a 51%),
+    linear-gradient(135deg,#ffd65a 50%,transparent 51%);
+  background-size:6px 6px,6px 6px;
+  background-position:calc(50% - 3px) 5px,calc(50% + 3px) 5px;
+}
+
+::-webkit-scrollbar-button:single-button:vertical:increment{
+  background-image:
+    linear-gradient(135deg,transparent 50%,#ffd65a 51%),
+    linear-gradient(45deg,#ffd65a 50%,transparent 51%);
+  background-size:6px 6px,6px 6px;
+  background-position:calc(50% - 3px) 3px,calc(50% + 3px) 3px;
+}
+
+::-webkit-scrollbar-button:single-button:horizontal:decrement{
+  background-image:
+    linear-gradient(45deg,transparent 50%,#ffd65a 51%),
+    linear-gradient(135deg,#ffd65a 50%,transparent 51%);
+  background-size:6px 6px,6px 6px;
+  background-position:3px calc(50% - 3px),3px calc(50% + 3px);
+}
+
+::-webkit-scrollbar-button:single-button:horizontal:increment{
+  background-image:
+    linear-gradient(135deg,transparent 50%,#ffd65a 51%),
+    linear-gradient(45deg,#ffd65a 50%,transparent 51%);
+  background-size:6px 6px,6px 6px;
+  background-position:5px calc(50% - 3px),5px calc(50% + 3px);
+}
+
+/* These panels had their own older scrollbar variants. */
+.deck-select-list,
+#decks .deck-selected-grid,
+#decks .deck-card-pool,
+#game .options-menu{
+  scrollbar-color:#e8b52a #08090e !important;
+}
+
+.deck-select-list::-webkit-scrollbar,
+#decks .deck-selected-grid::-webkit-scrollbar,
+#decks .deck-card-pool::-webkit-scrollbar,
+#game .options-menu::-webkit-scrollbar{
+  width:12px !important;
+  height:12px !important;
+}
+
+.deck-select-list::-webkit-scrollbar-track,
+#decks .deck-selected-grid::-webkit-scrollbar-track,
+#decks .deck-card-pool::-webkit-scrollbar-track,
+#game .options-menu::-webkit-scrollbar-track{
+  background:#08090e !important;
+  border:3px solid #08090e !important;
+  border-radius:999px !important;
+}
+
+.deck-select-list::-webkit-scrollbar-thumb,
+#decks .deck-selected-grid::-webkit-scrollbar-thumb,
+#decks .deck-card-pool::-webkit-scrollbar-thumb,
+#game .options-menu::-webkit-scrollbar-thumb{
+  border:3px solid #08090e !important;
+  border-radius:999px !important;
+  background:linear-gradient(180deg,#ffd65a,#d39512) !important;
+}
+
 /* Keep the pause menu dense and scannable, with no unused display section. */
 #game .game-options-actions{
   grid-column:1 / -1;
