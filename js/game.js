@@ -5743,9 +5743,11 @@ function win(winner,loser,reason){
       showEffectFeedback(loser.cat.card,loser.cat.card.name,"Technique adverse -2","malus");
     }
 
+    // A victory can trigger a pin before the winning object's end-of-round effect expires.
+    const objectPinBonus=Number(winner.objEffect?.pin||0);
     clearWrestler(loser);
     consumeRoundObjects();
-    attemptPin(winner,loser);
+    attemptPin(winner,loser,objectPinBonus);
   };
 
   if((winnerAbility==="sameStatNext"||winnerAbility==="sameStatNextFixed")&&G.stat){
@@ -5774,7 +5776,7 @@ function win(winner,loser,reason){
   finishWin();
 }
 
-function attemptPin(p,target){
+function attemptPin(p,target,objectPinBonus=0){
   G.matchPhase="pin";
   render();
   markOnlineDirty();
@@ -5786,7 +5788,7 @@ function attemptPin(p,target){
     ability==="pinBonus"&&koCount>=2?20:
     ability==="pinBonus40"&&koCount>=2?40:
     0;
-  const bonus=(p.cat?.pin||0)+abilityBonus;
+  const bonus=(p.cat?.pin||0)+abilityBonus+Number(objectPinBonus||0);
   const shield=target?.pinShield||0;
   if(target)target.pinShield=0;
   const chance=Math.max(0,Math.min(100,base+bonus-shield));
