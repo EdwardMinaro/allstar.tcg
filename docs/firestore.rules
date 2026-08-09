@@ -12,5 +12,22 @@ service cloud.firestore {
       allow create, update: if request.auth != null && request.auth.uid == userId;
       allow delete: if false;
     }
+
+    // A ticket also contains the payload consumed by Firebase's Trigger Email
+    // extension. Players can only create their own ticket for the ALLSTAR inbox.
+    match /tickets/{ticketId} {
+      allow create: if request.auth != null
+        && request.resource.data.requesterUid == request.auth.uid
+        && request.resource.data.to == 'allstar.tradingcardgame@gmail.com'
+        && request.resource.data.ticket.category in ['Bug', 'Effet de carte', 'Ergonomie', 'Suggestion', 'Autre']
+        && request.resource.data.ticket.subject is string
+        && request.resource.data.ticket.subject.size() >= 3
+        && request.resource.data.ticket.subject.size() <= 90
+        && request.resource.data.ticket.description is string
+        && request.resource.data.ticket.description.size() >= 10
+        && request.resource.data.ticket.description.size() <= 3000;
+      allow read: if request.auth != null && request.auth.uid == resource.data.requesterUid;
+      allow update, delete: if false;
+    }
   }
 }

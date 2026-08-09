@@ -75,6 +75,7 @@
           <button type="button" onclick="showHomeOptions()"><b>&#9881;</b><span>Options</span></button>
           <button class="music-pause-toggle" type="button" onclick="toggleThemePause()"><b>&#10074;&#10074;</b><span>Pause musique</span></button>
           <button type="button" onclick="playNextTheme()"><b>&#9197;</b><span>Musique suivante</span></button>
+          <button class="home-ticket-action" type="button" onclick="showTickets()"><b>&#9993;</b><span>Tickets</span></button>
         </div>
       </section>
     </div>
@@ -153,6 +154,38 @@
           <p class="profile-muted">Chargement du profil...</p>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section id="ticketsScreen" class="screen">
+  <button class="options-return-fixed" onclick="showMenu()">Retour</button>
+  <div class="menu-wrap">
+    <div class="menu-card options-page-card ticket-page-card">
+      <h1 class="logo small-logo">Tickets</h1>
+      <div class="ticket-page-intro">
+        <strong>UN RETOUR SUR LE RING ?</strong>
+        <p>Signale un probl&egrave;me, un effet de carte ou une id&eacute;e. Ton compte et la version du jeu seront ajout&eacute;s automatiquement.</p>
+      </div>
+      <form id="ticketForm" class="ticket-form" onsubmit="submitTicket(event)">
+        <label for="ticketCategory">Cat&eacute;gorie</label>
+        <select id="ticketCategory" name="category">
+          <option value="Bug">Bug</option>
+          <option value="Effet de carte">Effet de carte</option>
+          <option value="Ergonomie">Ergonomie</option>
+          <option value="Suggestion">Suggestion</option>
+          <option value="Autre">Autre</option>
+        </select>
+        <label for="ticketSubject">Titre</label>
+        <input id="ticketSubject" name="subject" type="text" maxlength="90" placeholder="Ex. L'effet de la carte X ne se d&eacute;clenche pas" required>
+        <label for="ticketDescription">D&eacute;tail</label>
+        <textarea id="ticketDescription" name="description" maxlength="3000" placeholder="Explique ce qui s'est pass&eacute;, avec le mode de jeu et les cartes concern&eacute;es si possible." required></textarea>
+        <p id="ticketStatus" class="ticket-status" role="status"></p>
+        <div class="ticket-actions">
+          <button class="small-btn" id="ticketSubmitButton" type="submit">Envoyer le ticket</button>
+          <button class="small-btn dark" type="button" onclick="showMenu()">Retour</button>
+        </div>
+      </form>
     </div>
   </div>
 </section>
@@ -734,6 +767,7 @@
 <script src="js/firebaseConfig.js"></script>
 <script src="js/firebaseService.js"></script>
 <script src="js/profileService.js"></script>
+<script src="js/ticketService.js"></script>
 <script src="js/authService.js"></script>
 <script src="js/connectionManager.js"></script>
 <script src="js/saveService.js"></script>

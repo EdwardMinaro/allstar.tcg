@@ -2887,6 +2887,40 @@ function toggleHomeQuickPanel(){
 }
 function showHomeOptions(){closeHomeQuickPanel();show("homeOptionsScreen")}
 function showProfile(){closeHomeQuickPanel();show("profileScreen");renderProfileScreen()}
+function showTickets(){
+  closeHomeQuickPanel();
+  show("ticketsScreen");
+  const status=document.getElementById("ticketStatus");
+  const form=document.getElementById("ticketForm");
+  const button=document.getElementById("ticketSubmitButton");
+  if(status)status.textContent="";
+  if(form)form.reset();
+  if(button)button.disabled=false;
+}
+async function submitTicket(event){
+  event?.preventDefault?.();
+  const form=document.getElementById("ticketForm");
+  const status=document.getElementById("ticketStatus");
+  const button=document.getElementById("ticketSubmitButton");
+  if(!form)return;
+  const fields=new FormData(form);
+  if(status){status.className="ticket-status";status.textContent="Envoi du ticket...";}
+  if(button)button.disabled=true;
+  try{
+    await window.AllstarTicketService?.submitTicket?.({
+      category:fields.get("category"),
+      subject:fields.get("subject"),
+      description:fields.get("description")
+    });
+    form.reset();
+    if(status){status.className="ticket-status success";status.textContent="Ticket envoy\u00e9. Merci pour ton retour !";}
+  }catch(error){
+    console.warn("[TICKET] Envoi impossible.",error);
+    if(status){status.className="ticket-status error";status.textContent=error?.message||"Impossible d'envoyer le ticket pour le moment.";}
+  }finally{
+    if(button)button.disabled=false;
+  }
+}
 function toggleOptions(){document.getElementById("optionsMenu").classList.toggle("active")}
 function hideOptions(){document.getElementById("optionsMenu")?.classList.remove("active")}
 
@@ -8107,6 +8141,8 @@ Object.assign(window,{
   discardPlayerCard,
   runAllstarAudit,
   showProfile,
+  showTickets,
+  submitTicket,
   createProfileAccount,
   loginProfileAccount,
   logoutProfileAccount,
