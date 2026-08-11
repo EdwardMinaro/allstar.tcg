@@ -67,6 +67,50 @@ const ABILITY_BY_KEY = {
   "Rare|Catcheur|Bernardot": "charismaWinRandom3",
   "Legende|Catcheur|Tony Trivaldo": "forceWheel50",
   "Rare|Manager|PURE TRADITION": "bonusPureTraditionDrawTeam",
+  "Rare|Objet|Batte de baseball": "opponentDiscardRandom1",
+  "Rare|Objet|Caméra": "rerollOnLoss",
+  "Rare|Objet|Guitare electrique": "objectChoiceForceCharisma2",
+  "Standard|Objet|Livre": "mTechnique1",
+  "Legende|Objet|Mégaphone": "megaphoneRound1",
+  "Standard|Objet|Perche à selfie": "mCharisme1",
+  "Rare|Objet|Poing Américain": "objectChoiceStat1",
+  "Rare|Objet|Sachet de punaises": "pinObject10",
+  "Legende|Objet|Sledgehammer": "pinObject30",
+};
+
+const CARD_OVERRIDES_BY_KEY = {
+  rare_objets_batte_de_baseball: {
+    effect: "Votre adversaire défausse une carte aléatoire.",
+  },
+  rare_objets_camera: {
+    name: "Caméra",
+    effect: "Si votre catcheur perd, relancez la roulette.",
+  },
+  rare_objets_guitare_electrique: {
+    name: "Guitare électrique",
+    effect: "Choisissez : +2 Force ou +2 Charisme.",
+  },
+  standard_objets_livre: {
+    effect: "+1 Technique.",
+  },
+  legende_objets_megaphone: {
+    name: "Mégaphone",
+    effect: "Round 1 : si vous jouez en deuxième, votre adversaire défausse 3 cartes. Sinon, piochez 2 cartes.",
+  },
+  standard_objets_perche_a_selfie: {
+    name: "Perche à selfie",
+    effect: "+1 Charisme.",
+  },
+  rare_objets_poing_americain: {
+    name: "Poing Américain",
+    effect: "Choisissez une statistique : +1 à la statistique choisie.",
+  },
+  rare_objets_sachet_de_punaises: {
+    effect: "+10 Tombé.",
+  },
+  legende_objets_sledgehammer: {
+    effect: "+30 Tombé.",
+  },
 };
 
 const STATS_BY_KEY = {
@@ -180,6 +224,7 @@ function readCard(jsonPath) {
   if (ability && !(type === "Catcheur" && rarity === "Standard")) {
     card.ability = ability;
   }
+  Object.assign(card, CARD_OVERRIDES_BY_KEY[key] || {});
   return { card, jsonPath, pngPath };
 }
 

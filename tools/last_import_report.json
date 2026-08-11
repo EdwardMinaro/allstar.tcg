@@ -1,18 +1,67 @@
 {
   "imported": [
     {
-      "key": "rare_catcheurs_bernardot",
-      "name": "Bernardot",
+      "key": "rare_objets_batte_de_baseball",
+      "name": "Batte de baseball",
       "rarity": "Rare",
-      "type": "Catcheur",
-      "ability": "charismaWinRandom3"
+      "type": "Objet",
+      "ability": "opponentDiscardRandom1"
     },
     {
-      "key": "legende_catcheurs_tony_trivaldo",
-      "name": "Tony Trivaldo",
+      "key": "rare_objets_camera",
+      "name": "Caméra",
+      "rarity": "Rare",
+      "type": "Objet",
+      "ability": "rerollOnLoss"
+    },
+    {
+      "key": "rare_objets_guitare_electrique",
+      "name": "Guitare électrique",
+      "rarity": "Rare",
+      "type": "Objet",
+      "ability": "objectChoiceForceCharisma2"
+    },
+    {
+      "key": "standard_objets_livre",
+      "name": "Livre",
+      "rarity": "Standard",
+      "type": "Objet",
+      "ability": "mTechnique1"
+    },
+    {
+      "key": "legende_objets_megaphone",
+      "name": "Mégaphone",
       "rarity": "Legende",
-      "type": "Catcheur",
-      "ability": "forceWheel50"
+      "type": "Objet",
+      "ability": "megaphoneRound1"
+    },
+    {
+      "key": "standard_objets_perche_a_selfie",
+      "name": "Perche à selfie",
+      "rarity": "Standard",
+      "type": "Objet",
+      "ability": "mCharisme1"
+    },
+    {
+      "key": "rare_objets_poing_americain",
+      "name": "Poing Américain",
+      "rarity": "Rare",
+      "type": "Objet",
+      "ability": "objectChoiceStat1"
+    },
+    {
+      "key": "rare_objets_sachet_de_punaises",
+      "name": "Sachet de punaises",
+      "rarity": "Rare",
+      "type": "Objet",
+      "ability": "pinObject10"
+    },
+    {
+      "key": "legende_objets_sledgehammer",
+      "name": "Sledgehammer",
+      "rarity": "Legende",
+      "type": "Objet",
+      "ability": "pinObject30"
     }
   ],
   "updated": [],

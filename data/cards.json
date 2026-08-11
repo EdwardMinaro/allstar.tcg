@@ -145,21 +145,6 @@
       "musicId": "ethan_riley"
     },
     {
-      "key": "legende_catcheurs_heracles",
-      "type": "Catcheur",
-      "rarity": "Legende",
-      "name": "Héraclès",
-      "stats": {
-        "Force": 10,
-        "Vitesse": 5,
-        "Technique": 6,
-        "Charisme": 7
-      },
-      "effect": "À l'arrivée : choisissez un bonus et un objet dans le deck et ajoutez-les à votre main.",
-      "ability": "tutorManagerObjectFromDeck",
-      "renderArt": "assets/card_renders/legende_catcheurs_heracles.png"
-    },
-    {
       "key": "legende_catcheurs_georges_chevalier",
       "type": "Catcheur",
       "rarity": "Legende",
@@ -189,6 +174,21 @@
       "effect": "Si un objet lui est équipé : +2 Vitesse et +2 Charisme.",
       "ability": "objectOwnedSpeedCharisma2",
       "renderArt": "assets/card_renders/legende_catcheurs_griff.png"
+    },
+    {
+      "key": "legende_catcheurs_heracles",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Héraclès",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "À l'arrivée : choisissez un bonus et un objet dans le deck et ajoutez-les à votre main.",
+      "ability": "tutorManagerObjectFromDeck",
+      "renderArt": "assets/card_renders/legende_catcheurs_heracles.png"
     },
     {
       "key": "legende_catcheurs_jaydon_ross",
@@ -763,22 +763,6 @@
       "musicId": "delacroix"
     },
     {
-      "key": "rare_catcheurs_dorian_garcia",
-      "type": "Catcheur",
-      "rarity": "Rare",
-      "name": "Dorian Garcia",
-      "stats": {
-        "Force": 4,
-        "Vitesse": 7,
-        "Technique": 5,
-        "Charisme": 8
-      },
-      "effect": "S'il gagne un duel : +1 Vitesse et +1 Charisme.",
-      "ability": "winSpeedCharisma1",
-      "renderArt": "assets/card_renders/rare_catcheurs_dorian_garcia.png",
-      "musicId": "dorian_garcia"
-    },
-    {
       "key": "rare_catcheurs_dirty_dau_si",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -793,6 +777,22 @@
       "ability": "entryEnemyTechniqueMinus2",
       "renderArt": "assets/card_renders/rare_catcheurs_dirty_dau_si.png",
       "musicId": "dirty_dau_si"
+    },
+    {
+      "key": "rare_catcheurs_dorian_garcia",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Dorian Garcia",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "S'il gagne un duel : +1 Vitesse et +1 Charisme.",
+      "ability": "winSpeedCharisma1",
+      "renderArt": "assets/card_renders/rare_catcheurs_dorian_garcia.png",
+      "musicId": "dorian_garcia"
     },
     {
       "key": "rare_catcheurs_drix",
@@ -2507,6 +2507,36 @@
       "renderArt": "assets/card_renders/legende_objets_malette.png"
     },
     {
+      "key": "legende_objets_megaphone",
+      "type": "Objet",
+      "rarity": "Legende",
+      "name": "Mégaphone",
+      "stats": {},
+      "effect": "Round 1 : si vous jouez en deuxième, votre adversaire défausse 3 cartes. Sinon, piochez 2 cartes.",
+      "renderArt": "assets/card_renders/legende_objets_megaphone.png",
+      "ability": "megaphoneRound1"
+    },
+    {
+      "key": "legende_objets_sledgehammer",
+      "type": "Objet",
+      "rarity": "Legende",
+      "name": "Sledgehammer",
+      "stats": {},
+      "effect": "+30 Tombé.",
+      "renderArt": "assets/card_renders/legende_objets_sledgehammer.png",
+      "ability": "pinObject30"
+    },
+    {
+      "key": "rare_objets_batte_de_baseball",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Batte de baseball",
+      "stats": {},
+      "effect": "Votre adversaire défausse une carte aléatoire.",
+      "renderArt": "assets/card_renders/rare_objets_batte_de_baseball.png",
+      "ability": "opponentDiscardRandom1"
+    },
+    {
       "key": "rare_objets_caddie",
       "type": "Objet",
       "rarity": "Rare",
@@ -2515,6 +2545,16 @@
       "effect": "Prochain tour : +1 pioche.",
       "ability": "drawNext1",
       "renderArt": "assets/card_renders/rare_objets_caddie.png"
+    },
+    {
+      "key": "rare_objets_camera",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Caméra",
+      "stats": {},
+      "effect": "Si votre catcheur perd, relancez la roulette.",
+      "renderArt": "assets/card_renders/rare_objets_camera.png",
+      "ability": "rerollOnLoss"
     },
     {
       "key": "rare_objets_cloche",
@@ -2537,6 +2577,16 @@
       "renderArt": "assets/card_renders/rare_objets_extincteur.png"
     },
     {
+      "key": "rare_objets_guitare_electrique",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Guitare électrique",
+      "stats": {},
+      "effect": "Choisissez : +2 Force ou +2 Charisme.",
+      "renderArt": "assets/card_renders/rare_objets_guitare_electrique.png",
+      "ability": "objectChoiceForceCharisma2"
+    },
+    {
       "key": "rare_objets_micro",
       "type": "Objet",
       "rarity": "Rare",
@@ -2545,6 +2595,16 @@
       "effect": "+2 Charisme.",
       "ability": "mCharisme",
       "renderArt": "assets/card_renders/rare_objets_micro.png"
+    },
+    {
+      "key": "rare_objets_poing_americain",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Poing Américain",
+      "stats": {},
+      "effect": "Choisissez une statistique : +1 à la statistique choisie.",
+      "renderArt": "assets/card_renders/rare_objets_poing_americain.png",
+      "ability": "objectChoiceStat1"
     },
     {
       "key": "rare_objets_poubelle",
@@ -2565,6 +2625,16 @@
       "effect": "+2 Charisme, -1 Vitesse.",
       "ability": "mCharisma2SpeedMinus1",
       "renderArt": "assets/card_renders/rare_objets_ringside_apparel.png"
+    },
+    {
+      "key": "rare_objets_sachet_de_punaises",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Sachet de punaises",
+      "stats": {},
+      "effect": "+10 Tombé.",
+      "renderArt": "assets/card_renders/rare_objets_sachet_de_punaises.png",
+      "ability": "pinObject10"
     },
     {
       "key": "standard_objets_barriere",
@@ -2595,6 +2665,26 @@
       "effect": "+1 en Vitesse.",
       "ability": "mVitesse1",
       "renderArt": "assets/card_renders/standard_objets_echelle.png"
+    },
+    {
+      "key": "standard_objets_livre",
+      "type": "Objet",
+      "rarity": "Standard",
+      "name": "Livre",
+      "stats": {},
+      "effect": "+1 Technique.",
+      "renderArt": "assets/card_renders/standard_objets_livre.png",
+      "ability": "mTechnique1"
+    },
+    {
+      "key": "standard_objets_perche_a_selfie",
+      "type": "Objet",
+      "rarity": "Standard",
+      "name": "Perche à selfie",
+      "stats": {},
+      "effect": "+1 Charisme.",
+      "renderArt": "assets/card_renders/standard_objets_perche_a_selfie.png",
+      "ability": "mCharisme1"
     },
     {
       "key": "standard_objets_table",

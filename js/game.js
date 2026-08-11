@@ -153,6 +153,37 @@ const CARD_DATA = [
     "musicId": "ethan_riley"
   },
   {
+    "key": "legende_catcheurs_georges_chevalier",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Georges Chevalier",
+    "stats": {
+      "Force": 7,
+      "Vitesse": 5,
+      "Technique": 6,
+      "Charisme": 10
+    },
+    "effect": "Chaque tour : perd 1 Charisme et gagne +3 dans une statistique aléatoire.",
+    "ability": "turnCharismaMinus1Random3",
+    "renderArt": "assets/card_renders/legende_catcheurs_georges_chevalier.png",
+    "musicId": "georges_chevalier"
+  },
+  {
+    "key": "legende_catcheurs_griff",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Griff",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 8,
+      "Technique": 8,
+      "Charisme": 6
+    },
+    "effect": "Si un objet lui est équipé : +2 Vitesse et +2 Charisme.",
+    "ability": "objectOwnedSpeedCharisma2",
+    "renderArt": "assets/card_renders/legende_catcheurs_griff.png"
+  },
+  {
     "key": "legende_catcheurs_heracles",
     "type": "Catcheur",
     "rarity": "Legende",
@@ -166,27 +197,6 @@ const CARD_DATA = [
     "effect": "À l'arrivée : choisissez un bonus et un objet dans le deck et ajoutez-les à votre main.",
     "ability": "tutorManagerObjectFromDeck",
     "renderArt": "assets/card_renders/legende_catcheurs_heracles.png"
-  },
-  {
-    "key": "legende_catcheurs_georges_chevalier",
-    "type": "Catcheur",
-    "rarity": "Legende",
-    "name": "Georges Chevalier",
-    "stats": { "Force": 7, "Vitesse": 5, "Technique": 6, "Charisme": 10 },
-    "effect": "Chaque tour : perd 1 Charisme et gagne +3 dans une statistique aléatoire.",
-    "ability": "turnCharismaMinus1Random3",
-    "renderArt": "assets/card_renders/legende_catcheurs_georges_chevalier.png",
-    "musicId": "georges_chevalier"
-  },
-  {
-    "key": "legende_catcheurs_griff",
-    "type": "Catcheur",
-    "rarity": "Legende",
-    "name": "Griff",
-    "stats": { "Force": 6, "Vitesse": 8, "Technique": 8, "Charisme": 6 },
-    "effect": "Si un objet lui est équipé : +2 Vitesse et +2 Charisme.",
-    "ability": "objectOwnedSpeedCharisma2",
-    "renderArt": "assets/card_renders/legende_catcheurs_griff.png"
   },
   {
     "key": "legende_catcheurs_jaydon_ross",
@@ -749,27 +759,16 @@ const CARD_DATA = [
     "type": "Catcheur",
     "rarity": "Rare",
     "name": "Delacroix",
-    "stats": { "Force": 7, "Vitesse": 5, "Technique": 7, "Charisme": 5 },
+    "stats": {
+      "Force": 7,
+      "Vitesse": 5,
+      "Technique": 7,
+      "Charisme": 5
+    },
     "effect": "Apparition : l'adversaire choisit une carte de sa main et la défausse.",
     "ability": "opponentDiscardChoice1",
     "renderArt": "assets/card_renders/rare_catcheurs_delacroix.png",
     "musicId": "delacroix"
-  },
-  {
-    "key": "rare_catcheurs_dorian_garcia",
-    "type": "Catcheur",
-    "rarity": "Rare",
-    "name": "Dorian Garcia",
-    "stats": {
-      "Force": 4,
-      "Vitesse": 7,
-      "Technique": 5,
-      "Charisme": 8
-    },
-    "effect": "S'il gagne un duel : +1 Vitesse et +1 Charisme.",
-    "ability": "winSpeedCharisma1",
-    "renderArt": "assets/card_renders/rare_catcheurs_dorian_garcia.png",
-    "musicId": "dorian_garcia"
   },
   {
     "key": "rare_catcheurs_dirty_dau_si",
@@ -786,6 +785,22 @@ const CARD_DATA = [
     "ability": "entryEnemyTechniqueMinus2",
     "renderArt": "assets/card_renders/rare_catcheurs_dirty_dau_si.png",
     "musicId": "dirty_dau_si"
+  },
+  {
+    "key": "rare_catcheurs_dorian_garcia",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Dorian Garcia",
+    "stats": {
+      "Force": 4,
+      "Vitesse": 7,
+      "Technique": 5,
+      "Charisme": 8
+    },
+    "effect": "S'il gagne un duel : +1 Vitesse et +1 Charisme.",
+    "ability": "winSpeedCharisma1",
+    "renderArt": "assets/card_renders/rare_catcheurs_dorian_garcia.png",
+    "musicId": "dorian_garcia"
   },
   {
     "key": "rare_catcheurs_drix",
@@ -903,7 +918,12 @@ const CARD_DATA = [
     "type": "Catcheur",
     "rarity": "Rare",
     "name": "Georges Chevalier",
-    "stats": { "Force": 5, "Vitesse": 4, "Technique": 5, "Charisme": 10 },
+    "stats": {
+      "Force": 5,
+      "Vitesse": 4,
+      "Technique": 5,
+      "Charisme": 10
+    },
     "effect": "Chaque tour : perd 1 Charisme et gagne +2 dans une statistique aléatoire.",
     "ability": "turnCharismaMinus1Random2",
     "renderArt": "assets/card_renders/rare_catcheurs_georges_chevalier.png",
@@ -914,7 +934,12 @@ const CARD_DATA = [
     "type": "Catcheur",
     "rarity": "Rare",
     "name": "Griff",
-    "stats": { "Force": 5, "Vitesse": 7, "Technique": 7, "Charisme": 5 },
+    "stats": {
+      "Force": 5,
+      "Vitesse": 7,
+      "Technique": 7,
+      "Charisme": 5
+    },
     "effect": "Si un objet lui est équipé : +2 Vitesse.",
     "ability": "objectOwnedSpeed2",
     "renderArt": "assets/card_renders/rare_catcheurs_griff.png"
@@ -1067,7 +1092,12 @@ const CARD_DATA = [
     "type": "Catcheur",
     "rarity": "Rare",
     "name": "Kyler O'Connor",
-    "stats": { "Force": 8, "Vitesse": 4, "Technique": 4, "Charisme": 8 },
+    "stats": {
+      "Force": 8,
+      "Vitesse": 4,
+      "Technique": 4,
+      "Charisme": 8
+    },
     "effect": "Insensible aux effets des autres cartes.",
     "ability": "immuneOtherCardEffects",
     "renderArt": "assets/card_renders/rare_catcheurs_kyler_o_connor.png",
@@ -1110,7 +1140,12 @@ const CARD_DATA = [
     "type": "Catcheur",
     "rarity": "Rare",
     "name": "Lux Strahl",
-    "stats": { "Force": 8, "Vitesse": 5, "Technique": 4, "Charisme": 7 },
+    "stats": {
+      "Force": 8,
+      "Vitesse": 5,
+      "Technique": 4,
+      "Charisme": 7
+    },
     "effect": "Chaque tour : l'adversaire défausse 1 carte.",
     "ability": "turnOpponentDiscard1",
     "renderArt": "assets/card_renders/rare_catcheurs_lux_strahl.png"
@@ -1623,7 +1658,12 @@ const CARD_DATA = [
     "type": "Catcheur",
     "rarity": "Standard",
     "name": "Delacroix",
-    "stats": { "Force": 7, "Vitesse": 5, "Technique": 7, "Charisme": 5 },
+    "stats": {
+      "Force": 7,
+      "Vitesse": 5,
+      "Technique": 7,
+      "Charisme": 5
+    },
     "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_catcheurs_delacroix.png",
     "musicId": "delacroix"
@@ -1872,7 +1912,12 @@ const CARD_DATA = [
     "type": "Catcheur",
     "rarity": "Standard",
     "name": "Lux Strahl",
-    "stats": { "Force": 8, "Vitesse": 5, "Technique": 4, "Charisme": 7 },
+    "stats": {
+      "Force": 8,
+      "Vitesse": 5,
+      "Technique": 4,
+      "Charisme": 7
+    },
     "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_catcheurs_lux_strahl.png"
   },
@@ -2470,6 +2515,36 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/legende_objets_malette.png"
   },
   {
+    "key": "legende_objets_megaphone",
+    "type": "Objet",
+    "rarity": "Legende",
+    "name": "Mégaphone",
+    "stats": {},
+    "effect": "Round 1 : si vous jouez en deuxième, votre adversaire défausse 3 cartes. Sinon, piochez 2 cartes.",
+    "renderArt": "assets/card_renders/legende_objets_megaphone.png",
+    "ability": "megaphoneRound1"
+  },
+  {
+    "key": "legende_objets_sledgehammer",
+    "type": "Objet",
+    "rarity": "Legende",
+    "name": "Sledgehammer",
+    "stats": {},
+    "effect": "+30 Tombé.",
+    "renderArt": "assets/card_renders/legende_objets_sledgehammer.png",
+    "ability": "pinObject30"
+  },
+  {
+    "key": "rare_objets_batte_de_baseball",
+    "type": "Objet",
+    "rarity": "Rare",
+    "name": "Batte de baseball",
+    "stats": {},
+    "effect": "Votre adversaire défausse une carte aléatoire.",
+    "renderArt": "assets/card_renders/rare_objets_batte_de_baseball.png",
+    "ability": "opponentDiscardRandom1"
+  },
+  {
     "key": "rare_objets_caddie",
     "type": "Objet",
     "rarity": "Rare",
@@ -2478,6 +2553,16 @@ const CARD_DATA = [
     "effect": "Prochain tour : +1 pioche.",
     "ability": "drawNext1",
     "renderArt": "assets/card_renders/rare_objets_caddie.png"
+  },
+  {
+    "key": "rare_objets_camera",
+    "type": "Objet",
+    "rarity": "Rare",
+    "name": "Caméra",
+    "stats": {},
+    "effect": "Si votre catcheur perd, relancez la roulette.",
+    "renderArt": "assets/card_renders/rare_objets_camera.png",
+    "ability": "rerollOnLoss"
   },
   {
     "key": "rare_objets_cloche",
@@ -2500,6 +2585,16 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_objets_extincteur.png"
   },
   {
+    "key": "rare_objets_guitare_electrique",
+    "type": "Objet",
+    "rarity": "Rare",
+    "name": "Guitare électrique",
+    "stats": {},
+    "effect": "Choisissez : +2 Force ou +2 Charisme.",
+    "renderArt": "assets/card_renders/rare_objets_guitare_electrique.png",
+    "ability": "objectChoiceForceCharisma2"
+  },
+  {
     "key": "rare_objets_micro",
     "type": "Objet",
     "rarity": "Rare",
@@ -2508,6 +2603,16 @@ const CARD_DATA = [
     "effect": "+2 Charisme.",
     "ability": "mCharisme",
     "renderArt": "assets/card_renders/rare_objets_micro.png"
+  },
+  {
+    "key": "rare_objets_poing_americain",
+    "type": "Objet",
+    "rarity": "Rare",
+    "name": "Poing Américain",
+    "stats": {},
+    "effect": "Choisissez une statistique : +1 à la statistique choisie.",
+    "renderArt": "assets/card_renders/rare_objets_poing_americain.png",
+    "ability": "objectChoiceStat1"
   },
   {
     "key": "rare_objets_poubelle",
@@ -2528,6 +2633,16 @@ const CARD_DATA = [
     "effect": "+2 Charisme, -1 Vitesse.",
     "ability": "mCharisma2SpeedMinus1",
     "renderArt": "assets/card_renders/rare_objets_ringside_apparel.png"
+  },
+  {
+    "key": "rare_objets_sachet_de_punaises",
+    "type": "Objet",
+    "rarity": "Rare",
+    "name": "Sachet de punaises",
+    "stats": {},
+    "effect": "+10 Tombé.",
+    "renderArt": "assets/card_renders/rare_objets_sachet_de_punaises.png",
+    "ability": "pinObject10"
   },
   {
     "key": "standard_objets_barriere",
@@ -2558,6 +2673,26 @@ const CARD_DATA = [
     "effect": "+1 en Vitesse.",
     "ability": "mVitesse1",
     "renderArt": "assets/card_renders/standard_objets_echelle.png"
+  },
+  {
+    "key": "standard_objets_livre",
+    "type": "Objet",
+    "rarity": "Standard",
+    "name": "Livre",
+    "stats": {},
+    "effect": "+1 Technique.",
+    "renderArt": "assets/card_renders/standard_objets_livre.png",
+    "ability": "mTechnique1"
+  },
+  {
+    "key": "standard_objets_perche_a_selfie",
+    "type": "Objet",
+    "rarity": "Standard",
+    "name": "Perche à selfie",
+    "stats": {},
+    "effect": "+1 Charisme.",
+    "renderArt": "assets/card_renders/standard_objets_perche_a_selfie.png",
+    "ability": "mCharisme1"
   },
   {
     "key": "standard_objets_table",
@@ -2663,6 +2798,7 @@ const EFFECT_REGISTRY = {
   mForce: { timing:"manager", text:"+1 Force." },
   mForce1: { timing:"manager", text:"+1 Force." },
   mForce3: { timing:"manager", text:"+3 Force." },
+  mTechnique1: { timing:"object", text:"+1 Technique." },
   mRandom: { timing:"manager", text:"+1 dans une stat aléatoire." },
   mRandom2: { timing:"manager", text:"+2 dans une stat aléatoire." },
   mVitesse1: { timing:"manager", text:"+1 Vitesse." },
@@ -2675,7 +2811,10 @@ const EFFECT_REGISTRY = {
   nextSpeedOnFirstLoss2: { timing:"firstLoss", text:"Si la carte perd son premier round, prochain catcheur +2 Vitesse." },
   objectExtra1: { timing:"manager", text:"Les objets durent 1 tour supplémentaire." },
   objectExtra2: { timing:"manager", text:"Les objets durent 2 tours supplémentaires." },
+  objectChoiceForceCharisma2: { timing:"object", text:"Choisissez +2 Force ou +2 Charisme.", choice:true },
+  objectChoiceStat1: { timing:"object", text:"Choisissez une statistique : +1.", choice:true },
   opponentDiscard1: { timing:"object", text:"L'adversaire défausse 1 carte." },
+  opponentDiscardRandom1: { timing:"object", text:"L'adversaire défausse 1 carte aléatoire." },
   opponentDiscardChoice1: { timing:"entry", text:"L'adversaire défausse 1 carte de son choix.", choice:true },
   opponentDiscardOnSupport: { timing:"manager", text:"Chaque bonus ou objet adverse force une défausse." },
   objectOwnedSpeed2: { timing:"duel", text:"Si un objet est équipé : +2 Vitesse." },
@@ -2684,7 +2823,9 @@ const EFFECT_REGISTRY = {
   pinBonus: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +20." },
   pinBonus40: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +40." },
   pinDual20Shield10: { timing:"entry", text:"+20 Tombé et -10 au prochain tombé adverse." },
+  pinObject10: { timing:"object", text:"Tombé +10." },
   pinObject20: { timing:"object", text:"+2 Charisme ou +20 Tombé.", choice:true },
+  pinObject30: { timing:"object", text:"Tombé +30." },
   pinObject5: { timing:"object", text:"Tombé +5." },
   pinShield: { timing:"entry", text:"Prochain tombé adverse -10." },
   pinShield20: { timing:"entry", text:"Prochain tombé adverse -20." },
@@ -2698,6 +2839,7 @@ const EFFECT_REGISTRY = {
   revealOpponentHand: { timing:"entry", text:"À l'arrivée : révèle la main adverse." },
   revealCharlieEachRoundForcePin: { timing:"round", text:"Une fois par tour, si Charlie Bergson est en main : +1 Force et +20 Tombé." },
   rerollStat: { timing:"roulette", text:"Relance la statistique du duel une fois." },
+  rerollOnLoss: { timing:"roulette", text:"Après une défaite de duel, relance automatiquement la roulette une fois." },
   ringsiderRecover1LoseTag: { timing:"round", text:"Une fois par tour : récupère 1 carte du vestiaire et perd 1 TAG." },
   ringsiderRecover2LoseTag: { timing:"round", text:"Une fois par tour : récupère 2 cartes du vestiaire et perd 1 TAG." },
   round4All1: { timing:"round4", text:"Round 4 : +1 à toutes les stats." },
@@ -2713,6 +2855,7 @@ const EFFECT_REGISTRY = {
   forceWheel50: { timing:"roulette", text:"Premier round : 50% de chance de forcer Force." },
   charismaWinRandom3: { timing:"win", text:"Une fois par tour, si Charisme est tiré : victoire +3 dans une statistique aléatoire." },
   techniqueWheel75: { timing:"roulette", text:"75% de chance de forcer Technique." },
+  megaphoneRound1: { timing:"object", text:"Round 1 : en jouant deuxième, l'adversaire défausse 3 cartes ; sinon, piochez 2 cartes." },
   wheelAutoReroll20: { timing:"roulette", text:"20% de chance de relancer automatiquement la roulette." },
   starterTechniqueCharisma1: { timing:"entry", text:"Si joué en premier ce tour : +1 Technique et +1 Charisme." },
   starterSpeed2: { timing:"duel", text:"Si joué en premier ce tour : +2 Vitesse." },
@@ -4829,6 +4972,17 @@ function addTrackedRandomStats(effect,s,count,value=1){
   return pool;
 }
 
+function discardRandomCards(player,count){
+  const discarded=[];
+  while(player?.hand?.length&&discarded.length<count){
+    const index=Math.floor(Math.random()*player.hand.length);
+    const [card]=player.hand.splice(index,1);
+    player.grave.push(card);
+    discarded.push(card);
+  }
+  return discarded;
+}
+
 function applyTrackedObjectEffect(owner,opp,c,choice=null){
   const s=owner.cat;
   if(!s)return;
@@ -4851,6 +5005,7 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
     case"mCharisme1":addTrackedStat(effect,s,"Charisme",1);feedback="+1 Charisme";break;
     case"mCharisme":addTrackedStat(effect,s,"Charisme",2);feedback="+2 Charisme";break;
     case"mCharisme3":addTrackedStat(effect,s,"Charisme",3);feedback="+3 Charisme";break;
+    case"mTechnique1":addTrackedStat(effect,s,"Technique",1);feedback="+1 Technique";break;
     case"mCharisma2SpeedMinus1":
       addTrackedStat(effect,s,"Charisme",2);
       addTrackedStat(effect,s,"Vitesse",-1);
@@ -4899,6 +5054,12 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
       feedback="Tombé +5";
       kind="pin";
       break;
+    case"pinObject10":
+      s.pin+=10;
+      effect.pin=10;
+      feedback="Tombé +10";
+      kind="pin";
+      break;
     case"pinObject20":{
       if(choice==="charisme"){
         addTrackedStat(effect,s,"Charisme",2);
@@ -4910,6 +5071,24 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
         feedback="Tombé +20";
         kind="pin";
       }
+      break;
+    }
+    case"pinObject30":
+      s.pin+=30;
+      effect.pin=30;
+      feedback="Tombé +30";
+      kind="pin";
+      break;
+    case"objectChoiceForceCharisma2":{
+      const stat=choice==="charisme"?"Charisme":"Force";
+      addTrackedStat(effect,s,stat,2);
+      feedback=`+2 ${stat}`;
+      break;
+    }
+    case"objectChoiceStat1":{
+      const stat=STATS.includes(choice)?choice:"Force";
+      addTrackedStat(effect,s,stat,1);
+      feedback=`+1 ${stat}`;
       break;
     }
     case"drawNext1":
@@ -4935,6 +5114,40 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
       }
       break;
     }
+    case"opponentDiscardRandom1":{
+      const [discarded]=discardRandomCards(opp,1);
+      if(discarded){
+        feedback=`Défausse ${discarded.name}`;
+        kind="malus";
+      }else{
+        feedback="Aucune carte à défausser";
+        kind="block";
+      }
+      break;
+    }
+    case"megaphoneRound1":{
+      if(G.round!==1){
+        feedback="Effet réservé au Round 1";
+        kind="block";
+        break;
+      }
+      if(owner.side!==G.roundStarter){
+        const discarded=discardRandomCards(opp,3);
+        feedback=discarded.length?`${discarded.length} carte${discarded.length>1?"s":""} adverse${discarded.length>1?"s":""} défaussée${discarded.length>1?"s":""}`:"Aucune carte à défausser";
+        kind=discarded.length?"malus":"block";
+      }else{
+        const before=owner.hand.length;
+        draw(owner,2);
+        const amount=owner.hand.length-before;
+        feedback=amount?`Pioche ${amount} carte${amount>1?"s":""}`:"Pioche impossible";
+        kind=amount?"special":"block";
+      }
+      break;
+    }
+    case"rerollOnLoss":
+      feedback="Relance prête en cas de défaite";
+      kind="special";
+      break;
   }
 
   const hasTrackedChange=Object.keys(effect.mods).length||effect.pin||effect.pinShield||effect.save;
@@ -5083,6 +5296,7 @@ function applyEffect(owner,opp,c){
     case"mVitesse":s.mods.Vitesse+=2;feedback="+2 Vitesse";break;
     case"mVitesse1":s.mods.Vitesse+=1;feedback="+1 Vitesse";break;
     case"mTechnique":s.mods.Technique+=2;feedback="+2 Technique";break;
+    case"mTechnique1":s.mods.Technique+=1;feedback="+1 Technique";break;
     case"mCharisme1":s.mods.Charisme+=1;feedback="+1 Charisme";break;
     case"mCharisme":s.mods.Charisme+=2;feedback="+2 Charisme";break;
     case"mCharisme3":s.mods.Charisme+=3;feedback="+3 Charisme";break;
@@ -5134,7 +5348,9 @@ function applyEffect(owner,opp,c){
     case"mSave":s.save=true;feedback="Sauvetage";kind="block";break;
     case"pinShield5":owner.pinShield=(owner.pinShield||0)+5;feedback="Tombé adverse -5";kind="block";break;
     case"pinObject5":s.pin+=5;feedback="Tombé +5";kind="pin";break;
+    case"pinObject10":s.pin+=10;feedback="Tombé +10";kind="pin";break;
     case"pinObject20":s.pin+=20;feedback="Tombé +20";kind="pin";break;
+    case"pinObject30":s.pin+=30;feedback="Tombé +30";kind="pin";break;
     case"drawNext1":owner.nextDrawBonus=(owner.nextDrawBonus||0)+1;feedback="Pioche +1";kind="special";break;
     case"recoverGrave":{
       const recovered=owner.grave.pop();
@@ -5235,6 +5451,31 @@ function triggerLudovicSupportDiscard(player,opponent,playedCard){
   showEffectFeedback(opponent.cat?.card||opponent.man,opponent.man.name,"Défausse adverse","malus");
 }
 
+function objectEffectChoices(card){
+  switch(card?.ability){
+    case"pinObject20":
+      return [
+        {label:"+2 Charisme",value:"charisme"},
+        {label:"+20 Tombé",value:"pin"}
+      ];
+    case"objectChoiceForceCharisma2":
+      return [
+        {label:"+2 Force",value:"force"},
+        {label:"+2 Charisme",value:"charisme"}
+      ];
+    case"objectChoiceStat1":
+      return STATS.map(stat=>({label:`+1 ${stat}`,value:stat}));
+    default:
+      return null;
+  }
+}
+
+function aiObjectEffectChoice(card,choices){
+  if(!choices?.length)return null;
+  if(card.ability==="pinObject20")return Math.random()<.8?"charisme":"pin";
+  return choices[Math.floor(Math.random()*choices.length)].value;
+}
+
 function playCard(p,opp,c,idx,announce=false){
   if(c.type==="Catcheur"){
     if(G.tagging===p.side&&c.id===p.tagLockedCardId)return announce&&log("Ce catcheur vient de sortir : choisis un autre relais.");
@@ -5285,14 +5526,12 @@ function playCard(p,opp,c,idx,announce=false){
     p.hand.splice(idx,1);
     triggerLudovicSupportDiscard(p,opp,c);
     if(p.objTurnsRemaining>1)log(`${c.name} restera actif ${p.objTurnsRemaining} tours.`);
-    if(c.ability==="pinObject20"&&p.side==="player"){
+    const choices=objectEffectChoices(c);
+    if(choices&&p.side==="player"){
       requestEffectChoice({
         title:c.name,
         text:"Choisis l'effet à appliquer.",
-        choices:[
-          {label:"+2 Charisme",value:"charisme"},
-          {label:"+20 Tombé",value:"pin"}
-        ],
+        choices,
         onChoose:choice=>{
           applyTrackedObjectEffect(p,opp,c,choice);
           markOnlineDirty();
@@ -5302,7 +5541,7 @@ function playCard(p,opp,c,idx,announce=false){
       markOnlineDirty();
       return;
     }else{
-      const aiChoice=c.ability==="pinObject20" ? (Math.random()<.8 ? "charisme" : "pin") : null;
+      const aiChoice=aiObjectEffectChoice(c,choices);
       applyTrackedObjectEffect(p,opp,c,aiChoice);
     }
   }
@@ -5566,6 +5805,19 @@ function statAbilityFeedback(s,stat){
   return null;
 }
 
+function rerollLostDuelWithObject(loser){
+  const object=loser?.obj;
+  if(!object||object.ability!=="rerollOnLoss"||loser.objRerollRound===G.round)return false;
+  loser.objRerollRound=G.round;
+  G.matchPhase="roulette";
+  log(`[EFFET] ${object.name} : ${loser.cat.card.name} a perdu le duel, la roulette est relancée.`);
+  showEffectFeedback(loser.cat.card,object.name,"Relance de la roulette","special",2400);
+  markOnlineDirty();
+  render();
+  setTimeout(()=>showWheel(()=>duel()),700);
+  return true;
+}
+
 function duel(){
   G.matchPhase="duel";
   render();
@@ -5598,6 +5850,8 @@ function duel(){
     setTimeout(startRound,1100);
     return;
   }
+  const loser=ps>as?G.ai:G.player;
+  if(rerollLostDuelWithObject(loser))return;
   if(G.mode==="challenge"&&G.challenge){
     if(ps>as)return challengePlayerWinsRound(ps-as,stat);
     return challengeBossWinsRound();
@@ -5605,7 +5859,7 @@ function duel(){
   ps>as?win(G.player,G.ai,"score supérieur"):win(G.ai,G.player,"score supérieur");
 }
 
-const REPEATABLE_EXTENDED_OBJECT_ABILITIES=new Set(["drawNext1","recoverGrave","opponentDiscard1"]);
+const REPEATABLE_EXTENDED_OBJECT_ABILITIES=new Set(["drawNext1","recoverGrave","opponentDiscard1","opponentDiscardRandom1"]);
 
 function reactivateExtendedObjects(afterDraw){
   [G.player,G.ai].forEach(p=>{
