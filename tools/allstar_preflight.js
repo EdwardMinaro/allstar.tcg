@@ -55,8 +55,14 @@ function verifyDesktopBuild() {
   const requiredFiles = ["index.html", "update.html", "electron-main.js", "electron-preload.js", "assets/**/*", "css/**/*", "data/**/*", "js/**/*"];
   assert(pkg.version && /^0\.\d+\.\d+$/.test(pkg.version), "Version de bêta valide");
   assert(requiredFiles.every(file => pkg.build.files.includes(file)), "Fichiers du jeu inclus dans le build");
-  assert(workflow.includes("npm run dist"), "Workflow de build Windows");
+  const verifyIndex = workflow.indexOf("npm run verify");
+  const buildIndex = workflow.indexOf("npm run dist");
+  const tagIndex = workflow.indexOf("Create the version tag");
+  assert(verifyIndex >= 0 && buildIndex > verifyIndex && tagIndex > buildIndex, "Workflow vérifie et construit avant le tag");
   assert(workflow.includes("dist/latest.yml"), "Manifest auto-update publié");
+  assert(workflow.includes("fail_on_unmatched_files: true"), "Publication refuse les fichiers manquants");
+  assert(workflow.includes("dist/SHA256SUMS.txt"), "Empreinte SHA256 publiée");
+  assert(fs.existsSync(path.join(root, "docs/open-beta-release-notes.md")), "Notes de bêta ouverte présentes");
 }
 
 function verifyInterfaceFiles() {
@@ -72,6 +78,7 @@ function verifyInterfaceFiles() {
   const audio = read("js/audio.js");
   assert(html.includes("music-pause-toggle") && audio.includes("toggleMusicPause()"), "Bouton pause/reprendre de musique");
   assert(audio.includes("musicPausedByUser") && audio.includes("music-stop-control,.music-pause-toggle"), "Pause manuelle preservee entre les clics");
+  assert(read("js/game.js").includes("Bêta ouverte - Version"), "Version bêta visible dans le menu");
 }
 
 function verifyRecentEffects() {

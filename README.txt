@@ -1,28 +1,22 @@
-ALLSTARS - build joueur
+ALLSTAR - BETA OUVERTE
 
-Ouvrir :
-- index.html dans un navigateur.
+INSTALLATION
+- Telechargez l'installateur ALLSTAR depuis la derniere release GitHub officielle.
+- Lancez ALLSTAR-Setup puis utilisez le raccourci cree sur le Bureau ou dans le menu Demarrer.
+- Windows SmartScreen peut afficher un avertissement tant que l'installateur n'est pas signe. Utilisez uniquement le fichier provenant du depot officiel.
 
-Contenu :
-- index.html : interface joueur
-- css/style.css : visuel et responsive
-- js/game.js : logique de jeu, cartes integrees et decks
-- js/audio.js : musiques, bruitages et volumes
-- data/cards.json : export lisible des cartes JSON integrees
-- data/card_import_report.json : rapport du dernier import cartes et garde-fous
-- quarantine/cards/ : cartes refusees lors de l'import si les stats ne respectent pas les regles
-- assets/cards/ : images extraites des cartes JSON
-- assets/audio/ : musiques et bruitages
-- Sauvegarde : pré-écran Nouvelle Partie / Charger Partie / Effacer Partie, puis auto-save localStorage
-- Boutique : credits de match, boosters Classique/Premium/Champion, collection locale
-- Multi experimental : js/networkAdapter.js, js/roomService.js, js/multiplayerClient.js
+MISES A JOUR
+- Au lancement, ALLSTAR recherche automatiquement une nouvelle version.
+- Si une mise a jour existe, elle est telechargee et installee avant l'ouverture du jeu.
+- La version installee est affichee en bas du menu principal.
 
-Le createur de cartes est volontairement absent de cette version joueur.
+CONNEXION ET SAUVEGARDE
+- Une connexion Internet et un compte ALLSTAR sont necessaires pour les fonctions en ligne et la synchronisation.
+- Fermez normalement le jeu apres une partie ou une modification de deck afin de laisser la synchronisation se terminer.
 
-Backend multi :
-- NetworkRoomAdapter est utilise par defaut pour le vrai multijoueur.
-- Configurer window.ALLSTAR_MULTIPLAYER_CONFIG = { backendUrl: "https://..." } avant les scripts, ou allstarsMultiplayerBackendUrl dans localStorage.
-- Contrat HTTP attendu : GET /rooms/:code, PUT /rooms/:code avec la room JSON en body.
-- Sans backend configuré, l'écran indique "Multijoueur en ligne non configuré" au lieu de faire croire qu'un code est invalide.
-- LocalRoomAdapter reste disponible uniquement pour test local avec ?multi=local ou localStorage allstarsMultiplayerMode=local.
-- La room reste l'autorité logique : le client envoie une intention, le service valide, puis renvoie un état JSON.
+SIGNALER UN PROBLEME
+- Ouvrez le raccourci de regie du menu principal, puis l'onglet Tickets.
+- Indiquez le mode de jeu, les cartes concernees et ce que vous avez observe.
+- Le ticket ajoute automatiquement votre compte et la version installee.
+
+Merci de participer a la beta ouverte d'ALLSTAR.

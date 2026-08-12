@@ -6,6 +6,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: publish-windows-release
+  cancel-in-progress: false
+
 jobs:
   publish:
     runs-on: windows-latest
@@ -15,6 +19,8 @@ jobs:
     steps:
       - name: Check out the release source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -25,30 +31,68 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Create the version tag
+      - name: Verify the release candidate
+        run: npm run verify
+
+      - name: Read the release version
         id: version
         shell: pwsh
         run: |
           $version = node -p "require('./package.json').version"
-          $tag = "v$version"
-          "version=$version" >> $env:GITHUB_OUTPUT
-          "tag=$tag" >> $env:GITHUB_OUTPUT
-          $existingTag = git ls-remote --tags origin "refs/tags/$tag"
-          if (-not $existingTag) {
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git tag -a $tag -m "ALLSTAR $version"
-            git push origin $tag
+          if ($version -notmatch '^0\.\d+\.\d+$') {
+            throw "Invalid beta version: $version"
           }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "tag=v$version" >> $env:GITHUB_OUTPUT
 
       - name: Build the Windows release
         run: npm run dist
 
-      - name: Attach the release files
+      - name: Verify the release files
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $files = @(
+            "dist/ALLSTAR-Setup-$version.exe",
+            "dist/ALLSTAR-Setup-$version.exe.blockmap",
+            "dist/latest.yml"
+          )
+          foreach ($file in $files) {
+            if (-not (Test-Path -LiteralPath $file)) {
+              throw "Missing release file: $file"
+            }
+          }
+          $installer = "dist/ALLSTAR-Setup-$version.exe"
+          $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $installer).Hash.ToLowerInvariant()
+          "$hash  ALLSTAR-Setup-$version.exe" | Set-Content -LiteralPath "dist/SHA256SUMS.txt" -Encoding ascii
+
+      - name: Create the version tag
+        shell: pwsh
+        run: |
+          $tag = "${{ steps.version.outputs.tag }}"
+          $existingTag = git tag --list $tag
+          if ($existingTag) {
+            $tagCommit = git rev-list -n 1 $tag
+            if ($tagCommit -ne $env:GITHUB_SHA) {
+              throw "Tag $tag already points to another commit."
+            }
+          } else {
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a $tag -m "ALLSTAR ${{ steps.version.outputs.version }}"
+            git push origin $tag
+          }
+
+      - name: Publish the open beta release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
+          name: ALLSTAR ${{ steps.version.outputs.version }} - Beta ouverte
+          body_path: docs/open-beta-release-notes.md
+          make_latest: true
+          fail_on_unmatched_files: true
           files: |
             dist/ALLSTAR-Setup-${{ steps.version.outputs.version }}.exe
             dist/ALLSTAR-Setup-${{ steps.version.outputs.version }}.exe.blockmap
             dist/latest.yml
+            dist/SHA256SUMS.txt

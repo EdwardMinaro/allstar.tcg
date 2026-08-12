@@ -3120,7 +3120,7 @@ async function showInstalledVersion(){
   if(!target)return;
   try{
     const version=await window.AllstarDesktop?.getAppVersion?.();
-    target.textContent=version ? `Version ${version}` : "Version navigateur";
+    target.textContent=version ? `Bêta ouverte - Version ${version}` : "Bêta ouverte - Version navigateur";
   }catch{
     target.textContent="Version inconnue";
   }
