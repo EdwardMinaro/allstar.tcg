@@ -84,6 +84,7 @@ function verifyInterfaceFiles() {
 function verifyRecentEffects() {
   const game = read("js/game.js");
   const audio = read("js/audio.js");
+  const importer = read("tools/import_folder_cards.js");
   const cards = JSON.parse(read("data/cards.json")).cards;
   const byKey = Object.fromEntries(cards.map(card => [card.key, card]));
   assert(game.includes('winnerAbility==="charismaWinRandom3"&&G.stat==="Charisme"'), "Effet Bernardot execute sur Charisme gagne");
@@ -101,7 +102,15 @@ function verifyRecentEffects() {
     game.includes('ability==="firstRoundSpeed1Technique2"&&firstRound') && game.includes('firstRoundSpeed1Technique2:"+1 Vitesse / +2 Technique"'),
     "Effet Ryu Kaizaru rare applique au Round 1"
   );
-  assert(audio.includes("lior_divine.mp3") && audio.includes("ryu_kaizaru.mp3"), "Themes Lior Divine et Ryu Kaizaru branches");
+  assert(audio.includes("lior_divine.mp3"), "Theme Lior Divine branche");
+  assert(
+    !audio.includes("ryu_kaizaru")
+      && !fs.existsSync(path.join(root, "assets/audio/music/ryu_kaizaru.mp3"))
+      && importer.includes("BLOCKED_MUSIC_FOLDERS")
+      && importer.includes('"ryu_kaizaru"')
+      && importer.includes("folders.some(folder => BLOCKED_MUSIC_FOLDERS.has(folder))"),
+    "Theme Ryu Kaizaru retire et bloque a l'import"
+  );
   assert(!byKey.standard_catcheurs_joe_cobra?.ability && !byKey.standard_catcheurs_lior_divine?.ability, "Catcheurs standards de la fournee sans effet");
   assert(
     ["rare_catcheurs_joe_cobra", "rare_catcheurs_lior_divine", "rare_catcheurs_ryu_kaizaru"]

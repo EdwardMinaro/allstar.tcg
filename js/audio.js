@@ -155,11 +155,6 @@ const AUDIO_LIBRARY = {
       wrestler: "RUKASU",
       src: "assets/audio/music/rukasu.mp3"
     },
-    ryu_kaizaru: {
-      label: "Ryu Kaizaru",
-      wrestler: "Ryu Kaizaru",
-      src: "assets/audio/music/ryu_kaizaru.mp3"
-    },
     dadou_bazooka: {
       label: "Dadou Bazooka",
       wrestler: "Dadou Bazooka",

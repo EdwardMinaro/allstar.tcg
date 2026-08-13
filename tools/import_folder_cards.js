@@ -44,10 +44,13 @@ const MUSIC_BY_FOLDER = {
   "maffa": "maffa.mp3",
   "mareck": "mareck.mp3",
   "romain_lestrange": "romain_lestrange.mp3",
-  "ryu_kaizaru": "ryu_kaizaru.mp3",
   "saitovic": "saitovic.mp3",
   "shawn_olsen": "shawn_olsen.mp3",
 };
+
+const BLOCKED_MUSIC_FOLDERS = new Set([
+  "ryu_kaizaru",
+]);
 
 const ABILITY_BY_KEY = {
   "Rare|Catcheur|Alex Kiss": "graveElAmnesicoAll1",
@@ -306,6 +309,7 @@ for (const jsonPath of walk(sourceRoot).filter((file) => path.extname(file).toLo
 for (const mp3Path of walk(sourceRoot).filter((file) => path.extname(file).toLowerCase() === ".mp3")) {
   const name = path.basename(mp3Path);
   const folders = path.relative(sourceRoot, path.dirname(mp3Path)).split(path.sep).map(slug);
+  if (folders.some(folder => BLOCKED_MUSIC_FOLDERS.has(folder))) continue;
   let target = MUSIC_TARGETS[name];
   if (!target) {
     target = folders.map(folder => MUSIC_BY_FOLDER[folder]).find(Boolean);
