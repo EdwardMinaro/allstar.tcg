@@ -1000,6 +1000,22 @@
       "musicId": "jet_kid"
     },
     {
+      "key": "rare_catcheurs_joe_cobra",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Joe Cobra",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "Apparition : choisissez une statistique adverse. Le catcheur adverse perd 1 point dans cette statistique.",
+      "renderArt": "assets/card_renders/rare_catcheurs_joe_cobra.png",
+      "musicId": "joe_cobra",
+      "ability": "entryEnemyStatChoiceMinus1"
+    },
+    {
       "key": "rare_catcheurs_jose_moreno",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -1110,6 +1126,22 @@
       "ability": "recoverObjectGrave",
       "musicId": "leon",
       "renderArt": "assets/card_renders/rare_catcheurs_leon.png"
+    },
+    {
+      "key": "rare_catcheurs_lior_divine",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Lior Divine",
+      "stats": {
+        "Force": 3,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 9
+      },
+      "effect": "Apparition : choisissez une carte Bonus ou Objet dans votre vestiaire et posez-la directement sur le terrain.",
+      "renderArt": "assets/card_renders/rare_catcheurs_lior_divine.png",
+      "musicId": "lior_divine",
+      "ability": "entryPlaySupportFromGrave"
     },
     {
       "key": "rare_catcheurs_lucas_menil",
@@ -1349,6 +1381,22 @@
       "ability": "lossEnemyTechniqueMinus2",
       "renderArt": "assets/card_renders/rare_catcheurs_rukasu.png",
       "musicId": "rukasu"
+    },
+    {
+      "key": "rare_catcheurs_ryu_kaizaru",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Ryu Kaizaru",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Round 1 : +2 Technique et +1 Vitesse.",
+      "renderArt": "assets/card_renders/rare_catcheurs_ryu_kaizaru.png",
+      "musicId": "ryu_kaizaru",
+      "ability": "firstRoundSpeed1Technique2"
     },
     {
       "key": "rare_catcheurs_s_m_s",
@@ -1840,6 +1888,21 @@
       "musicId": "jey_kill"
     },
     {
+      "key": "standard_catcheurs_joe_cobra",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Joe Cobra",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 5,
+        "Charisme": 8
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_joe_cobra.png",
+      "musicId": "joe_cobra"
+    },
+    {
       "key": "standard_catcheurs_kevin_avanti",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -1868,6 +1931,21 @@
       "effect": "Aucun effet.",
       "renderArt": "assets/card_renders/standard_catcheurs_kyle_hoxton.png",
       "musicId": "kyle_hoxton"
+    },
+    {
+      "key": "standard_catcheurs_lior_divine",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Lior Divine",
+      "stats": {
+        "Force": 3,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 9
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_lior_divine.png",
+      "musicId": "lior_divine"
     },
     {
       "key": "standard_catcheurs_lucas_menil",

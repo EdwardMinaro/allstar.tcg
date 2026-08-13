@@ -40,9 +40,11 @@ const MUSIC_BY_FOLDER = {
   "eddy_marston": "eddy_marston.mp3",
   "jafar_jordan": "jafar_jordan.mp3",
   "koro": "koro.mp3",
+  "lior_divine": "lior_divine.mp3",
   "maffa": "maffa.mp3",
   "mareck": "mareck.mp3",
   "romain_lestrange": "romain_lestrange.mp3",
+  "ryu_kaizaru": "ryu_kaizaru.mp3",
   "saitovic": "saitovic.mp3",
   "shawn_olsen": "shawn_olsen.mp3",
 };
@@ -66,6 +68,9 @@ const ABILITY_BY_KEY = {
   "Rare|Catcheur|Maffa": "entryPinBonus20",
   "Rare|Catcheur|Bernardot": "charismaWinRandom3",
   "Legende|Catcheur|Tony Trivaldo": "forceWheel50",
+  "Rare|Catcheur|Joe Cobra": "entryEnemyStatChoiceMinus1",
+  "Rare|Catcheur|Lior Divine": "entryPlaySupportFromGrave",
+  "Rare|Catcheur|Ryu Kaizaru": "firstRoundSpeed1Technique2",
   "Rare|Manager|PURE TRADITION": "bonusPureTraditionDrawTeam",
   "Rare|Objet|Batte de baseball": "opponentDiscardRandom1",
   "Rare|Objet|Caméra": "rerollOnLoss",
@@ -79,6 +84,15 @@ const ABILITY_BY_KEY = {
 };
 
 const CARD_OVERRIDES_BY_KEY = {
+  rare_catcheurs_joe_cobra: {
+    effect: "Apparition : choisissez une statistique adverse. Le catcheur adverse perd 1 point dans cette statistique.",
+  },
+  rare_catcheurs_lior_divine: {
+    effect: "Apparition : choisissez une carte Bonus ou Objet dans votre vestiaire et posez-la directement sur le terrain.",
+  },
+  rare_catcheurs_ryu_kaizaru: {
+    effect: "Round 1 : +2 Technique et +1 Vitesse.",
+  },
   rare_objets_batte_de_baseball: {
     effect: "Votre adversaire défausse une carte aléatoire.",
   },

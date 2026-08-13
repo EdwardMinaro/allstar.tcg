@@ -80,6 +80,11 @@ const AUDIO_LIBRARY = {
       wrestler: "Léon",
       src: "assets/audio/music/leon.mp3"
     },
+    lior_divine: {
+      label: "Lior Divine",
+      wrestler: "Lior Divine",
+      src: "assets/audio/music/lior_divine.mp3"
+    },
     ethan_riley: {
       label: "Ethan Riley",
       wrestler: "Ethan Riley",
@@ -149,6 +154,11 @@ const AUDIO_LIBRARY = {
       label: "RUKASU",
       wrestler: "RUKASU",
       src: "assets/audio/music/rukasu.mp3"
+    },
+    ryu_kaizaru: {
+      label: "Ryu Kaizaru",
+      wrestler: "Ryu Kaizaru",
+      src: "assets/audio/music/ryu_kaizaru.mp3"
     },
     dadou_bazooka: {
       label: "Dadou Bazooka",

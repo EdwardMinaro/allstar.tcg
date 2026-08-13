@@ -1008,6 +1008,22 @@ const CARD_DATA = [
     "musicId": "jet_kid"
   },
   {
+    "key": "rare_catcheurs_joe_cobra",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Joe Cobra",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 5,
+      "Technique": 5,
+      "Charisme": 8
+    },
+    "effect": "Apparition : choisissez une statistique adverse. Le catcheur adverse perd 1 point dans cette statistique.",
+    "renderArt": "assets/card_renders/rare_catcheurs_joe_cobra.png",
+    "musicId": "joe_cobra",
+    "ability": "entryEnemyStatChoiceMinus1"
+  },
+  {
     "key": "rare_catcheurs_jose_moreno",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -1118,6 +1134,22 @@ const CARD_DATA = [
     "ability": "recoverObjectGrave",
     "musicId": "leon",
     "renderArt": "assets/card_renders/rare_catcheurs_leon.png"
+  },
+  {
+    "key": "rare_catcheurs_lior_divine",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Lior Divine",
+    "stats": {
+      "Force": 3,
+      "Vitesse": 6,
+      "Technique": 6,
+      "Charisme": 9
+    },
+    "effect": "Apparition : choisissez une carte Bonus ou Objet dans votre vestiaire et posez-la directement sur le terrain.",
+    "renderArt": "assets/card_renders/rare_catcheurs_lior_divine.png",
+    "musicId": "lior_divine",
+    "ability": "entryPlaySupportFromGrave"
   },
   {
     "key": "rare_catcheurs_lucas_menil",
@@ -1357,6 +1389,22 @@ const CARD_DATA = [
     "ability": "lossEnemyTechniqueMinus2",
     "renderArt": "assets/card_renders/rare_catcheurs_rukasu.png",
     "musicId": "rukasu"
+  },
+  {
+    "key": "rare_catcheurs_ryu_kaizaru",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Ryu Kaizaru",
+    "stats": {
+      "Force": 4,
+      "Vitesse": 8,
+      "Technique": 6,
+      "Charisme": 6
+    },
+    "effect": "Round 1 : +2 Technique et +1 Vitesse.",
+    "renderArt": "assets/card_renders/rare_catcheurs_ryu_kaizaru.png",
+    "musicId": "ryu_kaizaru",
+    "ability": "firstRoundSpeed1Technique2"
   },
   {
     "key": "rare_catcheurs_s_m_s",
@@ -1848,6 +1896,21 @@ const CARD_DATA = [
     "musicId": "jey_kill"
   },
   {
+    "key": "standard_catcheurs_joe_cobra",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Joe Cobra",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 5,
+      "Technique": 5,
+      "Charisme": 8
+    },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_joe_cobra.png",
+    "musicId": "joe_cobra"
+  },
+  {
     "key": "standard_catcheurs_kevin_avanti",
     "type": "Catcheur",
     "rarity": "Standard",
@@ -1876,6 +1939,21 @@ const CARD_DATA = [
     "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_catcheurs_kyle_hoxton.png",
     "musicId": "kyle_hoxton"
+  },
+  {
+    "key": "standard_catcheurs_lior_divine",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Lior Divine",
+    "stats": {
+      "Force": 3,
+      "Vitesse": 6,
+      "Technique": 6,
+      "Charisme": 9
+    },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_lior_divine.png",
+    "musicId": "lior_divine"
   },
   {
     "key": "standard_catcheurs_lucas_menil",
@@ -2774,6 +2852,8 @@ const EFFECT_REGISTRY = {
   firstRoundCharTech2: { timing:"round1", text:"+2 Charisme et +2 Technique au round 1." },
   entryEnemyTechniqueMinus2: { timing:"entry", text:"À l'arrivée : -2 Technique au catcheur adverse." },
   entryEnemyForceMinus2: { timing:"entry", text:"À l'arrivée : -2 Force au catcheur adverse." },
+  entryEnemyStatChoiceMinus1: { timing:"entry", text:"À l'arrivée : choisissez une statistique adverse, -1.", choice:true },
+  entryPlaySupportFromGrave: { timing:"entry", text:"À l'arrivée : posez un Bonus ou un Objet depuis votre vestiaire.", choice:true },
   firstRoundForceCharTech: { timing:"round1", text:"+1 Force, Technique et Charisme au round 1." },
   firstRoundForceTechnique: { timing:"round1", text:"+1 Force et +1 Technique au premier round." },
   firstRoundForceSpeed1: { timing:"firstRound", text:"+1 Force et +1 Vitesse au premier round de la carte." },
@@ -2785,6 +2865,7 @@ const EFFECT_REGISTRY = {
   firstRoundSpeedCharisma3: { timing:"round1", text:"+3 Vitesse et +3 Charisme au round 1." },
   firstRoundSpeedTechnique1: { timing:"round1", text:"+1 Vitesse et +1 Technique au round 1." },
   firstRoundSpeedTechnique2: { timing:"round1", text:"+2 Vitesse et +2 Technique au round 1." },
+  firstRoundSpeed1Technique2: { timing:"round1", text:"+1 Vitesse et +2 Technique au round 1." },
   firstWinAll1: { timing:"win", text:"Première victoire : +1 à toutes les stats." },
   drawToSixBonusStats: { timing:"entry", text:"Pioche jusqu'à six cartes et gagne +1 stat aléatoire par bonus ainsi pioché." },
   lossEnemyTechniqueMinus2: { timing:"loss", text:"Après une défaite, -2 Technique au vainqueur." },
@@ -4436,6 +4517,7 @@ function isMatchRoundOneForWrestler(s){
 
 function isMatchRoundOneAbility(ability){
   return [
+    "firstRoundSpeed1Technique2",
     "firstRoundSpeedTechnique1",
     "firstRoundSpeedTechnique2",
     "firstRoundCharTech",
@@ -4477,6 +4559,7 @@ function openingRoundEffectLabel(s){
   const labels={
     firstRoundSpeed2:"+2 Vitesse",
     firstRoundSpeed3:"+3 Vitesse",
+    firstRoundSpeed1Technique2:"+1 Vitesse / +2 Technique",
     firstRoundSpeedTechnique1:"+1 Vitesse / +1 Technique",
     firstRoundSpeedTechnique2:"+2 Vitesse / +2 Technique",
     firstRoundForceTechnique:"+1 Force / +1 Technique",
@@ -4583,6 +4666,103 @@ function recoverNamedWrestler(owner,source,names){
   });
 }
 
+function applyEnemyStatChoiceMinus1(owner,source){
+  const enemy=owner.side==="player"?G.ai:G.player;
+  if(!enemy?.cat||isCardEffectImmune(enemy.cat)){
+    log(`[EFFET] ${source.name} : aucun catcheur adverse vulnérable sur le ring.`);
+    showEffectFeedback(source,source.name,"Aucune cible","block");
+    return;
+  }
+  const applyStat=stat=>{
+    if(!STATS.includes(stat)||!enemy?.cat||isCardEffectImmune(enemy.cat))return;
+    enemy.cat.mods[stat]-=1;
+    log(`[EFFET] ${source.name} : ${enemy.cat.card.name} perd 1 ${stat}.`);
+    showEffectFeedback(source,source.name,`${stat} adverse -1`,"malus");
+    markOnlineDirty();
+    render();
+  };
+  if(owner.side!=="player"){
+    const stat=STATS.reduce((best,current)=>score(enemy.cat,current)>score(enemy.cat,best)?current:best,STATS[0]);
+    applyStat(stat);
+    return;
+  }
+  requestEffectChoice({
+    title:source.name,
+    text:"Choisis la statistique que le catcheur adverse perdra.",
+    choices:STATS.map(stat=>({label:`-1 ${stat} adverse`,value:stat})),
+    onChoose:applyStat
+  });
+}
+
+function playSupportFromGrave(owner,source){
+  const enemy=owner.side==="player"?G.ai:G.player;
+  const candidates=owner.grave.filter(card=>
+    (card.type==="Manager"&&!owner.man&&!owner.managersBlocked)
+    ||(card.type==="Objet"&&!owner.obj&&!owner.objectsBlocked)
+  );
+  if(!candidates.length){
+    log(`[EFFET] ${source.name} : aucun Bonus ou Objet jouable dans le vestiaire.`);
+    showEffectFeedback(source,source.name,"Aucune carte jouable","block");
+    return;
+  }
+  const activate=id=>{
+    const index=owner.grave.findIndex(card=>card.id===id);
+    if(index<0)return;
+    const card=owner.grave[index];
+    const canPlay=card.type==="Manager"
+      ? !owner.man&&!owner.managersBlocked
+      : card.type==="Objet"&&!owner.obj&&!owner.objectsBlocked;
+    if(!canPlay)return;
+    owner.grave.splice(index,1);
+    log(`[EFFET] ${source.name} pose ${card.name} depuis le vestiaire.`);
+    playSound("carte_jouee");
+    if(card.type==="Manager"){
+      owner.man=card;
+      owner.cat.managers=(owner.cat.managers||0)+1;
+      applyEffect(owner,enemy,card);
+      triggerLudovicSupportDiscard(owner,enemy,card);
+      markOnlineDirty();
+      render();
+      return;
+    }
+    owner.obj=card;
+    owner.objTurnsRemaining=1+Number(owner.objectDurationBonus||0);
+    owner.objLastActivationRound=G.round;
+    owner.objExtraDrawQueued=false;
+    triggerLudovicSupportDiscard(owner,enemy,card);
+    if(owner.objTurnsRemaining>1)log(`${card.name} restera actif ${owner.objTurnsRemaining} tours.`);
+    const choices=objectEffectChoices(card);
+    if(choices&&owner.side==="player"){
+      requestEffectChoice({
+        title:card.name,
+        text:"Choisis l'effet à appliquer.",
+        choices,
+        onChoose:choice=>{
+          applyTrackedObjectEffect(owner,enemy,card,choice);
+          markOnlineDirty();
+          render();
+        }
+      });
+      markOnlineDirty();
+      return;
+    }
+    applyTrackedObjectEffect(owner,enemy,card,aiObjectEffectChoice(card,choices));
+    markOnlineDirty();
+    render();
+  };
+  if(owner.side!=="player"){
+    const selected=candidates[Math.floor(Math.random()*candidates.length)].id;
+    setTimeout(()=>activate(selected),0);
+    return;
+  }
+  requestEffectChoice({
+    title:source.name,
+    text:"Choisis la carte à poser depuis ton vestiaire.",
+    choices:candidates.map(card=>({label:`${card.name} (${card.type==="Manager"?"Bonus":"Objet"})`,value:card.id})),
+    onChoose:id=>setTimeout(()=>activate(id),0)
+  });
+}
+
 function showOpponentHandReveal(source,enemy){
   const overlay=document.getElementById("handRevealOverlay");
   const title=document.getElementById("handRevealTitle");
@@ -4612,6 +4792,8 @@ function applyWrestlerEntryEffect(owner,c){
     log(`[EFFET] ${c.name} : les objets qui lui sont équipés durent 2 tours.`);
     showEffectFeedback(c,c.name,"Objets : 2 tours","special");
   }
+  if(c.ability==="entryEnemyStatChoiceMinus1")applyEnemyStatChoiceMinus1(owner,c);
+  if(c.ability==="entryPlaySupportFromGrave")playSupportFromGrave(owner,c);
   if(c.ability==="drawToSixBonusStats"){
     const before=owner.hand.length;
     while(owner.hand.length<6){
@@ -5725,6 +5907,10 @@ function score(s,stat){
   if(ability==="speedPlus"&&stat==="Vitesse")v+=2;
   if(ability==="firstRoundSpeed2"&&firstRound&&stat==="Vitesse")v+=2;
   if(ability==="firstRoundSpeed3"&&firstRound&&stat==="Vitesse")v+=3;
+  if(ability==="firstRoundSpeed1Technique2"&&firstRound){
+    if(stat==="Vitesse")v+=1;
+    if(stat==="Technique")v+=2;
+  }
   if(ability==="firstRoundSpeedTechnique1"&&firstRound&&(stat==="Vitesse"||stat==="Technique"))v+=1;
   if(ability==="firstRoundSpeedTechnique2"&&firstRound&&(stat==="Vitesse"||stat==="Technique"))v+=2;
   if(ability==="firstRoundForceTechnique"&&firstRound&&(stat==="Force"||stat==="Technique"))v+=1;
@@ -5779,6 +5965,8 @@ function statAbilityFeedback(s,stat){
   if(ability==="speedPlus"&&stat==="Vitesse")return "+2 Vitesse";
   if(ability==="firstRoundSpeed2"&&firstRound&&stat==="Vitesse")return "+2 Vitesse";
   if(ability==="firstRoundSpeed3"&&firstRound&&stat==="Vitesse")return "+3 Vitesse";
+  if(ability==="firstRoundSpeed1Technique2"&&firstRound&&stat==="Vitesse")return "+1 Vitesse";
+  if(ability==="firstRoundSpeed1Technique2"&&firstRound&&stat==="Technique")return "+2 Technique";
   if(ability==="firstRoundSpeedTechnique1"&&firstRound&&(stat==="Vitesse"||stat==="Technique"))return `+1 ${stat}`;
   if(ability==="firstRoundSpeedTechnique2"&&firstRound&&(stat==="Vitesse"||stat==="Technique"))return `+2 ${stat}`;
   if(ability==="firstRoundForceTechnique"&&firstRound&&(stat==="Force"||stat==="Technique"))return `+1 ${stat}`;

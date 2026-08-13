@@ -1,70 +1,51 @@
 {
   "imported": [
     {
-      "key": "rare_objets_batte_de_baseball",
-      "name": "Batte de baseball",
-      "rarity": "Rare",
-      "type": "Objet",
-      "ability": "opponentDiscardRandom1"
-    },
-    {
-      "key": "rare_objets_camera",
-      "name": "Caméra",
-      "rarity": "Rare",
-      "type": "Objet",
-      "ability": "rerollOnLoss"
-    },
-    {
-      "key": "rare_objets_guitare_electrique",
-      "name": "Guitare électrique",
-      "rarity": "Rare",
-      "type": "Objet",
-      "ability": "objectChoiceForceCharisma2"
-    },
-    {
-      "key": "standard_objets_livre",
-      "name": "Livre",
+      "key": "standard_catcheurs_joe_cobra",
+      "name": "Joe Cobra",
       "rarity": "Standard",
-      "type": "Objet",
-      "ability": "mTechnique1"
+      "type": "Catcheur",
+      "ability": null
     },
     {
-      "key": "legende_objets_megaphone",
-      "name": "Mégaphone",
-      "rarity": "Legende",
-      "type": "Objet",
-      "ability": "megaphoneRound1"
+      "key": "rare_catcheurs_joe_cobra",
+      "name": "Joe Cobra",
+      "rarity": "Rare",
+      "type": "Catcheur",
+      "ability": "entryEnemyStatChoiceMinus1"
     },
     {
-      "key": "standard_objets_perche_a_selfie",
-      "name": "Perche à selfie",
+      "key": "rare_catcheurs_lior_divine",
+      "name": "Lior Divine",
+      "rarity": "Rare",
+      "type": "Catcheur",
+      "ability": "entryPlaySupportFromGrave"
+    },
+    {
+      "key": "standard_catcheurs_lior_divine",
+      "name": "Lior Divine",
       "rarity": "Standard",
-      "type": "Objet",
-      "ability": "mCharisme1"
+      "type": "Catcheur",
+      "ability": null
     },
     {
-      "key": "rare_objets_poing_americain",
-      "name": "Poing Américain",
+      "key": "rare_catcheurs_ryu_kaizaru",
+      "name": "Ryu Kaizaru",
       "rarity": "Rare",
-      "type": "Objet",
-      "ability": "objectChoiceStat1"
-    },
-    {
-      "key": "rare_objets_sachet_de_punaises",
-      "name": "Sachet de punaises",
-      "rarity": "Rare",
-      "type": "Objet",
-      "ability": "pinObject10"
-    },
-    {
-      "key": "legende_objets_sledgehammer",
-      "name": "Sledgehammer",
-      "rarity": "Legende",
-      "type": "Objet",
-      "ability": "pinObject30"
+      "type": "Catcheur",
+      "ability": "firstRoundSpeed1Technique2"
     }
   ],
   "updated": [],
   "skipped": [],
-  "music": []
+  "music": [
+    {
+      "source": "C:\\Users\\LENOVO\\Downloads\\rajouter\\Lior Divine\\Britney Manson - FASHION (Lyrics).mp3",
+      "target": "lior_divine.mp3"
+    },
+    {
+      "source": "C:\\Users\\LENOVO\\Downloads\\rajouter\\Ryu Kaizaru\\Convertisseur - ScreenRecording_07-10-2026 12-58-02_1.mp3",
+      "target": "ryu_kaizaru.mp3"
+    }
+  ]
 }

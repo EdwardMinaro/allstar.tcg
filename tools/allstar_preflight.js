@@ -83,9 +83,31 @@ function verifyInterfaceFiles() {
 
 function verifyRecentEffects() {
   const game = read("js/game.js");
+  const audio = read("js/audio.js");
+  const cards = JSON.parse(read("data/cards.json")).cards;
+  const byKey = Object.fromEntries(cards.map(card => [card.key, card]));
   assert(game.includes('winnerAbility==="charismaWinRandom3"&&G.stat==="Charisme"'), "Effet Bernardot execute sur Charisme gagne");
   assert(game.includes('forceWheel50:{stat:"Force",chance:.5}'), "Effet Tony Trivaldo force Force au premier round");
   assert(game.includes("ISO weeks make the challenge rotate") && game.includes("challenge_boss_${G.challenge.weekKey}_"), "Boss ALLSTAR previsualisable et rotation hebdomadaire");
+  assert(
+    game.includes('c.ability==="entryEnemyStatChoiceMinus1"') && game.includes("enemy.cat.mods[stat]-=1"),
+    "Effet Joe Cobra rare branche sur le choix de statistique adverse"
+  );
+  assert(
+    game.includes('c.ability==="entryPlaySupportFromGrave"') && game.includes("function playSupportFromGrave"),
+    "Effet Lior Divine rare branche sur le vestiaire"
+  );
+  assert(
+    game.includes('ability==="firstRoundSpeed1Technique2"&&firstRound') && game.includes('firstRoundSpeed1Technique2:"+1 Vitesse / +2 Technique"'),
+    "Effet Ryu Kaizaru rare applique au Round 1"
+  );
+  assert(audio.includes("lior_divine.mp3") && audio.includes("ryu_kaizaru.mp3"), "Themes Lior Divine et Ryu Kaizaru branches");
+  assert(!byKey.standard_catcheurs_joe_cobra?.ability && !byKey.standard_catcheurs_lior_divine?.ability, "Catcheurs standards de la fournee sans effet");
+  assert(
+    ["rare_catcheurs_joe_cobra", "rare_catcheurs_lior_divine", "rare_catcheurs_ryu_kaizaru"]
+      .every(key => Object.values(byKey[key]?.stats || {}).reduce((sum, value) => sum + value, 0) === 24),
+    "Catcheurs rares de la fournee a 24 points"
+  );
 }
 
 verifyRanking();
