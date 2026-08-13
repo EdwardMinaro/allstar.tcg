@@ -9,6 +9,22 @@ let onlineLastSnapshotHash="";
 let onlineLastAppliedVersion=0;
 const CARD_DATA = [
   {
+    "key": "legende_catcheurs_adam_frost",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Adam Frost",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 8,
+      "Technique": 6,
+      "Charisme": 8
+    },
+    "effect": "1/Tour : votre adversaire perd 2 points sur une statistique aléatoire. Cumulable 3 fois.",
+    "ability": "turnEnemyRandomPermanent2Max3",
+    "renderArt": "assets/card_renders/legende_catcheurs_adam_frost.png",
+    "musicId": "adam_frost"
+  },
+  {
     "key": "legende_catcheurs_alex_ezio",
     "type": "Catcheur",
     "rarity": "Legende",
@@ -468,6 +484,22 @@ const CARD_DATA = [
     "ability": "drawOnEntry2",
     "renderArt": "assets/card_renders/legende_catcheurs_zaeken.png",
     "musicId": "zaeken"
+  },
+  {
+    "key": "rare_catcheurs_adam_frost",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Adam Frost",
+    "stats": {
+      "Force": 5,
+      "Vitesse": 7,
+      "Technique": 5,
+      "Charisme": 7
+    },
+    "effect": "1/Tour : votre adversaire perd 1 point sur une statistique aléatoire. Cumulable 5 fois.",
+    "ability": "turnEnemyRandomPermanent1Max5",
+    "renderArt": "assets/card_renders/rare_catcheurs_adam_frost.png",
+    "musicId": "adam_frost"
   },
   {
     "key": "rare_catcheurs_ace_angel",
@@ -2948,6 +2980,8 @@ const EFFECT_REGISTRY = {
   turnCharismaMinus1Random3: { timing:"round", text:"Chaque tour : -1 Charisme et +3 dans une stat aléatoire." },
   turnCatRandomPermanent1Max5: { timing:"round", text:"Chaque tour : +1 dans une stat aléatoire, cumulable 5 fois." },
   turnCatRandomPermanent2Max3: { timing:"round", text:"Chaque tour : +2 dans une stat aléatoire, cumulable 3 fois." },
+  turnEnemyRandomPermanent1Max5: { timing:"round", text:"Chaque tour : -1 dans une stat adverse aléatoire, cumulable 5 fois." },
+  turnEnemyRandomPermanent2Max3: { timing:"round", text:"Chaque tour : -2 dans une stat adverse aléatoire, cumulable 3 fois." },
   turnEnemyForceMinus1: { timing:"round", text:"Chaque tour : -1 Force adverse." },
   turnEnemyForceMinus2: { timing:"round", text:"Chaque tour : -2 Force adverse." },
   turnEnemySpeedMinus1: { timing:"round", text:"Chaque tour : -1 Vitesse adverse." },
@@ -5048,6 +5082,18 @@ function applyRoundManagerEffects(){
         owner.cat.permanentGrowthCount=count+1;
         log(`[EFFET] ${owner.cat.card.name} progresse : +${value} ${stat} (${count+1}/${max}).`);
         showEffectFeedback(owner.cat.card,owner.cat.card.name,`+${value} ${stat} (${count+1}/${max})`,"buff");
+      }
+    }
+    if((catAbility==="turnEnemyRandomPermanent1Max5"||catAbility==="turnEnemyRandomPermanent2Max3")&&opp.cat&&!isCardEffectImmune(opp.cat)){
+      const value=catAbility==="turnEnemyRandomPermanent2Max3"?2:1;
+      const max=catAbility==="turnEnemyRandomPermanent2Max3"?3:5;
+      const count=owner.cat.enemyRandomPenaltyCount||0;
+      if(count<max){
+        const stat=STATS[Math.floor(Math.random()*STATS.length)];
+        opp.cat.mods[stat]-=value;
+        owner.cat.enemyRandomPenaltyCount=count+1;
+        log(`[EFFET] ${owner.cat.card.name} affaiblit ${opp.cat.card.name} : -${value} ${stat} (${count+1}/${max}).`);
+        showEffectFeedback(opp.cat.card,owner.cat.card.name,`-${value} ${stat} (${count+1}/${max})`,"malus");
       }
     }
     if(catAbility==="revealDanEachRoundTechSpeed2"){

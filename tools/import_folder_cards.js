@@ -25,6 +25,7 @@ const TYPE_MAP = {
 };
 
 const MUSIC_TARGETS = {
+  "History Untold (Entrance Edit).mp3": "adam_frost.mp3",
   "El Amnesico.mp3": "el_amnesico.mp3",
   "1-LOVE IN THE FIELD.mp3": "alex_kiss.mp3",
   "Thème Officiel Eddy Marston.mp3": "eddy_marston.mp3",
@@ -36,6 +37,7 @@ const MUSIC_TARGETS = {
 };
 
 const MUSIC_BY_FOLDER = {
+  "adam_frost": "adam_frost.mp3",
   "alex_kiss": "alex_kiss.mp3",
   "eddy_marston": "eddy_marston.mp3",
   "jafar_jordan": "jafar_jordan.mp3",
@@ -53,6 +55,8 @@ const BLOCKED_MUSIC_FOLDERS = new Set([
 ]);
 
 const ABILITY_BY_KEY = {
+  "Rare|Catcheur|Adam Frost": "turnEnemyRandomPermanent1Max5",
+  "Legende|Catcheur|Adam Frost": "turnEnemyRandomPermanent2Max3",
   "Rare|Catcheur|Alex Kiss": "graveElAmnesicoAll1",
   "Legende|Catcheur|NILS'N": "firstRoundRandomStats5",
   "Rare|Catcheur|Yann Skoric": "drawOnEntry1",
@@ -131,6 +135,7 @@ const CARD_OVERRIDES_BY_KEY = {
 };
 
 const STATS_BY_KEY = {
+  "Legende|Catcheur|Adam Frost": { Force: 6, Vitesse: 8, Technique: 6, Charisme: 8 },
   "Legende|Catcheur|NILS'N": { Force: 5, Vitesse: 9, Technique: 6, Charisme: 8 },
   "Legende|Catcheur|Yann Skoric": { Force: 6, Vitesse: 7, Technique: 6, Charisme: 9 },
   "Legende|Catcheur|Tony Trivaldo": { Force: 10, Vitesse: 4, Technique: 6, Charisme: 8 },

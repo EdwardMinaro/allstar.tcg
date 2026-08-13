@@ -262,6 +262,15 @@ function turnRoundEffects(player, opponent, game, rng) {
   if ((ability === "turnEnemyForceMinus1" || ability === "turnEnemyForceMinus2") && opponent.cat) {
     opponent.cat.mods.Force -= ability === "turnEnemyForceMinus2" ? 2 : 1;
   }
+  if ((ability === "turnEnemyRandomPermanent1Max5" || ability === "turnEnemyRandomPermanent2Max3") && opponent.cat) {
+    const value = ability === "turnEnemyRandomPermanent2Max3" ? 2 : 1;
+    const max = ability === "turnEnemyRandomPermanent2Max3" ? 3 : 5;
+    const count = player.cat.enemyRandomPenaltyCount || 0;
+    if (count < max) {
+      opponent.cat.mods[randomStat(game, rng)] -= value;
+      player.cat.enemyRandomPenaltyCount = count + 1;
+    }
+  }
   const chance = { turnRandomPermanent10: 0.1, turnRandomPermanent20: 0.2, turnRandomPermanent30: 0.3 }[player.man?.ability || ability] || 0;
   if (chance && rng() < chance) player.cat.mods[randomStat(game, rng)] += 1;
 }

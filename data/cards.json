@@ -1,6 +1,22 @@
 {
   "cards": [
     {
+      "key": "legende_catcheurs_adam_frost",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Adam Frost",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 8
+      },
+      "effect": "1/Tour : votre adversaire perd 2 points sur une statistique aléatoire. Cumulable 3 fois.",
+      "ability": "turnEnemyRandomPermanent2Max3",
+      "renderArt": "assets/card_renders/legende_catcheurs_adam_frost.png",
+      "musicId": "adam_frost"
+    },
+    {
       "key": "legende_catcheurs_alex_ezio",
       "type": "Catcheur",
       "rarity": "Legende",
@@ -460,6 +476,22 @@
       "ability": "drawOnEntry2",
       "renderArt": "assets/card_renders/legende_catcheurs_zaeken.png",
       "musicId": "zaeken"
+    },
+    {
+      "key": "rare_catcheurs_adam_frost",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Adam Frost",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 7
+      },
+      "effect": "1/Tour : votre adversaire perd 1 point sur une statistique aléatoire. Cumulable 5 fois.",
+      "ability": "turnEnemyRandomPermanent1Max5",
+      "renderArt": "assets/card_renders/rare_catcheurs_adam_frost.png",
+      "musicId": "adam_frost"
     },
     {
       "key": "rare_catcheurs_ace_angel",

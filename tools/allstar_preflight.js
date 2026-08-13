@@ -104,6 +104,24 @@ function verifyRecentEffects() {
   );
   assert(audio.includes("lior_divine.mp3"), "Theme Lior Divine branche");
   assert(
+    byKey.rare_catcheurs_adam_frost?.ability === "turnEnemyRandomPermanent1Max5"
+      && byKey.legende_catcheurs_adam_frost?.ability === "turnEnemyRandomPermanent2Max3"
+      && game.includes("owner.cat.enemyRandomPenaltyCount=count+1"),
+    "Effets Adam Frost plafonnes et branches"
+  );
+  assert(
+    audio.includes('label: "History Untold"')
+      && audio.includes('wrestler: "Adam Frost"')
+      && audio.includes("adam_frost.mp3")
+      && fs.existsSync(path.join(root, "assets/audio/music/adam_frost.mp3")),
+    "Theme Adam Frost branche"
+  );
+  assert(
+    Object.values(byKey.rare_catcheurs_adam_frost?.stats || {}).reduce((sum, value) => sum + value, 0) === 24
+      && Object.values(byKey.legende_catcheurs_adam_frost?.stats || {}).reduce((sum, value) => sum + value, 0) === 28,
+    "Stats Adam Frost conformes aux raretes"
+  );
+  assert(
     !audio.includes("ryu_kaizaru")
       && !fs.existsSync(path.join(root, "assets/audio/music/ryu_kaizaru.mp3"))
       && importer.includes("BLOCKED_MUSIC_FOLDERS")
