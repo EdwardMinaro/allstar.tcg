@@ -497,7 +497,7 @@ const CARD_DATA = [
       "Technique": 10,
       "Charisme": 7
     },
-    "effect": "Piochez deux cartes.",
+    "effect": "Apparition : Piochez deux cartes.",
     "ability": "drawOnEntry2",
     "renderArt": "assets/card_renders/legende_catcheurs_zaeken.png",
     "musicId": "zaeken"
@@ -1658,7 +1658,7 @@ const CARD_DATA = [
       "Technique": 10,
       "Charisme": 6
     },
-    "effect": "Piochez une carte.",
+    "effect": "Apparition : Piochez une carte.",
     "ability": "drawOnEntry1",
     "renderArt": "assets/card_renders/rare_catcheurs_zaeken.png",
     "musicId": "zaeken"
@@ -2426,16 +2426,6 @@ const CARD_DATA = [
     "effect": "Permet d'utiliser un objet deux fois supplémentaire",
     "ability": "objectExtra2",
     "renderArt": "assets/card_renders/legende_managers_tommy_rauzy.png"
-  },
-  {
-    "key": "legende_managers_yann_le_kersaudec",
-    "type": "Manager",
-    "rarity": "Legende",
-    "name": "YANN LE KERSAUDEC",
-    "stats": {},
-    "effect": "Annule objets et bonus adverses.",
-    "ability": "cancelObjectsManagers",
-    "renderArt": "assets/card_renders/legende_managers_yann_le_kersaudec.png"
   },
   {
     "key": "rare_managers_albert_roche",

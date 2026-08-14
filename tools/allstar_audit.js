@@ -9,6 +9,15 @@ function read(file) {
   return fs.readFileSync(file, "utf8");
 }
 
+function readPngDimensions(file) {
+  const data = fs.readFileSync(file);
+  if (data.length < 24 || data.toString("ascii", 1, 4) !== "PNG") return null;
+  return {
+    width: data.readUInt32BE(16),
+    height: data.readUInt32BE(20)
+  };
+}
+
 function normalizeName(name) {
   return String(name || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
@@ -78,8 +87,16 @@ function run() {
       if (total !== 24) errors.push(`${card.name} ${card.rarity}: ${total} points de stats au lieu de 24`);
     }
 
-    if (!card.renderArt || !fs.existsSync(path.join(root, card.renderArt))) {
+    const renderPath = card.renderArt ? path.join(root, card.renderArt) : null;
+    if (!renderPath || !fs.existsSync(renderPath)) {
       errors.push(`${card.name} ${card.rarity}: image introuvable (${card.renderArt || "aucun renderArt"})`);
+    } else {
+      const dimensions = readPngDimensions(renderPath);
+      const normalizedSizes = new Set(["1102x1498", "1106x1502"]);
+      const size = dimensions ? `${dimensions.width}x${dimensions.height}` : "format inconnu";
+      if (!dimensions || !normalizedSizes.has(size)) {
+        errors.push(`${card.name} ${card.rarity}: dimensions de rendu anormales (${size})`);
+      }
     }
 
     const text = String(card.effect || "").toLowerCase();
