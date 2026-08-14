@@ -2394,7 +2394,7 @@
       "rarity": "Legende",
       "name": "MR Ringsider",
       "stats": {},
-      "effect": "Une fois par tour, vous pouvez récupérer deux carte dans votre vestiaire. Si vous le faîtes, Perdez un tag.",
+      "effect": "Une fois par tour, vous pouvez récupérer deux cartes dans votre vestiaire. Si vous le faites, perdez un TAG.",
       "renderArt": "assets/card_renders/legende_managers_mr_ringsider.png",
       "ability": "ringsiderRecover2LoseTag"
     },
@@ -2504,7 +2504,7 @@
       "rarity": "Rare",
       "name": "MR Ringsider",
       "stats": {},
-      "effect": "Une fois par tour, vous pouvez récupérer une carte dans votre vestiaire. Si vous le faîtes, Perdez un tag.",
+      "effect": "Une fois par tour, vous pouvez récupérer une carte dans votre vestiaire. Si vous le faites, perdez un TAG.",
       "renderArt": "assets/card_renders/rare_managers_mr_ringsider.png",
       "ability": "ringsiderRecover1LoseTag"
     },

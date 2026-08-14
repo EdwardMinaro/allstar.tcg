@@ -205,6 +205,20 @@ function verifyRecentEffects() {
       && importer.includes("folders.some(folder => BLOCKED_MUSIC_FOLDERS.has(folder))"),
     "Theme Ryu Kaizaru retire et bloque a l'import"
   );
+  const roundManagerEffects=game.slice(
+    game.indexOf("function applyRoundManagerEffects()"),
+    game.indexOf("function addTrackedStat(")
+  );
+  assert(
+    game.includes("function requestRingsiderRecovery(owner)")
+      && game.includes("function chooseRingsiderCards(owner,source,selectedIds=[])")
+      && game.includes('{label:"Utiliser l\'effet",value:"recover"}')
+      && game.includes('{label:"Passer",value:"pass"}')
+      && game.includes("owner.grave.splice(index,1)")
+      && game.includes("owner.tagsRemaining=Math.max(0,currentTags-1)")
+      && !roundManagerEffects.includes("owner.grave.pop()"),
+    "Mr Ringsider propose son effet et laisse choisir les cartes du vestiaire"
+  );
   assert(!byKey.standard_catcheurs_joe_cobra?.ability && !byKey.standard_catcheurs_lior_divine?.ability, "Catcheurs standards de la fournee sans effet");
   assert(
     ["rare_catcheurs_joe_cobra", "rare_catcheurs_lior_divine", "rare_catcheurs_ryu_kaizaru"]

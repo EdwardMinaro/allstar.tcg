@@ -2402,7 +2402,7 @@ const CARD_DATA = [
     "rarity": "Legende",
     "name": "MR Ringsider",
     "stats": {},
-    "effect": "Une fois par tour, vous pouvez récupérer deux carte dans votre vestiaire. Si vous le faîtes, Perdez un tag.",
+    "effect": "Une fois par tour, vous pouvez récupérer deux cartes dans votre vestiaire. Si vous le faites, perdez un TAG.",
     "renderArt": "assets/card_renders/legende_managers_mr_ringsider.png",
     "ability": "ringsiderRecover2LoseTag"
   },
@@ -2512,7 +2512,7 @@ const CARD_DATA = [
     "rarity": "Rare",
     "name": "MR Ringsider",
     "stats": {},
-    "effect": "Une fois par tour, vous pouvez récupérer une carte dans votre vestiaire. Si vous le faîtes, Perdez un tag.",
+    "effect": "Une fois par tour, vous pouvez récupérer une carte dans votre vestiaire. Si vous le faites, perdez un TAG.",
     "renderArt": "assets/card_renders/rare_managers_mr_ringsider.png",
     "ability": "ringsiderRecover1LoseTag"
   },
@@ -2987,8 +2987,8 @@ const EFFECT_REGISTRY = {
   revealCharlieEachRoundForcePin: { timing:"round", text:"Une fois par tour, si Charlie Bergson est en main : +1 Force et +20 Tombé." },
   rerollStat: { timing:"roulette", text:"Relance la statistique du duel une fois." },
   rerollOnLoss: { timing:"roulette", text:"Après une défaite de duel, relance automatiquement la roulette une fois." },
-  ringsiderRecover1LoseTag: { timing:"round", text:"Une fois par tour : récupère 1 carte du vestiaire et perd 1 TAG." },
-  ringsiderRecover2LoseTag: { timing:"round", text:"Une fois par tour : récupère 2 cartes du vestiaire et perd 1 TAG." },
+  ringsiderRecover1LoseTag: { timing:"round", choice:true, text:"Une fois par tour : peut récupérer 1 carte choisie du vestiaire contre 1 TAG." },
+  ringsiderRecover2LoseTag: { timing:"round", choice:true, text:"Une fois par tour : peut récupérer jusqu'à 2 cartes choisies du vestiaire contre 1 TAG." },
   round4All1: { timing:"round4", text:"Round 4 : +1 à toutes les stats." },
   round2ActiveStat3: { timing:"duel", text:"À partir du round 2 : +3 dans la stat active." },
   sameStatNext: { timing:"win", text:"Verrouille la statistique du prochain duel.", choice:true },
@@ -3767,6 +3767,7 @@ function init(label,side,deckKeys){
     koSuffered:0,
     nextEntryMods:null,
     oncePerMatch:{},
+    ringsiderDecisionRound:null,
     tagsRemaining:TAGS_PER_MATCH,
     tagLockedCardId:null,
     played:{Catcheur:false,Manager:false,Objet:false}
@@ -3843,6 +3844,106 @@ function requestEffectChoice({title,text,choices,onChoose}){
     },{once:true});
   });
   overlay.classList.add("active");
+}
+
+function isRingsiderRecoveryAbility(ability){
+  return ability==="ringsiderRecover1LoseTag"||ability==="ringsiderRecover2LoseTag";
+}
+
+function ringsiderRecoveryLimit(card){
+  return card?.ability==="ringsiderRecover2LoseTag"?2:1;
+}
+
+function finishRingsiderRecovery(owner,source,selectedIds){
+  if(!owner||!source||owner.man?.id!==source.id||owner.managersBlocked)return;
+  const currentTags=Number.isFinite(owner.tagsRemaining)?owner.tagsRemaining:TAGS_PER_MATCH;
+  if(currentTags<=0){
+    log(`[EFFET] ${source.name} : aucun TAG disponible.`);
+    return;
+  }
+  const recovered=[];
+  [...new Set(selectedIds||[])].slice(0,ringsiderRecoveryLimit(source)).forEach(cardId=>{
+    const index=owner.grave.findIndex(card=>card.id===cardId);
+    if(index<0)return;
+    const [card]=owner.grave.splice(index,1);
+    owner.hand.push(card);
+    recovered.push(card);
+  });
+  if(!recovered.length){
+    log(`[EFFET] ${source.name} ne récupère aucune carte : aucun TAG dépensé.`);
+    markOnlineDirty();
+    render();
+    return;
+  }
+  owner.tagsRemaining=Math.max(0,currentTags-1);
+  log(`[EFFET] ${source.name} récupère ${recovered.map(card=>card.name).join(", ")} et dépense 1 TAG.`);
+  showEffectFeedback(owner.cat?.card||source,source.name,`Récupère ${recovered.length} / TAG -1`,"special");
+  markOnlineDirty();
+  render();
+}
+
+function chooseRingsiderCards(owner,source,selectedIds=[]){
+  if(!owner||owner.man?.id!==source?.id||owner.managersBlocked)return;
+  const targetCount=Math.min(ringsiderRecoveryLimit(source),owner.grave.length);
+  const remaining=owner.grave.filter(card=>!selectedIds.includes(card.id));
+  if(selectedIds.length>=targetCount||!remaining.length){
+    finishRingsiderRecovery(owner,source,selectedIds);
+    return;
+  }
+  const position=selectedIds.length+1;
+  requestEffectChoice({
+    title:source.name,
+    text:targetCount>1
+      ? `Choisis la carte ${position} sur ${targetCount} à récupérer.`
+      : "Choisis la carte à récupérer dans ton vestiaire.",
+    choices:remaining.map(card=>({
+      label:`${card.name} - ${displayCardType(card.type)} ${card.rarity||"Standard"}`,
+      value:card.id
+    })),
+    onChoose:cardId=>chooseRingsiderCards(owner,source,[...selectedIds,cardId])
+  });
+}
+
+function requestRingsiderRecovery(owner){
+  const source=owner?.man;
+  if(!G||G.over||G.resolving||G.discarding||G.currentTurn!=="player"||owner!==G.player)return;
+  if(!source||!isRingsiderRecoveryAbility(source.ability)||owner.managersBlocked)return;
+  if(owner.ringsiderDecisionRound===G.round)return;
+  const currentTags=Number.isFinite(owner.tagsRemaining)?owner.tagsRemaining:TAGS_PER_MATCH;
+  if(currentTags<=0||!owner.grave.length)return;
+  owner.ringsiderDecisionRound=G.round;
+  markOnlineDirty();
+  render();
+  const amount=Math.min(ringsiderRecoveryLimit(source),owner.grave.length);
+  requestEffectChoice({
+    title:source.name,
+    text:`Veux-tu dépenser 1 TAG pour choisir ${amount>1?"deux cartes":"une carte"} dans ton vestiaire ?`,
+    choices:[
+      {label:"Utiliser l'effet",value:"recover"},
+      {label:"Passer",value:"pass"}
+    ],
+    onChoose:choice=>{
+      if(choice!=="recover"){
+        log(`[EFFET] ${source.name} : effet non utilisé, aucun TAG dépensé.`);
+        markOnlineDirty();
+        render();
+        return;
+      }
+      chooseRingsiderCards(owner,source);
+    }
+  });
+}
+
+function autoUseRingsider(owner){
+  const source=owner?.man;
+  if(!source||!isRingsiderRecoveryAbility(source.ability)||owner.managersBlocked)return;
+  if(owner.ringsiderDecisionRound===G.round)return;
+  const currentTags=Number.isFinite(owner.tagsRemaining)?owner.tagsRemaining:TAGS_PER_MATCH;
+  if(currentTags<=0||!owner.grave.length)return;
+  owner.ringsiderDecisionRound=G.round;
+  const amount=Math.min(ringsiderRecoveryLimit(source),owner.grave.length);
+  const selectedIds=owner.grave.slice(-amount).map(card=>card.id);
+  finishRingsiderRecovery(owner,source,selectedIds);
 }
 
 function chooseRps(playerChoice){
@@ -4262,6 +4363,7 @@ function restoreOnlineSide(side, localSide){
   restored.side=localSide;
   restored.played=restored.played||{Catcheur:false,Manager:false,Objet:false};
   restored.oncePerMatch=restored.oncePerMatch||{};
+  restored.ringsiderDecisionRound=Number.isFinite(restored.ringsiderDecisionRound)?restored.ringsiderDecisionRound:null;
   restored.tagsRemaining=Number.isFinite(restored.tagsRemaining)?restored.tagsRemaining:TAGS_PER_MATCH;
   restored.tagLockedCardId=restored.tagLockedCardId||null;
   restored.deck=Array.isArray(restored.deck)?restored.deck:[];
@@ -4378,6 +4480,7 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     showOnlineFinalResult();
   }
   onlineApplyingRemote=false;
+  if(!G.over&&G.currentTurn==="player")setTimeout(()=>requestRingsiderRecovery(G.player),80);
 }
 
 function enterOnlineMatchFromSnapshot(room, playerSlot){
@@ -4477,6 +4580,11 @@ function inactivePlayer(){return G.currentTurn==="player"?G.ai:G.player}
 
 function announceTurn(){
   log(G.currentTurn==="player" ? "<b>Tour du Joueur.</b>" : "<b>Tour de l'Adversaire.</b>");
+  if(G.currentTurn==="player"){
+    const roundOverlay=document.getElementById("roundOverlay");
+    const delay=roundOverlay?.classList.contains("active")?1200:80;
+    setTimeout(()=>requestRingsiderRecovery(G.player),delay);
+  }
 }
 
 function zeroMods(){return {Force:0,Vitesse:0,Technique:0,Charisme:0}}
@@ -5190,20 +5298,6 @@ function applyRoundManagerEffects(){
         showEffectFeedback(owner.cat?.card||owner.man,owner.man.name,`Pioche +${drawn}`,"special");
       }
     }
-    if(owner.man?.ability==="ringsiderRecover1LoseTag"||owner.man?.ability==="ringsiderRecover2LoseTag"){
-      if((owner.tagsRemaining??TAGS_PER_MATCH)>0&&owner.grave.length){
-        const amount=owner.man.ability==="ringsiderRecover2LoseTag"?2:1;
-        const recovered=[];
-        for(let i=0;i<amount&&owner.grave.length;i++){
-          const card=owner.grave.pop();
-          owner.hand.push(card);
-          recovered.push(card.name);
-        }
-        owner.tagsRemaining=Math.max(0,(owner.tagsRemaining??TAGS_PER_MATCH)-1);
-        log(`[EFFET] ${owner.man.name} récupère ${recovered.join(", ")} et dépense 1 TAG.`);
-        showEffectFeedback(owner.cat?.card||owner.man,owner.man.name,`Récupère ${recovered.length} / TAG -1`,"special");
-      }
-    }
     if(owner.man?.ability==="turnEnemyPinMinus10"){
       opp.pinShield=(opp.pinShield||0)+10;
       log(`[EFFET] ${owner.man.name} protège le prochain tombé adverse : -10.`);
@@ -5245,6 +5339,7 @@ function applyRoundManagerEffects(){
       showEffectFeedback(owner.cat.card,supportCard.name,`+1 ${stat}`,"buff");
     }
   });
+  if(!isOnlineMatch())autoUseRingsider(G.ai);
 }
 
 function addTrackedStat(effect,s,stat,value){
@@ -5799,6 +5894,10 @@ function playCard(p,opp,c,idx,announce=false){
     p.hand.splice(idx,1);
     applyEffect(p,opp,c);
     triggerLudovicSupportDiscard(p,opp,c);
+    if(isRingsiderRecoveryAbility(c.ability)){
+      if(p.side==="player")setTimeout(()=>requestRingsiderRecovery(G.player),80);
+      else if(!isOnlineMatch())autoUseRingsider(p);
+    }
   } else if(c.type==="Objet"){
     if(G.tagging===p.side)return announce&&log("Choisis un catcheur pour terminer le TAG.");
     if(!p.cat)return announce&&log("Il faut un catcheur pour jouer un objet.");
