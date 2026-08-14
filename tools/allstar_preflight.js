@@ -122,6 +122,19 @@ function verifyRecentEffects() {
     "Stats Adam Frost conformes aux raretes"
   );
   assert(
+    game.includes("function preventFirstDefeat(loser)")
+      && game.includes("loser.oncePerMatch.firstLossDeck=true")
+      && game.includes('wrestler.card.rarity==="Legende"')
+      && game.includes("Première défaite annulée"),
+    "Shawn Olsen annule vraiment sa premiere defaite et applique son bonus legendaire"
+  );
+  assert(
+    game.includes("function resolveNextStatWinEffect(winner,currentStat,onComplete)")
+      && (game.match(/resolveNextStatWinEffect\(/g) || []).length >= 3
+      && game.includes("applyChallengeWinEffects(G.player,G.ai,stat,finishChallengeWin)"),
+    "Ethan Riley partage son verrouillage de statistique avec le Defi ALLSTAR"
+  );
+  assert(
     !audio.includes("ryu_kaizaru")
       && !fs.existsSync(path.join(root, "assets/audio/music/ryu_kaizaru.mp3"))
       && importer.includes("BLOCKED_MUSIC_FOLDERS")

@@ -297,6 +297,17 @@ function score(state, stat, round, roundStarter) {
   return value;
 }
 
+function preventFirstDefeat(player) {
+  if (!player.cat || player.cat.card.ability !== "firstLossDeck" || player.once.firstLossDeck) return false;
+  player.once.firstLossDeck = true;
+  if (player.cat.card.rarity === "Legende") {
+    player.cat.mods.Force += 1;
+    player.cat.mods.Vitesse += 1;
+    player.cat.mods.Technique += 1;
+  }
+  return true;
+}
+
 function clearLoser(player, winner, rng) {
   if (!player.cat) return;
   const lost = player.cat;
@@ -305,12 +316,6 @@ function clearLoser(player, winner, rng) {
     player.once.bossSecondWind = true;
     lost.mods.Force += 3;
     lost.mods.Vitesse += 3;
-    return;
-  }
-  if (ability === "firstLossDeck" && !player.once.firstLossDeck) {
-    player.once.firstLossDeck = true;
-    player.deck.unshift(lost.card);
-    player.cat = null;
     return;
   }
   if ((ability === "returnChance" && rng() < 0.2) || (ability === "returnChance40" && rng() < 0.4)) {
@@ -427,10 +432,12 @@ function simulateMatch(game, playerDeckKeys, aiDeckKeys, seed) {
     if (playerScore !== aiScore) {
       const winner = playerScore > aiScore ? player : ai;
       const loser = playerScore > aiScore ? ai : player;
-      applyWinEffects(winner, loser, rng);
-      clearLoser(loser, winner, rng);
-      if (attemptPin(winner, loser, rng)) {
-        return { winner: winner.side, rounds: round, reason: "pin" };
+      if (!preventFirstDefeat(loser)) {
+        applyWinEffects(winner, loser, rng);
+        clearLoser(loser, winner, rng);
+        if (attemptPin(winner, loser, rng)) {
+          return { winner: winner.side, rounds: round, reason: "pin" };
+        }
       }
     }
     tickObjects(player);

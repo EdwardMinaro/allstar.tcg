@@ -2879,7 +2879,7 @@ const EFFECT_REGISTRY = {
   drawOnWin2: { timing:"win", text:"Pioche 2 cartes après une victoire de duel." },
   entryIfTrevorInGraveFTV1: { timing:"entry", text:"Si Trevor Mayden est au vestiaire : +1 Force, Technique et Vitesse." },
   entryIfZerkInHandDiscard1: { timing:"entry", text:"Si The Butcher Zerk est en main : l'adversaire défausse 1 carte." },
-  firstLossDeck: { timing:"defeat", text:"Une fois par match, annule la première défaite et retourne dans le deck." },
+  firstLossDeck: { timing:"defeat", text:"Une fois par match, annule la première défaite et reste sur le terrain." },
   firstRoundCharTech: { timing:"round1", text:"+1 Charisme et +1 Technique au round 1." },
   firstRoundCharTech2: { timing:"round1", text:"+2 Charisme et +2 Technique au round 1." },
   entryEnemyTechniqueMinus2: { timing:"entry", text:"À l'arrivée : -2 Technique au catcheur adverse." },
@@ -6052,6 +6052,25 @@ function rerollLostDuelWithObject(loser){
   return true;
 }
 
+function preventFirstDefeat(loser){
+  const wrestler=loser?.cat;
+  if(!wrestler||wrestlerAbility(wrestler)!=="firstLossDeck")return false;
+  loser.oncePerMatch=loser.oncePerMatch||{};
+  if(loser.oncePerMatch.firstLossDeck)return false;
+
+  loser.oncePerMatch.firstLossDeck=true;
+  let feedback="Première défaite annulée";
+  if(wrestler.card.rarity==="Legende"){
+    wrestler.mods.Force+=1;
+    wrestler.mods.Vitesse+=1;
+    wrestler.mods.Technique+=1;
+    feedback+=" · +1 Force / Vitesse / Technique";
+  }
+  log(`[EFFET] ${wrestler.card.name} annule sa première défaite et reste sur le terrain.`);
+  showEffectFeedback(wrestler.card,wrestler.card.name,feedback,"block",2600);
+  return true;
+}
+
 function duel(){
   G.matchPhase="duel";
   render();
@@ -6084,13 +6103,21 @@ function duel(){
     setTimeout(startRound,1100);
     return;
   }
+  const winner=ps>as?G.player:G.ai;
   const loser=ps>as?G.ai:G.player;
   if(rerollLostDuelWithObject(loser))return;
+  if(preventFirstDefeat(loser)){
+    consumeRoundObjects();
+    markOnlineDirty();
+    render();
+    setTimeout(startRound,1100);
+    return;
+  }
   if(G.mode==="challenge"&&G.challenge){
     if(ps>as)return challengePlayerWinsRound(ps-as,stat);
     return challengeBossWinsRound();
   }
-  ps>as?win(G.player,G.ai,"score supérieur"):win(G.ai,G.player,"score supérieur");
+  win(winner,loser,"score supérieur");
 }
 
 const REPEATABLE_EXTENDED_OBJECT_ABILITIES=new Set(["drawNext1","recoverGrave","opponentDiscard1","opponentDiscardRandom1"]);
@@ -6158,12 +6185,6 @@ function clearWrestler(p){
     p.objectDurationBonus=0;
     revertActiveObject(p,true);
     return;
-  }else if(lostAbility==="firstLossDeck"&&!lost.card.firstLossDeckUsed){
-    lost.card.firstLossDeckUsed=true;
-    p.deck.unshift(lost.card);
-    shuffle(p.deck);
-    log(`${lost.card.name} échappe au vestiaire et retourne dans le deck.`);
-    showEffectFeedback(lost.card,lost.card.name,"Retour deck","block");
   }else{
     p.koSuffered++;
     playSound("ko");
@@ -6199,6 +6220,32 @@ function clearWrestler(p){
 
   p.cat=null;
   markOnlineDirty();
+}
+
+function resolveNextStatWinEffect(winner,currentStat,onComplete){
+  const ability=wrestlerAbility(winner?.cat);
+  if((ability!=="sameStatNext"&&ability!=="sameStatNextFixed")||!currentStat)return false;
+
+  const applyChosenStat=stat=>{
+    G.lockedStat=stat||currentStat;
+    log(`[EFFET] ${winner.cat.card.name} : prochaine statistique verrouillée sur ${G.lockedStat}.`);
+    showEffectFeedback(winner.cat.card,winner.cat.card.name,`${G.lockedStat} verrouillée`,"special");
+    onComplete?.();
+  };
+  if(ability==="sameStatNextFixed"){
+    applyChosenStat(currentStat);
+  }else if(winner.side==="player"){
+    requestEffectChoice({
+      title:winner.cat.card.name,
+      text:"Choisis la statistique du prochain duel.",
+      choices:STATS.map(stat=>({label:stat,value:stat})),
+      onChoose:applyChosenStat
+    });
+  }else{
+    const best=STATS.reduce((bestStat,stat)=>score(winner.cat,stat)>score(winner.cat,bestStat)?stat:bestStat,STATS[0]);
+    applyChosenStat(best);
+  }
+  return true;
 }
 
 function win(winner,loser,reason){
@@ -6272,28 +6319,7 @@ function win(winner,loser,reason){
     attemptPin(winner,loser,objectPinBonus);
   };
 
-  if((winnerAbility==="sameStatNext"||winnerAbility==="sameStatNextFixed")&&G.stat){
-    const applyChosenStat=stat=>{
-      G.lockedStat=stat||G.stat;
-      log(`[EFFET] ${winner.cat.card.name} : prochaine statistique verrouillée sur ${G.lockedStat}.`);
-      showEffectFeedback(winner.cat.card,winner.cat.card.name,`${G.lockedStat} verrouillée`,"special");
-      finishWin();
-    };
-    if(winnerAbility==="sameStatNextFixed"){
-      applyChosenStat(G.stat);
-    }else if(winner.side==="player"){
-      requestEffectChoice({
-        title:winner.cat.card.name,
-        text:"Choisis la statistique du prochain duel.",
-        choices:STATS.map(stat=>({label:stat,value:stat})),
-        onChoose:applyChosenStat
-      });
-    }else{
-      const best=STATS.reduce((bestStat,stat)=>score(winner.cat,stat)>score(winner.cat,bestStat)?stat:bestStat,STATS[0]);
-      applyChosenStat(best);
-    }
-    return;
-  }
+  if(resolveNextStatWinEffect(winner,G.stat,finishWin))return;
 
   finishWin();
 }
@@ -7673,27 +7699,33 @@ function showChallengeResult(title,detail,won=false){
 
 function challengePlayerWinsRound(damage,stat){
   const dealt=Math.max(1,Number(damage)||1);
-  applyChallengeWinEffects(G.player,G.ai,stat);
-  G.challenge.hp=Math.max(0,(Number(G.challenge.hp)||0)-dealt);
-  playSound("victoire_duel");
-  log(`[DÉFI] ${G.player.cat.card.name} blesse ${G.challenge.bossName} : -${dealt} PV en ${stat}.`);
-  showEffectFeedback(G.player.cat.card,"Défi ALLSTAR",`-${dealt} PV boss`,"pin",2200);
-  consumeRoundObjects();
-  updateSavedChallengeFromMatch();
-  render();
-  if(G.challenge.hp<=0){
-    completeAllstarChallenge();
-    return;
-  }
-  setTimeout(startRound,900);
+  const finishChallengeWin=()=>{
+    G.challenge.hp=Math.max(0,(Number(G.challenge.hp)||0)-dealt);
+    playSound("victoire_duel");
+    log(`[DÉFI] ${G.player.cat.card.name} blesse ${G.challenge.bossName} : -${dealt} PV en ${stat}.`);
+    showEffectFeedback(G.player.cat.card,"Défi ALLSTAR",`-${dealt} PV boss`,"pin",2200);
+    consumeRoundObjects();
+    updateSavedChallengeFromMatch();
+    render();
+    if(G.challenge.hp<=0){
+      completeAllstarChallenge();
+      return;
+    }
+    setTimeout(startRound,900);
+  };
+  if(applyChallengeWinEffects(G.player,G.ai,stat,finishChallengeWin))return;
+  finishChallengeWin();
 }
 
 function challengeBossWinsRound(){
-  applyChallengeWinEffects(G.ai,G.player,G.stat);
-  log(`[DÉFI] ${G.challenge.bossName} gagne le round : tentative de tombé.`);
-  clearWrestler(G.player);
-  consumeRoundObjects();
-  attemptPin(G.ai,G.player);
+  const finishChallengeWin=()=>{
+    log(`[DÉFI] ${G.challenge.bossName} gagne le round : tentative de tombé.`);
+    clearWrestler(G.player);
+    consumeRoundObjects();
+    attemptPin(G.ai,G.player);
+  };
+  if(applyChallengeWinEffects(G.ai,G.player,G.stat,finishChallengeWin))return;
+  finishChallengeWin();
 }
 
 function handleChallengePinSuccess(winnerSide){
@@ -7724,9 +7756,9 @@ function handleChallengePinSuccess(winnerSide){
   setTimeout(()=>{hidePin();startRound()},950);
 }
 
-function applyChallengeWinEffects(winner,loser,stat){
+function applyChallengeWinEffects(winner,loser,stat,onComplete){
   const ability=wrestlerAbility(winner?.cat);
-  if(!ability)return;
+  if(!ability)return false;
 
   if(ability==="drawOnWin1"||ability==="drawOnWin2"){
     const amount=ability==="drawOnWin2"?2:1;
@@ -7761,10 +7793,7 @@ function applyChallengeWinEffects(winner,loser,stat){
     log(`[EFFET] ${winner.cat.card.name} : victoire en Charisme, +3 ${boosted}.`);
     showEffectFeedback(winner.cat.card,winner.cat.card.name,`Victoire +3 ${boosted}`,"buff");
   }
-  if(ability==="sameStatNextFixed"){
-    G.lockedStat=stat;
-    log(`[EFFET] ${winner.cat.card.name} : prochaine statistique verrouillée sur ${stat}.`);
-  }
+  return resolveNextStatWinEffect(winner,stat,onComplete);
 }
 
 function completeAllstarChallenge(){
