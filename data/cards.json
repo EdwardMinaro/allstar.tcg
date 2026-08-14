@@ -129,6 +129,22 @@
       "musicId": "car_crash_gonzo"
     },
     {
+      "key": "legende_catcheurs_coda_reznov",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Coda Reznov",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 6,
+        "Technique": 7,
+        "Charisme": 7
+      },
+      "effect": "Apparition : Choisissez une statistique, gagnez +3 sur la statistique choisie.",
+      "renderArt": "assets/card_renders/legende_catcheurs_coda_reznov.png",
+      "musicId": "coda_reznov",
+      "ability": "entryStatChoice3"
+    },
+    {
       "key": "legende_catcheurs_drix",
       "type": "Catcheur",
       "rarity": "Legende",
@@ -478,22 +494,6 @@
       "musicId": "zaeken"
     },
     {
-      "key": "rare_catcheurs_adam_frost",
-      "type": "Catcheur",
-      "rarity": "Rare",
-      "name": "Adam Frost",
-      "stats": {
-        "Force": 5,
-        "Vitesse": 7,
-        "Technique": 5,
-        "Charisme": 7
-      },
-      "effect": "1/Tour : votre adversaire perd 1 point sur une statistique aléatoire. Cumulable 5 fois.",
-      "ability": "turnEnemyRandomPermanent1Max5",
-      "renderArt": "assets/card_renders/rare_catcheurs_adam_frost.png",
-      "musicId": "adam_frost"
-    },
-    {
       "key": "rare_catcheurs_ace_angel",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -508,6 +508,22 @@
       "ability": "revealObjectHandCharSpeed",
       "musicId": "ace_angel",
       "renderArt": "assets/card_renders/rare_catcheurs_ace_angel.png"
+    },
+    {
+      "key": "rare_catcheurs_adam_frost",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Adam Frost",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 7
+      },
+      "effect": "1/Tour : votre adversaire perd 1 point sur une statistique aléatoire. Cumulable 5 fois.",
+      "ability": "turnEnemyRandomPermanent1Max5",
+      "renderArt": "assets/card_renders/rare_catcheurs_adam_frost.png",
+      "musicId": "adam_frost"
     },
     {
       "key": "rare_catcheurs_alex_ezio",
@@ -731,6 +747,22 @@
       "ability": "entryEnemyForceMinus2",
       "renderArt": "assets/card_renders/rare_catcheurs_christophe_cassagne.png",
       "musicId": "christophe_cassagne"
+    },
+    {
+      "key": "rare_catcheurs_coda_reznov",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Coda Reznov",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Apparition : gagnez +3 sur une statistique aléatoire.",
+      "renderArt": "assets/card_renders/rare_catcheurs_coda_reznov.png",
+      "musicId": "coda_reznov",
+      "ability": "entryRandomStat3"
     },
     {
       "key": "rare_catcheurs_dadou_bazooka",

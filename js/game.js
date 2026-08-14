@@ -137,6 +137,22 @@ const CARD_DATA = [
     "musicId": "car_crash_gonzo"
   },
   {
+    "key": "legende_catcheurs_coda_reznov",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Coda Reznov",
+    "stats": {
+      "Force": 8,
+      "Vitesse": 6,
+      "Technique": 7,
+      "Charisme": 7
+    },
+    "effect": "Apparition : Choisissez une statistique, gagnez +3 sur la statistique choisie.",
+    "renderArt": "assets/card_renders/legende_catcheurs_coda_reznov.png",
+    "musicId": "coda_reznov",
+    "ability": "entryStatChoice3"
+  },
+  {
     "key": "legende_catcheurs_drix",
     "type": "Catcheur",
     "rarity": "Legende",
@@ -486,22 +502,6 @@ const CARD_DATA = [
     "musicId": "zaeken"
   },
   {
-    "key": "rare_catcheurs_adam_frost",
-    "type": "Catcheur",
-    "rarity": "Rare",
-    "name": "Adam Frost",
-    "stats": {
-      "Force": 5,
-      "Vitesse": 7,
-      "Technique": 5,
-      "Charisme": 7
-    },
-    "effect": "1/Tour : votre adversaire perd 1 point sur une statistique aléatoire. Cumulable 5 fois.",
-    "ability": "turnEnemyRandomPermanent1Max5",
-    "renderArt": "assets/card_renders/rare_catcheurs_adam_frost.png",
-    "musicId": "adam_frost"
-  },
-  {
     "key": "rare_catcheurs_ace_angel",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -516,6 +516,22 @@ const CARD_DATA = [
     "ability": "revealObjectHandCharSpeed",
     "musicId": "ace_angel",
     "renderArt": "assets/card_renders/rare_catcheurs_ace_angel.png"
+  },
+  {
+    "key": "rare_catcheurs_adam_frost",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Adam Frost",
+    "stats": {
+      "Force": 5,
+      "Vitesse": 7,
+      "Technique": 5,
+      "Charisme": 7
+    },
+    "effect": "1/Tour : votre adversaire perd 1 point sur une statistique aléatoire. Cumulable 5 fois.",
+    "ability": "turnEnemyRandomPermanent1Max5",
+    "renderArt": "assets/card_renders/rare_catcheurs_adam_frost.png",
+    "musicId": "adam_frost"
   },
   {
     "key": "rare_catcheurs_alex_ezio",
@@ -739,6 +755,22 @@ const CARD_DATA = [
     "ability": "entryEnemyForceMinus2",
     "renderArt": "assets/card_renders/rare_catcheurs_christophe_cassagne.png",
     "musicId": "christophe_cassagne"
+  },
+  {
+    "key": "rare_catcheurs_coda_reznov",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Coda Reznov",
+    "stats": {
+      "Force": 7,
+      "Vitesse": 5,
+      "Technique": 6,
+      "Charisme": 6
+    },
+    "effect": "Apparition : gagnez +3 sur une statistique aléatoire.",
+    "renderArt": "assets/card_renders/rare_catcheurs_coda_reznov.png",
+    "musicId": "coda_reznov",
+    "ability": "entryRandomStat3"
   },
   {
     "key": "rare_catcheurs_dadou_bazooka",
@@ -2879,6 +2911,8 @@ const EFFECT_REGISTRY = {
   drawOnWin2: { timing:"win", text:"Pioche 2 cartes après une victoire de duel." },
   entryIfTrevorInGraveFTV1: { timing:"entry", text:"Si Trevor Mayden est au vestiaire : +1 Force, Technique et Vitesse." },
   entryIfZerkInHandDiscard1: { timing:"entry", text:"Si The Butcher Zerk est en main : l'adversaire défausse 1 carte." },
+  entryRandomStat3: { timing:"entry", text:"À l'arrivée : +3 à une statistique aléatoire." },
+  entryStatChoice3: { timing:"entry", text:"À l'arrivée : choisissez une statistique, +3.", choice:true },
   firstLossDeck: { timing:"defeat", text:"Une fois par match, annule la première défaite et reste sur le terrain." },
   firstRoundCharTech: { timing:"round1", text:"+1 Charisme et +1 Technique au round 1." },
   firstRoundCharTech2: { timing:"round1", text:"+2 Charisme et +2 Technique au round 1." },
@@ -4463,6 +4497,7 @@ function state(card){
     pin:0,
     managers:0,
     enteredRound:G?.round||0,
+    firstRoundRandomMods:zeroMods(),
     forcePlusUsed:false,
     bossSecondWindUsed:false
   };
@@ -4728,6 +4763,32 @@ function applyEnemyStatChoiceMinus1(owner,source){
   });
 }
 
+function applyEntryStatBonus(owner,source,amount,chooseStat){
+  const applyStat=stat=>{
+    if(!STATS.includes(stat)||!owner?.cat)return;
+    owner.cat.mods[stat]+=amount;
+    log(`[EFFET] ${source.name} : +${amount} ${stat}.`);
+    showEffectFeedback(source,source.name,`+${amount} ${stat}`,"buff");
+    markOnlineDirty();
+    render();
+  };
+  if(!chooseStat){
+    applyStat(STATS[Math.floor(Math.random()*STATS.length)]);
+    return;
+  }
+  if(owner.side!=="player"){
+    const best=STATS.reduce((current,stat)=>score(owner.cat,stat)>score(owner.cat,current)?stat:current,STATS[0]);
+    applyStat(best);
+    return;
+  }
+  requestEffectChoice({
+    title:source.name,
+    text:`Choisis la statistique qui gagnera ${amount} points.`,
+    choices:STATS.map(stat=>({label:`+${amount} ${stat}`,value:stat})),
+    onChoose:applyStat
+  });
+}
+
 function playSupportFromGrave(owner,source){
   const enemy=owner.side==="player"?G.ai:G.player;
   const candidates=owner.grave.filter(card=>
@@ -4827,6 +4888,8 @@ function applyWrestlerEntryEffect(owner,c){
     showEffectFeedback(c,c.name,"Objets : 2 tours","special");
   }
   if(c.ability==="entryEnemyStatChoiceMinus1")applyEnemyStatChoiceMinus1(owner,c);
+  if(c.ability==="entryRandomStat3")applyEntryStatBonus(owner,c,3,false);
+  if(c.ability==="entryStatChoice3")applyEntryStatBonus(owner,c,3,true);
   if(c.ability==="entryPlaySupportFromGrave")playSupportFromGrave(owner,c);
   if(c.ability==="drawToSixBonusStats"){
     const before=owner.hand.length;
@@ -4891,9 +4954,10 @@ function applyWrestlerEntryEffect(owner,c){
   }
   if(c.ability==="firstRoundRandomStats5"&&isFirstRoundForWrestler(owner.cat)){
     const gains={};
+    owner.cat.firstRoundRandomMods=zeroMods();
     for(let i=0;i<5;i++){
       const stat=STATS[Math.floor(Math.random()*STATS.length)];
-      owner.cat.mods[stat]+=1;
+      owner.cat.firstRoundRandomMods[stat]+=1;
       gains[stat]=(gains[stat]||0)+1;
     }
     const feedback=Object.entries(gains).map(([stat,value])=>`+${value} ${stat}`).join(" / ");
@@ -5950,6 +6014,7 @@ function score(s,stat){
   const ability=wrestlerAbility(s);
   if(!ability)return v;
   const firstRound=isRoundEffectActive(s);
+  if(ability==="firstRoundRandomStats5"&&firstRound)v+=Number(s.firstRoundRandomMods?.[stat]||0);
   if(ability==="speedPlus"&&stat==="Vitesse")v+=2;
   if(ability==="firstRoundSpeed2"&&firstRound&&stat==="Vitesse")v+=2;
   if(ability==="firstRoundSpeed3"&&firstRound&&stat==="Vitesse")v+=3;
@@ -6008,6 +6073,7 @@ function statAbilityFeedback(s,stat){
   const ability=wrestlerAbility(s);
   if(!ability)return null;
   const firstRound=isRoundEffectActive(s);
+  if(ability==="firstRoundRandomStats5"&&firstRound&&s.firstRoundRandomMods?.[stat])return `+${s.firstRoundRandomMods[stat]} ${stat}`;
   if(ability==="speedPlus"&&stat==="Vitesse")return "+2 Vitesse";
   if(ability==="firstRoundSpeed2"&&firstRound&&stat==="Vitesse")return "+2 Vitesse";
   if(ability==="firstRoundSpeed3"&&firstRound&&stat==="Vitesse")return "+3 Vitesse";
@@ -6068,6 +6134,7 @@ function preventFirstDefeat(loser){
   }
   log(`[EFFET] ${wrestler.card.name} annule sa première défaite et reste sur le terrain.`);
   showEffectFeedback(wrestler.card,wrestler.card.name,feedback,"block",2600);
+  markOnlineDirty();
   return true;
 }
 
@@ -6106,13 +6173,6 @@ function duel(){
   const winner=ps>as?G.player:G.ai;
   const loser=ps>as?G.ai:G.player;
   if(rerollLostDuelWithObject(loser))return;
-  if(preventFirstDefeat(loser)){
-    consumeRoundObjects();
-    markOnlineDirty();
-    render();
-    setTimeout(startRound,1100);
-    return;
-  }
   if(G.mode==="challenge"&&G.challenge){
     if(ps>as)return challengePlayerWinsRound(ps-as,stat);
     return challengeBossWinsRound();
@@ -6314,8 +6374,14 @@ function win(winner,loser,reason){
 
     // A victory can trigger a pin before the winning object's end-of-round effect expires.
     const objectPinBonus=Number(winner.objEffect?.pin||0);
-    clearWrestler(loser);
+    const defeatPrevented=preventFirstDefeat(loser);
     consumeRoundObjects();
+    if(defeatPrevented){
+      render();
+      setTimeout(startRound,1100);
+      return;
+    }
+    clearWrestler(loser);
     attemptPin(winner,loser,objectPinBonus);
   };
 
@@ -7720,8 +7786,15 @@ function challengePlayerWinsRound(damage,stat){
 function challengeBossWinsRound(){
   const finishChallengeWin=()=>{
     log(`[DÉFI] ${G.challenge.bossName} gagne le round : tentative de tombé.`);
-    clearWrestler(G.player);
+    const defeatPrevented=preventFirstDefeat(G.player);
     consumeRoundObjects();
+    if(defeatPrevented){
+      updateSavedChallengeFromMatch();
+      render();
+      setTimeout(startRound,1100);
+      return;
+    }
+    clearWrestler(G.player);
     attemptPin(G.ai,G.player);
   };
   if(applyChallengeWinEffects(G.ai,G.player,G.stat,finishChallengeWin))return;

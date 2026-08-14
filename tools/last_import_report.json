@@ -1,47 +1,26 @@
 {
   "imported": [
     {
-      "key": "standard_catcheurs_joe_cobra",
-      "name": "Joe Cobra",
-      "rarity": "Standard",
-      "type": "Catcheur",
-      "ability": null
-    },
-    {
-      "key": "rare_catcheurs_joe_cobra",
-      "name": "Joe Cobra",
+      "key": "rare_catcheurs_coda_reznov",
+      "name": "Coda Reznov",
       "rarity": "Rare",
       "type": "Catcheur",
-      "ability": "entryEnemyStatChoiceMinus1"
+      "ability": "entryRandomStat3"
     },
     {
-      "key": "rare_catcheurs_lior_divine",
-      "name": "Lior Divine",
-      "rarity": "Rare",
+      "key": "legende_catcheurs_coda_reznov",
+      "name": "Coda Reznov",
+      "rarity": "Legende",
       "type": "Catcheur",
-      "ability": "entryPlaySupportFromGrave"
-    },
-    {
-      "key": "standard_catcheurs_lior_divine",
-      "name": "Lior Divine",
-      "rarity": "Standard",
-      "type": "Catcheur",
-      "ability": null
-    },
-    {
-      "key": "rare_catcheurs_ryu_kaizaru",
-      "name": "Ryu Kaizaru",
-      "rarity": "Rare",
-      "type": "Catcheur",
-      "ability": "firstRoundSpeed1Technique2"
+      "ability": "entryStatChoice3"
     }
   ],
   "updated": [],
   "skipped": [],
   "music": [
     {
-      "source": "C:\\Users\\LENOVO\\Downloads\\rajouter\\Lior Divine\\Britney Manson - FASHION (Lyrics).mp3",
-      "target": "lior_divine.mp3"
+      "source": "C:\\Users\\LENOVO\\Documents\\Codex\\2026-06-15\\tu-peux-travailler-sur-plusieurs-projets\\outputs\\catch_cards_audio_responsive\\tools\\coda_reznov_import_025\\copy_AA475EE8-BCB0-4AEA-9360-29AE91889027.mp3",
+      "target": "coda_reznov.mp3"
     }
   ]
 }

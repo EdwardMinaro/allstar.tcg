@@ -15,6 +15,11 @@ const AUDIO_LIBRARY = {
       wrestler: "Bernardot",
       src: "assets/audio/music/bernardot.mp3"
     },
+    coda_reznov: {
+      label: "Coda Reznov",
+      wrestler: "Coda Reznov",
+      src: "assets/audio/music/coda_reznov.mp3"
+    },
     delacroix: {
       label: "Delacroix",
       wrestler: "Delacroix",

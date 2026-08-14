@@ -14,6 +14,11 @@ function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
 }
 
+function pngDimensions(relativePath) {
+  const data = fs.readFileSync(path.join(root, relativePath));
+  return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
+}
+
 function loadRanking() {
   const source = read("js/rankingService.js");
   const windowStub = {};
@@ -127,6 +132,64 @@ function verifyRecentEffects() {
       && game.includes('wrestler.card.rarity==="Legende"')
       && game.includes("Première défaite annulée"),
     "Shawn Olsen annule vraiment sa premiere defaite et applique son bonus legendaire"
+  );
+  const winStart = game.indexOf("function win(winner,loser,reason)");
+  const winRecorded = game.indexOf("winner.wins++;", winStart);
+  const shawnProtection = game.indexOf("const defeatPrevented=preventFirstDefeat(loser);", winStart);
+  const loserCleared = game.indexOf("clearWrestler(loser);", shawnProtection);
+  assert(
+    winStart >= 0 && winRecorded > winStart && shawnProtection > winRecorded && loserCleared > shawnProtection,
+    "Shawn Olsen protege apres la resolution de la victoire et avant le vestiaire"
+  );
+  const challengeProtection = game.indexOf("const defeatPrevented=preventFirstDefeat(G.player)");
+  const challengeSaved = game.indexOf("updateSavedChallengeFromMatch();", challengeProtection);
+  assert(challengeProtection >= 0 && challengeSaved > challengeProtection, "Shawn Olsen protege aussi dans le Defi ALLSTAR");
+  const nilsEntryStart = game.indexOf('if(c.ability==="firstRoundRandomStats5"');
+  const nilsEntryEnd = game.indexOf("if(c.ability===", nilsEntryStart + 10);
+  const nilsEntryBlock = game.slice(nilsEntryStart, nilsEntryEnd);
+  assert(
+    nilsEntryStart >= 0
+      && nilsEntryBlock.includes("owner.cat.firstRoundRandomMods[stat]+=1")
+      && !nilsEntryBlock.includes("owner.cat.mods[stat]+=1")
+      && game.includes('ability==="firstRoundRandomStats5"&&firstRound'),
+    "Bonus NILS'N limite au premier round du catcheur"
+  );
+  assert(
+    byKey.rare_catcheurs_coda_reznov?.ability === "entryRandomStat3"
+      && byKey.legende_catcheurs_coda_reznov?.ability === "entryStatChoice3"
+      && game.includes('if(c.ability==="entryRandomStat3")applyEntryStatBonus(owner,c,3,false)')
+      && game.includes('if(c.ability==="entryStatChoice3")applyEntryStatBonus(owner,c,3,true)'),
+    "Effets Coda Reznov branches"
+  );
+  assert(
+    Object.values(byKey.rare_catcheurs_coda_reznov?.stats || {}).reduce((sum, value) => sum + value, 0) === 24
+      && Object.values(byKey.legende_catcheurs_coda_reznov?.stats || {}).reduce((sum, value) => sum + value, 0) === 28,
+    "Stats Coda Reznov conformes aux raretes"
+  );
+  assert(
+    audio.includes('wrestler: "Coda Reznov"')
+      && audio.includes("coda_reznov.mp3")
+      && fs.existsSync(path.join(root, "assets/audio/music/coda_reznov.mp3")),
+    "Theme Coda Reznov branche"
+  );
+  const normalizedCardRenders = [
+    "standard_catcheurs_delacroix.png",
+    "rare_catcheurs_delacroix.png",
+    "rare_catcheurs_georges_chevalier.png",
+    "legende_catcheurs_georges_chevalier.png",
+    "standard_catcheurs_el_amnesico.png",
+    "rare_catcheurs_el_amnesico.png",
+    "standard_catcheurs_tom_evans.png",
+    "rare_catcheurs_tom_evans.png",
+    "rare_catcheurs_coda_reznov.png",
+    "legende_catcheurs_coda_reznov.png"
+  ];
+  assert(
+    normalizedCardRenders.every(file => {
+      const dimensions = pngDimensions(path.join("assets", "card_renders", file));
+      return dimensions.width === 1102 && dimensions.height === 1498;
+    }),
+    "Rendus Delacroix, Georges, Amnesico, Tom Evans et Coda sans marge blanche"
   );
   assert(
     game.includes("function resolveNextStatWinEffect(winner,currentStat,onComplete)")

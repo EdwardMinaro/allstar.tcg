@@ -96,6 +96,7 @@ function makeState(card, owner) {
     card,
     owner,
     mods: { Force: 0, Vitesse: 0, Technique: 0, Charisme: 0 },
+    firstRoundRandomMods: { Force: 0, Vitesse: 0, Technique: 0, Charisme: 0 },
     pin: 0,
     rounds: 0,
     firstWinAll1Used: false,
@@ -189,6 +190,11 @@ function playCards(player, opponent, game, rng, stat) {
     const cat = chooseBest(player, "Catcheur", stat);
     if (cat) {
       player.cat = makeState(cat, player);
+      if (cat.ability === "entryRandomStat3") player.cat.mods[randomStat(game, rng)] += 3;
+      if (cat.ability === "entryStatChoice3") player.cat.mods[stat] += 3;
+      if (cat.ability === "firstRoundRandomStats5") {
+        for (let i = 0; i < 5; i += 1) player.cat.firstRoundRandomMods[randomStat(game, rng)] += 1;
+      }
       if (cat.ability === "drawOnEntry1") draw(player, 1, rng);
       if (cat.ability === "drawOnEntry2") draw(player, 2, rng);
       if (cat.ability === "entryEnemyForceMinus2" && opponent.cat) opponent.cat.mods.Force -= 2;
@@ -281,6 +287,7 @@ function score(state, stat, round, roundStarter) {
   const firstRound = state.rounds === 0;
   const matchRoundOne = round === 1;
   const ability = state.card.ability;
+  if (ability === "firstRoundRandomStats5" && firstRound) value += Number(state.firstRoundRandomMods?.[stat] || 0);
   if (ability === "firstRoundSpeed2" && firstRound && stat === "Vitesse") value += 2;
   if (ability === "firstRoundSpeed3" && firstRound && stat === "Vitesse") value += 3;
   if (ability === "firstRoundSpeedTechnique1" && firstRound && (stat === "Vitesse" || stat === "Technique")) value += 1;
@@ -432,8 +439,8 @@ function simulateMatch(game, playerDeckKeys, aiDeckKeys, seed) {
     if (playerScore !== aiScore) {
       const winner = playerScore > aiScore ? player : ai;
       const loser = playerScore > aiScore ? ai : player;
+      applyWinEffects(winner, loser, rng);
       if (!preventFirstDefeat(loser)) {
-        applyWinEffects(winner, loser, rng);
         clearLoser(loser, winner, rng);
         if (attemptPin(winner, loser, rng)) {
           return { winner: winner.side, rounds: round, reason: "pin" };
