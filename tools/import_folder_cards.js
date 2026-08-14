@@ -71,6 +71,7 @@ const ABILITY_BY_KEY = {
   "Rare|Catcheur|Jafar Jordan": "firstRoundCharTech2",
   "Rare|Catcheur|Koro": "drawOnEntry1",
   "Rare|Catcheur|Mareck": "recoverGraveDiscard1",
+  "Legende|Catcheur|Mareck": "recoverOrPlayObjectGrave",
   "Legende|Catcheur|Saitovic": "recoverGraveDiscard1",
   "Rare|Catcheur|Saitovic": "recoverGrave",
   "Rare|Catcheur|Romain Lestrange": "secondPlayerForceCharisma1",

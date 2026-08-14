@@ -322,6 +322,7 @@ const CARD_DATA = [
       "Charisme": 7
     },
     "effect": "Apparition : Récupérez dans votre main ou jouez une carte objet depuis votre vestiaire.",
+    "ability": "recoverOrPlayObjectGrave",
     "renderArt": "assets/card_renders/legende_catcheurs_mareck.png",
     "musicId": "mareck"
   },
@@ -2977,9 +2978,10 @@ const EFFECT_REGISTRY = {
   pinShield: { timing:"entry", text:"Prochain tombé adverse -10." },
   pinShield20: { timing:"entry", text:"Prochain tombé adverse -20." },
   pinShield5: { timing:"object", text:"Prochain tombé adverse -5." },
-  recoverGrave: { timing:"object", text:"Récupère une carte du vestiaire." },
-  recoverGraveDiscard1: { timing:"entry", text:"À l'arrivée : récupère une carte du vestiaire et l'adversaire défausse une carte aléatoire." },
-  recoverObjectGrave: { timing:"entry", text:"À l'arrivée : récupère un objet du vestiaire." },
+  recoverGrave: { timing:"object", choice:true, text:"Choisit et récupère une carte du vestiaire." },
+  recoverGraveDiscard1: { timing:"entry", choice:true, text:"À l'arrivée : choisit une carte du vestiaire et l'adversaire défausse une carte aléatoire." },
+  recoverObjectGrave: { timing:"entry", choice:true, text:"À l'arrivée : choisit et récupère un objet du vestiaire." },
+  recoverOrPlayObjectGrave: { timing:"entry", choice:true, text:"À l'arrivée : choisit un objet du vestiaire, puis le récupère ou le joue." },
   recoverBonusDeck: { timing:"entry", text:"À l'arrivée : récupère un bonus depuis le deck." },
   recoverJaydonOrFenrir: { timing:"entry", choice:true, text:"Récupère Jaydon Ross ou Fenrir Strom depuis le deck ou le vestiaire." },
   revealObjectHandCharSpeed: { timing:"entry", text:"Révélez un objet en main : +2 Charisme et +1 Vitesse." },
@@ -4811,6 +4813,75 @@ function tutorDeckCards(owner,source,types){
   chooseNext();
 }
 
+function chooseCardFromGrave(owner,source,{allowedTypes=null,prompt="",random=false,onChoose}={}){
+  const candidates=owner.grave.filter(card=>!allowedTypes||allowedTypes.includes(card.type));
+  const objectOnly=allowedTypes?.length===1&&allowedTypes[0]==="Objet";
+  if(!candidates.length){
+    const missing=objectOnly?"aucun objet à récupérer":"aucune carte à récupérer";
+    log(`[EFFET] ${source.name} : ${missing} au vestiaire.`);
+    showEffectFeedback(source,source.name,objectOnly?"Aucun objet au vestiaire":"Vestiaire vide","block");
+    if(onChoose)onChoose(null);
+    return;
+  }
+  const select=cardId=>{
+    const card=owner.grave.find(candidate=>candidate.id===cardId);
+    if(onChoose)onChoose(card?.id||null);
+  };
+  if(owner.side!=="player"||random){
+    const selected=random
+      ? candidates[Math.floor(Math.random()*candidates.length)]
+      : candidates[candidates.length-1];
+    select(selected.id);
+    return;
+  }
+  requestEffectChoice({
+    title:source.name,
+    text:prompt||(objectOnly?"Choisis l'objet à récupérer dans ton vestiaire.":"Choisis la carte à récupérer dans ton vestiaire."),
+    choices:candidates.map(card=>({
+      label:`${card.name} - ${displayCardType(card.type)} ${card.rarity||"Standard"}`,
+      value:card.id
+    })),
+    onChoose:select
+  });
+}
+
+function moveGraveCardToHand(owner,source,cardId,kind="special"){
+  const index=owner.grave.findIndex(card=>card.id===cardId);
+  if(index<0)return null;
+  const [recovered]=owner.grave.splice(index,1);
+  owner.hand.push(recovered);
+  log(`[EFFET] ${source.name} récupère ${recovered.name} depuis le vestiaire.`);
+  showEffectFeedback(source,source.name,`Récupère ${recovered.name}`,kind);
+  return recovered;
+}
+
+function recoverCardFromGrave(owner,source,{allowedTypes=null,prompt="",random=false,kind="special",onComplete=null}={}){
+  chooseCardFromGrave(owner,source,{
+    allowedTypes,
+    prompt,
+    random,
+    onChoose:cardId=>{
+      const recovered=cardId?moveGraveCardToHand(owner,source,cardId,kind):null;
+      if(onComplete)onComplete(recovered);
+      markOnlineDirty();
+      render();
+    }
+  });
+}
+
+function discardRandomOpponentCard(owner,source){
+  const enemy=owner.side==="player"?G.ai:G.player;
+  const discardIndex=enemy.hand.length?Math.floor(Math.random()*enemy.hand.length):-1;
+  if(discardIndex<0){
+    log(`[EFFET] ${source.name} : adversaire sans carte à défausser.`);
+    return;
+  }
+  const [discarded]=enemy.hand.splice(discardIndex,1);
+  enemy.grave.push(discarded);
+  log(`[EFFET] ${source.name} force ${enemy.label} à défausser ${discarded.name}.`);
+  showEffectFeedback(source,source.name,"Défausse adverse","malus");
+}
+
 function recoverNamedWrestler(owner,source,names){
   const candidates=[...owner.deck.map(card=>({card,zone:"deck"})),...owner.grave.map(card=>({card,zone:"grave"}))]
     .filter(entry=>names.includes(entry.card.name));
@@ -4897,8 +4968,88 @@ function applyEntryStatBonus(owner,source,amount,chooseStat){
   });
 }
 
-function playSupportFromGrave(owner,source){
+function activateSupportFromGrave(owner,source,id){
   const enemy=owner.side==="player"?G.ai:G.player;
+  const index=owner.grave.findIndex(card=>card.id===id);
+  if(index<0)return false;
+  const card=owner.grave[index];
+  const canPlay=card.type==="Manager"
+    ? !owner.man&&!owner.managersBlocked
+    : card.type==="Objet"&&!owner.obj&&!owner.objectsBlocked;
+  if(!canPlay)return false;
+  owner.grave.splice(index,1);
+  log(`[EFFET] ${source.name} pose ${card.name} depuis le vestiaire.`);
+  playSound("carte_jouee");
+  if(card.type==="Manager"){
+    owner.man=card;
+    owner.cat.managers=(owner.cat.managers||0)+1;
+    applyEffect(owner,enemy,card);
+    triggerLudovicSupportDiscard(owner,enemy,card);
+    markOnlineDirty();
+    render();
+    return true;
+  }
+  owner.obj=card;
+  owner.objTurnsRemaining=1+Number(owner.objectDurationBonus||0);
+  owner.objLastActivationRound=G.round;
+  owner.objExtraDrawQueued=false;
+  triggerLudovicSupportDiscard(owner,enemy,card);
+  if(owner.objTurnsRemaining>1)log(`${card.name} restera actif ${owner.objTurnsRemaining} tours.`);
+  const choices=objectEffectChoices(card);
+  if(choices&&owner.side==="player"){
+    requestEffectChoice({
+      title:card.name,
+      text:"Choisis l'effet à appliquer.",
+      choices,
+      onChoose:choice=>{
+        applyTrackedObjectEffect(owner,enemy,card,choice);
+        markOnlineDirty();
+        render();
+      }
+    });
+    markOnlineDirty();
+    return true;
+  }
+  applyTrackedObjectEffect(owner,enemy,card,aiObjectEffectChoice(card,choices));
+  markOnlineDirty();
+  render();
+  return true;
+}
+
+function recoverOrPlayObjectFromGrave(owner,source){
+  chooseCardFromGrave(owner,source,{
+    allowedTypes:["Objet"],
+    prompt:"Choisis l'objet à récupérer ou à jouer depuis ton vestiaire.",
+    onChoose:cardId=>{
+      if(!cardId){
+        markOnlineDirty();
+        render();
+        return;
+      }
+      const canPlay=!owner.obj&&!owner.objectsBlocked;
+      const resolve=action=>{
+        if(action==="play"&&activateSupportFromGrave(owner,source,cardId))return;
+        moveGraveCardToHand(owner,source,cardId,"special");
+        markOnlineDirty();
+        render();
+      };
+      if(owner.side!=="player"){
+        resolve(canPlay?"play":"hand");
+        return;
+      }
+      const choices=[{label:"Récupérer dans la main",value:"hand"}];
+      if(canPlay)choices.push({label:"Jouer sur le terrain",value:"play"});
+      requestEffectChoice({
+        title:source.name,
+        text:"Que veux-tu faire de cette carte Objet ?",
+        choices,
+        onChoose:resolve
+      });
+    }
+  });
+}
+
+function playSupportFromGrave(owner,source){
   const candidates=owner.grave.filter(card=>
     (card.type==="Manager"&&!owner.man&&!owner.managersBlocked)
     ||(card.type==="Objet"&&!owner.obj&&!owner.objectsBlocked)
@@ -4909,49 +5060,12 @@ function playSupportFromGrave(owner,source){
     return;
   }
   const activate=id=>{
-    const index=owner.grave.findIndex(card=>card.id===id);
-    if(index<0)return;
-    const card=owner.grave[index];
-    const canPlay=card.type==="Manager"
-      ? !owner.man&&!owner.managersBlocked
-      : card.type==="Objet"&&!owner.obj&&!owner.objectsBlocked;
-    if(!canPlay)return;
-    owner.grave.splice(index,1);
-    log(`[EFFET] ${source.name} pose ${card.name} depuis le vestiaire.`);
-    playSound("carte_jouee");
-    if(card.type==="Manager"){
-      owner.man=card;
-      owner.cat.managers=(owner.cat.managers||0)+1;
-      applyEffect(owner,enemy,card);
-      triggerLudovicSupportDiscard(owner,enemy,card);
-      markOnlineDirty();
-      render();
-      return;
-    }
-    owner.obj=card;
-    owner.objTurnsRemaining=1+Number(owner.objectDurationBonus||0);
-    owner.objLastActivationRound=G.round;
-    owner.objExtraDrawQueued=false;
-    triggerLudovicSupportDiscard(owner,enemy,card);
-    if(owner.objTurnsRemaining>1)log(`${card.name} restera actif ${owner.objTurnsRemaining} tours.`);
-    const choices=objectEffectChoices(card);
-    if(choices&&owner.side==="player"){
-      requestEffectChoice({
-        title:card.name,
-        text:"Choisis l'effet à appliquer.",
-        choices,
-        onChoose:choice=>{
-          applyTrackedObjectEffect(owner,enemy,card,choice);
-          markOnlineDirty();
-          render();
-        }
-      });
+    if(activateSupportFromGrave(owner,source,id)){
       markOnlineDirty();
       return;
     }
-    applyTrackedObjectEffect(owner,enemy,card,aiObjectEffectChoice(card,choices));
-    markOnlineDirty();
-    render();
+    log(`[EFFET] ${source.name} : cette carte ne peut plus être jouée.`);
+    showEffectFeedback(source,source.name,"Carte indisponible","block");
   };
   if(owner.side!=="player"){
     const selected=candidates[Math.floor(Math.random()*candidates.length)].id;
@@ -4999,6 +5113,7 @@ function applyWrestlerEntryEffect(owner,c){
   if(c.ability==="entryRandomStat3")applyEntryStatBonus(owner,c,3,false);
   if(c.ability==="entryStatChoice3")applyEntryStatBonus(owner,c,3,true);
   if(c.ability==="entryPlaySupportFromGrave")playSupportFromGrave(owner,c);
+  if(c.ability==="recoverOrPlayObjectGrave")recoverOrPlayObjectFromGrave(owner,c);
   if(c.ability==="drawToSixBonusStats"){
     const before=owner.hand.length;
     while(owner.hand.length<6){
@@ -5098,15 +5213,10 @@ function applyWrestlerEntryEffect(owner,c){
     }
   }
   if(c.ability==="recoverObjectGrave"){
-    const index=owner.grave.map(card=>card.type).lastIndexOf("Objet");
-    if(index>=0){
-      const [recovered]=owner.grave.splice(index,1);
-      owner.hand.push(recovered);
-      log(`[EFFET] ${c.name} récupère ${recovered.name} depuis le vestiaire.`);
-      showEffectFeedback(c,c.name,`Récupère ${recovered.name}`,"special");
-    }else{
-      log(`[EFFET] ${c.name} : aucun objet à récupérer au vestiaire.`);
-    }
+    recoverCardFromGrave(owner,c,{
+      allowedTypes:["Objet"],
+      prompt:"Choisis l'objet à récupérer dans ton vestiaire."
+    });
   }
   if(c.ability==="recoverBonusDeck"){
     const index=owner.deck.map(card=>card.type).lastIndexOf("Manager");
@@ -5165,26 +5275,13 @@ function applyWrestlerEntryEffect(owner,c){
     showEffectFeedback(c,c.name,"Tombé +20","pin");
   }
   if(c.ability==="recoverGrave"||c.ability==="recoverGraveDiscard1"){
-    const recovered=owner.grave.pop();
-    if(recovered){
-      owner.hand.push(recovered);
-      log(`[EFFET] ${c.name} récupère ${recovered.name} depuis le vestiaire.`);
-      showEffectFeedback(c,c.name,`Récupère ${recovered.name}`,"block");
-    }else{
-      log(`[EFFET] ${c.name} : aucune carte à récupérer au vestiaire.`);
-    }
-    if(c.ability==="recoverGraveDiscard1"){
-      const enemy=owner.side==="player"?G.ai:G.player;
-      const discardIndex=enemy.hand.length?Math.floor(Math.random()*enemy.hand.length):-1;
-      if(discardIndex>=0){
-        const [discarded]=enemy.hand.splice(discardIndex,1);
-        enemy.grave.push(discarded);
-        log(`[EFFET] ${c.name} force ${enemy.label} à défausser ${discarded.name}.`);
-        showEffectFeedback(c,c.name,"Défausse adverse","malus");
-      }else{
-        log(`[EFFET] ${c.name} : adversaire sans carte à défausser.`);
+    recoverCardFromGrave(owner,c,{
+      prompt:"Choisis la carte à récupérer dans ton vestiaire.",
+      kind:"block",
+      onComplete:()=>{
+        if(c.ability==="recoverGraveDiscard1")discardRandomOpponentCard(owner,c);
       }
-    }
+    });
   }
   if(c.ability==="opponentDiscardChoice1"){
     const enemy=owner.side==="player"?G.ai:G.player;
@@ -5484,12 +5581,10 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
       kind="special";
       break;
     case"recoverGrave":{
-      const recovered=owner.grave.pop();
-      if(recovered){
-        owner.hand.push(recovered);
-        feedback=`Récupère ${recovered.name}`;
-        kind="block";
-      }
+      recoverCardFromGrave(owner,c,{
+        prompt:"Choisis la carte à récupérer dans ton vestiaire.",
+        kind:"block"
+      });
       break;
     }
     case"opponentDiscard1":{
@@ -5740,8 +5835,10 @@ function applyEffect(owner,opp,c){
     case"pinObject30":s.pin+=30;feedback="Tombé +30";kind="pin";break;
     case"drawNext1":owner.nextDrawBonus=(owner.nextDrawBonus||0)+1;feedback="Pioche +1";kind="special";break;
     case"recoverGrave":{
-      const recovered=owner.grave.pop();
-      if(recovered){owner.hand.push(recovered);feedback=`Récupère ${recovered.name}`;kind="block";}
+      recoverCardFromGrave(owner,c,{
+        prompt:"Choisis la carte à récupérer dans ton vestiaire.",
+        kind:"block"
+      });
       break;
     }
     case"opponentDiscard1":{

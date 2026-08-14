@@ -219,6 +219,28 @@ function verifyRecentEffects() {
       && !roundManagerEffects.includes("owner.grave.pop()"),
     "Mr Ringsider propose son effet et laisse choisir les cartes du vestiaire"
   );
+  const selectableGraveAbilities = new Set([
+    "recoverGrave",
+    "recoverGraveDiscard1",
+    "recoverObjectGrave",
+    "recoverOrPlayObjectGrave",
+    "recoverJaydonOrFenrir",
+    "entryPlaySupportFromGrave",
+    "ringsiderRecover1LoseTag",
+    "ringsiderRecover2LoseTag",
+  ]);
+  const graveRecoveryCards = cards.filter(card => /récup/i.test(card.effect || "") && /vestiaire/i.test(card.effect || ""));
+  assert(
+    graveRecoveryCards.every(card => {
+      const randomRecovery = /récup[^.!?]*(?:aléatoire|au hasard)/i.test(card.effect || "");
+      return randomRecovery || selectableGraveAbilities.has(card.ability);
+    })
+      && game.includes("function chooseCardFromGrave(owner,source")
+      && game.includes("function recoverOrPlayObjectFromGrave(owner,source)")
+      && byKey.legende_catcheurs_mareck?.ability === "recoverOrPlayObjectGrave"
+      && !game.includes("owner.grave.pop()"),
+    "Toute recuperation non aleatoire du vestiaire laisse choisir la carte"
+  );
   assert(!byKey.standard_catcheurs_joe_cobra?.ability && !byKey.standard_catcheurs_lior_divine?.ability, "Catcheurs standards de la fournee sans effet");
   assert(
     ["rare_catcheurs_joe_cobra", "rare_catcheurs_lior_divine", "rare_catcheurs_ryu_kaizaru"]

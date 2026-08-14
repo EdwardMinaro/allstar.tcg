@@ -314,6 +314,7 @@
         "Charisme": 7
       },
       "effect": "Apparition : Récupérez dans votre main ou jouez une carte objet depuis votre vestiaire.",
+      "ability": "recoverOrPlayObjectGrave",
       "renderArt": "assets/card_renders/legende_catcheurs_mareck.png",
       "musicId": "mareck"
     },
