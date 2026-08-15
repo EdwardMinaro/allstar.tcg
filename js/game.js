@@ -3210,7 +3210,7 @@ function hideOptions(){document.getElementById("optionsMenu")?.classList.remove(
 
 const QUICK_SHORTCUTS_KEY="allstarsQuickShortcuts";
 const DEFAULT_QUICK_SHORTCUTS=Object.freeze({
-  menu:"Escape",
+  menu:"KeyM",
   nextMusic:"KeyS",
   toggleMusic:"Space",
   previousMusic:"KeyP"
@@ -3220,7 +3220,12 @@ let quickShortcuts=readQuickShortcuts();
 
 function readQuickShortcuts(){
   try{
-    return {...DEFAULT_QUICK_SHORTCUTS,...JSON.parse(localStorage.getItem(QUICK_SHORTCUTS_KEY)||"{}")};
+    const shortcuts={...DEFAULT_QUICK_SHORTCUTS,...JSON.parse(localStorage.getItem(QUICK_SHORTCUTS_KEY)||"{}")};
+    if(shortcuts.menu==="Escape"){
+      shortcuts.menu=DEFAULT_QUICK_SHORTCUTS.menu;
+      localStorage.setItem(QUICK_SHORTCUTS_KEY,JSON.stringify(shortcuts));
+    }
+    return shortcuts;
   }catch{
     return {...DEFAULT_QUICK_SHORTCUTS};
   }
@@ -3311,6 +3316,12 @@ function handleQuickShortcutKey(event){
     event.preventDefault();
     event.stopPropagation();
     if(["ShiftLeft","ShiftRight","ControlLeft","ControlRight","AltLeft","AltRight","MetaLeft","MetaRight"].includes(event.code))return;
+    if(event.code==="Escape"){
+      quickShortcutCapture=null;
+      setShortcutStatus("Échap reste réservé au menu de fermeture.",true);
+      renderQuickShortcuts();
+      return;
+    }
     const duplicate=Object.entries(quickShortcuts).find(([action,code])=>action!==quickShortcutCapture&&code===event.code);
     if(duplicate){
       setShortcutStatus(`Cette touche est déjà utilisée pour « ${shortcutActionLabel(duplicate[0])} ».`,true);
@@ -3323,7 +3334,21 @@ function handleQuickShortcutKey(event){
     renderQuickShortcuts();
     return;
   }
-  if(event.repeat||event.ctrlKey||event.altKey||event.metaKey||isShortcutInputTarget(event.target))return;
+  if(event.repeat||event.ctrlKey||event.altKey||event.metaKey)return;
+  if(event.code==="Escape"){
+    event.preventDefault();
+    if(document.getElementById("sessionModal")?.classList.contains("active")){
+      closeSessionModal();
+      return;
+    }
+    if(document.getElementById("optionsMenu")?.classList.contains("active")){
+      hideOptions();
+      return;
+    }
+    openSessionModal();
+    return;
+  }
+  if(isShortcutInputTarget(event.target))return;
   const action=Object.keys(quickShortcuts).find(name=>quickShortcuts[name]===event.code);
   if(!action)return;
   event.preventDefault();
