@@ -3208,6 +3208,134 @@ async function submitTicket(event){
 function toggleOptions(){document.getElementById("optionsMenu").classList.toggle("active")}
 function hideOptions(){document.getElementById("optionsMenu")?.classList.remove("active")}
 
+const QUICK_SHORTCUTS_KEY="allstarsQuickShortcuts";
+const DEFAULT_QUICK_SHORTCUTS=Object.freeze({
+  menu:"Escape",
+  nextMusic:"KeyS",
+  toggleMusic:"Space",
+  previousMusic:"KeyP"
+});
+let quickShortcutCapture=null;
+let quickShortcuts=readQuickShortcuts();
+
+function readQuickShortcuts(){
+  try{
+    return {...DEFAULT_QUICK_SHORTCUTS,...JSON.parse(localStorage.getItem(QUICK_SHORTCUTS_KEY)||"{}")};
+  }catch{
+    return {...DEFAULT_QUICK_SHORTCUTS};
+  }
+}
+function saveQuickShortcuts(){
+  try{localStorage.setItem(QUICK_SHORTCUTS_KEY,JSON.stringify(quickShortcuts))}catch{}
+}
+function shortcutCodeLabel(code){
+  const labels={Escape:"Échap",Space:"Espace",Enter:"Entrée",Backspace:"Retour arrière",Delete:"Suppr",ArrowUp:"Flèche haut",ArrowDown:"Flèche bas",ArrowLeft:"Flèche gauche",ArrowRight:"Flèche droite"};
+  if(labels[code])return labels[code];
+  if(/^Key[A-Z]$/.test(code))return code.slice(3);
+  if(/^Digit\d$/.test(code))return code.slice(5);
+  return String(code||"").replace(/^Numpad/,"Pavé ");
+}
+function setShortcutStatus(message="",isError=false){
+  document.querySelectorAll(".shortcut-status").forEach(status=>{
+    status.textContent=message;
+    status.classList.toggle("error",isError);
+  });
+}
+function renderQuickShortcuts(){
+  document.querySelectorAll("[data-shortcut-action]").forEach(button=>{
+    const action=button.dataset.shortcutAction;
+    const label=button.querySelector("b");
+    if(label)label.textContent=quickShortcutCapture===action ? "Appuie sur une touche..." : shortcutCodeLabel(quickShortcuts[action]);
+    button.classList.toggle("capturing",quickShortcutCapture===action);
+  });
+}
+function beginQuickShortcutCapture(action){
+  quickShortcutCapture=action;
+  setShortcutStatus("Appuie sur la touche souhaitée.");
+  renderQuickShortcuts();
+}
+function resetQuickShortcuts(){
+  quickShortcuts={...DEFAULT_QUICK_SHORTCUTS};
+  quickShortcutCapture=null;
+  saveQuickShortcuts();
+  setShortcutStatus("Touches par défaut restaurées.");
+  renderQuickShortcuts();
+}
+function setOptionsTab(tab="general"){
+  const shortcuts=tab==="shortcuts";
+  const menu=document.getElementById("optionsMenu");
+  const section=document.getElementById("shortcutOptions");
+  menu?.classList.toggle("shortcut-tab-active",shortcuts);
+  if(section)section.hidden=!shortcuts;
+  const generalTab=document.getElementById("generalOptionsTab");
+  const shortcutsTab=document.getElementById("shortcutsOptionsTab");
+  generalTab?.classList.toggle("active",!shortcuts);
+  shortcutsTab?.classList.toggle("active",shortcuts);
+  generalTab?.setAttribute("aria-selected",shortcuts?"false":"true");
+  shortcutsTab?.setAttribute("aria-selected",shortcuts?"true":"false");
+}
+function setHomeOptionsTab(tab="general"){
+  const shortcuts=tab==="shortcuts";
+  document.querySelectorAll(".home-general-options").forEach(section=>{section.hidden=shortcuts});
+  const section=document.querySelector(".shortcut-options-home");
+  if(section)section.hidden=!shortcuts;
+  const generalTab=document.getElementById("homeGeneralOptionsTab");
+  const shortcutsTab=document.getElementById("homeShortcutsOptionsTab");
+  generalTab?.classList.toggle("active",!shortcuts);
+  shortcutsTab?.classList.toggle("active",shortcuts);
+  generalTab?.setAttribute("aria-selected",shortcuts?"false":"true");
+  shortcutsTab?.setAttribute("aria-selected",shortcuts?"true":"false");
+}
+function wireQuickShortcuts(){
+  document.querySelectorAll("[data-shortcut-action]").forEach(button=>{
+    button.addEventListener("click",()=>beginQuickShortcutCapture(button.dataset.shortcutAction));
+  });
+  renderQuickShortcuts();
+}
+function isShortcutInputTarget(target){
+  return Boolean(target?.closest?.("input,select,textarea,button,[contenteditable='true']"));
+}
+function handleMenuShortcut(){
+  if(document.getElementById("sessionModal")?.classList.contains("active")){
+    closeSessionModal();
+    return;
+  }
+  if(document.getElementById("game")?.classList.contains("active")){
+    toggleOptions();
+    return;
+  }
+  if(document.getElementById("menu")?.classList.contains("active"))toggleHomeQuickPanel();
+}
+function handleQuickShortcutKey(event){
+  if(quickShortcutCapture){
+    event.preventDefault();
+    event.stopPropagation();
+    if(["ShiftLeft","ShiftRight","ControlLeft","ControlRight","AltLeft","AltRight","MetaLeft","MetaRight"].includes(event.code))return;
+    const duplicate=Object.entries(quickShortcuts).find(([action,code])=>action!==quickShortcutCapture&&code===event.code);
+    if(duplicate){
+      setShortcutStatus(`Cette touche est déjà utilisée pour « ${shortcutActionLabel(duplicate[0])} ».`,true);
+      return;
+    }
+    quickShortcuts[quickShortcutCapture]=event.code;
+    quickShortcutCapture=null;
+    saveQuickShortcuts();
+    setShortcutStatus("Touche enregistrée.");
+    renderQuickShortcuts();
+    return;
+  }
+  if(event.repeat||event.ctrlKey||event.altKey||event.metaKey||isShortcutInputTarget(event.target))return;
+  const action=Object.keys(quickShortcuts).find(name=>quickShortcuts[name]===event.code);
+  if(!action)return;
+  event.preventDefault();
+  if(action==="menu")handleMenuShortcut();
+  if(action==="nextMusic")playNextTheme();
+  if(action==="toggleMusic")toggleThemePause();
+  if(action==="previousMusic")playPreviousTheme();
+}
+function shortcutActionLabel(action){
+  return {menu:"Menu",nextMusic:"Musique suivante",toggleMusic:"Couper / reprendre la musique",previousMusic:"Musique précédente"}[action]||action;
+}
+
 const DISPLAY_SETTINGS_KEY="allstarsDisplaySettings";
 function readDisplaySettings(){
   try{
@@ -3292,19 +3420,6 @@ async function confirmQuitGame(){
   closeSessionModal();
   showMenu();
 }
-function handleEscapeKey(event){
-  if(event.key!=="Escape")return;
-  if(document.getElementById("sessionModal")?.classList.contains("active")){
-    closeSessionModal();
-    return;
-  }
-  if(document.getElementById("optionsMenu")?.classList.contains("active")){
-    hideOptions();
-    return;
-  }
-  openSessionModal();
-}
-
 const profileUiState={user:null,profile:null,loading:false,message:"",requestId:0};
 function escapeHtml(value){
   return String(value ?? "").replace(/[&<>"']/g, char=>({
@@ -8940,6 +9055,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   runAllstarAudit();
   wireSaveScreen();
   wireDisplayOptions();
+  wireQuickShortcuts();
   showInstalledVersion();
   void window.AllstarFirebaseService?.warmup?.().then(services=>{
     const user=services.auth?.currentUser;
@@ -8952,5 +9068,5 @@ document.addEventListener("DOMContentLoaded", ()=>{
     if(type==="update-downloaded")showSystemToast("Mise à jour prête : redémarrage automatique...",5000);
     if(type==="update-error")showSystemToast("Vérification de mise à jour impossible.",4000);
   });
-  document.addEventListener("keydown",handleEscapeKey);
+  document.addEventListener("keydown",handleQuickShortcutKey);
 });

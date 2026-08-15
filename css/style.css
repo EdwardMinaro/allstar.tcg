@@ -7187,6 +7187,148 @@ button:disabled,
   }
 }
 
+/* Configurable quick controls. */
+#game .game-options-tabs{
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+#game .game-options-tabs button{
+  min-height:36px;
+  margin:0;
+  padding:6px 10px;
+  border:2px solid #343845;
+  background:#171922;
+  color:#d8d9df;
+  font-size:12px;
+}
+
+#game .game-options-tabs button.active{
+  border-color:#e8b52a;
+  background:linear-gradient(180deg,#3b2c0d,#171209);
+  color:#ffd65a;
+}
+
+#game .options-menu.shortcut-tab-active .audio-options,
+#game .options-menu.shortcut-tab-active .display-options{
+  display:none !important;
+}
+
+#game .shortcut-options{
+  grid-column:1 / -1;
+}
+
+.shortcut-options[hidden]{display:none !important}
+.home-general-options[hidden],
+.shortcut-options-home[hidden]{display:none !important}
+
+.home-options-tabs{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:10px 0 2px;
+}
+
+.home-options-tabs button{
+  min-height:42px;
+  border:2px solid #343845;
+  border-radius:8px;
+  background:#171922;
+  color:#d8d9df;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+
+.home-options-tabs button.active{
+  border-color:#e8b52a;
+  background:linear-gradient(180deg,#3b2c0d,#171209);
+  color:#ffd65a;
+}
+
+.shortcut-options,
+.shortcut-options-home{
+  color:#f3ead9;
+}
+
+.shortcut-intro{
+  margin:0 0 10px;
+  color:#c7c0b2;
+  font-size:12px;
+}
+
+.shortcut-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.shortcut-list > div{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-height:48px;
+  padding:7px 9px 7px 12px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:8px;
+  background:rgba(3,4,8,.58);
+  font-size:12px;
+  font-weight:900;
+}
+
+.shortcut-list button,
+#game .shortcut-list button{
+  flex:0 0 auto;
+  width:auto !important;
+  min-width:94px;
+  min-height:34px;
+  margin:0 !important;
+  padding:6px 10px !important;
+  border:2px solid #267fba !important;
+  border-radius:7px !important;
+  background:#0b2a40 !important;
+  color:#fff !important;
+  font-size:12px !important;
+}
+
+.shortcut-list button.capturing,
+#game .shortcut-list button.capturing{
+  border-color:#ffd65a !important;
+  background:#49350c !important;
+  color:#ffd65a !important;
+}
+
+.shortcut-status{
+  min-height:18px;
+  margin:8px 0 4px;
+  color:#80d59a;
+  font-size:11px;
+  text-align:center;
+}
+
+.shortcut-status.error{color:#ff7e83}
+
+.shortcut-reset,
+#game .shortcut-reset{
+  width:100% !important;
+  min-height:36px;
+  margin:0 !important;
+  border:2px solid #4a4d58 !important;
+  background:linear-gradient(180deg,#30323c,#181920) !important;
+  color:#fff !important;
+  font-size:11px !important;
+}
+
+.shortcut-options-home{
+  grid-column:1 / -1;
+}
+
+@media (max-width:620px), (max-height:620px){
+  .shortcut-list{grid-template-columns:1fr}
+}
+
 /* Global ALLSTAR scroll treatment: the same dark rail and gold handle are
    used everywhere a screen genuinely needs to scroll. */
 :root,

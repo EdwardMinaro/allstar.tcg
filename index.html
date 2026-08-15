@@ -73,6 +73,7 @@
         <div class="home-quick-actions">
           <button type="button" onclick="showProfile()"><b>&#9679;</b><span>Profil</span></button>
           <button type="button" onclick="showHomeOptions()"><b>&#9881;</b><span>Options</span></button>
+          <button type="button" onclick="playPreviousTheme()"><b>&#9198;</b><span>Musique pr&eacute;c&eacute;dente</span></button>
           <button class="music-pause-toggle" type="button" onclick="toggleThemePause()"><b>&#10074;&#10074;</b><span>Pause musique</span></button>
           <button type="button" onclick="playNextTheme()"><b>&#9197;</b><span>Musique suivante</span></button>
           <button class="home-ticket-action" type="button" onclick="showTickets()"><b>&#9993;</b><span>Tickets</span></button>
@@ -253,8 +254,12 @@
     <div class="menu-card options-page-card">
       <h1 class="logo small-logo">Options</h1>
       <p class="subtitle"></p>
+      <div class="home-options-tabs" role="tablist" aria-label="Cat&eacute;gories des options">
+        <button class="active" id="homeGeneralOptionsTab" type="button" role="tab" aria-selected="true" onclick="setHomeOptionsTab('general')">G&eacute;n&eacute;ral</button>
+        <button id="homeShortcutsOptionsTab" type="button" role="tab" aria-selected="false" onclick="setHomeOptionsTab('shortcuts')">Touches rapides</button>
+      </div>
       <div class="options-page-grid">
-        <div class="options-block">
+        <div class="options-block home-general-options">
           <div class="home-options-title">Audio</div>
           <div class="audio-options home-audio-options">
             <label for="homeMusicVolume">Volume musique</label>
@@ -274,7 +279,7 @@
             <div class="current-track">Theme : <span class="current-music-label">aucun</span></div>
           </div>
         </div>
-        <div class="options-block">
+        <div class="options-block home-general-options">
           <div class="home-options-title">Affichage / session</div>
           <div class="display-options">
             <label class="display-check"><input id="homeFullscreenToggle" class="fullscreen-control" type="checkbox"> Plein écran</label>
@@ -291,6 +296,18 @@
             </div>
           </div>
         </div>
+        <div class="options-block shortcut-options-home" hidden>
+          <div class="home-options-title">Touches rapides</div>
+          <p class="shortcut-intro">Clique sur une touche, puis appuie sur la nouvelle commande.</p>
+          <div class="shortcut-list">
+            <div><span>Menu</span><button type="button" data-shortcut-action="menu"><b>&Eacute;chap</b></button></div>
+            <div><span>Musique suivante</span><button type="button" data-shortcut-action="nextMusic"><b>S</b></button></div>
+            <div><span>Couper / reprendre la musique</span><button type="button" data-shortcut-action="toggleMusic"><b>Espace</b></button></div>
+            <div><span>Musique pr&eacute;c&eacute;dente</span><button type="button" data-shortcut-action="previousMusic"><b>P</b></button></div>
+          </div>
+          <p class="shortcut-status" aria-live="polite"></p>
+          <button class="shortcut-reset" type="button" onclick="resetQuickShortcuts()">R&eacute;tablir les touches par d&eacute;faut</button>
+        </div>
       </div>
     </div>
   </div>
@@ -299,6 +316,7 @@
   <div class="crowd"></div>
   <div class="game-utility-controls" aria-label="Contrôles rapides">
     <button class="settings" onclick="toggleOptions()" aria-label="Options">&#9881;</button>
+    <button class="next-track-button game-previous-track-button" type="button" onclick="playPreviousTheme()" aria-label="Musique pr&eacute;c&eacute;dente" title="Musique pr&eacute;c&eacute;dente">&#9198;</button>
     <button class="next-track-button music-pause-toggle game-pause-track-button" type="button" onclick="toggleThemePause()" aria-label="Mettre la musique en pause" title="Mettre la musique en pause">&#10074;&#10074;</button>
     <button class="next-track-button game-next-track-button" type="button" onclick="playNextTheme()" aria-label="Musique suivante" title="Musique suivante">&#9197;</button>
   </div>
@@ -313,6 +331,11 @@
       <button onclick="hideOptions();showMenu()">Retour menu principal</button>
       <button class="dark" onclick="requestProfileLogout()">Se déconnecter</button>
       <button class="danger" onclick="requestQuitGame()">Quitter le jeu</button>
+    </div>
+
+    <div class="game-options-tabs" role="tablist" aria-label="Cat&eacute;gories des options">
+      <button class="active" id="generalOptionsTab" type="button" role="tab" aria-selected="true" onclick="setOptionsTab('general')">G&eacute;n&eacute;ral</button>
+      <button id="shortcutsOptionsTab" type="button" role="tab" aria-selected="false" onclick="setOptionsTab('shortcuts')">Touches rapides</button>
     </div>
 
     <div class="audio-options">
@@ -341,6 +364,17 @@
         <option value="1600x900">1600 x 900</option>
         <option value="1920x1080">1920 x 1080</option>
       </select>
+    </div>
+    <div class="shortcut-options" id="shortcutOptions" hidden>
+      <p class="shortcut-intro">Clique sur une touche, puis appuie sur la nouvelle commande.</p>
+      <div class="shortcut-list">
+        <div><span>Menu</span><button type="button" data-shortcut-action="menu"><b>&Eacute;chap</b></button></div>
+        <div><span>Musique suivante</span><button type="button" data-shortcut-action="nextMusic"><b>S</b></button></div>
+        <div><span>Couper / reprendre la musique</span><button type="button" data-shortcut-action="toggleMusic"><b>Espace</b></button></div>
+        <div><span>Musique pr&eacute;c&eacute;dente</span><button type="button" data-shortcut-action="previousMusic"><b>P</b></button></div>
+      </div>
+      <p class="shortcut-status" id="shortcutStatus" aria-live="polite"></p>
+      <button class="shortcut-reset" type="button" onclick="resetQuickShortcuts()">R&eacute;tablir les touches par d&eacute;faut</button>
     </div>
   </div>
   <div class="game-layout">
