@@ -180,17 +180,17 @@ function sortMultiLeaderboard(entries=[]){
   return [...entries].sort((a,b)=>{
     const progressA = window.AllstarRankingService.normalizeProgress(a);
     const progressB = window.AllstarRankingService.normalizeProgress(b);
+    const totalA = leaderboardTotalMatches(a);
+    const totalB = leaderboardTotalMatches(b);
+    if(multiLeaderboardSort === "matches")return totalB-totalA || progressB.elo-progressA.elo || leaderboardCreatedAt(a)-leaderboardCreatedAt(b);
     const tryoutsA=progressA.rankedMatches<window.AllstarRankingService.TRYOUT_MATCHES;
     const tryoutsB=progressB.rankedMatches<window.AllstarRankingService.TRYOUT_MATCHES;
     if(tryoutsA||tryoutsB){
       if(tryoutsA!==tryoutsB)return tryoutsA ? 1 : -1;
       return leaderboardCreatedAt(a)-leaderboardCreatedAt(b)||String(a.pseudo||"").localeCompare(String(b.pseudo||""),"fr");
     }
-    const totalA = leaderboardTotalMatches(a);
-    const totalB = leaderboardTotalMatches(b);
     const rateA = totalA ? progressA.wins / totalA : 0;
     const rateB = totalB ? progressB.wins / totalB : 0;
-    if(multiLeaderboardSort === "matches")return totalB-totalA || progressB.elo-progressA.elo;
     if(multiLeaderboardSort === "winrate")return rateB-rateA || totalB-totalA || progressB.elo-progressA.elo;
     if(multiLeaderboardSort === "record")return progressB.bestElo-progressA.bestElo || progressB.elo-progressA.elo;
     return progressB.elo-progressA.elo || totalB-totalA;

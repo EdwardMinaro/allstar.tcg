@@ -776,8 +776,8 @@
         "Technique": 4,
         "Charisme": 8
       },
-      "effect": "S'il a un bonus, + 1 en Force et +1 en Vitesse.",
-      "ability": "managerOwnedForceSpeed1",
+      "effect": "S'il a une carte bonus d'\u00e9quip\u00e9e, +2 en Force et +2 en Vitesse.",
+      "ability": "bonusEquippedForceSpeed2",
       "renderArt": "assets/card_renders/rare_catcheurs_dadou_bazooka.png",
       "musicId": "dadou_bazooka"
     },

@@ -784,8 +784,8 @@ const CARD_DATA = [
       "Technique": 4,
       "Charisme": 8
     },
-    "effect": "S'il a un bonus, + 1 en Force et +1 en Vitesse.",
-    "ability": "managerOwnedForceSpeed1",
+    "effect": "S'il a une carte bonus d'\u00e9quip\u00e9e, +2 en Force et +2 en Vitesse.",
+    "ability": "bonusEquippedForceSpeed2",
     "renderArt": "assets/card_renders/rare_catcheurs_dadou_bazooka.png",
     "musicId": "dadou_bazooka"
   },
@@ -2942,7 +2942,7 @@ const EFFECT_REGISTRY = {
   mVitesse1: { timing:"manager", text:"+1 Vitesse." },
   matchRoundOneAll1: { timing:"round1", text:"Round 1 : +1 dans toutes les statistiques." },
   graveElAmnesicoAll1: { timing:"grave", text:"Au vestiaire : El Amnesico gagne +1 partout." },
-  managerOwnedForceSpeed1: { timing:"duel", text:"Si un bonus est actif : +1 Force et +1 Vitesse." },
+  bonusEquippedForceSpeed2: { timing:"duel", text:"Si une carte bonus est \u00e9quip\u00e9e : +2 Force et +2 Vitesse." },
   managerOwnedTechForceSpeed1: { timing:"duel", text:"Si un bonus est actif : +1 Technique, Force et Vitesse." },
   nextEntryAll1: { timing:"defeat", text:"Une fois par match, le prochain catcheur gagne +1 partout." },
   nextSpeedOnFirstLoss1: { timing:"firstLoss", text:"Si la carte perd son premier round, prochain catcheur +1 Vitesse." },
@@ -6336,7 +6336,7 @@ function score(s,stat){
   if(ability==="firstRoundSpeedCharisma3"&&firstRound&&(stat==="Vitesse"||stat==="Charisme"))v+=3;
   if(ability==="techniqueRound1"&&firstRound&&stat==="Technique")v+=3;
   if(ability==="managerOwnedTechForceSpeed1"&&s.owner?.man&&(stat==="Technique"||stat==="Force"||stat==="Vitesse"))v+=1;
-  if(ability==="managerOwnedForceSpeed1"&&s.owner?.man&&(stat==="Force"||stat==="Vitesse"))v+=1;
+  if(ability==="bonusEquippedForceSpeed2"&&s.owner?.man&&(stat==="Force"||stat==="Vitesse"))v+=2;
   if(ability==="round2ActiveStat3"&&G.round===2)v+=3;
   if(ability==="round4All1"&&G.round===4)v+=1;
   if(ability==="secondPlayerForceCharisma1"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Force"||stat==="Charisme"))v+=1;
@@ -6393,7 +6393,7 @@ function statAbilityFeedback(s,stat){
   if(ability==="firstRoundSpeedCharisma3"&&firstRound&&(stat==="Vitesse"||stat==="Charisme"))return `+3 ${stat}`;
   if(ability==="techniqueRound1"&&firstRound&&stat==="Technique")return "+3 Technique";
   if(ability==="managerOwnedTechForceSpeed1"&&s.owner?.man&&(stat==="Technique"||stat==="Force"||stat==="Vitesse"))return `Bonus +1 ${stat}`;
-  if(ability==="managerOwnedForceSpeed1"&&s.owner?.man&&(stat==="Force"||stat==="Vitesse"))return `Bonus +1 ${stat}`;
+  if(ability==="bonusEquippedForceSpeed2"&&s.owner?.man&&(stat==="Force"||stat==="Vitesse"))return `Bonus +2 ${stat}`;
   if(ability==="round2ActiveStat3"&&G.round===2)return `Round 2 +3 ${stat}`;
   if(ability==="round4All1"&&G.round===4)return `Round 4 +1 ${stat}`;
   if(ability==="secondPlayerForceCharisma1"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Force"||stat==="Charisme"))return `Second +1 ${stat}`;

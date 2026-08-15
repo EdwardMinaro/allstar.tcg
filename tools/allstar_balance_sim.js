@@ -298,7 +298,7 @@ function score(state, stat, round, roundStarter) {
   if (ability === "firstRoundSpeedCharisma3" && matchRoundOne && (stat === "Vitesse" || stat === "Charisme")) value += 3;
   if (ability === "techniqueRound1" && matchRoundOne && stat === "Technique") value += 3;
   if (ability === "managerOwnedTechForceSpeed1" && state.owner.man && (stat === "Technique" || stat === "Force" || stat === "Vitesse")) value += 1;
-  if (ability === "managerOwnedForceSpeed1" && state.owner.man && (stat === "Force" || stat === "Vitesse")) value += 1;
+  if (ability === "bonusEquippedForceSpeed2" && state.owner.man && (stat === "Force" || stat === "Vitesse")) value += 2;
   if (ability === "round2ActiveStat3" && round === 2) value += 3;
   if (ability === "secondPlayerTechniqueCharisma2" && state.owner.side !== roundStarter && (stat === "Technique" || stat === "Charisme")) value += 2;
   return value;
