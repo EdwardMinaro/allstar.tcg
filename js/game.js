@@ -784,7 +784,7 @@ const CARD_DATA = [
       "Technique": 4,
       "Charisme": 8
     },
-    "effect": "S'il a une carte bonus d'\u00e9quip\u00e9e, +2 en Force et +2 en Vitesse.",
+    "effect": "S'il a une carte bonus d'équipée, +2 en Force et +2 en Vitesse.",
     "ability": "bonusEquippedForceSpeed2",
     "renderArt": "assets/card_renders/rare_catcheurs_dadou_bazooka.png",
     "musicId": "dadou_bazooka"
@@ -1105,6 +1105,22 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_catcheurs_jose_moreno.png"
   },
   {
+    "key": "rare_catcheurs_kev_lagadec",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Kev Lagadec",
+    "stats": {
+      "Force": 5,
+      "Vitesse": 7,
+      "Technique": 6,
+      "Charisme": 6
+    },
+    "effect": "Si une carte bonus ou objet, de rareté \"rare\" maximum, lui est équipée, doublez son effet",
+    "renderArt": "assets/card_renders/rare_catcheurs_kev_lagadec.png",
+    "musicId": "kev_lagadec",
+    "ability": "doubleEquippedSupportUpToRare"
+  },
+  {
     "key": "rare_catcheurs_kevin_avanti",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -1326,6 +1342,22 @@ const CARD_DATA = [
     "ability": "pinBonus",
     "renderArt": "assets/card_renders/rare_catcheurs_maxime_cuadrado.png",
     "musicId": "maxime_cuadrado"
+  },
+  {
+    "key": "rare_catcheurs_melusine",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Melusine",
+    "stats": {
+      "Force": 10,
+      "Vitesse": 1,
+      "Technique": 4,
+      "Charisme": 9
+    },
+    "effect": "Apparition : Gagnez +1 de Vitesse et +1 de Technique par carte \"Melusine\" ou \"Melusine Aconit\" dans votre vestiaire.",
+    "renderArt": "assets/card_renders/rare_catcheurs_melusine.png",
+    "musicId": "melusine",
+    "ability": "entryMelusineGraveSpeedTechnique1Each"
   },
   {
     "key": "rare_catcheurs_nilsn",
@@ -2108,6 +2140,21 @@ const CARD_DATA = [
     "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_catcheurs_maxime_cuadrado.png",
     "musicId": "maxime_cuadrado"
+  },
+  {
+    "key": "standard_catcheurs_melusine_aconit",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Melusine Aconit",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 5,
+      "Technique": 7,
+      "Charisme": 6
+    },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_melusine_aconit.png",
+    "musicId": "melusine_aconit"
   },
   {
     "key": "standard_catcheurs_nilsn",
@@ -2904,6 +2951,8 @@ const EFFECT_REGISTRY = {
   entryIfZerkInHandDiscard1: { timing:"entry", text:"Si The Butcher Zerk est en main : l'adversaire défausse 1 carte." },
   entryRandomStat3: { timing:"entry", text:"À l'arrivée : +3 à une statistique aléatoire." },
   entryStatChoice3: { timing:"entry", text:"À l'arrivée : choisissez une statistique, +3.", choice:true },
+  entryMelusineGraveSpeedTechnique1Each: { timing:"entry", text:"À l'arrivée : +1 Vitesse et +1 Technique par Mélusine ou Mélusine Aconit dans votre vestiaire." },
+  doubleEquippedSupportUpToRare: { timing:"continuous", text:"Double les valeurs numériques du Bonus ou de l'Objet Standard ou Rare équipé." },
   firstLossDeck: { timing:"defeat", text:"Une fois par match, annule la première défaite et reste sur le terrain." },
   firstRoundCharTech: { timing:"round1", text:"+1 Charisme et +1 Technique au round 1." },
   firstRoundCharTech2: { timing:"round1", text:"+2 Charisme et +2 Technique au round 1." },
@@ -5234,6 +5283,18 @@ function applyWrestlerEntryEffect(owner,c){
     showEffectFeedback(c,c.name,"Effet annulé","block");
     return;
   }
+  if(c.ability==="entryMelusineGraveSpeedTechnique1Each"){
+    const linked=owner.grave.filter(card=>card.type==="Catcheur"&&["Melusine","Melusine Aconit"].includes(card.name)).length;
+    if(linked){
+      owner.cat.mods.Vitesse+=linked;
+      owner.cat.mods.Technique+=linked;
+      log(`[EFFET] ${c.name} : +${linked} Vitesse et +${linked} Technique grâce au vestiaire.`);
+      showEffectFeedback(owner.cat.card,c.name,`+${linked} Vitesse / +${linked} Technique`,"buff");
+    }else{
+      log(`[EFFET] ${c.name} : aucune Melusine au vestiaire.`);
+    }
+    return;
+  }
   if(c.ability==="objectExtra1"){
     owner.objectDurationBonus=Math.max(owner.objectDurationBonus||0,1);
     log(`[EFFET] ${c.name} : les objets qui lui sont équipés durent 2 tours.`);
@@ -5606,32 +5667,33 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
     return;
   }
   const effect={targetSide:owner.side,mods:{},pin:0,pinShield:0,save:false};
+  const mult=supportEffectMultiplier(owner,c);
   let feedback="";
   let kind="buff";
 
   switch(c.ability){
-    case"mForce1":addTrackedStat(effect,s,"Force",1);feedback="+1 Force";break;
-    case"mForce":addTrackedStat(effect,s,"Force",2);feedback="+2 Force";break;
-    case"mForce3":addTrackedStat(effect,s,"Force",3);feedback="+3 Force";break;
-    case"mVitesse":addTrackedStat(effect,s,"Vitesse",2);feedback="+2 Vitesse";break;
-    case"mVitesse1":addTrackedStat(effect,s,"Vitesse",1);feedback="+1 Vitesse";break;
-    case"mTechnique":addTrackedStat(effect,s,"Technique",2);feedback="+2 Technique";break;
-    case"mCharisme1":addTrackedStat(effect,s,"Charisme",1);feedback="+1 Charisme";break;
-    case"mCharisme":addTrackedStat(effect,s,"Charisme",2);feedback="+2 Charisme";break;
-    case"mCharisme3":addTrackedStat(effect,s,"Charisme",3);feedback="+3 Charisme";break;
-    case"mTechnique1":addTrackedStat(effect,s,"Technique",1);feedback="+1 Technique";break;
+    case"mForce1":addTrackedStat(effect,s,"Force",mult);feedback=`+${mult} Force`;break;
+    case"mForce":addTrackedStat(effect,s,"Force",2*mult);feedback=`+${2*mult} Force`;break;
+    case"mForce3":addTrackedStat(effect,s,"Force",3*mult);feedback=`+${3*mult} Force`;break;
+    case"mVitesse":addTrackedStat(effect,s,"Vitesse",2*mult);feedback=`+${2*mult} Vitesse`;break;
+    case"mVitesse1":addTrackedStat(effect,s,"Vitesse",mult);feedback=`+${mult} Vitesse`;break;
+    case"mTechnique":addTrackedStat(effect,s,"Technique",2*mult);feedback=`+${2*mult} Technique`;break;
+    case"mCharisme1":addTrackedStat(effect,s,"Charisme",mult);feedback=`+${mult} Charisme`;break;
+    case"mCharisme":addTrackedStat(effect,s,"Charisme",2*mult);feedback=`+${2*mult} Charisme`;break;
+    case"mCharisme3":addTrackedStat(effect,s,"Charisme",3*mult);feedback=`+${3*mult} Charisme`;break;
+    case"mTechnique1":addTrackedStat(effect,s,"Technique",mult);feedback=`+${mult} Technique`;break;
     case"mCharisma2SpeedMinus1":
-      addTrackedStat(effect,s,"Charisme",2);
-      addTrackedStat(effect,s,"Vitesse",-1);
-      feedback="+2 Charisme / -1 Vitesse";
+      addTrackedStat(effect,s,"Charisme",2*mult);
+      addTrackedStat(effect,s,"Vitesse",-mult);
+      feedback=`+${2*mult} Charisme / -${mult} Vitesse`;
       break;
-    case"mAll1":addTrackedAllStats(effect,s,1);feedback="+1 partout";break;
-    case"mAll2":addTrackedAllStats(effect,s,2);feedback="+2 partout";break;
+    case"mAll1":addTrackedAllStats(effect,s,mult);feedback=`+${mult} partout`;break;
+    case"mAll2":addTrackedAllStats(effect,s,2*mult);feedback=`+${2*mult} partout`;break;
     case"mAll2IfGrave3":{
       const wrestlersInGrave=owner.grave.filter(card=>card.type==="Catcheur").length;
       if(wrestlersInGrave>=3){
-        addTrackedAllStats(effect,s,2);
-        feedback="+2 partout";
+        addTrackedAllStats(effect,s,2*mult);
+        feedback=`+${2*mult} partout`;
       }else{
         feedback="Condition non remplie";
         kind="block";
@@ -5639,75 +5701,75 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
       }
       break;
     }
-    case"mAll3":addTrackedAllStats(effect,s,3);feedback="+3 partout";break;
+    case"mAll3":addTrackedAllStats(effect,s,3*mult);feedback=`+${3*mult} partout`;break;
     case"mRandom":{
-      const [stat]=addTrackedRandomStats(effect,s,1);
-      feedback=`+1 ${stat}`;
+      const stats=addTrackedRandomStats(effect,s,1,mult);
+      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
       break;
     }
     case"mRandom2":{
-      const stats=addTrackedRandomStats(effect,s,2);
-      feedback=stats.map(stat=>`+1 ${stat}`).join(" / ");
+      const stats=addTrackedRandomStats(effect,s,2,mult);
+      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
       break;
     }
     case"bellRandomStats2":{
-      const stats=addTrackedRandomStats(effect,s,2);
-      feedback=stats.map(stat=>`+1 ${stat}`).join(" / ");
+      const stats=addTrackedRandomStats(effect,s,2,mult);
+      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
       break;
     }
     case"mSave":s.save=true;effect.save=true;feedback="Sauvetage";kind="block";break;
     case"pinShield5":
-      owner.pinShield=(owner.pinShield||0)+5;
-      effect.pinShield=5;
-      feedback="Tombé adverse -5";
+      owner.pinShield=(owner.pinShield||0)+5*mult;
+      effect.pinShield=5*mult;
+      feedback=`Tombé adverse -${5*mult}`;
       kind="block";
       break;
     case"pinObject5":
-      s.pin+=5;
-      effect.pin=5;
-      feedback="Tombé +5";
+      s.pin+=5*mult;
+      effect.pin=5*mult;
+      feedback=`Tombé +${5*mult}`;
       kind="pin";
       break;
     case"pinObject10":
-      s.pin+=10;
-      effect.pin=10;
-      feedback="Tombé +10";
+      s.pin+=10*mult;
+      effect.pin=10*mult;
+      feedback=`Tombé +${10*mult}`;
       kind="pin";
       break;
     case"pinObject20":{
       if(choice==="charisme"){
-        addTrackedStat(effect,s,"Charisme",2);
-        feedback="+2 Charisme";
+        addTrackedStat(effect,s,"Charisme",2*mult);
+        feedback=`+${2*mult} Charisme`;
         kind="buff";
       }else{
-        s.pin+=20;
-        effect.pin=20;
-        feedback="Tombé +20";
+        s.pin+=20*mult;
+        effect.pin=20*mult;
+        feedback=`Tombé +${20*mult}`;
         kind="pin";
       }
       break;
     }
     case"pinObject30":
-      s.pin+=30;
-      effect.pin=30;
-      feedback="Tombé +30";
+      s.pin+=30*mult;
+      effect.pin=30*mult;
+      feedback=`Tombé +${30*mult}`;
       kind="pin";
       break;
     case"objectChoiceForceCharisma2":{
       const stat=choice==="charisme"?"Charisme":"Force";
-      addTrackedStat(effect,s,stat,2);
-      feedback=`+2 ${stat}`;
+      addTrackedStat(effect,s,stat,2*mult);
+      feedback=`+${2*mult} ${stat}`;
       break;
     }
     case"objectChoiceStat1":{
       const stat=STATS.includes(choice)?choice:"Force";
-      addTrackedStat(effect,s,stat,1);
-      feedback=`+1 ${stat}`;
+      addTrackedStat(effect,s,stat,mult);
+      feedback=`+${mult} ${stat}`;
       break;
     }
     case"drawNext1":
-      owner.nextDrawBonus=(owner.nextDrawBonus||0)+1;
-      feedback="Pioche +1";
+      owner.nextDrawBonus=(owner.nextDrawBonus||0)+mult;
+      feedback=`Pioche +${mult}`;
       kind="special";
       break;
     case"recoverGrave":{
@@ -5718,18 +5780,19 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
       break;
     }
     case"opponentDiscard1":{
-      const discarded=opp.hand.pop();
-      if(discarded){
-        opp.grave.push(discarded);
-        feedback="Défausse adverse";
+      const discarded=[];
+      for(let i=0;i<mult&&opp.hand.length;i++)discarded.push(opp.hand.pop());
+      if(discarded.length){
+        opp.grave.push(...discarded);
+        feedback=`${discarded.length} défausse${discarded.length>1?"s":""} adverse${discarded.length>1?"s":""}`;
         kind="malus";
       }
       break;
     }
     case"opponentDiscardRandom1":{
-      const [discarded]=discardRandomCards(opp,1);
-      if(discarded){
-        feedback=`Défausse ${discarded.name}`;
+      const discarded=discardRandomCards(opp,mult);
+      if(discarded.length){
+        feedback=`Défausse ${discarded.map(card=>card.name).join(" / ")}`;
         kind="malus";
       }else{
         feedback="Aucune carte à défausser";
@@ -5744,12 +5807,12 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
         break;
       }
       if(owner.side!==G.roundStarter){
-        const discarded=discardRandomCards(opp,3);
+        const discarded=discardRandomCards(opp,3*mult);
         feedback=discarded.length?`${discarded.length} carte${discarded.length>1?"s":""} adverse${discarded.length>1?"s":""} défaussée${discarded.length>1?"s":""}`:"Aucune carte à défausser";
         kind=discarded.length?"malus":"block";
       }else{
         const before=owner.hand.length;
-        draw(owner,2);
+        draw(owner,2*mult);
         const amount=owner.hand.length-before;
         feedback=amount?`Pioche ${amount} carte${amount>1?"s":""}`:"Pioche impossible";
         kind=amount?"special":"block";
@@ -5820,6 +5883,12 @@ function releaseSupportEffects(owner,opp){
 function wrestlerAbility(s){
   if(!s||s.owner?.wrestlerEffectsBlocked)return null;
   return s.card?.ability || null;
+}
+
+function supportEffectMultiplier(owner,c){
+  const supportedType=c?.type==="Manager"||c?.type==="Objet";
+  const supportedRarity=c?.rarity==="Standard"||c?.rarity==="Rare";
+  return wrestlerAbility(owner?.cat)==="doubleEquippedSupportUpToRare"&&supportedType&&supportedRarity?2:1;
 }
 
 function isCardEffectImmune(s){
@@ -5901,23 +5970,24 @@ function applyEffect(owner,opp,c){
   if(!s)return;
   let feedback="";
   let kind="buff";
+  const mult=supportEffectMultiplier(owner,c);
   switch(c.ability){
-    case"mForce1":s.mods.Force+=1;feedback="+1 Force";break;
-    case"mForce":s.mods.Force+=2;feedback="+2 Force";break;
-    case"mForce3":s.mods.Force+=3;feedback="+3 Force";break;
-    case"mVitesse":s.mods.Vitesse+=2;feedback="+2 Vitesse";break;
-    case"mVitesse1":s.mods.Vitesse+=1;feedback="+1 Vitesse";break;
-    case"mTechnique":s.mods.Technique+=2;feedback="+2 Technique";break;
-    case"mTechnique1":s.mods.Technique+=1;feedback="+1 Technique";break;
-    case"mCharisme1":s.mods.Charisme+=1;feedback="+1 Charisme";break;
-    case"mCharisme":s.mods.Charisme+=2;feedback="+2 Charisme";break;
-    case"mCharisme3":s.mods.Charisme+=3;feedback="+3 Charisme";break;
-    case"mAll1":addAllStats(s,1);feedback="+1 partout";break;
-    case"mAll2":addAllStats(s,2);feedback="+2 partout";break;
+    case"mForce1":s.mods.Force+=mult;feedback=`+${mult} Force`;break;
+    case"mForce":s.mods.Force+=2*mult;feedback=`+${2*mult} Force`;break;
+    case"mForce3":s.mods.Force+=3*mult;feedback=`+${3*mult} Force`;break;
+    case"mVitesse":s.mods.Vitesse+=2*mult;feedback=`+${2*mult} Vitesse`;break;
+    case"mVitesse1":s.mods.Vitesse+=mult;feedback=`+${mult} Vitesse`;break;
+    case"mTechnique":s.mods.Technique+=2*mult;feedback=`+${2*mult} Technique`;break;
+    case"mTechnique1":s.mods.Technique+=mult;feedback=`+${mult} Technique`;break;
+    case"mCharisme1":s.mods.Charisme+=mult;feedback=`+${mult} Charisme`;break;
+    case"mCharisme":s.mods.Charisme+=2*mult;feedback=`+${2*mult} Charisme`;break;
+    case"mCharisme3":s.mods.Charisme+=3*mult;feedback=`+${3*mult} Charisme`;break;
+    case"mAll1":addAllStats(s,mult);feedback=`+${mult} partout`;break;
+    case"mAll2":addAllStats(s,2*mult);feedback=`+${2*mult} partout`;break;
     case"mAll2IfGrave3":{
       const wrestlersInGrave=owner.grave.filter(card=>card.type==="Catcheur").length;
       if(wrestlersInGrave>=3){
-        feedback="+2 partout";
+        feedback=`+${2*mult} partout`;
       }else{
         feedback="Actif à 3 catcheurs au vestiaire";
         kind="block";
@@ -5925,45 +5995,45 @@ function applyEffect(owner,opp,c){
       }
       break;
     }
-    case"mAll3":addAllStats(s,3);feedback="+3 partout";break;
+    case"mAll3":addAllStats(s,3*mult);feedback=`+${3*mult} partout`;break;
     case"bonusOdysseeTechForceTeam":{
-      const amount=["Charlie Bergson","Trevor Mayden"].includes(s.card.name)?2:1;
+      const amount=(["Charlie Bergson","Trevor Mayden"].includes(s.card.name)?2:1)*mult;
       s.mods.Technique+=amount;
       s.mods.Force+=amount;
       feedback=`+${amount} Technique / +${amount} Force`;
       break;
     }
     case"bonusPassionForceCharTeam":{
-      const amount=["Black Sam","Angelo Folena"].includes(s.card.name)?2:1;
+      const amount=(["Black Sam","Angelo Folena"].includes(s.card.name)?2:1)*mult;
       s.mods.Force+=amount;
       s.mods.Charisme+=amount;
       feedback=`+${amount} Force / +${amount} Charisme`;
       break;
     }
     case"bonusPfiCharSpeedTeam":{
-      const amount=["Ethan Riley","Maxime Cuadrado"].includes(s.card.name)?2:1;
+      const amount=(["Ethan Riley","Maxime Cuadrado"].includes(s.card.name)?2:1)*mult;
       s.mods.Charisme+=amount;
       s.mods.Vitesse+=amount;
       feedback=`+${amount} Charisme / +${amount} Vitesse`;
       break;
     }
     case"mRandom":{
-      const [stat]=addRandomStats(s,1);
-      feedback=`+1 ${stat}`;
+      const stats=addRandomStats(s,1,mult);
+      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
       break;
     }
     case"mRandom2":{
-      const stats=addRandomStats(s,2);
-      feedback=stats.map(stat=>`+1 ${stat}`).join(" / ");
+      const stats=addRandomStats(s,2,mult);
+      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
       break;
     }
     case"mSave":s.save=true;feedback="Sauvetage";kind="block";break;
-    case"pinShield5":owner.pinShield=(owner.pinShield||0)+5;feedback="Tombé adverse -5";kind="block";break;
-    case"pinObject5":s.pin+=5;feedback="Tombé +5";kind="pin";break;
-    case"pinObject10":s.pin+=10;feedback="Tombé +10";kind="pin";break;
-    case"pinObject20":s.pin+=20;feedback="Tombé +20";kind="pin";break;
-    case"pinObject30":s.pin+=30;feedback="Tombé +30";kind="pin";break;
-    case"drawNext1":owner.nextDrawBonus=(owner.nextDrawBonus||0)+1;feedback="Pioche +1";kind="special";break;
+    case"pinShield5":owner.pinShield=(owner.pinShield||0)+5*mult;feedback=`Tombé adverse -${5*mult}`;kind="block";break;
+    case"pinObject5":s.pin+=5*mult;feedback=`Tombé +${5*mult}`;kind="pin";break;
+    case"pinObject10":s.pin+=10*mult;feedback=`Tombé +${10*mult}`;kind="pin";break;
+    case"pinObject20":s.pin+=20*mult;feedback=`Tombé +${20*mult}`;kind="pin";break;
+    case"pinObject30":s.pin+=30*mult;feedback=`Tombé +${30*mult}`;kind="pin";break;
+    case"drawNext1":owner.nextDrawBonus=(owner.nextDrawBonus||0)+mult;feedback=`Pioche +${mult}`;kind="special";break;
     case"recoverGrave":{
       recoverCardFromGrave(owner,c,{
         prompt:"Choisis la carte à récupérer dans ton vestiaire.",
@@ -5972,8 +6042,9 @@ function applyEffect(owner,opp,c){
       break;
     }
     case"opponentDiscard1":{
-      const discarded=opp.hand.pop();
-      if(discarded){opp.grave.push(discarded);feedback="Défausse adverse";kind="malus";}
+      const discarded=[];
+      for(let i=0;i<mult&&opp.hand.length;i++)discarded.push(opp.hand.pop());
+      if(discarded.length){opp.grave.push(...discarded);feedback=`${discarded.length} défausse${discarded.length>1?"s":""} adverse${discarded.length>1?"s":""}`;kind="malus";}
       break;
     }
     case"cancelObjects":{
@@ -6010,15 +6081,15 @@ function applyEffect(owner,opp,c){
       kind="block";
       break;
     }
-    case"objectExtra1":owner.objectDurationBonus=Math.max(owner.objectDurationBonus||0,1);feedback="Objet +1 tour";kind="special";break;
-    case"objectExtra2":owner.objectDurationBonus=Math.max(owner.objectDurationBonus||0,2);feedback="Objet +2 tours";kind="special";break;
+    case"objectExtra1":owner.objectDurationBonus=Math.max(owner.objectDurationBonus||0,mult);feedback=`Objet +${mult} tour${mult>1?"s":""}`;kind="special";break;
+    case"objectExtra2":owner.objectDurationBonus=Math.max(owner.objectDurationBonus||0,2*mult);feedback=`Objet +${2*mult} tours`;kind="special";break;
     case"objectExtra2Weakest":{
-      owner.objectDurationBonus=Math.max(owner.objectDurationBonus||0,2);
+      owner.objectDurationBonus=Math.max(owner.objectDurationBonus||0,2*mult);
       const weakest=STATS.reduce((best,stat)=>(s.card.stats?.[stat]||0)+s.mods[stat] < (s.card.stats?.[best]||0)+s.mods[best] ? stat : best,STATS[0]);
-      s.mods[weakest]+=1;
-      feedback=`Objet +2 tours / +1 ${weakest}`;
+      s.mods[weakest]+=mult;
+      feedback=`Objet +${2*mult} tours / +${mult} ${weakest}`;
       kind="special";
-      log(`${c.name} renforce ${weakest} (+1).`);
+      log(`${c.name} renforce ${weakest} (+${mult}).`);
       break;
     }
   }

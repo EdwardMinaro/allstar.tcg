@@ -1,26 +1,19 @@
 {
   "imported": [
     {
-      "key": "rare_catcheurs_coda_reznov",
-      "name": "Coda Reznov",
+      "key": "rare_catcheurs_kev_lagadec",
+      "name": "Kev Lagadec",
       "rarity": "Rare",
       "type": "Catcheur",
-      "ability": "entryRandomStat3"
-    },
-    {
-      "key": "legende_catcheurs_coda_reznov",
-      "name": "Coda Reznov",
-      "rarity": "Legende",
-      "type": "Catcheur",
-      "ability": "entryStatChoice3"
+      "ability": "doubleEquippedSupportUpToRare"
     }
   ],
   "updated": [],
   "skipped": [],
   "music": [
     {
-      "source": "C:\\Users\\LENOVO\\Documents\\Codex\\2026-06-15\\tu-peux-travailler-sur-plusieurs-projets\\outputs\\catch_cards_audio_responsive\\tools\\coda_reznov_import_025\\copy_AA475EE8-BCB0-4AEA-9360-29AE91889027.mp3",
-      "target": "coda_reznov.mp3"
+      "source": "C:\\Users\\LENOVO\\Downloads\\Kev Lagadec\\Kev Lagadec titantron theme song.mov (2).mp3",
+      "target": "kev_lagadec.mp3"
     }
   ]
 }

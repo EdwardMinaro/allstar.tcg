@@ -776,7 +776,7 @@
         "Technique": 4,
         "Charisme": 8
       },
-      "effect": "S'il a une carte bonus d'\u00e9quip\u00e9e, +2 en Force et +2 en Vitesse.",
+      "effect": "S'il a une carte bonus d'équipée, +2 en Force et +2 en Vitesse.",
       "ability": "bonusEquippedForceSpeed2",
       "renderArt": "assets/card_renders/rare_catcheurs_dadou_bazooka.png",
       "musicId": "dadou_bazooka"
@@ -1097,6 +1097,22 @@
       "renderArt": "assets/card_renders/rare_catcheurs_jose_moreno.png"
     },
     {
+      "key": "rare_catcheurs_kev_lagadec",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Kev Lagadec",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Si une carte bonus ou objet, de rareté \"rare\" maximum, lui est équipée, doublez son effet",
+      "renderArt": "assets/card_renders/rare_catcheurs_kev_lagadec.png",
+      "musicId": "kev_lagadec",
+      "ability": "doubleEquippedSupportUpToRare"
+    },
+    {
       "key": "rare_catcheurs_kevin_avanti",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -1318,6 +1334,22 @@
       "ability": "pinBonus",
       "renderArt": "assets/card_renders/rare_catcheurs_maxime_cuadrado.png",
       "musicId": "maxime_cuadrado"
+    },
+    {
+      "key": "rare_catcheurs_melusine",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Melusine",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 1,
+        "Technique": 4,
+        "Charisme": 9
+      },
+      "effect": "Apparition : Gagnez +1 de Vitesse et +1 de Technique par carte \"Melusine\" ou \"Melusine Aconit\" dans votre vestiaire.",
+      "renderArt": "assets/card_renders/rare_catcheurs_melusine.png",
+      "musicId": "melusine",
+      "ability": "entryMelusineGraveSpeedTechnique1Each"
     },
     {
       "key": "rare_catcheurs_nilsn",
@@ -2100,6 +2132,21 @@
       "effect": "Aucun effet.",
       "renderArt": "assets/card_renders/standard_catcheurs_maxime_cuadrado.png",
       "musicId": "maxime_cuadrado"
+    },
+    {
+      "key": "standard_catcheurs_melusine_aconit",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Melusine Aconit",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 5,
+        "Technique": 7,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_melusine_aconit.png",
+      "musicId": "melusine_aconit"
     },
     {
       "key": "standard_catcheurs_nilsn",

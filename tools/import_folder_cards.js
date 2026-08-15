@@ -27,6 +27,9 @@ const TYPE_MAP = {
 const MUSIC_TARGETS = {
   "History Untold (Entrance Edit).mp3": "adam_frost.mp3",
   "copy_AA475EE8-BCB0-4AEA-9360-29AE91889027.mp3": "coda_reznov.mp3",
+  "Melusine.mp3": "melusine.mp3",
+  "Melusine Aconit.mp3": "melusine_aconit.mp3",
+  "Kev Lagadec titantron theme song.mov (2).mp3": "kev_lagadec.mp3",
   "El Amnesico.mp3": "el_amnesico.mp3",
   "1-LOVE IN THE FIELD.mp3": "alex_kiss.mp3",
   "Thème Officiel Eddy Marston.mp3": "eddy_marston.mp3",
@@ -59,6 +62,8 @@ const BLOCKED_MUSIC_FOLDERS = new Set([
 const ABILITY_BY_KEY = {
   "Rare|Catcheur|Adam Frost": "turnEnemyRandomPermanent1Max5",
   "Legende|Catcheur|Adam Frost": "turnEnemyRandomPermanent2Max3",
+  "Rare|Catcheur|Melusine": "entryMelusineGraveSpeedTechnique1Each",
+  "Rare|Catcheur|Kev Lagadec": "doubleEquippedSupportUpToRare",
   "Rare|Catcheur|Coda Reznov": "entryRandomStat3",
   "Legende|Catcheur|Coda Reznov": "entryStatChoice3",
   "Rare|Catcheur|Alex Kiss": "graveElAmnesicoAll1",

@@ -20,6 +20,21 @@ const AUDIO_LIBRARY = {
       wrestler: "Coda Reznov",
       src: "assets/audio/music/coda_reznov.mp3"
     },
+    kev_lagadec: {
+      label: "Kev Lagadec",
+      wrestler: "Kev Lagadec",
+      src: "assets/audio/music/kev_lagadec.mp3"
+    },
+    melusine: {
+      label: "Melusine",
+      wrestler: "Melusine",
+      src: "assets/audio/music/melusine.mp3"
+    },
+    melusine_aconit: {
+      label: "Melusine Aconit",
+      wrestler: "Melusine Aconit",
+      src: "assets/audio/music/melusine_aconit.mp3"
+    },
     delacroix: {
       label: "Delacroix",
       wrestler: "Delacroix",
