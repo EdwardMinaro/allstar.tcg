@@ -3843,6 +3843,44 @@ button{font-family:inherit;cursor:pointer}
   color:#ffd35d;
 }
 
+.collection-toolbar{
+  display:grid;
+  grid-template-columns:minmax(240px,1.5fr) repeat(2,minmax(150px,.65fr));
+  gap:10px;
+  margin:0 0 14px;
+  padding:10px;
+  border:2px solid rgba(255,211,93,.28);
+  border-radius:8px;
+  background:rgba(5,6,10,.72);
+}
+
+.collection-filter{
+  display:grid;
+  gap:5px;
+  min-width:0;
+}
+
+.collection-filter span{
+  color:#ffd35d;
+  font-size:12px;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+
+.collection-filter input,
+.collection-filter select{
+  width:100%;
+  min-width:0;
+  height:42px;
+  padding:0 12px;
+  border:2px solid #08090d;
+  border-radius:6px;
+  background:#f7f6f2;
+  color:#111217;
+  font:inherit;
+  font-weight:900;
+}
+
 .collection-layout{
   display:grid;
   grid-template-columns:minmax(280px,1fr) minmax(0,2fr);
@@ -3873,6 +3911,17 @@ button{font-family:inherit;cursor:pointer}
 
 .collection-card:hover .game-card{
   filter:brightness(1.08);
+  transform:translateY(-3px);
+}
+
+.collection-card.is-unowned .game-card{
+  filter:grayscale(1) brightness(.48);
+  opacity:.68;
+}
+
+.collection-card.is-unowned:hover .game-card{
+  filter:grayscale(1) brightness(.62);
+  opacity:.84;
   transform:translateY(-3px);
 }
 
@@ -3935,6 +3984,28 @@ button{font-family:inherit;cursor:pointer}
   color:#fff;
   font-weight:1000;
   box-shadow:2px 2px 0 rgba(0,0,0,.5);
+}
+
+.collection-count.is-unowned{
+  width:auto;
+  padding:0 8px;
+  border-color:#1b1c22;
+  background:linear-gradient(180deg,#555a65,#25272e);
+  color:#ece9df;
+  font-size:9px;
+  text-transform:uppercase;
+}
+
+.collection-empty-result{
+  grid-column:1/-1;
+  align-self:center;
+  padding:30px 18px;
+  border:2px dashed rgba(255,211,93,.35);
+  border-radius:8px;
+  color:#d6d0c0;
+  font-weight:900;
+  text-align:center;
+  text-transform:uppercase;
 }
 
 .deck-empty-note{
@@ -4129,6 +4200,14 @@ button{font-family:inherit;cursor:pointer}
     grid-template-columns:1fr;
   }
 
+  .collection-toolbar{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .collection-search-filter{
+    grid-column:1/-1;
+  }
+
   .collection-preview{
     min-height:360px;
     height:360px;
@@ -4152,6 +4231,16 @@ button{font-family:inherit;cursor:pointer}
   .booster-reveal .game-card{
     width:clamp(158px,38vw,220px) !important;
     height:clamp(210px,50vw,292px) !important;
+  }
+}
+
+@media (max-width:600px){
+  .collection-toolbar{
+    grid-template-columns:1fr;
+  }
+
+  .collection-search-filter{
+    grid-column:auto;
   }
 }
 
@@ -6260,6 +6349,7 @@ button:disabled,
   #menu .home-next-track-button{left:calc(5% + 238px)}
 }
 
+#game .game-previous-track-button,
 #game .game-pause-track-button{
   left:108px;
   top:26px;

@@ -33,6 +33,19 @@ class LocalRoomAdapter {
     return room;
   }
 
+  updateRoom(code, updater) {
+    const normalized = String(code || "").trim().toUpperCase();
+    const rooms = this.loadRooms();
+    const current = rooms[normalized] || null;
+    const next = updater(current);
+    if (typeof next === "undefined") return current;
+    const savedRoom = { ...next, updatedAt: Date.now() };
+    rooms[normalized] = savedRoom;
+    this.saveRooms(rooms);
+    this.emit(normalized, savedRoom);
+    return savedRoom;
+  }
+
   subscribe(code, callback) {
     if (!this.listeners.has(code)) this.listeners.set(code, new Set());
     this.listeners.get(code).add(callback);
@@ -101,6 +114,27 @@ class NetworkRoomAdapter {
     };
     await set(ref(database, this.roomPath(savedRoom.roomCode)), savedRoom);
     return savedRoom;
+  }
+
+  async updateRoom(code, updater) {
+    const path = this.roomPath(code);
+    if (!path) throw new Error("Code invalide.");
+    const { database, modules } = await this.firebaseTools();
+    const { ref, runTransaction } = modules.database;
+    let updateError = null;
+    const result = await runTransaction(ref(database, path), current => {
+      try {
+        const next = updater(current);
+        if (typeof next === "undefined") return;
+        return { ...next, updatedAt: Date.now() };
+      } catch (error) {
+        updateError = error;
+        return;
+      }
+    }, { applyLocally: false });
+    if (updateError) throw updateError;
+    if (!result.committed) throw new Error("La mise à jour de la partie a été interrompue.");
+    return result.snapshot.val();
   }
 
   subscribe(code, callback) {

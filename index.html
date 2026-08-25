@@ -591,6 +591,31 @@
       <h1 class="logo small-logo">Collection</h1>
       <p class="subtitle" id="collectionStatus"></p>
       <div class="collection-summary" id="collectionSummary"></div>
+      <div class="collection-toolbar" aria-label="Filtres de la collection">
+        <label class="collection-filter collection-search-filter">
+          <span>Recherche</span>
+          <input id="collectionSearch" type="search" placeholder="Rechercher une carte" oninput="renderCollection()">
+        </label>
+        <label class="collection-filter">
+          <span>Type</span>
+          <select id="collectionTypeFilter" onchange="renderCollection()">
+            <option value="">Tous</option>
+            <option value="Catcheur">Catcheurs</option>
+            <option value="Manager">Bonus</option>
+            <option value="Objet">Objets</option>
+          </select>
+        </label>
+        <label class="collection-filter">
+          <span>Raret&eacute;</span>
+          <select id="collectionRarityFilter" onchange="renderCollection()">
+            <option value="">Toutes</option>
+            <option value="Standard">Standard</option>
+            <option value="Rare">Rare</option>
+            <option value="Legende">L&eacute;gendaire</option>
+            <option value="Ultime">Ultime</option>
+          </select>
+        </label>
+      </div>
       <div class="collection-layout">
         <aside class="collection-preview" id="collectionPreview">
           <div class="preview-empty">Sélectionne une carte</div>

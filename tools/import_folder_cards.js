@@ -38,6 +38,12 @@ const MUSIC_TARGETS = {
   "maffa.mp3": "maffa.mp3",
   "TPW Thème Officiel Mareck.mp3": "mareck.mp3",
   "Lestrange Theme.mp3": "romain_lestrange.mp3",
+  "Heddi Karaoui.mp3": "heddi_karaoui.mp3",
+  "Ben Damage Songg.wav": "ben_damage.wav",
+  "Julius Trajan HCP Titantron.mp3": "julius_trajan.mp3",
+  "Musique Marcus JAW (I ain't got time).mp3": "marcus_jaw.mp3",
+  "Slow Royale.mp3": "peter_fischer.mp3",
+  "12 - ROCKY J.mp3": "rocky_j.mp3",
 };
 
 const MUSIC_BY_FOLDER = {
@@ -53,6 +59,11 @@ const MUSIC_BY_FOLDER = {
   "romain_lestrange": "romain_lestrange.mp3",
   "saitovic": "saitovic.mp3",
   "shawn_olsen": "shawn_olsen.mp3",
+  "ben_damage": "ben_damage.wav",
+  "julius_trajan": "julius_trajan.mp3",
+  "marcus_jaw": "marcus_jaw.mp3",
+  "peter_fischer": "peter_fischer.mp3",
+  "rocky_j": "rocky_j.mp3",
 };
 
 const BLOCKED_MUSIC_FOLDERS = new Set([
@@ -98,6 +109,16 @@ const ABILITY_BY_KEY = {
   "Rare|Objet|Poing Américain": "objectChoiceStat1",
   "Rare|Objet|Sachet de punaises": "pinObject10",
   "Legende|Objet|Sledgehammer": "pinObject30",
+  "Rare|Catcheur|Adrian Maccio": "lossReturnEnemyWrestlerToHand",
+  "Rare|Catcheur|Ben Damage": "entryResetEnemyStatMods",
+  "Standard|Manager|Lord Gidéon Salvini": "turnDrawChance20",
+  "Rare|Manager|Lord Gidéon Salvini": "turnDrawChance40",
+  "Rare|Catcheur|Julius Trajan": "entryRecoverFactionDeck",
+  "Rare|Catcheur|Lucas Thoumazet": "firstRoundForceSpeedCharisma1",
+  "Rare|Catcheur|Marcus Jaw": "winTag1Max2",
+  "Ultime|Catcheur|MBM": "entryDiscardUpTo3RandomStat2",
+  "Legende|Catcheur|Peter Fischer": "forceWheel50",
+  "Rare|Catcheur|Rocky J": "round2ForceSpeedCharisma1",
 };
 
 const CARD_OVERRIDES_BY_KEY = {
@@ -141,6 +162,17 @@ const CARD_OVERRIDES_BY_KEY = {
   },
   legende_objets_sledgehammer: {
     effect: "+30 Tombé.",
+  },
+  standard_managers_lord_gideon_salvini: {
+    name: "Lord Gidéon Salvini",
+    effect: "Une fois par tour, 20 % de chance de piocher une carte.",
+  },
+  rare_managers_lord_gideon_salvini: {
+    name: "Lord Gidéon Salvini",
+    effect: "Une fois par tour, 40 % de chance de piocher une carte.",
+  },
+  rare_catcheurs_julius_trajan: {
+    effect: "Apparition : choisissez The World, Drix, Kyle Hoxton ou Saitovic dans votre deck et ajoutez cette carte à votre main.",
   },
 };
 
@@ -194,10 +226,16 @@ function normalizeType(raw) {
 
 function normalizeRarity(raw) {
   const value = slug(raw);
-  if (value.includes("ultime")) return "Ultime";
+  if (value.includes("ultime") || value.includes("ultimate")) return "Ultime";
   if (value.includes("legend") || value.includes("legende")) return "Legende";
   if (value.includes("rare")) return "Rare";
   return "Standard";
+}
+
+function normalizeCardName(raw) {
+  const name = cleanText(raw);
+  if (/^Lord Gid.on Salvini$/i.test(name)) return "Lord Gidéon Salvini";
+  return name;
 }
 
 function normalizeStats(raw) {
@@ -232,7 +270,7 @@ function readCard(jsonPath) {
   const data = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
   const type = normalizeType(data.type || data.cardType || data.role);
   const rarity = normalizeRarity(data.rarity || data.rarete || data.rarityLabel);
-  const name = cleanText(data.name || data.nom || data.title || path.basename(jsonPath, ".json"));
+  const name = normalizeCardName(data.name || data.nom || data.title || path.basename(jsonPath, ".json"));
   const stats = type === "Catcheur" ? normalizeStats(data.stats || data.Stats) : {};
   const group = type === "Catcheur" ? "catcheurs" : type === "Manager" ? "managers" : "objets";
   const nameKey = slug(name).replace(/^nils_n$/, "nilsn");
@@ -317,28 +355,32 @@ for (const jsonPath of walk(sourceRoot).filter((file) => path.extname(file).toLo
     continue;
   }
   fs.copyFileSync(pngPath, path.join(projectRoot, card.renderArt));
+  // Clean up the incorrect Standard entry produced before "ultimate" was normalized.
+  if (card.name === "MBM" && card.rarity === "Ultime") {
+    byKey.delete("standard_catcheurs_mbm");
+  }
   const existed = byKey.has(card.key);
   byKey.set(card.key, card);
   report[existed ? "updated" : "imported"].push({ key: card.key, name: card.name, rarity: card.rarity, type: card.type, ability: card.ability || null });
 }
 
-for (const mp3Path of walk(sourceRoot).filter((file) => path.extname(file).toLowerCase() === ".mp3")) {
-  const name = path.basename(mp3Path);
-  const folders = path.relative(sourceRoot, path.dirname(mp3Path)).split(path.sep).map(slug);
+for (const audioPath of walk(sourceRoot).filter((file) => [".mp3", ".wav"].includes(path.extname(file).toLowerCase()))) {
+  const name = path.basename(audioPath);
+  const folders = path.relative(sourceRoot, path.dirname(audioPath)).split(path.sep).map(slug);
   if (folders.some(folder => BLOCKED_MUSIC_FOLDERS.has(folder))) continue;
   let target = MUSIC_TARGETS[name];
   if (!target) {
     target = folders.map(folder => MUSIC_BY_FOLDER[folder]).find(Boolean);
   }
   if (!target) {
-    const fileSlug = slug(path.basename(mp3Path, ".mp3"));
+    const fileSlug = slug(path.basename(audioPath, path.extname(audioPath)));
     const nameMatch = Object.keys(MUSIC_BY_FOLDER).find(key => fileSlug.includes(key) || key.includes(fileSlug));
     if (nameMatch) target = MUSIC_BY_FOLDER[nameMatch];
   }
-  if (!target && /Saitovic/i.test(mp3Path)) target = "saitovic.mp3";
+  if (!target && /Saitovic/i.test(audioPath)) target = "saitovic.mp3";
   if (!target) continue;
-  fs.copyFileSync(mp3Path, path.join(musicDir, target));
-  report.music.push({ source: mp3Path, target });
+  fs.copyFileSync(audioPath, path.join(musicDir, target));
+  report.music.push({ source: audioPath, target });
 }
 
 db.cards = [...byKey.values()];

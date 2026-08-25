@@ -7,6 +7,10 @@ let onlineDirty=false;
 let onlinePublishTimer=null;
 let onlineLastSnapshotHash="";
 let onlineLastAppliedVersion=0;
+let onlineChoiceToken=0;
+let activeOnlineChoice=null;
+let deferredOnlineRoomSnapshot=null;
+let onlineLastPinEventId="";
 const CARD_DATA = [
   {
     "key": "legende_catcheurs_adam_frost",
@@ -375,6 +379,22 @@ const CARD_DATA = [
     "ability": "firstRoundRandomStats5"
   },
   {
+    "key": "legende_catcheurs_peter_fischer",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Peter Fischer",
+    "stats": {
+      "Force": 8,
+      "Vitesse": 4,
+      "Technique": 7,
+      "Charisme": 5
+    },
+    "effect": "Sur son premier tour, la roulette possède 50% de chance en plus de tomber sur Force.",
+    "renderArt": "assets/card_renders/legende_catcheurs_peter_fischer.png",
+    "musicId": "peter_fischer",
+    "ability": "forceWheel50"
+  },
+  {
     "key": "legende_catcheurs_s_m_s",
     "type": "Catcheur",
     "rarity": "Legende",
@@ -533,6 +553,22 @@ const CARD_DATA = [
     "ability": "turnEnemyRandomPermanent1Max5",
     "renderArt": "assets/card_renders/rare_catcheurs_adam_frost.png",
     "musicId": "adam_frost"
+  },
+  {
+    "key": "rare_catcheurs_adrian_maccio",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Adrian Maccio",
+    "stats": {
+      "Force": 8,
+      "Vitesse": 6,
+      "Technique": 6,
+      "Charisme": 4
+    },
+    "effect": "Si cette carte perd, renvoyez la carte catcheur adverse dans la main de l'adversaire.",
+    "renderArt": "assets/card_renders/rare_catcheurs_adrian_maccio.png",
+    "musicId": "adrian_maccio",
+    "ability": "lossReturnEnemyWrestlerToHand"
   },
   {
     "key": "rare_catcheurs_alex_ezio",
@@ -1105,6 +1141,22 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_catcheurs_jose_moreno.png"
   },
   {
+    "key": "rare_catcheurs_julius_trajan",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Julius Trajan",
+    "stats": {
+      "Force": 6,
+      "Vitesse": 6,
+      "Technique": 7,
+      "Charisme": 5
+    },
+    "effect": "Apparition : choisissez The World, Drix, Kyle Hoxton ou Saitovic dans votre deck et ajoutez cette carte à votre main.",
+    "renderArt": "assets/card_renders/rare_catcheurs_julius_trajan.png",
+    "musicId": "julius_trajan",
+    "ability": "entryRecoverFactionDeck"
+  },
+  {
     "key": "rare_catcheurs_kev_lagadec",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -1249,6 +1301,22 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_catcheurs_lucas_menil.png"
   },
   {
+    "key": "rare_catcheurs_lucas_thoumazet",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Lucas Thoumazet",
+    "stats": {
+      "Force": 7,
+      "Vitesse": 6,
+      "Technique": 5,
+      "Charisme": 6
+    },
+    "effect": "Tour 1 : + 1 en Force, Charisme, et en Vitesse",
+    "renderArt": "assets/card_renders/rare_catcheurs_lucas_thoumazet.png",
+    "musicId": "lucas_thoumazet",
+    "ability": "firstRoundForceSpeedCharisma1"
+  },
+  {
     "key": "rare_catcheurs_lux_strahl",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -1278,6 +1346,22 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_catcheurs_maffa.png",
     "musicId": "maffa",
     "ability": "entryPinBonus20"
+  },
+  {
+    "key": "rare_catcheurs_marcus_jaw",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Marcus Jaw",
+    "stats": {
+      "Force": 3,
+      "Vitesse": 4,
+      "Technique": 7,
+      "Charisme": 10
+    },
+    "effect": "Victoire : gagnez un tag (max : 2)",
+    "renderArt": "assets/card_renders/rare_catcheurs_marcus_jaw.png",
+    "musicId": "marcus_jaw",
+    "ability": "winTag1Max2"
   },
   {
     "key": "rare_catcheurs_mareck",
@@ -1454,6 +1538,22 @@ const CARD_DATA = [
     "ability": "round2ActiveStat3",
     "renderArt": "assets/card_renders/rare_catcheurs_rayen_gurzil.png",
     "musicId": "rayen_gurzil"
+  },
+  {
+    "key": "rare_catcheurs_rocky_j",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Rocky J",
+    "stats": {
+      "Force": 7,
+      "Vitesse": 6,
+      "Technique": 5,
+      "Charisme": 6
+    },
+    "effect": "Round 2 : + 1 en Force, en Vitesse et en Charisme",
+    "renderArt": "assets/card_renders/rare_catcheurs_rocky_j.png",
+    "musicId": "rocky_j",
+    "ability": "round2ForceSpeedCharisma1"
   },
   {
     "key": "rare_catcheurs_romain_lestrange",
@@ -2232,6 +2332,21 @@ const CARD_DATA = [
     "musicId": "r_man"
   },
   {
+    "key": "standard_catcheurs_rocky_j",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Rocky J",
+    "stats": {
+      "Force": 7,
+      "Vitesse": 6,
+      "Technique": 5,
+      "Charisme": 6
+    },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_rocky_j.png",
+    "musicId": "rocky_j"
+  },
+  {
     "key": "standard_catcheurs_romain_lestrange",
     "type": "Catcheur",
     "rarity": "Standard",
@@ -2381,6 +2496,22 @@ const CARD_DATA = [
     "ability": "techniqueWheel75",
     "musicId": "heddi_karaoui",
     "renderArt": "assets/card_renders/ultime_catcheurs_heddi_karaoui.png"
+  },
+  {
+    "key": "ultime_catcheurs_mbm",
+    "type": "Catcheur",
+    "rarity": "Ultime",
+    "name": "MBM",
+    "stats": {
+      "Force": 3,
+      "Vitesse": 7,
+      "Technique": 5,
+      "Charisme": 9
+    },
+    "effect": "Apparition : Défaussez un nombre de carte (max : 3), cette carte gagne +2 points dans une statistique aléatoire par carte défaussée.",
+    "renderArt": "assets/card_renders/ultime_catcheurs_mbm.png",
+    "musicId": "mbm",
+    "ability": "entryDiscardUpTo3RandomStat2"
   },
   {
     "key": "ultime_catcheurs_princesse_lauriana",
@@ -2535,6 +2666,16 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_managers_loic_bloodykilt.png"
   },
   {
+    "key": "rare_managers_lord_gideon_salvini",
+    "type": "Manager",
+    "rarity": "Rare",
+    "name": "Lord Gidéon Salvini",
+    "stats": {},
+    "effect": "Une fois par tour, 40 % de chance de piocher une carte.",
+    "renderArt": "assets/card_renders/rare_managers_lord_gideon_salvini.png",
+    "ability": "turnDrawChance40"
+  },
+  {
     "key": "rare_managers_ludovic_vaillant",
     "type": "Manager",
     "rarity": "Rare",
@@ -2663,6 +2804,16 @@ const CARD_DATA = [
     "effect": "Premier tour : +1 dans 1 stat aléatoire.",
     "ability": "mRandom",
     "renderArt": "assets/card_renders/standard_managers_loic_bloodykilt.png"
+  },
+  {
+    "key": "standard_managers_lord_gideon_salvini",
+    "type": "Manager",
+    "rarity": "Standard",
+    "name": "Lord Gidéon Salvini",
+    "stats": {},
+    "effect": "Une fois par tour, 20 % de chance de piocher une carte.",
+    "renderArt": "assets/card_renders/standard_managers_lord_gideon_salvini.png",
+    "ability": "turnDrawChance20"
   },
   {
     "key": "standard_managers_yann_le_kersaudec",
@@ -2951,6 +3102,9 @@ const EFFECT_REGISTRY = {
   entryIfZerkInHandDiscard1: { timing:"entry", text:"Si The Butcher Zerk est en main : l'adversaire défausse 1 carte." },
   entryRandomStat3: { timing:"entry", text:"À l'arrivée : +3 à une statistique aléatoire." },
   entryStatChoice3: { timing:"entry", text:"À l'arrivée : choisissez une statistique, +3.", choice:true },
+  entryDiscardUpTo3RandomStat2: { timing:"entry", text:"À l'arrivée : défaussez jusqu'à 3 cartes ; +2 à une statistique aléatoire par carte.", choice:true },
+  entryRecoverFactionDeck: { timing:"entry", text:"À l'arrivée : récupérez The World, Drix, Kyle Hoxton ou Saitovic depuis votre deck.", choice:true },
+  entryResetEnemyStatMods: { timing:"entry", text:"À l'arrivée : annule les modifications de statistiques du catcheur adverse." },
   entryMelusineGraveSpeedTechnique1Each: { timing:"entry", text:"À l'arrivée : +1 Vitesse et +1 Technique par Mélusine ou Mélusine Aconit dans votre vestiaire." },
   doubleEquippedSupportUpToRare: { timing:"continuous", text:"Double les valeurs numériques du Bonus ou de l'Objet Standard ou Rare équipé." },
   firstLossDeck: { timing:"defeat", text:"Une fois par match, annule la première défaite et reste sur le terrain." },
@@ -2964,6 +3118,7 @@ const EFFECT_REGISTRY = {
   firstRoundForceTechnique: { timing:"round1", text:"+1 Force et +1 Technique au premier round." },
   firstRoundForceSpeed1: { timing:"firstRound", text:"+1 Force et +1 Vitesse au premier round de la carte." },
   firstRoundForceSpeed2: { timing:"firstRound", text:"+2 Force et +2 Vitesse au premier round de la carte." },
+  firstRoundForceSpeedCharisma1: { timing:"firstRound", text:"+1 Force, Vitesse et Charisme au premier round de la carte." },
   firstRoundRandomStats5: { timing:"firstRound", text:"Au premier round : +5 points répartis aléatoirement." },
   firstRoundOpponentMill1: { timing:"entry", text:"Envoie la carte au-dessus du deck adverse au vestiaire." },
   firstRoundSpeed2: { timing:"firstRound", text:"+2 Vitesse au premier round de la carte." },
@@ -3032,6 +3187,7 @@ const EFFECT_REGISTRY = {
   ringsiderRecover2LoseTag: { timing:"round", choice:true, text:"Une fois par tour : peut récupérer jusqu'à 2 cartes choisies du vestiaire contre 1 TAG." },
   round4All1: { timing:"round4", text:"Round 4 : +1 à toutes les stats." },
   round2ActiveStat3: { timing:"duel", text:"À partir du round 2 : +3 dans la stat active." },
+  round2ForceSpeedCharisma1: { timing:"round2", text:"Round 2 : +1 Force, Vitesse et Charisme." },
   sameStatNext: { timing:"win", text:"Verrouille la statistique du prochain duel.", choice:true },
   sameStatNextFixed: { timing:"win", text:"Verrouille la statistique du duel gagné pour le prochain duel." },
   secondPlayerTechnique2: { timing:"duel", text:"Si joué en second : +2 Technique." },
@@ -3041,6 +3197,10 @@ const EFFECT_REGISTRY = {
   speedWheel25: { timing:"roulette", text:"Premier round : 25% de chance de forcer Vitesse." },
   speedWheel50: { timing:"roulette", text:"Premier round : 50% de chance de forcer Vitesse." },
   forceWheel50: { timing:"roulette", text:"Premier round : 50% de chance de forcer Force." },
+  lossReturnEnemyWrestlerToHand: { timing:"defeat", text:"Après une défaite : renvoie le catcheur adverse actif dans la main de son propriétaire." },
+  turnDrawChance20: { timing:"round", text:"Une fois par tour : 20% de chance de piocher 1 carte." },
+  turnDrawChance40: { timing:"round", text:"Une fois par tour : 40% de chance de piocher 1 carte." },
+  winTag1Max2: { timing:"win", text:"Après une victoire : +1 TAG, sans dépasser 2." },
   charismaWinRandom3: { timing:"win", text:"Une fois par tour, si Charisme est tiré : victoire +3 dans une statistique aléatoire." },
   techniqueWheel75: { timing:"roulette", text:"75% de chance de forcer Technique." },
   megaphoneRound1: { timing:"object", text:"Round 1 : en jouant deuxième, l'adversaire défausse 3 cartes ; sinon, piochez 2 cartes." },
@@ -4013,6 +4173,7 @@ function requestEffectChoice({title,text,choices,onChoose}){
     if(onChoose)onChoose(fallback);
     return;
   }
+  const onlineToken=beginOnlineChoice("effect");
   titleEl.textContent=title||"Choix d'effet";
   textEl.textContent=text||"Choisis l'effet à appliquer.";
   choicesEl.innerHTML=(choices||[]).map((choice,index)=>`<button class="small-btn effect-choice-btn" type="button" data-choice-index="${index}">${choice.label}</button>`).join("");
@@ -4021,7 +4182,9 @@ function requestEffectChoice({title,text,choices,onChoose}){
       const choice=choices[Number(btn.dataset.choiceIndex)]||choices[0];
       overlay.classList.remove("active");
       choicesEl.innerHTML="";
+      endOnlineChoice(onlineToken);
       if(onChoose)onChoose(choice?.value);
+      publishResolvedOnlineChoice();
     },{once:true});
   });
   overlay.classList.add("active");
@@ -4535,6 +4698,25 @@ function markOnlineDirty(){
   if(isOnlineMatch()&&!onlineApplyingRemote)onlineDirty=true;
 }
 
+function beginOnlineChoice(kind="effect"){
+  if(!isOnlineMatch())return null;
+  const token=++onlineChoiceToken;
+  activeOnlineChoice={token,kind};
+  return token;
+}
+
+function endOnlineChoice(token){
+  if(token===null||activeOnlineChoice?.token!==token)return;
+  activeOnlineChoice=null;
+}
+
+function publishResolvedOnlineChoice(){
+  if(!isOnlineMatch()||activeOnlineChoice)return;
+  deferredOnlineRoomSnapshot=null;
+  markOnlineDirty();
+  publishOnlineSnapshotNow();
+}
+
 function stripOwnerForNetwork(value){
   return JSON.parse(JSON.stringify(value,(key,val)=>key==="owner"?undefined:val));
 }
@@ -4583,6 +4765,7 @@ function onlineSnapshotFromGame(){
     round:G.round,
     stat:G.stat,
     wheelSpinId:G.resolving&&G.stat ? `${G.round}:${G.stat}:${G.turnsTaken}` : null,
+    pinEvent:G.pinEvent||null,
     matchId:G.matchOptions?.onlineMatchId||`${ctx.roomCode}:legacy`,
     lockedStat:G.lockedStat||null,
     over:Boolean(G.over),
@@ -4614,6 +4797,8 @@ function applyOnlineSnapshot(snapshot, playerSlot){
   const p2=restoreOnlineSide(snapshot.ai, ownSlot==="p2" ? "player" : "ai");
   const incomingWheelId=snapshot.wheelSpinId||null;
   const shouldShowRemoteWheel=Boolean(snapshot.resolving&&snapshot.stat&&incomingWheelId&&incomingWheelId!==onlineLastWheelSpinId);
+  const incomingPinEvent=snapshot.pinEvent||null;
+  const shouldShowRemotePin=Boolean(incomingPinEvent?.id&&incomingPinEvent.id!==onlineLastPinEventId);
   onlineApplyingRemote=true;
   G={
     ...(G||{}),
@@ -4648,6 +4833,7 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     matchPhase:snapshot.matchPhase ? (snapshot.matchPhase===ownSlot ? "player" : snapshot.matchPhase===opponentSlot ? "ai" : snapshot.matchPhase) : null,
     resolving:Boolean(snapshot.resolving),
     winner:snapshot.winner ? (snapshot.winner===ownSlot ? "player" : "ai") : null,
+    pinEvent:incomingPinEvent,
     effectMarks:G?.effectMarks||{}
   };
   show("game");
@@ -4655,6 +4841,18 @@ function applyOnlineSnapshot(snapshot, playerSlot){
   if(shouldShowRemoteWheel){
     onlineLastWheelSpinId=incomingWheelId;
     showRemoteWheel(snapshot.stat);
+  }
+  if(shouldShowRemotePin){
+    onlineLastPinEventId=incomingPinEvent.id;
+    const winnerSide=incomingPinEvent.winnerSlot===ownSlot ? "player" : "ai";
+    showPin(
+      incomingPinEvent.name,
+      Boolean(incomingPinEvent.success),
+      Number(incomingPinEvent.chance||0),
+      Number(incomingPinEvent.roll||0),
+      winnerSide,
+      {visualOnly:true}
+    );
   }
   if(G.over){
     settleOnlineMatchRewards();
@@ -4678,6 +4876,10 @@ function applyOnlineRoomSnapshot(room, playerSlot){
   if(!room?.matchState)return;
   if(!isOnlineMatch() && (room.status==="playing"||room.status==="finished")){
     enterOnlineMatchFromSnapshot(room, playerSlot);
+    return;
+  }
+  if(activeOnlineChoice){
+    deferredOnlineRoomSnapshot={room,playerSlot};
     return;
   }
   const version=Number(room.matchState.version||room.matchState.updatedAt||0);
@@ -4985,7 +5187,7 @@ function tutorDeckCards(owner,source,types){
         choices:candidates.map(card=>({label:card.name,value:card.id})),
         onChoose:takeCard
       });
-    }else{
+    }else if(!isOnlineMatch()){
       takeCard(candidates[Math.floor(Math.random()*candidates.length)].id);
     }
   };
@@ -5046,6 +5248,94 @@ function recoverCardFromGrave(owner,source,{allowedTypes=null,prompt="",random=f
       render();
     }
   });
+}
+
+function recoverNamedCardFromDeck(owner,source,names){
+  const candidates=owner.deck.filter(card=>names.includes(card.name));
+  if(!candidates.length){
+    log(`[EFFET] ${source.name} : aucun membre de son équipe dans le deck.`);
+    showEffectFeedback(source,source.name,"Aucune carte compatible","block");
+    return;
+  }
+  const recover=cardId=>{
+    const index=owner.deck.findIndex(card=>card.id===cardId);
+    if(index<0)return;
+    const [card]=owner.deck.splice(index,1);
+    owner.hand.push(card);
+    log(`[EFFET] ${source.name} récupère ${card.name} depuis son deck.`);
+    showEffectFeedback(source,source.name,`Récupère ${card.name}`,"special");
+    markOnlineDirty();
+    render();
+  };
+  if(owner.side==="player"){
+    requestEffectChoice({
+      title:source.name,
+      text:"Choisis un membre de l'équipe à récupérer dans ton deck.",
+      choices:candidates.map(card=>({label:card.name,value:card.id})),
+      onChoose:recover
+    });
+  }else recover(candidates[Math.floor(Math.random()*candidates.length)].id);
+}
+
+function discardUpToThreeForRandomStats(owner,source){
+  let discardedCount=0;
+  const finish=()=>{
+    const feedback=discardedCount?`Défausse ${discardedCount} / +${discardedCount*2} stats`:"Aucune défausse";
+    log(`[EFFET] ${source.name} : ${feedback}.`);
+    showEffectFeedback(source,source.name,feedback,discardedCount?"buff":"block");
+    markOnlineDirty();
+    render();
+  };
+  const discard=cardId=>{
+    if(cardId==="finish"){
+      finish();
+      return;
+    }
+    const index=owner.hand.findIndex(card=>card.id===cardId);
+    if(index<0){
+      finish();
+      return;
+    }
+    const [card]=owner.hand.splice(index,1);
+    owner.grave.push(card);
+    const stat=STATS[Math.floor(Math.random()*STATS.length)];
+    owner.cat.mods[stat]+=2;
+    discardedCount++;
+    log(`[EFFET] ${source.name} défausse ${card.name} : +2 ${stat}.`);
+    if(discardedCount>=3||!owner.hand.length){
+      finish();
+      return;
+    }
+    chooseNext();
+  };
+  const chooseNext=()=>{
+    if(owner.side!=="player"){
+      const target=Math.min(3,owner.hand.length);
+      while(discardedCount<target&&owner.hand.length){
+        const card=owner.hand[Math.floor(Math.random()*owner.hand.length)];
+        const index=owner.hand.findIndex(item=>item.id===card.id);
+        if(index<0)break;
+        const [discarded]=owner.hand.splice(index,1);
+        owner.grave.push(discarded);
+        const stat=STATS[Math.floor(Math.random()*STATS.length)];
+        owner.cat.mods[stat]+=2;
+        discardedCount++;
+        log(`[EFFET] ${source.name} défausse ${discarded.name} : +2 ${stat}.`);
+      }
+      finish();
+      return;
+    }
+    requestEffectChoice({
+      title:source.name,
+      text:`Choisis une carte à défausser (${discardedCount}/3), ou termine l'effet.`,
+      choices:[
+        ...owner.hand.map(card=>({label:`${card.name} - ${displayCardType(card.type)}`,value:card.id})),
+        {label:"Terminer",value:"finish"}
+      ],
+      onChoose:discard
+    });
+  };
+  chooseNext();
 }
 
 function discardRandomOpponentCard(owner,source){
@@ -5356,6 +5646,19 @@ function applyWrestlerEntryEffect(owner,c){
       showEffectFeedback(c,c.name,"Force adverse -2","malus");
     }else log(`[EFFET] ${c.name} : aucun catcheur adverse vulnérable sur le ring.`);
   }
+  if(c.ability==="entryResetEnemyStatMods"){
+    const enemy=owner.side==="player"?G.ai:G.player;
+    if(enemy?.cat&&!isCardEffectImmune(enemy.cat)){
+      enemy.cat.mods={...normalizeMods(enemy.cat.permanentMods)};
+      enemy.cat.firstRoundRandomMods=zeroMods();
+      log(`[EFFET] ${c.name} annule les modifications de statistiques de ${enemy.cat.card.name}.`);
+      showEffectFeedback(c,c.name,"Stats adverses réinitialisées","malus");
+    }else log(`[EFFET] ${c.name} : aucun catcheur adverse vulnérable sur le ring.`);
+  }
+  if(c.ability==="entryRecoverFactionDeck"){
+    recoverNamedCardFromDeck(owner,c,["The World","Drix","Kyle Hoxton","Saitovic"]);
+  }
+  if(c.ability==="entryDiscardUpTo3RandomStat2")discardUpToThreeForRandomStats(owner,c);
   if(c.ability==="drawOnEntry1"||c.ability==="drawOnEntry2"||c.ability==="drawOnEntry3"){
     const amount=c.ability==="drawOnEntry3"?3:c.ability==="drawOnEntry2"?2:1;
     const before=owner.hand.length;
@@ -5584,6 +5887,16 @@ function applyRoundManagerEffects(){
       if(drawn){
         log(`[EFFET] ${owner.man.name} : ${owner.label} pioche ${drawn} carte${drawn>1?"s":""}.`);
         showEffectFeedback(owner.cat?.card||owner.man,owner.man.name,`Pioche +${drawn}`,"special");
+      }
+    }
+    const drawChance={turnDrawChance20:0.2,turnDrawChance40:0.4}[owner.man?.ability]||0;
+    if(drawChance&&Math.random()<drawChance){
+      const before=owner.hand.length;
+      draw(owner,1);
+      const drawn=owner.hand.length-before;
+      if(drawn){
+        log(`[EFFET] ${owner.man.name} : ${owner.label} pioche 1 carte.`);
+        showEffectFeedback(owner.cat?.card||owner.man,owner.man.name,"Pioche +1","special");
       }
     }
     if(owner.man?.ability==="turnEnemyPinMinus10"){
@@ -6425,6 +6738,7 @@ function score(s,stat){
   if(ability==="firstRoundForceTechnique2"&&firstRound&&(stat==="Force"||stat==="Technique"))v+=2;
   if(ability==="firstRoundForceSpeed1"&&firstRound&&(stat==="Force"||stat==="Vitesse"))v+=1;
   if(ability==="firstRoundForceSpeed2"&&firstRound&&(stat==="Force"||stat==="Vitesse"))v+=2;
+  if(ability==="firstRoundForceSpeedCharisma1"&&firstRound&&(stat==="Force"||stat==="Vitesse"||stat==="Charisme"))v+=1;
   if(ability==="firstRoundCharTech"&&firstRound&&(stat==="Charisme"||stat==="Technique"))v+=1;
   if(ability==="firstRoundCharTech2"&&firstRound&&(stat==="Charisme"||stat==="Technique"))v+=2;
   if(ability==="matchRoundOneAll1"&&firstRound)v+=1;
@@ -6434,6 +6748,7 @@ function score(s,stat){
   if(ability==="managerOwnedTechForceSpeed1"&&s.owner?.man&&(stat==="Technique"||stat==="Force"||stat==="Vitesse"))v+=1;
   if(ability==="bonusEquippedForceSpeed2"&&s.owner?.man&&(stat==="Force"||stat==="Vitesse"))v+=2;
   if(ability==="round2ActiveStat3"&&G.round===2)v+=3;
+  if(ability==="round2ForceSpeedCharisma1"&&G.round===2&&(stat==="Force"||stat==="Vitesse"||stat==="Charisme"))v+=1;
   if(ability==="round4All1"&&G.round===4)v+=1;
   if(ability==="secondPlayerForceCharisma1"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Force"||stat==="Charisme"))v+=1;
   if(ability==="secondPlayerTechnique2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&stat==="Technique")v+=2;
@@ -6482,6 +6797,7 @@ function statAbilityFeedback(s,stat){
   if(ability==="firstRoundForceTechnique2"&&firstRound&&(stat==="Force"||stat==="Technique"))return `+2 ${stat}`;
   if(ability==="firstRoundForceSpeed1"&&firstRound&&(stat==="Force"||stat==="Vitesse"))return `+1 ${stat}`;
   if(ability==="firstRoundForceSpeed2"&&firstRound&&(stat==="Force"||stat==="Vitesse"))return `+2 ${stat}`;
+  if(ability==="firstRoundForceSpeedCharisma1"&&firstRound&&(stat==="Force"||stat==="Vitesse"||stat==="Charisme"))return `+1 ${stat}`;
   if(ability==="firstRoundCharTech"&&firstRound&&(stat==="Charisme"||stat==="Technique"))return `+1 ${stat}`;
   if(ability==="firstRoundCharTech2"&&firstRound&&(stat==="Charisme"||stat==="Technique"))return `+2 ${stat}`;
   if(ability==="matchRoundOneAll1"&&firstRound)return `Round 1 +1 ${stat}`;
@@ -6491,6 +6807,7 @@ function statAbilityFeedback(s,stat){
   if(ability==="managerOwnedTechForceSpeed1"&&s.owner?.man&&(stat==="Technique"||stat==="Force"||stat==="Vitesse"))return `Bonus +1 ${stat}`;
   if(ability==="bonusEquippedForceSpeed2"&&s.owner?.man&&(stat==="Force"||stat==="Vitesse"))return `Bonus +2 ${stat}`;
   if(ability==="round2ActiveStat3"&&G.round===2)return `Round 2 +3 ${stat}`;
+  if(ability==="round2ForceSpeedCharisma1"&&G.round===2&&(stat==="Force"||stat==="Vitesse"||stat==="Charisme"))return `Round 2 +1 ${stat}`;
   if(ability==="round4All1"&&G.round===4)return `Round 4 +1 ${stat}`;
   if(ability==="secondPlayerForceCharisma1"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Force"||stat==="Charisme"))return `Second +1 ${stat}`;
   if(ability==="secondPlayerTechnique2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&stat==="Technique")return "Second +2 Technique";
@@ -6679,6 +6996,24 @@ function clearWrestler(p){
   markOnlineDirty();
 }
 
+function returnActiveWrestlerToHand(p,sourceCard=null){
+  const active=p?.cat;
+  if(!active)return false;
+  p.hand.push(active.card);
+  log(`[EFFET] ${sourceCard?.name||"Carte"} : ${active.card.name} retourne dans la main de ${p.label}.`);
+  showEffectFeedback(sourceCard||active.card,sourceCard?.name||active.card.name,"Catcheur adverse renvoyé en main","special");
+  if(p.man){
+    releaseSupportEffects(p,p.side==="player"?G.ai:G.player);
+    p.grave.push(p.man);
+    p.man=null;
+  }
+  p.objectDurationBonus=0;
+  revertActiveObject(p,true);
+  p.cat=null;
+  markOnlineDirty();
+  return true;
+}
+
 function resolveNextStatWinEffect(winner,currentStat,onComplete){
   const ability=wrestlerAbility(winner?.cat);
   if((ability!=="sameStatNext"&&ability!=="sameStatNextFixed")||!currentStat)return false;
@@ -6698,7 +7033,7 @@ function resolveNextStatWinEffect(winner,currentStat,onComplete){
       choices:STATS.map(stat=>({label:stat,value:stat})),
       onChoose:applyChosenStat
     });
-  }else{
+  }else if(!isOnlineMatch()){
     const best=STATS.reduce((bestStat,stat)=>score(winner.cat,stat)>score(winner.cat,bestStat)?stat:bestStat,STATS[0]);
     applyChosenStat(best);
   }
@@ -6741,6 +7076,16 @@ function win(winner,loser,reason){
     log(`[EFFET] ${winner.cat.card.name} : victoire en Charisme, +3 ${stat}.`);
     showEffectFeedback(winner.cat.card,winner.cat.card.name,`+3 ${stat}`,"buff");
   }
+  if(winnerAbility==="winTag1Max2"){
+    const before=Number.isFinite(winner.tagsRemaining)?winner.tagsRemaining:TAGS_PER_MATCH;
+    winner.tagsRemaining=Math.min(TAGS_PER_MATCH,before+1);
+    if(winner.tagsRemaining>before){
+      log(`[EFFET] ${winner.cat.card.name} : +1 TAG (${winner.tagsRemaining}/${TAGS_PER_MATCH}).`);
+      showEffectFeedback(winner.cat.card,winner.cat.card.name,"Victoire : +1 TAG","buff");
+    }else{
+      log(`[EFFET] ${winner.cat.card.name} : TAG déjà au maximum.`);
+    }
+  }
   const nextEnemyTechniqueMalus={
     winNextEnemyTechniqueMinus2:-2,
     winNextEnemyTechniqueMinus3:-3
@@ -6772,14 +7117,18 @@ function win(winner,loser,reason){
     // A victory can trigger a pin before the winning object's end-of-round effect expires.
     const objectPinBonus=Number(winner.objEffect?.pin||0);
     const defeatPrevented=preventFirstDefeat(loser);
+    const returnWinnerToHand=loserAbility==="lossReturnEnemyWrestlerToHand";
+    const returnSource=loser.cat?.card||null;
     consumeRoundObjects();
     if(defeatPrevented){
+      if(returnWinnerToHand)returnActiveWrestlerToHand(winner,returnSource);
       render();
       setTimeout(startRound,1100);
       return;
     }
     clearWrestler(loser);
     attemptPin(winner,loser,objectPinBonus);
+    if(returnWinnerToHand)returnActiveWrestlerToHand(winner,returnSource);
   };
 
   if(resolveNextStatWinEffect(winner,G.stat,finishWin))return;
@@ -6804,6 +7153,21 @@ function attemptPin(p,target,objectPinBonus=0){
   if(target)target.pinShield=0;
   const chance=Math.max(0,Math.min(100,base+bonus-shield));
   const roll=Math.floor(Math.random()*100)+1;
+  if(isOnlineMatch()){
+    const winnerSlot=localSideToOnlineSlot(p.side);
+    const pinEvent={
+      id:`${G.matchOptions?.onlineMatchId||"online"}:${G.round}:${G.turnsTaken}:${winnerSlot}:${Date.now()}`,
+      name:p.label,
+      success:roll<=chance,
+      chance,
+      roll,
+      winnerSlot
+    };
+    G.pinEvent=pinEvent;
+    onlineLastPinEventId=pinEvent.id;
+    markOnlineDirty();
+    publishOnlineSnapshotNow();
+  }
   log(`Tombe : ${chance}% (${base}% danger adverse + ${bonus}% bonus - ${shield}% protection) - ${roll}.`);
   if(abilityBonus)showEffectFeedback(p.cat.card,p.cat.card.name,`Tombé +${abilityBonus}`,"pin");
   if(shield&&target?.cat?.card)showEffectFeedback(target.cat.card,target.cat.card.name,`Protection -${shield}`,"block");
@@ -7141,20 +7505,27 @@ function showWheel(cb){
     }
     const source=reroller.man?.ability==="rerollStat" ? reroller.man : reroller.cat.card;
     if(reroller.side==="player"){
+      const onlineToken=beginOnlineChoice("reroll");
       rerollActions?.classList.add("active");
       if(sub)sub.textContent=`${source.name} peut relancer la roulette.`;
       if(rerollButton)rerollButton.onclick=()=>{
         rerollActions?.classList.remove("active");
+        endOnlineChoice(onlineToken);
         const next=rerollRoundStatFor(reroller,G.stat);
+        publishResolvedOnlineChoice();
         spinTo(next,()=>setTimeout(closeWheel,1300));
       };
       if(keepButton)keepButton.onclick=()=>{
         rerollActions?.classList.remove("active");
+        endOnlineChoice(onlineToken);
         log(`[EFFET] ${source.name} : relance conservée.`);
+        markOnlineDirty();
+        publishResolvedOnlineChoice();
         setTimeout(closeWheel,800);
       };
       return;
       }
+    if(isOnlineMatch())return;
     setTimeout(()=>{
       const next=rerollRoundStatFor(reroller,G.stat);
       spinTo(next,()=>setTimeout(closeWheel,1300));
@@ -7237,7 +7608,7 @@ function showOnlineFinalResult(){
   actions.classList.add("active");
 }
 
-function showPin(name,success,chance,roll,winnerSide=null){
+function showPin(name,success,chance,roll,winnerSide=null,{visualOnly=false}={}){
   const ov=document.getElementById("pinOverlay"),count=document.getElementById("pinCount"),msg=document.getElementById("pinMessage"),sub=document.getElementById("pinSub"),actions=document.getElementById("pinActions");
   const nextButton=document.getElementById("careerNextButton");
   const replayButton=document.getElementById("pinReplayButton");
@@ -7281,6 +7652,10 @@ function showPin(name,success,chance,roll,winnerSide=null){
       msg.textContent=final;
       sub.textContent=finalSub;
       if(success){
+        if(visualOnly){
+          if(G.mode==="online"&&G.over)showOnlineFinalResult();
+          return;
+        }
         if(G.mode==="challenge"&&G.challenge){
           handleChallengePinSuccess(winnerSide);
           return;
@@ -7327,6 +7702,8 @@ function showPin(name,success,chance,roll,winnerSide=null){
         }
         fadeMusic(playerWon ? "victoire" : "defaite",900);
         actions.classList.add("active");
+      }else if(visualOnly){
+        setTimeout(hidePin,800);
       }else{
         fadeMusic("match",600);
         setTimeout(()=>{hidePin();startRound()},800);
@@ -7652,21 +8029,39 @@ function renderCollection(){
   if(!grid||!summary||!status)return;
   const owned=ownedCards();
   const total=owned.reduce((sum,card)=>sum+ownedCount(cardKey(card)),0);
+  const search=normalizeDeckFilterText(document.getElementById("collectionSearch")?.value);
+  const typeFilter=document.getElementById("collectionTypeFilter")?.value||"";
+  const rarityFilter=document.getElementById("collectionRarityFilter")?.value||"";
+  const catalog=CARD_DATA
+    .filter(card=>{
+      if(typeFilter&&card.type!==typeFilter)return false;
+      if(rarityFilter&&card.rarity!==rarityFilter)return false;
+      if(!search)return true;
+      return normalizeDeckFilterText([
+        card.name,
+        displayCardType(card.type),
+        card.rarity,
+        displayEffectText(card.effect)
+      ].join(" ")).includes(search);
+    })
+    .sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),"fr",{sensitivity:"base"}));
   summary.innerHTML=`
     <span><b>${owned.length}</b> / ${CARD_DATA.length} cartes uniques</span>
     <span><b>${total}</b> cartes au total</span>
     <span><b>${playerState.credits}</b> crédits</span>
   `;
-  status.textContent="";
-  grid.innerHTML=owned.map(card=>{
+  const plural=catalog.length!==1;
+  status.textContent=`${catalog.length} carte${plural?"s":""} affichée${plural?"s":""}`;
+  grid.innerHTML=catalog.length ? catalog.map(card=>{
     const count=ownedCount(cardKey(card));
+    const isOwned=count>0;
     const safeId=escapeAttr(cardKey(card));
-    return `<div class="collection-card ${String(card.rarity||"").toLowerCase()}" onmouseenter="setCollectionPreview('${safeId}')" onclick="setCollectionPreview('${safeId}')">
+    return `<div class="collection-card ${String(card.rarity||"").toLowerCase()} ${isOwned?"is-owned":"is-unowned"}" onmouseenter="setCollectionPreview('${safeId}')" onclick="setCollectionPreview('${safeId}')">
       ${cardHTML(card,"","")}
-      <div class="collection-count">x${count}</div>
+      <div class="collection-count ${isOwned?"":"is-unowned"}">${isOwned?`x${count}`:"Non possédée"}</div>
     </div>`;
-  }).join("");
-  setCollectionPreview(owned[0] ? cardKey(owned[0]) : null);
+  }).join("") : `<div class="collection-empty-result">Aucune carte ne correspond aux filtres.</div>`;
+  setCollectionPreview(catalog[0] ? cardKey(catalog[0]) : null);
 }
 
 function setCollectionPreview(cardOrId){

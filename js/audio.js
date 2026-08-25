@@ -6,7 +6,7 @@ const AUDIO_LIBRARY = {
     victoire: { label: "Victoire", src: "assets/audio/music/victoire.mp3" },
     defaite: { label: "Défaite", src: "assets/audio/music/defaite.mp3" },
     adam_frost: {
-      label: "History Untold",
+      label: "Adam Frost",
       wrestler: "Adam Frost",
       src: "assets/audio/music/adam_frost.mp3"
     },

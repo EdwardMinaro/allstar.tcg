@@ -115,7 +115,7 @@ function verifyRecentEffects() {
     "Effets Adam Frost plafonnes et branches"
   );
   assert(
-    audio.includes('label: "History Untold"')
+    audio.includes('label: "Adam Frost"')
       && audio.includes('wrestler: "Adam Frost"')
       && audio.includes("adam_frost.mp3")
       && fs.existsSync(path.join(root, "assets/audio/music/adam_frost.mp3")),

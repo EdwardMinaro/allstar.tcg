@@ -1,19 +1,118 @@
 {
   "imported": [
     {
-      "key": "rare_catcheurs_kev_lagadec",
-      "name": "Kev Lagadec",
-      "rarity": "Rare",
+      "key": "ultime_catcheurs_mbm",
+      "name": "MBM",
+      "rarity": "Ultime",
       "type": "Catcheur",
-      "ability": "doubleEquippedSupportUpToRare"
+      "ability": "entryDiscardUpTo3RandomStat2"
     }
   ],
-  "updated": [],
-  "skipped": [],
+  "updated": [
+    {
+      "key": "rare_catcheurs_adrian_maccio",
+      "name": "Adrian Maccio",
+      "rarity": "Rare",
+      "type": "Catcheur",
+      "ability": "lossReturnEnemyWrestlerToHand"
+    },
+    {
+      "key": "rare_managers_lord_gideon_salvini",
+      "name": "Lord Gidéon Salvini",
+      "rarity": "Rare",
+      "type": "Manager",
+      "ability": "turnDrawChance40"
+    },
+    {
+      "key": "standard_managers_lord_gideon_salvini",
+      "name": "Lord Gidéon Salvini",
+      "rarity": "Standard",
+      "type": "Manager",
+      "ability": "turnDrawChance20"
+    },
+    {
+      "key": "rare_catcheurs_julius_trajan",
+      "name": "Julius Trajan",
+      "rarity": "Rare",
+      "type": "Catcheur",
+      "ability": "entryRecoverFactionDeck"
+    },
+    {
+      "key": "rare_catcheurs_lucas_thoumazet",
+      "name": "Lucas Thoumazet",
+      "rarity": "Rare",
+      "type": "Catcheur",
+      "ability": "firstRoundForceSpeedCharisma1"
+    },
+    {
+      "key": "rare_catcheurs_marcus_jaw",
+      "name": "Marcus Jaw",
+      "rarity": "Rare",
+      "type": "Catcheur",
+      "ability": "winTag1Max2"
+    },
+    {
+      "key": "legende_catcheurs_peter_fischer",
+      "name": "Peter Fischer",
+      "rarity": "Legende",
+      "type": "Catcheur",
+      "ability": "forceWheel50"
+    },
+    {
+      "key": "rare_catcheurs_rocky_j",
+      "name": "Rocky J",
+      "rarity": "Rare",
+      "type": "Catcheur",
+      "ability": "round2ForceSpeedCharisma1"
+    },
+    {
+      "key": "standard_catcheurs_rocky_j",
+      "name": "Rocky J",
+      "rarity": "Standard",
+      "type": "Catcheur",
+      "ability": null
+    }
+  ],
+  "skipped": [
+    {
+      "file": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Ben Damage\\Ben_Damage.json",
+      "name": "Ben Damage",
+      "rarity": "Rare",
+      "statsTotal": 22,
+      "reason": "Catcheur Standard/Rare != 24 stats"
+    },
+    {
+      "file": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Ben Damage\\S Ben_Damage.json",
+      "name": "Ben Damage",
+      "rarity": "Standard",
+      "statsTotal": 22,
+      "reason": "Catcheur Standard/Rare != 24 stats"
+    }
+  ],
   "music": [
     {
-      "source": "C:\\Users\\LENOVO\\Downloads\\Kev Lagadec\\Kev Lagadec titantron theme song.mov (2).mp3",
-      "target": "kev_lagadec.mp3"
+      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Ben Damage\\Ben Damage Songg.wav",
+      "target": "ben_damage.wav"
+    },
+    {
+      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Heddi Karaoui.mp3",
+      "target": "heddi_karaoui.mp3"
+    },
+    {
+      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Julius Trajan\\Julius Trajan HCP Titantron.mp3",
+      "target": "julius_trajan.mp3"
+    },
+    {
+      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Marcus Jaw\\Musique Marcus JAW (I ain't got time).mp3",
+      "target": "marcus_jaw.mp3"
+    },
+    {
+      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Peter Fischer\\Slow Royale.mp3",
+      "target": "peter_fischer.mp3"
+    },
+    {
+      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Rocky J\\12 - ROCKY J.mp3",
+      "target": "rocky_j.mp3"
     }
   ]
 }

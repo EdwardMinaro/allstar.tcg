@@ -105,23 +105,36 @@ class RoomService {
   }
 
   async updateMatchState(code, playerSlot, matchState) {
-    const room = await this.adapter.getRoom(String(code || "").trim().toUpperCase());
-    if (!room) throw new Error("Room introuvable.");
-    if (room.status !== "playing" && !(room.status === "finished" && matchState?.over)) {
-      throw new Error("La partie n'est pas active.");
-    }
-    if (!room.players?.[playerSlot]) throw new Error("Joueur introuvable.");
-    room.matchState = {
-      ...matchState,
-      sourceSlot: playerSlot,
-      updatedAt: Date.now()
+    const normalized = String(code || "").trim().toUpperCase();
+    const update = room => {
+      if (!room) throw new Error("Room introuvable.");
+      if (room.status !== "playing" && !(room.status === "finished" && matchState?.over)) {
+        throw new Error("La partie n'est pas active.");
+      }
+      if (!room.players?.[playerSlot]) throw new Error("Joueur introuvable.");
+      const previousVersion = Number(room.matchState?.version || room.matchState?.updatedAt || 0);
+      const requestedVersion = Number(matchState?.version || 0);
+      const version = Math.max(previousVersion + 1, requestedVersion, Date.now());
+      const updatedRoom = {
+        ...room,
+        matchState: {
+          ...matchState,
+          version,
+          sourceSlot: playerSlot,
+          updatedAt: version
+        },
+        currentTurn: matchState?.currentTurn || room.currentTurn,
+        currentRound: Number(matchState?.round || room.currentRound || 1),
+        activeStat: matchState?.stat || null,
+        winner: matchState?.winner || null
+      };
+      if (matchState?.over) updatedRoom.status = "finished";
+      return updatedRoom;
     };
-    room.currentTurn = matchState?.currentTurn || room.currentTurn;
-    room.currentRound = Number(matchState?.round || room.currentRound || 1);
-    room.activeStat = matchState?.stat || null;
-    room.winner = matchState?.winner || null;
-    if (matchState?.over) room.status = "finished";
-    return this.adapter.writeRoom(room);
+    if (typeof this.adapter.updateRoom === "function") {
+      return this.adapter.updateRoom(normalized, update);
+    }
+    return this.adapter.writeRoom(update(await this.adapter.getRoom(normalized)));
   }
 
   subscribe(code, callback) {

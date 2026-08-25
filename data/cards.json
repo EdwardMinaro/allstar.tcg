@@ -367,6 +367,22 @@
       "ability": "firstRoundRandomStats5"
     },
     {
+      "key": "legende_catcheurs_peter_fischer",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Peter Fischer",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Sur son premier tour, la roulette possède 50% de chance en plus de tomber sur Force.",
+      "renderArt": "assets/card_renders/legende_catcheurs_peter_fischer.png",
+      "musicId": "peter_fischer",
+      "ability": "forceWheel50"
+    },
+    {
       "key": "legende_catcheurs_s_m_s",
       "type": "Catcheur",
       "rarity": "Legende",
@@ -525,6 +541,22 @@
       "ability": "turnEnemyRandomPermanent1Max5",
       "renderArt": "assets/card_renders/rare_catcheurs_adam_frost.png",
       "musicId": "adam_frost"
+    },
+    {
+      "key": "rare_catcheurs_adrian_maccio",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Adrian Maccio",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 4
+      },
+      "effect": "Si cette carte perd, renvoyez la carte catcheur adverse dans la main de l'adversaire.",
+      "renderArt": "assets/card_renders/rare_catcheurs_adrian_maccio.png",
+      "musicId": "adrian_maccio",
+      "ability": "lossReturnEnemyWrestlerToHand"
     },
     {
       "key": "rare_catcheurs_alex_ezio",
@@ -1097,6 +1129,22 @@
       "renderArt": "assets/card_renders/rare_catcheurs_jose_moreno.png"
     },
     {
+      "key": "rare_catcheurs_julius_trajan",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Julius Trajan",
+      "stats": {
+        "Force": 6,
+        "Vitesse": 6,
+        "Technique": 7,
+        "Charisme": 5
+      },
+      "effect": "Apparition : choisissez The World, Drix, Kyle Hoxton ou Saitovic dans votre deck et ajoutez cette carte à votre main.",
+      "renderArt": "assets/card_renders/rare_catcheurs_julius_trajan.png",
+      "musicId": "julius_trajan",
+      "ability": "entryRecoverFactionDeck"
+    },
+    {
       "key": "rare_catcheurs_kev_lagadec",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -1241,6 +1289,22 @@
       "renderArt": "assets/card_renders/rare_catcheurs_lucas_menil.png"
     },
     {
+      "key": "rare_catcheurs_lucas_thoumazet",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Lucas Thoumazet",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 6
+      },
+      "effect": "Tour 1 : + 1 en Force, Charisme, et en Vitesse",
+      "renderArt": "assets/card_renders/rare_catcheurs_lucas_thoumazet.png",
+      "musicId": "lucas_thoumazet",
+      "ability": "firstRoundForceSpeedCharisma1"
+    },
+    {
       "key": "rare_catcheurs_lux_strahl",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -1270,6 +1334,22 @@
       "renderArt": "assets/card_renders/rare_catcheurs_maffa.png",
       "musicId": "maffa",
       "ability": "entryPinBonus20"
+    },
+    {
+      "key": "rare_catcheurs_marcus_jaw",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Marcus Jaw",
+      "stats": {
+        "Force": 3,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 10
+      },
+      "effect": "Victoire : gagnez un tag (max : 2)",
+      "renderArt": "assets/card_renders/rare_catcheurs_marcus_jaw.png",
+      "musicId": "marcus_jaw",
+      "ability": "winTag1Max2"
     },
     {
       "key": "rare_catcheurs_mareck",
@@ -1446,6 +1526,22 @@
       "ability": "round2ActiveStat3",
       "renderArt": "assets/card_renders/rare_catcheurs_rayen_gurzil.png",
       "musicId": "rayen_gurzil"
+    },
+    {
+      "key": "rare_catcheurs_rocky_j",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Rocky J",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 6
+      },
+      "effect": "Round 2 : + 1 en Force, en Vitesse et en Charisme",
+      "renderArt": "assets/card_renders/rare_catcheurs_rocky_j.png",
+      "musicId": "rocky_j",
+      "ability": "round2ForceSpeedCharisma1"
     },
     {
       "key": "rare_catcheurs_romain_lestrange",
@@ -2224,6 +2320,21 @@
       "musicId": "r_man"
     },
     {
+      "key": "standard_catcheurs_rocky_j",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Rocky J",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 6,
+        "Technique": 5,
+        "Charisme": 6
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_rocky_j.png",
+      "musicId": "rocky_j"
+    },
+    {
       "key": "standard_catcheurs_romain_lestrange",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -2373,6 +2484,22 @@
       "ability": "techniqueWheel75",
       "musicId": "heddi_karaoui",
       "renderArt": "assets/card_renders/ultime_catcheurs_heddi_karaoui.png"
+    },
+    {
+      "key": "ultime_catcheurs_mbm",
+      "type": "Catcheur",
+      "rarity": "Ultime",
+      "name": "MBM",
+      "stats": {
+        "Force": 3,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 9
+      },
+      "effect": "Apparition : Défaussez un nombre de carte (max : 3), cette carte gagne +2 points dans une statistique aléatoire par carte défaussée.",
+      "renderArt": "assets/card_renders/ultime_catcheurs_mbm.png",
+      "musicId": "mbm",
+      "ability": "entryDiscardUpTo3RandomStat2"
     },
     {
       "key": "ultime_catcheurs_princesse_lauriana",
@@ -2527,6 +2654,16 @@
       "renderArt": "assets/card_renders/rare_managers_loic_bloodykilt.png"
     },
     {
+      "key": "rare_managers_lord_gideon_salvini",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "Lord Gidéon Salvini",
+      "stats": {},
+      "effect": "Une fois par tour, 40 % de chance de piocher une carte.",
+      "renderArt": "assets/card_renders/rare_managers_lord_gideon_salvini.png",
+      "ability": "turnDrawChance40"
+    },
+    {
       "key": "rare_managers_ludovic_vaillant",
       "type": "Manager",
       "rarity": "Rare",
@@ -2655,6 +2792,16 @@
       "effect": "Premier tour : +1 dans 1 stat aléatoire.",
       "ability": "mRandom",
       "renderArt": "assets/card_renders/standard_managers_loic_bloodykilt.png"
+    },
+    {
+      "key": "standard_managers_lord_gideon_salvini",
+      "type": "Manager",
+      "rarity": "Standard",
+      "name": "Lord Gidéon Salvini",
+      "stats": {},
+      "effect": "Une fois par tour, 20 % de chance de piocher une carte.",
+      "renderArt": "assets/card_renders/standard_managers_lord_gideon_salvini.png",
+      "ability": "turnDrawChance20"
     },
     {
       "key": "standard_managers_yann_le_kersaudec",
