@@ -284,6 +284,36 @@ const AUDIO_LIBRARY = {
       label: "Trevor Mayden",
       wrestler: "Trevor Mayden",
       src: "assets/audio/music/trevor_mayden.mp3"
+    },
+    heddi_karaoui: {
+      label: "Heddi Karaoui",
+      wrestler: "Heddi Karaoui",
+      src: "assets/audio/music/heddi_karaoui.mp3"
+    },
+    ben_damage: {
+      label: "Ben Damage",
+      wrestler: "Ben Damage",
+      src: "assets/audio/music/ben_damage.wav"
+    },
+    julius_trajan: {
+      label: "Julius Trajan",
+      wrestler: "Julius Trajan",
+      src: "assets/audio/music/julius_trajan.mp3"
+    },
+    marcus_jaw: {
+      label: "Marcus Jaw",
+      wrestler: "Marcus Jaw",
+      src: "assets/audio/music/marcus_jaw.mp3"
+    },
+    peter_fischer: {
+      label: "Peter Fischer",
+      wrestler: "Peter Fischer",
+      src: "assets/audio/music/peter_fischer.mp3"
+    },
+    rocky_j: {
+      label: "Rocky J",
+      wrestler: "Rocky J",
+      src: "assets/audio/music/rocky_j.mp3"
     }
   },
   sfx: {

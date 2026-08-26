@@ -639,6 +639,22 @@
       "musicId": "baadshah_pehalwan_khan"
     },
     {
+      "key": "rare_catcheurs_ben_damage",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Ben Damage",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 3,
+        "Technique": 4,
+        "Charisme": 9
+      },
+      "effect": "Apparition : Annulez les modifications de statistique sur la carte de votre adversaire.",
+      "ability": "entryResetEnemyStatMods",
+      "renderArt": "assets/card_renders/rare_catcheurs_ben_damage.png",
+      "musicId": "ben_damage"
+    },
+    {
       "key": "rare_catcheurs_bernardot",
       "type": "Catcheur",
       "rarity": "Rare",
@@ -1032,6 +1048,21 @@
       "effect": "Si un objet lui est équipé : +2 Vitesse.",
       "ability": "objectOwnedSpeed2",
       "renderArt": "assets/card_renders/rare_catcheurs_griff.png"
+    },
+    {
+      "key": "rare_catcheurs_hedi_silver",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Hedi Silver",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 4,
+        "Charisme": 8
+      },
+      "effect": "Une fois par round : jouez à pierre-feuille-ciseaux avec votre adversaire avant la roulette. Si vous gagnez, vous gagnez +1 dans toutes vos statistiques pendant ce round.",
+      "ability": "roundRpsAll1",
+      "renderArt": "assets/card_renders/rare_catcheurs_hedi_silver.png"
     },
     {
       "key": "rare_catcheurs_heracles",
@@ -1814,6 +1845,21 @@
       "musicId": "angelo_folena"
     },
     {
+      "key": "standard_catcheurs_ben_damage",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Ben Damage",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 3,
+        "Technique": 4,
+        "Charisme": 9
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_ben_damage.png",
+      "musicId": "ben_damage"
+    },
+    {
       "key": "standard_catcheurs_black_sam",
       "type": "Catcheur",
       "rarity": "Standard",
@@ -2019,6 +2065,20 @@
       "effect": "Aucun effet.",
       "renderArt": "assets/card_renders/standard_catcheurs_fenrir_strom.png",
       "musicId": "fenrir_strom"
+    },
+    {
+      "key": "standard_catcheurs_hedi_silver",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Hedi Silver",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 4,
+        "Charisme": 8
+      },
+      "effect": "Aucun effet.",
+      "renderArt": "assets/card_renders/standard_catcheurs_hedi_silver.png"
     },
     {
       "key": "standard_catcheurs_jafar_jordan",

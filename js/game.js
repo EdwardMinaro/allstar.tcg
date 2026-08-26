@@ -651,6 +651,22 @@ const CARD_DATA = [
     "musicId": "baadshah_pehalwan_khan"
   },
   {
+    "key": "rare_catcheurs_ben_damage",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Ben Damage",
+    "stats": {
+      "Force": 8,
+      "Vitesse": 3,
+      "Technique": 4,
+      "Charisme": 9
+    },
+    "effect": "Apparition : Annulez les modifications de statistique sur la carte de votre adversaire.",
+    "ability": "entryResetEnemyStatMods",
+    "renderArt": "assets/card_renders/rare_catcheurs_ben_damage.png",
+    "musicId": "ben_damage"
+  },
+  {
     "key": "rare_catcheurs_bernardot",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -1044,6 +1060,21 @@ const CARD_DATA = [
     "effect": "Si un objet lui est équipé : +2 Vitesse.",
     "ability": "objectOwnedSpeed2",
     "renderArt": "assets/card_renders/rare_catcheurs_griff.png"
+  },
+  {
+    "key": "rare_catcheurs_hedi_silver",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Hedi Silver",
+    "stats": {
+      "Force": 5,
+      "Vitesse": 7,
+      "Technique": 4,
+      "Charisme": 8
+    },
+    "effect": "Une fois par round : jouez à pierre-feuille-ciseaux avec votre adversaire avant la roulette. Si vous gagnez, vous gagnez +1 dans toutes vos statistiques pendant ce round.",
+    "ability": "roundRpsAll1",
+    "renderArt": "assets/card_renders/rare_catcheurs_hedi_silver.png"
   },
   {
     "key": "rare_catcheurs_heracles",
@@ -1826,6 +1857,21 @@ const CARD_DATA = [
     "musicId": "angelo_folena"
   },
   {
+    "key": "standard_catcheurs_ben_damage",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Ben Damage",
+    "stats": {
+      "Force": 8,
+      "Vitesse": 3,
+      "Technique": 4,
+      "Charisme": 9
+    },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_ben_damage.png",
+    "musicId": "ben_damage"
+  },
+  {
     "key": "standard_catcheurs_black_sam",
     "type": "Catcheur",
     "rarity": "Standard",
@@ -2031,6 +2077,20 @@ const CARD_DATA = [
     "effect": "Aucun effet.",
     "renderArt": "assets/card_renders/standard_catcheurs_fenrir_strom.png",
     "musicId": "fenrir_strom"
+  },
+  {
+    "key": "standard_catcheurs_hedi_silver",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Hedi Silver",
+    "stats": {
+      "Force": 5,
+      "Vitesse": 7,
+      "Technique": 4,
+      "Charisme": 8
+    },
+    "effect": "Aucun effet.",
+    "renderArt": "assets/card_renders/standard_catcheurs_hedi_silver.png"
   },
   {
     "key": "standard_catcheurs_jafar_jordan",
@@ -3183,6 +3243,7 @@ const EFFECT_REGISTRY = {
   revealCharlieEachRoundForcePin: { timing:"round", text:"Une fois par tour, si Charlie Bergson est en main : +1 Force et +20 Tombé." },
   rerollStat: { timing:"roulette", text:"Relance la statistique du duel une fois." },
   rerollOnLoss: { timing:"roulette", text:"Après une défaite de duel, relance automatiquement la roulette une fois." },
+  roundRpsAll1: { timing:"roulette", choice:true, text:"Une fois par round avant la roulette : victoire à pierre-feuille-ciseaux, +1 à toutes les statistiques pour ce round." },
   ringsiderRecover1LoseTag: { timing:"round", choice:true, text:"Une fois par tour : peut récupérer 1 carte choisie du vestiaire contre 1 TAG." },
   ringsiderRecover2LoseTag: { timing:"round", choice:true, text:"Une fois par tour : peut récupérer jusqu'à 2 cartes choisies du vestiaire contre 1 TAG." },
   round4All1: { timing:"round4", text:"Round 4 : +1 à toutes les stats." },
@@ -5008,6 +5069,11 @@ function startRound(){
   G.turnsTaken=0;
 
   [G.player,G.ai].forEach(p=>{
+    if(p.cat?.hediSilverRpsBonusRound&&p.cat.hediSilverRpsBonusRound<G.round){
+      addAllStats(p.cat,-Number(p.cat.hediSilverRpsBonus||0));
+      p.cat.hediSilverRpsBonus=0;
+      p.cat.hediSilverRpsBonusRound=null;
+    }
     p.played={Catcheur:false,Manager:false,Objet:false};
     p.objectsBlocked=false;
     p.managersBlocked=false;
@@ -7523,7 +7589,59 @@ function rerollRoundStatFor(reroller,currentStat){
   return nextStat;
 }
 
+function resolveRoundRpsAll1(done){
+  const candidates=[G.player,G.ai].filter(owner=>
+    owner.cat&&
+    wrestlerAbility(owner.cat)==="roundRpsAll1"&&
+    owner.cat.hediSilverRpsUsedRound!==G.round
+  );
+  const choices=["Pierre","Feuille","Ciseaux"];
+  const resolveNext=()=>{
+    const owner=candidates.shift();
+    if(!owner){
+      done();
+      return;
+    }
+    const wrestler=owner.cat;
+    wrestler.hediSilverRpsUsedRound=G.round;
+    requestEffectChoice({
+      title:`${wrestler.card.name} · Pierre-feuille-ciseaux`,
+      text:owner.side==="player"
+        ? "Choisissez votre signe. L'adversaire joue simultanément."
+        : "Choisissez votre signe face à Hedi Silver.",
+      choices:choices.map(choice=>({label:choice,value:choice})),
+      onChoose:playerChoice=>{
+        const aiChoice=choices[Math.floor(Math.random()*choices.length)];
+        const result=rpsWinner(playerChoice,aiChoice);
+        const ownerWon=owner.side==="player" ? result==="player" : result==="ai";
+        const verdict=result==="tie" ? "Égalité" : ownerWon ? `${wrestler.card.name} gagne` : `${wrestler.card.name} perd`;
+        if(ownerWon){
+          addAllStats(wrestler,1);
+          wrestler.hediSilverRpsBonus=1;
+          wrestler.hediSilverRpsBonusRound=G.round;
+        }
+        log(`[EFFET] ${wrestler.card.name} : ${playerChoice} contre ${aiChoice} — ${verdict}${ownerWon?", +1 partout pour ce round":""}.`);
+        showEffectFeedback(
+          wrestler.card,
+          wrestler.card.name,
+          `${playerChoice} contre ${aiChoice} · ${ownerWon?"+1 partout":verdict}`,
+          ownerWon?"buff":"special",
+          2400
+        );
+        markOnlineDirty();
+        render();
+        setTimeout(resolveNext,350);
+      }
+    });
+  };
+  resolveNext();
+}
+
 function showWheel(cb){
+  resolveRoundRpsAll1(()=>showWheelCore(cb));
+}
+
+function showWheelCore(cb){
   const ov=document.getElementById("wheelOverlay"),t=document.getElementById("wheelText");
   const splash=ov?.querySelector(".wheel-splash");
   const wheel=ov?.querySelector(".wheel");
