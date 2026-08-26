@@ -8122,8 +8122,7 @@ function renderCollection(){
   loadPlayerState();
   const grid=document.getElementById("collectionGrid");
   const summary=document.getElementById("collectionSummary");
-  const status=document.getElementById("collectionStatus");
-  if(!grid||!summary||!status)return;
+  if(!grid||!summary)return;
   const owned=ownedCards();
   const total=owned.reduce((sum,card)=>sum+ownedCount(cardKey(card)),0);
   const search=normalizeDeckFilterText(document.getElementById("collectionSearch")?.value);
@@ -8147,8 +8146,6 @@ function renderCollection(){
     <span><b>${total}</b> cartes au total</span>
     <span><b>${playerState.credits}</b> crédits</span>
   `;
-  const plural=catalog.length!==1;
-  status.textContent=`${catalog.length} carte${plural?"s":""} affichée${plural?"s":""}`;
   grid.innerHTML=catalog.length ? catalog.map(card=>{
     const count=ownedCount(cardKey(card));
     const isOwned=count>0;

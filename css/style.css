@@ -3755,6 +3755,22 @@ button{font-family:inherit;cursor:pointer}
   flex:0 0 auto;
 }
 
+#collection .small-logo{
+  margin-bottom:4px;
+}
+
+#collection .collection-summary{
+  margin:8px 0;
+}
+
+#collection .collection-toolbar{
+  margin-bottom:10px;
+}
+
+#collection .shop-actions{
+  margin-top:10px;
+}
+
 .wallet-strip{
   display:flex;
   align-items:center;
