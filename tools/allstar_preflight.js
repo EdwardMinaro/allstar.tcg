@@ -73,6 +73,7 @@ function verifyDesktopBuild() {
 function verifyInterfaceFiles() {
   const html = read("index.html");
   const css = read("css/style.css");
+  const game = read("js/game.js");
   const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map(match => match[1]);
   assert(scripts.every(file => fs.existsSync(path.join(root, file))), "Scripts interface présents");
   assert(scripts.indexOf("js/firebaseService.js") < scripts.indexOf("js/profileService.js"), "Ordre Firebase puis profil");
@@ -83,7 +84,15 @@ function verifyInterfaceFiles() {
   const audio = read("js/audio.js");
   assert(html.includes("music-pause-toggle") && audio.includes("toggleMusicPause()"), "Bouton pause/reprendre de musique");
   assert(audio.includes("musicPausedByUser") && audio.includes("music-stop-control,.music-pause-toggle"), "Pause manuelle preservee entre les clics");
-  assert(read("js/game.js").includes("Bêta ouverte - Version"), "Version bêta visible dans le menu");
+  assert(game.includes("Bêta ouverte - Version"), "Version bêta visible dans le menu");
+  assert(
+    game.includes("function effectChoiceCard(choice)")
+      && game.includes('class="effect-card-gallery"')
+      && game.includes("galleryTrack.scrollLeft+=event.deltaY")
+      && css.includes(".effect-card-gallery{")
+      && css.includes("overflow-x:auto"),
+    "Selections de cartes en galerie horizontale visuelle"
+  );
 }
 
 function verifyRecentEffects() {

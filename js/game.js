@@ -4163,31 +4163,98 @@ function hideRpsOverlay(){
   document.getElementById("rpsOverlay").classList.remove("active");
 }
 
+function effectChoiceCard(choice){
+  const rawValue=String(choice?.value??"");
+  const cardId=rawValue.includes(":")?rawValue.slice(rawValue.lastIndexOf(":")+1):rawValue;
+  if(!cardId||!G)return null;
+  for(const owner of [G.player,G.ai]){
+    if(!owner)continue;
+    for(const cards of [owner.hand,owner.deck,owner.grave]){
+      const match=(cards||[]).find(card=>card.id===cardId);
+      if(match)return match;
+    }
+    for(const active of [owner.cat?.card,owner.man,owner.obj]){
+      if(active?.id===cardId)return active;
+    }
+  }
+  return null;
+}
+
+function syncEffectChoiceGalleryNav(shell){
+  const gallery=shell?.querySelector(".effect-card-gallery");
+  const previous=shell?.querySelector('[data-gallery-direction="-1"]');
+  const next=shell?.querySelector('[data-gallery-direction="1"]');
+  if(!gallery||!previous||!next)return;
+  const overflow=gallery.scrollWidth-gallery.clientWidth>4;
+  gallery.classList.toggle("is-contained",!overflow);
+  previous.hidden=!overflow;
+  next.hidden=!overflow;
+  previous.disabled=!overflow||gallery.scrollLeft<=4;
+  next.disabled=!overflow||gallery.scrollLeft+gallery.clientWidth>=gallery.scrollWidth-4;
+}
+
 function requestEffectChoice({title,text,choices,onChoose}){
   const overlay=document.getElementById("effectChoiceOverlay");
   const titleEl=document.getElementById("effectChoiceTitle");
   const textEl=document.getElementById("effectChoiceText");
   const choicesEl=document.getElementById("effectChoiceButtons");
+  const choiceList=Array.isArray(choices)?choices:[];
   if(!overlay||!titleEl||!textEl||!choicesEl){
-    const fallback=choices?.[0]?.value;
+    const fallback=choiceList[0]?.value;
     if(onChoose)onChoose(fallback);
     return;
   }
   const onlineToken=beginOnlineChoice("effect");
   titleEl.textContent=title||"Choix d'effet";
   textEl.textContent=text||"Choisis l'effet à appliquer.";
-  choicesEl.innerHTML=(choices||[]).map((choice,index)=>`<button class="small-btn effect-choice-btn" type="button" data-choice-index="${index}">${choice.label}</button>`).join("");
-  choicesEl.querySelectorAll("button").forEach(btn=>{
+  const resolvedChoices=choiceList.map((choice,index)=>({choice,index,card:effectChoiceCard(choice)}));
+  const visualChoices=resolvedChoices.filter(entry=>entry.card);
+  const actionChoices=resolvedChoices.filter(entry=>!entry.card);
+  const hasCardGallery=visualChoices.length>0;
+  const splash=overlay.querySelector(".effect-choice-splash");
+  choicesEl.classList.toggle("has-card-gallery",hasCardGallery);
+  splash?.classList.toggle("has-card-gallery",hasCardGallery);
+  const gallery=hasCardGallery?`
+    <div class="effect-card-gallery-shell">
+      <button class="effect-card-gallery-nav previous" type="button" data-gallery-direction="-1" aria-label="Voir les cartes précédentes">&#10094;</button>
+      <div class="effect-card-gallery" aria-label="Cartes disponibles">
+        ${visualChoices.map(({choice,index,card})=>`<button class="effect-card-choice" type="button" data-choice-index="${index}" aria-label="${escapeAttr(choice.label||card.name)}">
+          ${cardHTML(card)}
+          <span class="effect-card-choice-caption">${escapeHtml(choice.label||card.name)}</span>
+        </button>`).join("")}
+      </div>
+      <button class="effect-card-gallery-nav next" type="button" data-gallery-direction="1" aria-label="Voir les cartes suivantes">&#10095;</button>
+    </div>`:"";
+  const actions=actionChoices.length?`<div class="effect-choice-actions">${actionChoices.map(({choice,index})=>`<button class="small-btn effect-choice-btn" type="button" data-choice-index="${index}">${escapeHtml(choice.label)}</button>`).join("")}</div>`:"";
+  choicesEl.innerHTML=gallery+actions;
+  choicesEl.querySelectorAll("[data-choice-index]").forEach(btn=>{
     btn.addEventListener("click",()=>{
-      const choice=choices[Number(btn.dataset.choiceIndex)]||choices[0];
+      const choice=choiceList[Number(btn.dataset.choiceIndex)]||choiceList[0];
       overlay.classList.remove("active");
       choicesEl.innerHTML="";
+      choicesEl.classList.remove("has-card-gallery");
+      splash?.classList.remove("has-card-gallery");
       endOnlineChoice(onlineToken);
       if(onChoose)onChoose(choice?.value);
       publishResolvedOnlineChoice();
     },{once:true});
   });
+  const galleryShell=choicesEl.querySelector(".effect-card-gallery-shell");
+  const galleryTrack=choicesEl.querySelector(".effect-card-gallery");
+  galleryShell?.querySelectorAll("[data-gallery-direction]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      const direction=Number(button.dataset.galleryDirection)||1;
+      galleryTrack?.scrollBy({left:direction*Math.max(240,galleryTrack.clientWidth*.72),behavior:"smooth"});
+    });
+  });
+  galleryTrack?.addEventListener("scroll",()=>syncEffectChoiceGalleryNav(galleryShell),{passive:true});
+  galleryTrack?.addEventListener("wheel",event=>{
+    if(Math.abs(event.deltaY)<=Math.abs(event.deltaX)||galleryTrack.scrollWidth<=galleryTrack.clientWidth)return;
+    event.preventDefault();
+    galleryTrack.scrollLeft+=event.deltaY;
+  },{passive:false});
   overlay.classList.add("active");
+  requestAnimationFrame(()=>syncEffectChoiceGalleryNav(galleryShell));
 }
 
 function isRingsiderRecoveryAbility(ability){
