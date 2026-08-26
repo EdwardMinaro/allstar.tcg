@@ -7389,11 +7389,41 @@ function closePileViewer(){
   document.getElementById("pileViewerOverlay")?.classList.remove("active");
 }
 
+const REFRESHED_RENDER_ART=new Set([
+  "assets/card_renders/legende_catcheurs_black_sam.png",
+  "assets/card_renders/legende_catcheurs_drix.png",
+  "assets/card_renders/legende_catcheurs_ethan_riley.png",
+  "assets/card_renders/legende_catcheurs_maxime_cuadrado.png",
+  "assets/card_renders/legende_catcheurs_nilsn.png",
+  "assets/card_renders/rare_catcheurs_angelo_folena.png",
+  "assets/card_renders/rare_catcheurs_black_sam.png",
+  "assets/card_renders/rare_catcheurs_drix.png",
+  "assets/card_renders/rare_catcheurs_ethan_riley.png",
+  "assets/card_renders/rare_catcheurs_maxime_cuadrado.png",
+  "assets/card_renders/rare_catcheurs_nilsn.png",
+  "assets/card_renders/rare_catcheurs_paul_meunier.png",
+  "assets/card_renders/standard_catcheurs_angelo_folena.png",
+  "assets/card_renders/standard_catcheurs_black_sam.png",
+  "assets/card_renders/standard_catcheurs_drix.png",
+  "assets/card_renders/standard_catcheurs_ethan_riley.png",
+  "assets/card_renders/standard_catcheurs_jey_kill.png",
+  "assets/card_renders/standard_catcheurs_luke_kane.png",
+  "assets/card_renders/standard_catcheurs_maxime_cuadrado.png",
+  "assets/card_renders/standard_catcheurs_nilsn.png",
+  "assets/card_renders/standard_catcheurs_nocif.png",
+  "assets/card_renders/standard_catcheurs_paul_meunier.png"
+]);
+
+function renderArtSrc(path){
+  const src=String(path||"");
+  return REFRESHED_RENDER_ART.has(src) ? `${src}?art=0212-refresh-1` : src;
+}
+
 function cardHTML(c,attrs="",id=""){
   const effectOverlay=effectOverlayHTML(c);
   if(c.renderArt){
     return `<div class="game-card rendered ${String(c.type||"").toLowerCase()} ${String(c.rarity||"").toLowerCase()}" ${attrs}>
-      <img class="full-card-art" src="${c.renderArt}" alt="${c.name}" onerror="this.closest('.game-card')?.classList.add('render-fallback');this.remove()">
+      <img class="full-card-art" src="${renderArtSrc(c.renderArt)}" alt="${c.name}" onerror="this.closest('.game-card')?.classList.add('render-fallback');this.remove()">
       <div class="render-card-fallback">
         <b>${c.name}</b>
         <span>${displayCardType(c.type)} - ${c.rarity||"Standard"}</span>

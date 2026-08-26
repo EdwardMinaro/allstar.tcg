@@ -3732,6 +3732,29 @@ button{font-family:inherit;cursor:pointer}
   width:min(1120px,94vw);
 }
 
+#collection .menu-wrap{
+  min-height:0;
+  padding:clamp(10px,2vh,22px);
+}
+
+#collection .collection-menu-card{
+  height:calc(100dvh - clamp(20px,4vh,44px));
+  max-height:calc(100dvh - clamp(20px,4vh,44px));
+  min-height:0;
+  padding:clamp(14px,2.2vh,30px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+#collection .collection-menu-card > .small-logo,
+#collection .collection-menu-card > .subtitle,
+#collection .collection-menu-card > .collection-summary,
+#collection .collection-menu-card > .collection-toolbar,
+#collection .collection-menu-card > .shop-actions{
+  flex:0 0 auto;
+}
+
 .wallet-strip{
   display:flex;
   align-items:center;
@@ -3884,16 +3907,23 @@ button{font-family:inherit;cursor:pointer}
 .collection-layout{
   display:grid;
   grid-template-columns:minmax(280px,1fr) minmax(0,2fr);
-  align-items:center;
+  align-items:stretch;
   gap:18px;
+  flex:1 1 auto;
   min-height:0;
 }
 
 .collection-grid{
-  max-height:58vh;
-  overflow:auto;
+  height:100%;
+  max-height:none;
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:scroll;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+  align-content:start;
   gap:14px;
   padding:4px 8px 8px 0;
 }
@@ -3926,8 +3956,8 @@ button{font-family:inherit;cursor:pointer}
 }
 
 .collection-preview{
-  min-height:58vh;
-  height:58vh;
+  min-height:0;
+  height:100%;
   border-radius:8px;
   border:3px solid #07070b;
   background:linear-gradient(180deg,rgba(31,31,42,.98),rgba(8,8,12,.98));
@@ -3940,8 +3970,10 @@ button{font-family:inherit;cursor:pointer}
 }
 
 .collection-preview-card{
-  width:min(100%,calc((58vh - 28px) * .737));
+  width:auto;
+  height:100%;
   max-height:100%;
+  max-width:100%;
   aspect-ratio:1108/1504;
   display:flex;
   align-items:center;
@@ -4198,6 +4230,8 @@ button{font-family:inherit;cursor:pointer}
 
   .collection-layout{
     grid-template-columns:1fr;
+    flex:none;
+    min-height:auto;
   }
 
   .collection-toolbar{
@@ -4214,7 +4248,19 @@ button{font-family:inherit;cursor:pointer}
   }
 
   .collection-preview-card{
+    height:auto;
     width:min(100%,calc(360px * .737));
+  }
+
+  #collection .collection-menu-card{
+    overflow-x:hidden;
+    overflow-y:auto;
+    scrollbar-gutter:stable;
+  }
+
+  .collection-grid{
+    height:min(58vh,520px);
+    min-height:320px;
   }
 
   .booster-splash{
