@@ -92,7 +92,9 @@ ipcMain.handle("allstar:set-resolution", (_event, size = {}) => {
 });
 
 ipcMain.handle("allstar:quit-app", () => {
-  app.quit();
+  setImmediate(() => app.quit());
+  const forceExitTimer = setTimeout(() => app.exit(0), 750);
+  forceExitTimer.unref();
   return true;
 });
 

@@ -3646,12 +3646,21 @@ async function confirmProfileLogout(){
   renderSaveScreen();
 }
 async function confirmQuitGame(){
-  try{await pushCloudSaveNow()}catch{}
+  closeSessionModal();
+  try{
+    await Promise.race([
+      Promise.resolve().then(()=>pushCloudSaveNow()).catch(()=>{}),
+      new Promise(resolve=>setTimeout(resolve,800))
+    ]);
+  }catch{}
   if(window.AllstarDesktop?.quitApp){
-    window.AllstarDesktop.quitApp();
+    try{
+      await window.AllstarDesktop.quitApp();
+    }catch{
+      window.close();
+    }
     return;
   }
-  closeSessionModal();
   showMenu();
 }
 const profileUiState={user:null,profile:null,loading:false,message:"",requestId:0};
