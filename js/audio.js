@@ -142,7 +142,7 @@ const AUDIO_LIBRARY = {
     },
     jet_kid: {
       label: "Jet Kid",
-      wrestler: "JET KID",
+      wrestler: "Jet Kid",
       src: "assets/audio/music/jet_kid.mp3"
     },
     paul_meunier: {
@@ -218,6 +218,7 @@ const AUDIO_LIBRARY = {
     the_butcher_zerk: {
       label: "Oeil de L'ascension",
       wrestler: "The Butcher Zerk",
+      teamTheme: true,
       src: "assets/audio/music/the_butcher_zerk.mp3"
     },
     shawn_olsen: {
@@ -293,7 +294,7 @@ const AUDIO_LIBRARY = {
     ben_damage: {
       label: "Ben Damage",
       wrestler: "Ben Damage",
-      src: "assets/audio/music/ben_damage.wav"
+      src: "assets/audio/music/ben_damage.mp3"
     },
     julius_trajan: {
       label: "Julius Trajan",

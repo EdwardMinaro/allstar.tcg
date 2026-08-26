@@ -124,6 +124,17 @@ function run() {
   const musicByWrestler = new Set(Object.values(audio.music || {})
     .filter(item => item.wrestler)
     .map(item => normalizeName(item.wrestler)));
+  Object.entries(audio.music || {}).forEach(([id, item]) => {
+    if (item.wrestler && !item.teamTheme && item.label !== item.wrestler) {
+      errors.push(`Thème ${id}: le libellé "${item.label}" doit être exactement le nom du catcheur "${item.wrestler}"`);
+    }
+  });
+  game.CARD_DATA.filter(card => card.musicId).forEach(card => {
+    const track = audio.music?.[card.musicId];
+    if (track && normalizeName(track.wrestler) !== normalizeName(card.name)) {
+      errors.push(`${card.name} ${card.rarity}: le thème "${card.musicId}" est attribué à "${track.wrestler}"`);
+    }
+  });
   const wrestlers = [...new Set(game.CARD_DATA
     .filter(card => card.type === "Catcheur")
     .map(card => card.name))]
