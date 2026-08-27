@@ -340,6 +340,7 @@ class AudioManager {
     this.crossfadeTimer = null;
     this.toastTimer = null;
     this.pendingMusicId = null;
+    this.musicRequestId = 0;
     this.unlocked = false;
     this.musicStoppedByUser = false;
     this.musicPausedByUser = false;
@@ -471,22 +472,31 @@ class AudioManager {
     const item = this.library.music[id];
     if (!item) return;
 
-    this.music = this.createAudio(item.src, !item.wrestler);
+    const requestId = ++this.musicRequestId;
+    const music = this.createAudio(item.src, !item.wrestler);
+    this.music = music;
     this.currentMusicId = id;
-    if (this.music) this.music.volume = fadeInDuration ? 0 : this.effectiveVolume("music");
+    if (music) music.volume = fadeInDuration ? 0 : this.effectiveVolume("music");
     this.updateNowPlaying();
     this.showMusicToast(item);
 
-    if (!this.music) return;
-    this.attachMusicEvents(this.music, id, item);
-    this.music.play()
+    if (!music) return;
+    this.attachMusicEvents(music, id, item);
+    music.play()
       .then(() => {
+        if (requestId !== this.musicRequestId || this.music !== music) {
+          music.pause();
+          music.currentTime = 0;
+          return;
+        }
         this.unlocked = true;
         this.pendingMusicId = null;
-        if (fadeInDuration) this.fadeAudioIn(this.music, fadeInDuration);
+        if (fadeInDuration) this.fadeAudioIn(music, fadeInDuration);
       })
       .catch(() => {
-        this.pendingMusicId = id;
+        if (requestId === this.musicRequestId && this.music === music) {
+          this.pendingMusicId = id;
+        }
       });
   }
 
@@ -524,6 +534,7 @@ class AudioManager {
     }
     clearInterval(this.fadeTimer);
     clearInterval(this.crossfadeTimer);
+    this.musicRequestId += 1;
     this.fadeTimer = null;
     this.crossfadeTimer = null;
     this.pendingMusicId = null;
@@ -542,6 +553,7 @@ class AudioManager {
       clearInterval(this.crossfadeTimer);
       this.fadeTimer = null;
       this.crossfadeTimer = null;
+      this.musicRequestId += 1;
       this.music.pause();
       this.musicPausedByUser = true;
       this.updateNowPlaying();
@@ -549,14 +561,23 @@ class AudioManager {
     }
 
     if (this.music && this.music.paused) {
+      const music = this.music;
+      const requestId = ++this.musicRequestId;
       this.musicStoppedByUser = false;
       this.musicPausedByUser = false;
-      this.music.play().then(() => {
+      music.play().then(() => {
+        if (requestId !== this.musicRequestId || this.music !== music) {
+          music.pause();
+          music.currentTime = 0;
+          return;
+        }
         this.unlocked = true;
         this.updateNowPlaying();
       }).catch(() => {
-        this.musicPausedByUser = true;
-        this.updateNowPlaying();
+        if (requestId === this.musicRequestId && this.music === music) {
+          this.musicPausedByUser = true;
+          this.updateNowPlaying();
+        }
       });
       this.updateNowPlaying();
       return;
@@ -576,49 +597,8 @@ class AudioManager {
     if (rememberHistory && this.currentMusicId) {
       this.wrestlerHistory.push(this.currentMusicId);
     }
-    if (!this.music || this.music.paused) {
-      this.stopMusic(false);
-      this.startMusic(id, Math.min(700, duration));
-      return;
-    }
-
-    clearInterval(this.fadeTimer);
-    clearInterval(this.crossfadeTimer);
-    const oldMusic = this.music;
-    const newMusic = this.createAudio(next.src, !next.wrestler);
-    if (!newMusic) return;
-    newMusic.volume = 0;
-    this.attachMusicEvents(newMusic, id, next);
-
-    const oldStartVolume = oldMusic.volume;
-
-    newMusic.play()
-      .then(() => {
-        this.music = newMusic;
-        this.currentMusicId = id;
-        this.unlocked = true;
-        this.pendingMusicId = null;
-        this.updateNowPlaying();
-        this.showMusicToast(next);
-        const startedAt = performance.now();
-        this.crossfadeTimer = setInterval(() => {
-          const elapsed = performance.now() - startedAt;
-          const progress = Math.min(1, elapsed / Math.max(1, duration));
-          const targetVolume = this.effectiveVolume("music");
-          oldMusic.volume = oldStartVolume * (1 - progress);
-          newMusic.volume = targetVolume * progress;
-          if (progress >= 1) {
-            clearInterval(this.crossfadeTimer);
-            this.crossfadeTimer = null;
-            oldMusic.pause();
-            oldMusic.currentTime = 0;
-            newMusic.volume = this.effectiveVolume("music");
-          }
-        }, 40);
-      })
-      .catch(() => {
-        this.pendingMusicId = id;
-      });
+    this.stopMusic(false);
+    this.startMusic(id, Math.min(700, duration));
   }
 
   fadeAudioIn(audio, duration = 500) {
