@@ -315,6 +315,21 @@ const AUDIO_LIBRARY = {
       label: "Rocky J",
       wrestler: "Rocky J",
       src: "assets/audio/music/rocky_j.mp3"
+    },
+    marc_sebire: {
+      label: "Marc Sebire",
+      wrestler: "Marc Sebire",
+      src: "assets/audio/music/marc_sebire.mp3"
+    },
+    rafael_belmont: {
+      label: "Rafael Belmont",
+      wrestler: "Rafael Belmont",
+      src: "assets/audio/music/rafael_belmont.mp3"
+    },
+    john_gage: {
+      label: "John Gage",
+      wrestler: "John Gage",
+      src: "assets/audio/music/john_gage.mp3"
     }
   },
   sfx: {

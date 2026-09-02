@@ -256,6 +256,49 @@ function verifyRecentEffects() {
       .every(key => Object.values(byKey[key]?.stats || {}).reduce((sum, value) => sum + value, 0) === 24),
     "Catcheurs rares de la fournee a 24 points"
   );
+  const milestoneCardKeys = [
+    "rare_catcheurs_john_gage",
+    "ultime_catcheurs_marc_sebire",
+    "rare_managers_mr_catch",
+    "standard_managers_mr_catch",
+    "rare_catcheurs_pauline",
+    "rare_catcheurs_rafael_belmont"
+  ];
+  assert(milestoneCardKeys.every(key => byKey[key]), "Six cartes de la fournee des 50 joueurs presentes");
+  assert(
+    cards.filter(card => card.rarity === "Standard" && card.type === "Catcheur").every(card => !card.ability),
+    "Tous les catcheurs Standard restent sans effet"
+  );
+  assert(
+    byKey.standard_managers_mr_catch?.ability === "mWeakest1Choice"
+      && byKey.rare_managers_mr_catch?.ability === "mWeakest2Choice"
+      && game.includes('case"mWeakest1Choice":applyWeakestStatChoice(owner,c,mult);return;')
+      && game.includes('case"mWeakest2Choice":applyWeakestStatChoice(owner,c,2*mult);return;'),
+    "Effets Bonus de MR Catch branches"
+  );
+  assert(
+    game.includes('startsAt:Date.parse("2026-09-01T00:00:00+02:00")')
+      && game.includes('endsAt:Date.parse("2026-10-02T00:00:00+02:00")')
+      && game.includes("if(now<campaign.startsAt||now>=campaign.endsAt)return null;")
+      && game.includes("limitedRewards:playerState.limitedRewards||{}")
+      && game.includes("boosterRevealQueue.push")
+      && game.includes("function showOfficialCommunique")
+      && game.includes("50 joueurs : merci à toute la communauté ALLSTAR !")
+      && game.includes('title:"Cadeau Exclusif"')
+      && game.includes("La carte Ultime Marc Sebire rejoint votre collection.")
+      && game.includes("openBooster(welcomeCards,\"Pack Champion offert\",new Set(),revealLimitedGift)"),
+    "Cadeau Marc Sebire unique, annonce officiellement puis revele sans chevauchement"
+  );
+  assert(
+    ["marc_sebire", "rafael_belmont", "john_gage"].every(id => {
+      const displayName = id.split("_").map(part => part[0].toUpperCase() + part.slice(1)).join(" ");
+      return audio.includes(`${id}: {`)
+        && audio.includes(`label: "${displayName}"`)
+        && audio.includes(`wrestler: "${displayName}"`)
+        && fs.existsSync(path.join(root, `assets/audio/music/${id}.mp3`));
+    }),
+    "Themes Marc Sebire, Rafael Belmont et John Gage branches sous leur nom"
+  );
 }
 
 verifyRanking();

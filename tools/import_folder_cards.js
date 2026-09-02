@@ -44,6 +44,9 @@ const MUSIC_TARGETS = {
   "Musique Marcus JAW (I ain't got time).mp3": "marcus_jaw.mp3",
   "Slow Royale.mp3": "peter_fischer.mp3",
   "12 - ROCKY J.mp3": "rocky_j.mp3",
+  "Thème Officiel Marc Sebire.mp3": "marc_sebire.mp3",
+  "Thème Officiel Rafael Belmont.mp3": "rafael_belmont.mp3",
+  "Thème Officiel John Gage.mp3": "john_gage.mp3",
 };
 
 const MUSIC_BY_FOLDER = {
@@ -119,6 +122,12 @@ const ABILITY_BY_KEY = {
   "Ultime|Catcheur|MBM": "entryDiscardUpTo3RandomStat2",
   "Legende|Catcheur|Peter Fischer": "forceWheel50",
   "Rare|Catcheur|Rocky J": "round2ForceSpeedCharisma1",
+  "Rare|Catcheur|Pauline": "objectOwnedStatChoice2",
+  "Ultime|Catcheur|Marc Sebire": "lossDiscardReroll",
+  "Rare|Catcheur|Rafael BELMONT": "lossDiscardReroll",
+  "Rare|Catcheur|John Gage": "entryRandomStats5IfMoreWrestlersGrave",
+  "Standard|Manager|MR catch": "mWeakest1Choice",
+  "Rare|Manager|MR catch": "mWeakest2Choice",
 };
 
 const CARD_OVERRIDES_BY_KEY = {
@@ -173,6 +182,9 @@ const CARD_OVERRIDES_BY_KEY = {
   },
   rare_catcheurs_julius_trajan: {
     effect: "Apparition : choisissez The World, Drix, Kyle Hoxton ou Saitovic dans votre deck et ajoutez cette carte à votre main.",
+  },
+  ultime_catcheurs_marc_sebire: {
+    stats: { Force: 5, Vitesse: 8, Technique: 7, Charisme: 8 },
   },
 };
 

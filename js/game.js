@@ -1156,6 +1156,22 @@ const CARD_DATA = [
     "ability": "entryEnemyStatChoiceMinus1"
   },
   {
+    "key": "rare_catcheurs_john_gage",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "John Gage",
+    "stats": {
+      "Force": 8,
+      "Vitesse": 4,
+      "Technique": 6,
+      "Charisme": 6
+    },
+    "effect": "Apparition : Si vous avez plus de catcheurs que votre adversaire au vestiaire, gagnez 5 points aléatoirement sur vos statistiques.",
+    "renderArt": "assets/card_renders/rare_catcheurs_john_gage.png",
+    "musicId": "john_gage",
+    "ability": "entryRandomStats5IfMoreWrestlersGrave"
+  },
+  {
     "key": "rare_catcheurs_jose_moreno",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -1523,6 +1539,22 @@ const CARD_DATA = [
     "musicId": "paul_meunier"
   },
   {
+    "key": "rare_catcheurs_pauline",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Pauline",
+    "stats": {
+      "Force": 3,
+      "Vitesse": 6,
+      "Technique": 6,
+      "Charisme": 9
+    },
+    "effect": "Si cette carte est équipé d'une carte objet : Choisissez une stat et obtenez +2 sur cette stat.",
+    "renderArt": "assets/card_renders/rare_catcheurs_pauline.png",
+    "musicId": "pauline",
+    "ability": "objectOwnedStatChoice2"
+  },
+  {
     "key": "rare_catcheurs_queen_phoenixia",
     "type": "Catcheur",
     "rarity": "Rare",
@@ -1553,6 +1585,22 @@ const CARD_DATA = [
     "ability": "nextEntryAll1",
     "renderArt": "assets/card_renders/rare_catcheurs_r_man.png",
     "musicId": "r_man"
+  },
+  {
+    "key": "rare_catcheurs_rafael_belmont",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Rafael BELMONT",
+    "stats": {
+      "Force": 7,
+      "Vitesse": 3,
+      "Technique": 7,
+      "Charisme": 7
+    },
+    "effect": "Apparition : Si vous perdez, vous pouvez défaussez une carte. Si vous le faites, relancez la roulette.",
+    "renderArt": "assets/card_renders/rare_catcheurs_rafael_belmont.png",
+    "musicId": "rafael_belmont",
+    "ability": "lossDiscardReroll"
   },
   {
     "key": "rare_catcheurs_rayen_gurzil",
@@ -2558,6 +2606,22 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/ultime_catcheurs_heddi_karaoui.png"
   },
   {
+    "key": "ultime_catcheurs_marc_sebire",
+    "type": "Catcheur",
+    "rarity": "Ultime",
+    "name": "Marc Sebire",
+    "stats": {
+      "Force": 5,
+      "Vitesse": 8,
+      "Technique": 7,
+      "Charisme": 8
+    },
+    "effect": "Apparition : Si vous perdez, vous pouvez défaussez une carte. Si vous le faites, relancez la roulette.",
+    "renderArt": "assets/card_renders/ultime_catcheurs_marc_sebire.png",
+    "musicId": "marc_sebire",
+    "ability": "lossDiscardReroll"
+  },
+  {
     "key": "ultime_catcheurs_mbm",
     "type": "Catcheur",
     "rarity": "Ultime",
@@ -2746,6 +2810,16 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_managers_ludovic_vaillant.png"
   },
   {
+    "key": "rare_managers_mr_catch",
+    "type": "Manager",
+    "rarity": "Rare",
+    "name": "MR catch",
+    "stats": {},
+    "effect": "Apparition : +2 sur votre statistique la plus faible. S'il y une égalité sur plusieurs statistiques, choisissez.",
+    "renderArt": "assets/card_renders/rare_managers_mr_catch.png",
+    "ability": "mWeakest2Choice"
+  },
+  {
     "key": "rare_managers_mr_ringsider",
     "type": "Manager",
     "rarity": "Rare",
@@ -2874,6 +2948,16 @@ const CARD_DATA = [
     "effect": "Une fois par tour, 20 % de chance de piocher une carte.",
     "renderArt": "assets/card_renders/standard_managers_lord_gideon_salvini.png",
     "ability": "turnDrawChance20"
+  },
+  {
+    "key": "standard_managers_mr_catch",
+    "type": "Manager",
+    "rarity": "Standard",
+    "name": "MR catch",
+    "stats": {},
+    "effect": "Apparition : +1 sur votre statistique la plus faible. S'il y une égalité sur plusieurs statistiques, choisissez.",
+    "renderArt": "assets/card_renders/standard_managers_mr_catch.png",
+    "ability": "mWeakest1Choice"
   },
   {
     "key": "standard_managers_yann_le_kersaudec",
@@ -3161,6 +3245,7 @@ const EFFECT_REGISTRY = {
   entryIfTrevorInGraveFTV1: { timing:"entry", text:"Si Trevor Mayden est au vestiaire : +1 Force, Technique et Vitesse." },
   entryIfZerkInHandDiscard1: { timing:"entry", text:"Si The Butcher Zerk est en main : l'adversaire défausse 1 carte." },
   entryRandomStat3: { timing:"entry", text:"À l'arrivée : +3 à une statistique aléatoire." },
+  entryRandomStats5IfMoreWrestlersGrave: { timing:"entry", text:"À l'arrivée : si vous avez plus de catcheurs au vestiaire, +5 points répartis aléatoirement." },
   entryStatChoice3: { timing:"entry", text:"À l'arrivée : choisissez une statistique, +3.", choice:true },
   entryDiscardUpTo3RandomStat2: { timing:"entry", text:"À l'arrivée : défaussez jusqu'à 3 cartes ; +2 à une statistique aléatoire par carte.", choice:true },
   entryRecoverFactionDeck: { timing:"entry", text:"À l'arrivée : récupérez The World, Drix, Kyle Hoxton ou Saitovic depuis votre deck.", choice:true },
@@ -3203,6 +3288,8 @@ const EFFECT_REGISTRY = {
   mTechnique1: { timing:"object", text:"+1 Technique." },
   mRandom: { timing:"manager", text:"+1 dans une stat aléatoire." },
   mRandom2: { timing:"manager", text:"+2 dans une stat aléatoire." },
+  mWeakest1Choice: { timing:"manager", text:"+1 dans une statistique parmi les plus faibles.", choice:true },
+  mWeakest2Choice: { timing:"manager", text:"+2 dans une statistique parmi les plus faibles.", choice:true },
   mVitesse1: { timing:"manager", text:"+1 Vitesse." },
   matchRoundOneAll1: { timing:"round1", text:"Round 1 : +1 dans toutes les statistiques." },
   graveElAmnesicoAll1: { timing:"grave", text:"Au vestiaire : El Amnesico gagne +1 partout." },
@@ -3221,6 +3308,7 @@ const EFFECT_REGISTRY = {
   opponentDiscardOnSupport: { timing:"manager", text:"Chaque bonus ou objet adverse force une défausse." },
   objectOwnedSpeed2: { timing:"duel", text:"Si un objet est équipé : +2 Vitesse." },
   objectOwnedSpeedCharisma2: { timing:"duel", text:"Si un objet est équipé : +2 Vitesse et +2 Charisme." },
+  objectOwnedStatChoice2: { timing:"object", text:"Quand un objet est équipé : choisissez une statistique, +2.", choice:true },
   immuneOtherCardEffects: { timing:"passive", text:"Insensible aux effets des autres cartes." },
   pinBonus: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +20." },
   pinBonus40: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +40." },
@@ -3243,6 +3331,7 @@ const EFFECT_REGISTRY = {
   revealCharlieEachRoundForcePin: { timing:"round", text:"Une fois par tour, si Charlie Bergson est en main : +1 Force et +20 Tombé." },
   rerollStat: { timing:"roulette", text:"Relance la statistique du duel une fois." },
   rerollOnLoss: { timing:"roulette", text:"Après une défaite de duel, relance automatiquement la roulette une fois." },
+  lossDiscardReroll: { timing:"roulette", text:"Après une défaite, vous pouvez défausser une carte pour relancer la roulette.", choice:true },
   roundRpsAll1: { timing:"roulette", choice:true, text:"Une fois par round avant la roulette : victoire à pierre-feuille-ciseaux, +1 à toutes les statistiques pour ce round." },
   ringsiderRecover1LoseTag: { timing:"round", choice:true, text:"Une fois par tour : peut récupérer 1 carte choisie du vestiaire contre 1 TAG." },
   ringsiderRecover2LoseTag: { timing:"round", choice:true, text:"Une fois par tour : peut récupérer jusqu'à 2 cartes choisies du vestiaire contre 1 TAG." },
@@ -3961,6 +4050,7 @@ function serializedPlayerState(){
     challenge:playerState.challenge||null,
     starterGranted:Boolean(playerState.starterGranted),
     welcomeClaimed:Boolean(playerState.welcomeClaimed),
+    limitedRewards:playerState.limitedRewards||{},
     careerUnlocked:playerState.careerUnlocked||0,
     settledOnlineMatches:playerState.settledOnlineMatches||{},
     savedAt:Number(playerState.savedAt)||0,
@@ -4002,6 +4092,7 @@ function remotePlayerState(remote){
       challenge:remote.challenge||null,
       starterGranted:Boolean(remote.starterGranted),
       welcomeClaimed:Boolean(remote.welcomeClaimed),
+      limitedRewards:remote.limitedRewards||{},
       careerUnlocked:Number(remote.careerUnlocked)||0,
       settledOnlineMatches:remote.settledOnlineMatches||{},
       savedAt:Number(remote.savedAt)||0,
@@ -4047,6 +4138,7 @@ function mergePlayerStateForHydration(remotePlayer,localPlayer){
     challenge:localIsNewer ? (localPlayer.challenge||null) : (remotePlayer.challenge||null),
     starterGranted:Boolean(remotePlayer.starterGranted||localPlayer.starterGranted),
     welcomeClaimed:Boolean(remotePlayer.welcomeClaimed||localPlayer.welcomeClaimed),
+    limitedRewards:{...(remotePlayer.limitedRewards||{}),...(localPlayer.limitedRewards||{})},
     careerUnlocked:Math.max(Number(remotePlayer.careerUnlocked)||0,Number(localPlayer.careerUnlocked)||0),
     settledOnlineMatches:{...(remotePlayer.settledOnlineMatches||{}),...(localPlayer.settledOnlineMatches||{})},
     savedAt:Math.max(Number(remotePlayer.savedAt)||0,Number(localPlayer.savedAt)||0),
@@ -5734,6 +5826,25 @@ function applyWrestlerEntryEffect(owner,c){
   }
   if(c.ability==="entryEnemyStatChoiceMinus1")applyEnemyStatChoiceMinus1(owner,c);
   if(c.ability==="entryRandomStat3")applyEntryStatBonus(owner,c,3,false);
+  if(c.ability==="entryRandomStats5IfMoreWrestlersGrave"){
+    const opponent=owner.side==="player"?G.ai:G.player;
+    const ownWrestlers=owner.grave.filter(card=>card.type==="Catcheur").length;
+    const opposingWrestlers=opponent.grave.filter(card=>card.type==="Catcheur").length;
+    if(ownWrestlers>opposingWrestlers){
+      const gains={};
+      for(let i=0;i<5;i++){
+        const stat=STATS[Math.floor(Math.random()*STATS.length)];
+        owner.cat.mods[stat]+=1;
+        gains[stat]=(gains[stat]||0)+1;
+      }
+      const feedback=Object.entries(gains).map(([stat,value])=>`+${value} ${stat}`).join(" / ");
+      log(`[EFFET] ${c.name} : ${feedback} (${ownWrestlers} catcheur${ownWrestlers>1?"s":""} au vestiaire contre ${opposingWrestlers}).`);
+      showEffectFeedback(c,c.name,feedback,"buff");
+    }else{
+      log(`[EFFET] ${c.name} : condition non remplie (${ownWrestlers} catcheur${ownWrestlers>1?"s":""} au vestiaire contre ${opposingWrestlers}).`);
+      showEffectFeedback(c,c.name,"Condition non remplie","block");
+    }
+  }
   if(c.ability==="entryStatChoice3")applyEntryStatBonus(owner,c,3,true);
   if(c.ability==="entryPlaySupportFromGrave")playSupportFromGrave(owner,c);
   if(c.ability==="recoverOrPlayObjectGrave")recoverOrPlayObjectFromGrave(owner,c);
@@ -6420,6 +6531,31 @@ function tagPlayer(){
   render();
 }
 
+function applyWeakestStatChoice(owner,source,amount){
+  const wrestler=owner.cat;
+  if(!wrestler)return;
+  const scores=Object.fromEntries(STATS.map(stat=>[stat,(Number(wrestler.card.stats?.[stat])||0)+(Number(wrestler.mods?.[stat])||0)]));
+  const minimum=Math.min(...Object.values(scores));
+  const weakest=STATS.filter(stat=>scores[stat]===minimum);
+  const apply=stat=>{
+    wrestler.mods[stat]+=amount;
+    log(`[EFFET] ${source.name} : +${amount} ${stat}.`);
+    showEffectFeedback(wrestler.card,source.name,`+${amount} ${stat}`,"buff");
+    markOnlineDirty();
+    render();
+  };
+  if(weakest.length>1&&owner.side==="player"){
+    requestEffectChoice({
+      title:source.name,
+      text:"Plusieurs statistiques sont à égalité. Choisis celle à renforcer.",
+      choices:weakest.map(stat=>({label:`+${amount} ${stat}`,value:stat})),
+      onChoose:apply
+    });
+    return;
+  }
+  apply(weakest.length===1?weakest[0]:weakest[Math.floor(Math.random()*weakest.length)]);
+}
+
 function applyEffect(owner,opp,c){
   let s=owner.cat;
   if(!s)return;
@@ -6482,6 +6618,8 @@ function applyEffect(owner,opp,c){
       feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
       break;
     }
+    case"mWeakest1Choice":applyWeakestStatChoice(owner,c,mult);return;
+    case"mWeakest2Choice":applyWeakestStatChoice(owner,c,2*mult);return;
     case"mSave":s.save=true;feedback="Sauvetage";kind="block";break;
     case"pinShield5":owner.pinShield=(owner.pinShield||0)+5*mult;feedback=`Tombé adverse -${5*mult}`;kind="block";break;
     case"pinObject5":s.pin+=5*mult;feedback=`Tombé +${5*mult}`;kind="pin";break;
@@ -6616,6 +6754,32 @@ function aiObjectEffectChoice(card,choices){
   return choices[Math.floor(Math.random()*choices.length)].value;
 }
 
+function applyEquippedObjectWrestlerBonus(owner,onComplete=()=>{}){
+  const wrestler=owner.cat;
+  if(!wrestler||wrestlerAbility(wrestler)!=="objectOwnedStatChoice2"){
+    onComplete();
+    return;
+  }
+  const apply=stat=>{
+    wrestler.mods[stat]+=2;
+    log(`[EFFET] ${wrestler.card.name} : objet équipé, +2 ${stat}.`);
+    showEffectFeedback(wrestler.card,wrestler.card.name,`Objet : +2 ${stat}`,"buff");
+    markOnlineDirty();
+    render();
+    onComplete();
+  };
+  if(owner.side==="player"){
+    requestEffectChoice({
+      title:wrestler.card.name,
+      text:"Un objet est équipé. Choisis la statistique qui gagne +2.",
+      choices:STATS.map(stat=>({label:`+2 ${stat}`,value:stat})),
+      onChoose:apply
+    });
+    return;
+  }
+  apply(STATS[Math.floor(Math.random()*STATS.length)]);
+}
+
 function playCard(p,opp,c,idx,announce=false){
   if(c.type==="Catcheur"){
     if(G.tagging===p.side&&c.id===p.tagLockedCardId)return announce&&log("Ce catcheur vient de sortir : choisis un autre relais.");
@@ -6678,8 +6842,10 @@ function playCard(p,opp,c,idx,announce=false){
         choices,
         onChoose:choice=>{
           applyTrackedObjectEffect(p,opp,c,choice);
-          markOnlineDirty();
-          render();
+          applyEquippedObjectWrestlerBonus(p,()=>{
+            markOnlineDirty();
+            render();
+          });
         }
       });
       markOnlineDirty();
@@ -6687,6 +6853,7 @@ function playCard(p,opp,c,idx,announce=false){
     }else{
       const aiChoice=aiObjectEffectChoice(c,choices);
       applyTrackedObjectEffect(p,opp,c,aiChoice);
+      applyEquippedObjectWrestlerBonus(p);
     }
   }
   playSound("carte_jouee");
@@ -6974,6 +7141,45 @@ function rerollLostDuelWithObject(loser){
   return true;
 }
 
+function rerollLostDuelWithWrestler(loser,onDecline){
+  const wrestler=loser?.cat;
+  if(!wrestler||wrestlerAbility(wrestler)!=="lossDiscardReroll"||!loser.hand.length)return false;
+  const resolve=cardId=>{
+    if(cardId==="__pass"){
+      log(`[EFFET] ${wrestler.card.name} conserve sa main et accepte la défaite.`);
+      onDecline();
+      return;
+    }
+    const index=loser.hand.findIndex(card=>card.id===cardId);
+    if(index<0){
+      onDecline();
+      return;
+    }
+    const [discarded]=loser.hand.splice(index,1);
+    loser.grave.push(discarded);
+    G.matchPhase="roulette";
+    log(`[EFFET] ${wrestler.card.name} défausse ${discarded.name} et relance la roulette.`);
+    showEffectFeedback(wrestler.card,wrestler.card.name,"Défausse / relance","special",2400);
+    markOnlineDirty();
+    render();
+    setTimeout(()=>showWheel(()=>duel()),700);
+  };
+  if(loser.side==="player"){
+    requestEffectChoice({
+      title:wrestler.card.name,
+      text:"Défausse une carte pour relancer la roulette, ou conserve ta main.",
+      choices:[
+        ...loser.hand.map(card=>({label:`Défausser ${card.name}`,value:card.id})),
+        {label:"Ne pas relancer",value:"__pass"}
+      ],
+      onChoose:resolve
+    });
+  }else{
+    resolve(loser.hand[Math.floor(Math.random()*loser.hand.length)].id);
+  }
+  return true;
+}
+
 function preventFirstDefeat(loser){
   const wrestler=loser?.cat;
   if(!wrestler||wrestlerAbility(wrestler)!=="firstLossDeck")return false;
@@ -7029,11 +7235,15 @@ function duel(){
   const winner=ps>as?G.player:G.ai;
   const loser=ps>as?G.ai:G.player;
   if(rerollLostDuelWithObject(loser))return;
-  if(G.mode==="challenge"&&G.challenge){
-    if(ps>as)return challengePlayerWinsRound(ps-as,stat);
-    return challengeBossWinsRound();
-  }
-  win(winner,loser,"score supérieur");
+  const finishDuel=()=>{
+    if(G.mode==="challenge"&&G.challenge){
+      if(ps>as)return challengePlayerWinsRound(ps-as,stat);
+      return challengeBossWinsRound();
+    }
+    win(winner,loser,"score supérieur");
+  };
+  if(rerollLostDuelWithWrestler(loser,finishDuel))return;
+  finishDuel();
 }
 
 const REPEATABLE_EXTENDED_OBJECT_ABILITIES=new Set(["drawNext1","recoverGrave","opponentDiscard1","opponentDiscardRandom1"]);
@@ -7998,6 +8208,14 @@ const LEVEL_TITLE_REWARDS = [
   { level:300, title:"ALLSTAR" }
 ];
 
+const LIMITED_GIFT_CAMPAIGN = {
+  id:"milestone_50_players_2026",
+  cardKey:"ultime_catcheurs_marc_sebire",
+  startsAt:Date.parse("2026-09-01T00:00:00+02:00"),
+  endsAt:Date.parse("2026-10-02T00:00:00+02:00"),
+  title:"Merci pour les 50 joueurs !"
+};
+
 let playerState = {
   credits: 0,
   collection: {},
@@ -8005,6 +8223,7 @@ let playerState = {
   challenge: null,
   starterGranted: false,
   welcomeClaimed: false,
+  limitedRewards: {},
   careerUnlocked: 0,
   settledOnlineMatches: {},
   savedAt: 0,
@@ -8042,6 +8261,21 @@ function autoDeckFromCollection(){
   return keys;
 }
 
+function claimLimitedGiftCampaign(){
+  playerState.limitedRewards=playerState.limitedRewards||{};
+  const campaign=LIMITED_GIFT_CAMPAIGN;
+  const now=Date.now();
+  if(!Number.isFinite(campaign.startsAt)||!Number.isFinite(campaign.endsAt))return null;
+  if(now<campaign.startsAt||now>=campaign.endsAt)return null;
+  if(playerState.limitedRewards[campaign.id])return null;
+  const card=cardByKey(campaign.cardKey);
+  if(!card)return null;
+  playerState.limitedRewards[campaign.id]=Date.now();
+  const gift=cloneCard(card);
+  const newCardKeys=addCardsToCollection([gift]);
+  return {cards:[gift],title:campaign.title,newCardKeys};
+}
+
 function loadPlayerState(){
   if(playerState.loaded)return;
   try{
@@ -8054,6 +8288,7 @@ function loadPlayerState(){
         challenge:saved.challenge||null,
         starterGranted:Boolean(saved.starterGranted),
         welcomeClaimed:Boolean(saved.welcomeClaimed),
+        limitedRewards:saved.limitedRewards||{},
         careerUnlocked:Number(saved.careerUnlocked)||0,
         settledOnlineMatches:saved.settledOnlineMatches||{},
         savedAt:Number(saved.savedAt)||0,
@@ -8064,10 +8299,11 @@ function loadPlayerState(){
   }catch{
     // Progression remains playable without localStorage.
   }
-  if(!playerState.loaded)playerState={credits:0,collection:{},boosterTickets:{},challenge:null,starterGranted:false,welcomeClaimed:false,careerUnlocked:0,settledOnlineMatches:{},savedAt:0,profileProgress:window.AllstarRankingService.normalizeProgress({}),loaded:true};
+  if(!playerState.loaded)playerState={credits:0,collection:{},boosterTickets:{},challenge:null,starterGranted:false,welcomeClaimed:false,limitedRewards:{},careerUnlocked:0,settledOnlineMatches:{},savedAt:0,profileProgress:window.AllstarRankingService.normalizeProgress({}),loaded:true};
   playerState.profileProgress=window.AllstarRankingService.normalizeProgress(playerState.profileProgress||{});
   playerState.boosterTickets=playerState.boosterTickets||{};
   playerState.challenge=playerState.challenge||null;
+  playerState.limitedRewards=playerState.limitedRewards||{};
   playerState.settledOnlineMatches=playerState.settledOnlineMatches||{};
   playerState.savedAt=Number(playerState.savedAt)||0;
   if(!playerState.starterGranted){
@@ -8075,17 +8311,23 @@ function loadPlayerState(){
     playerState.credits=Math.max(playerState.credits,1000);
     addCardsToCollection(starterStandardCards());
   }
+  let welcomeCards=null;
   if(!playerState.welcomeClaimed){
     playerState.welcomeClaimed=true;
-    const cards=generateBooster("champion");
-    ensureBoosterHasWrestler(cards,"Legende");
-    capBoosterLegendaries(cards,3);
-    addCardsToCollection(cards);
-    savePlayerState();
-    setTimeout(()=>openBooster(cards,"Pack Champion offert"),450);
-  }else{
-    savePlayerState();
+    welcomeCards=generateBooster("champion");
+    ensureBoosterHasWrestler(welcomeCards,"Legende");
+    capBoosterLegendaries(welcomeCards,3);
+    addCardsToCollection(welcomeCards);
   }
+  const limitedGift=claimLimitedGiftCampaign();
+  savePlayerState();
+  const revealLimitedGift=limitedGift ? ()=>showOfficialCommunique(
+    "50 joueurs : merci à toute la communauté ALLSTAR !",
+    [{title:"Cadeau Exclusif",label:"La carte Ultime Marc Sebire rejoint votre collection."}],
+    ()=>openBooster(limitedGift.cards,limitedGift.title,limitedGift.newCardKeys)
+  ) : null;
+  if(welcomeCards)setTimeout(()=>openBooster(welcomeCards,"Pack Champion offert",new Set(),revealLimitedGift),450);
+  else if(revealLimitedGift)setTimeout(revealLimitedGift,450);
 }
 
 function savePlayerState(){
@@ -8098,6 +8340,7 @@ function savePlayerState(){
       challenge:playerState.challenge||null,
       starterGranted:playerState.starterGranted,
       welcomeClaimed:playerState.welcomeClaimed,
+      limitedRewards:playerState.limitedRewards||{},
       careerUnlocked:playerState.careerUnlocked||0,
       settledOnlineMatches:playerState.settledOnlineMatches||{},
       savedAt:playerState.savedAt,
@@ -8294,11 +8537,19 @@ function setCollectionPreview(cardOrId){
     : `<div class="preview-empty">Sélectionne une carte</div>`;
 }
 
-function openBooster(cards,title,newCardKeys=new Set()){
+const boosterRevealQueue=[];
+let boosterCloseAction=null;
+
+function openBooster(cards,title,newCardKeys=new Set(),onClose=null){
   const overlay=document.getElementById("boosterOverlay");
   const cardBox=document.getElementById("boosterCards");
   const actions=document.getElementById("boosterActions");
   if(!overlay||!cardBox||!actions)return;
+  if(overlay.classList.contains("active")){
+    boosterRevealQueue.push({cards,title,newCardKeys,onClose});
+    return;
+  }
+  boosterCloseAction=typeof onClose==="function" ? onClose : null;
   document.getElementById("boosterTitle").textContent=title;
   document.getElementById("boosterSub").textContent="Ouverture du booster...";
   cardBox.innerHTML="";
@@ -8334,6 +8585,14 @@ function closeBooster(){
   document.getElementById("boosterActions")?.classList.remove("active");
   renderShop();
   renderCollection();
+  const closeAction=boosterCloseAction;
+  boosterCloseAction=null;
+  if(closeAction){
+    setTimeout(closeAction,250);
+    return;
+  }
+  const nextReveal=boosterRevealQueue.shift();
+  if(nextReveal)setTimeout(()=>openBooster(nextReveal.cards,nextReveal.title,nextReveal.newCardKeys,nextReveal.onClose),250);
 }
 
 function playThemeForCard(card){
@@ -8484,8 +8743,24 @@ function showLevelRewards(rewards=[]){
   overlay.classList.add("active");
 }
 
+let officialCommuniqueCloseAction=null;
+
+function showOfficialCommunique(subtitleText,items=[],onClose=null){
+  const overlay=document.getElementById("levelRewardOverlay");
+  const subtitle=document.getElementById("levelRewardSubtitle");
+  const list=document.getElementById("levelRewardList");
+  if(!overlay||!subtitle||!list)return;
+  officialCommuniqueCloseAction=typeof onClose==="function" ? onClose : null;
+  subtitle.textContent=subtitleText;
+  list.innerHTML=items.map(item=>`<div class="level-reward-item">${escapeHtml(item.title)}<small>${escapeHtml(item.label)}</small></div>`).join("");
+  overlay.classList.add("active");
+}
+
 function closeLevelRewards(){
   document.getElementById("levelRewardOverlay")?.classList.remove("active");
+  const closeAction=officialCommuniqueCloseAction;
+  officialCommuniqueCloseAction=null;
+  if(closeAction)setTimeout(closeAction,250);
 }
 
 async function awardProfileProgress(playerWon, options={}){
@@ -9229,9 +9504,15 @@ function resetRuntimeProgress(){
   playerState = {
     credits: 0,
     collection: {},
+    boosterTickets: {},
+    challenge: null,
     starterGranted: false,
     welcomeClaimed: false,
+    limitedRewards: {},
     careerUnlocked: 0,
+    settledOnlineMatches: {},
+    savedAt: 0,
+    profileProgress: null,
     loaded: false
   };
   deckState = {

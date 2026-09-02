@@ -1,118 +1,62 @@
 {
   "imported": [
     {
-      "key": "ultime_catcheurs_mbm",
-      "name": "MBM",
+      "key": "rare_catcheurs_john_gage",
+      "name": "John Gage",
+      "rarity": "Rare",
+      "type": "Catcheur",
+      "ability": "entryRandomStats5IfMoreWrestlersGrave"
+    },
+    {
+      "key": "ultime_catcheurs_marc_sebire",
+      "name": "Marc Sebire",
       "rarity": "Ultime",
       "type": "Catcheur",
-      "ability": "entryDiscardUpTo3RandomStat2"
-    }
-  ],
-  "updated": [
-    {
-      "key": "rare_catcheurs_adrian_maccio",
-      "name": "Adrian Maccio",
-      "rarity": "Rare",
-      "type": "Catcheur",
-      "ability": "lossReturnEnemyWrestlerToHand"
+      "ability": "lossDiscardReroll"
     },
     {
-      "key": "rare_managers_lord_gideon_salvini",
-      "name": "Lord Gidéon Salvini",
+      "key": "rare_managers_mr_catch",
+      "name": "MR catch",
       "rarity": "Rare",
       "type": "Manager",
-      "ability": "turnDrawChance40"
+      "ability": "mWeakest2Choice"
     },
     {
-      "key": "standard_managers_lord_gideon_salvini",
-      "name": "Lord Gidéon Salvini",
+      "key": "standard_managers_mr_catch",
+      "name": "MR catch",
       "rarity": "Standard",
       "type": "Manager",
-      "ability": "turnDrawChance20"
+      "ability": "mWeakest1Choice"
     },
     {
-      "key": "rare_catcheurs_julius_trajan",
-      "name": "Julius Trajan",
+      "key": "rare_catcheurs_pauline",
+      "name": "Pauline",
       "rarity": "Rare",
       "type": "Catcheur",
-      "ability": "entryRecoverFactionDeck"
+      "ability": "objectOwnedStatChoice2"
     },
     {
-      "key": "rare_catcheurs_lucas_thoumazet",
-      "name": "Lucas Thoumazet",
+      "key": "rare_catcheurs_rafael_belmont",
+      "name": "Rafael BELMONT",
       "rarity": "Rare",
       "type": "Catcheur",
-      "ability": "firstRoundForceSpeedCharisma1"
-    },
-    {
-      "key": "rare_catcheurs_marcus_jaw",
-      "name": "Marcus Jaw",
-      "rarity": "Rare",
-      "type": "Catcheur",
-      "ability": "winTag1Max2"
-    },
-    {
-      "key": "legende_catcheurs_peter_fischer",
-      "name": "Peter Fischer",
-      "rarity": "Legende",
-      "type": "Catcheur",
-      "ability": "forceWheel50"
-    },
-    {
-      "key": "rare_catcheurs_rocky_j",
-      "name": "Rocky J",
-      "rarity": "Rare",
-      "type": "Catcheur",
-      "ability": "round2ForceSpeedCharisma1"
-    },
-    {
-      "key": "standard_catcheurs_rocky_j",
-      "name": "Rocky J",
-      "rarity": "Standard",
-      "type": "Catcheur",
-      "ability": null
+      "ability": "lossDiscardReroll"
     }
   ],
-  "skipped": [
-    {
-      "file": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Ben Damage\\Ben_Damage.json",
-      "name": "Ben Damage",
-      "rarity": "Rare",
-      "statsTotal": 22,
-      "reason": "Catcheur Standard/Rare != 24 stats"
-    },
-    {
-      "file": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Ben Damage\\S Ben_Damage.json",
-      "name": "Ben Damage",
-      "rarity": "Standard",
-      "statsTotal": 22,
-      "reason": "Catcheur Standard/Rare != 24 stats"
-    }
-  ],
+  "updated": [],
+  "skipped": [],
   "music": [
     {
-      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Ben Damage\\Ben Damage Songg.wav",
-      "target": "ben_damage.wav"
+      "source": "C:\\Users\\LENOVO\\Documents\\Codex\\2026-08-26\\reprendre-allstar-galerie-horizontale-visuelle-pour-2\\work\\lot-50-update\\John Gage\\Thème Officiel John Gage.mp3",
+      "target": "john_gage.mp3"
     },
     {
-      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Heddi Karaoui.mp3",
-      "target": "heddi_karaoui.mp3"
+      "source": "C:\\Users\\LENOVO\\Documents\\Codex\\2026-08-26\\reprendre-allstar-galerie-horizontale-visuelle-pour-2\\work\\lot-50-update\\Marc Sebire\\Thème Officiel Marc Sebire.mp3",
+      "target": "marc_sebire.mp3"
     },
     {
-      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Julius Trajan\\Julius Trajan HCP Titantron.mp3",
-      "target": "julius_trajan.mp3"
-    },
-    {
-      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Marcus Jaw\\Musique Marcus JAW (I ain't got time).mp3",
-      "target": "marcus_jaw.mp3"
-    },
-    {
-      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Peter Fischer\\Slow Royale.mp3",
-      "target": "peter_fischer.mp3"
-    },
-    {
-      "source": "C:\\Users\\LENOVO\\Downloads\\Fournée MBM\\Rocky J\\12 - ROCKY J.mp3",
-      "target": "rocky_j.mp3"
+      "source": "C:\\Users\\LENOVO\\Documents\\Codex\\2026-08-26\\reprendre-allstar-galerie-horizontale-visuelle-pour-2\\work\\lot-50-update\\Rafael Belmont\\Thème Officiel Rafael Belmont.mp3",
+      "target": "rafael_belmont.mp3"
     }
   ]
 }
