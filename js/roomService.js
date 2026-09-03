@@ -137,6 +137,39 @@ class RoomService {
     return this.adapter.writeRoom(update(await this.adapter.getRoom(normalized)));
   }
 
+  async submitOpeningRpsChoice(code, playerSlot, eventId, choice) {
+    const normalized = String(code || "").trim().toUpperCase();
+    const allowedChoices = new Set(["Pierre", "Feuille", "Ciseaux"]);
+    const update = room => {
+      if (!room) throw new Error("Room introuvable.");
+      if (room.status !== "playing") throw new Error("La partie n'est pas active.");
+      if (!room.players?.[playerSlot]) throw new Error("Joueur introuvable.");
+      if (!allowedChoices.has(choice)) throw new Error("Choix pierre-feuille-ciseaux invalide.");
+      const openingRps = room.matchState?.openingRps;
+      if (!openingRps || openingRps.id !== eventId || openingRps.status !== "pending") {
+        throw new Error("Ce pierre-feuille-ciseaux n'est plus actif.");
+      }
+      const choices = { ...(openingRps.choices || {}), [playerSlot]: choice };
+      const status = choices.p1 && choices.p2 ? "ready" : "pending";
+      const previousVersion = Number(room.matchState?.version || room.matchState?.updatedAt || 0);
+      const version = Math.max(previousVersion + 1, Date.now());
+      return {
+        ...room,
+        matchState: {
+          ...room.matchState,
+          openingRps: { ...openingRps, choices, status },
+          version,
+          sourceSlot: playerSlot,
+          updatedAt: version
+        }
+      };
+    };
+    if (typeof this.adapter.updateRoom === "function") {
+      return this.adapter.updateRoom(normalized, update);
+    }
+    return this.adapter.writeRoom(update(await this.adapter.getRoom(normalized)));
+  }
+
   subscribe(code, callback) {
     return this.adapter.subscribe(code, callback);
   }

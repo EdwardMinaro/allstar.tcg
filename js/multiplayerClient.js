@@ -352,6 +352,18 @@ async function publishOnlineMatchState(matchState) {
   return room;
 }
 
+async function submitOnlineOpeningRpsChoice(eventId, choice) {
+  if (!multiplayer.room?.roomCode || !multiplayer.playerSlot) return null;
+  const room = await multiplayerService().submitOpeningRpsChoice(
+    multiplayer.room.roomCode,
+    multiplayer.playerSlot,
+    eventId,
+    choice
+  );
+  multiplayer.room = room;
+  return room;
+}
+
 async function readyCurrentOnlineDeck(deck) {
   const room = await multiplayerService().setReady(multiplayer.room.roomCode, multiplayer.playerSlot, deck.cards);
   renderMultiRoom(room);
@@ -602,6 +614,7 @@ window.closeOnlineSession = closeOnlineSession;
 window.initMultiplayerStatus = initMultiplayerStatus;
 window.displayMultiplayerError = displayMultiplayerError;
 window.publishOnlineMatchState = publishOnlineMatchState;
+window.submitOnlineOpeningRpsChoice = submitOnlineOpeningRpsChoice;
 window.getOnlineMultiplayerContext = () => ({
   room: multiplayer.room,
   playerSlot: multiplayer.playerSlot,

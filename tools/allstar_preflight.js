@@ -98,9 +98,32 @@ function verifyInterfaceFiles() {
 function verifyRecentEffects() {
   const game = read("js/game.js");
   const audio = read("js/audio.js");
+  const multiplayer = read("js/multiplayerClient.js");
+  const roomService = read("js/roomService.js");
   const importer = read("tools/import_folder_cards.js");
   const cards = JSON.parse(read("data/cards.json")).cards;
   const byKey = Object.fromEntries(cards.map(card => [card.key, card]));
+  assert(
+    game.includes('activeOnlineChoice?.kind==="ace-reveal"')
+      && !game.includes("onlineApplyingRemote||activeOnlineChoice||!onlineDirty"),
+    "Les choix en ligne restent synchronises pendant la protection Ace Angel"
+  );
+  assert(
+    game.includes("openingRps:G.openingRps||null")
+      && game.includes("handleOnlineOpeningRps(incomingOpeningRps,ownSlot)")
+      && game.includes("submitOnlineOpeningRpsChoice")
+      && game.includes("onlineOpeningRpsWinner")
+      && roomService.includes("submitOpeningRpsChoice")
+      && roomService.includes("adapter.updateRoom")
+      && multiplayer.includes("submitOnlineOpeningRpsChoice"),
+    "PFC d'ouverture en ligne synchronise entre les deux joueurs"
+  );
+  assert(
+    !game.includes('log("Mode en ligne : Joueur 1 commence.")')
+      && game.includes('winnerSlot==="p1"?"player":"ai"')
+      && game.includes('winnerSlot==="tie"'),
+    "PFC en ligne choisit le premier joueur et rejoue les egalites"
+  );
   assert(game.includes('winnerAbility==="charismaWinRandom3"&&G.stat==="Charisme"'), "Effet Bernardot execute sur Charisme gagne");
   assert(game.includes('forceWheel50:{stat:"Force",chance:.5}'), "Effet Tony Trivaldo force Force au premier round");
   assert(game.includes("ISO weeks make the challenge rotate") && game.includes("challenge_boss_${G.challenge.weekKey}_"), "Boss ALLSTAR previsualisable et rotation hebdomadaire");

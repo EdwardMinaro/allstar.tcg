@@ -12,6 +12,8 @@ let activeOnlineChoice=null;
 let deferredOnlineRoomSnapshot=null;
 let onlineLastPinEventId="";
 let onlineLastRevealEventId="";
+let onlineOpeningRpsSubmitting=false;
+let onlineLastOpeningRpsResolvedId="";
 const CARD_DATA = [
   {
     "key": "legende_catcheurs_adam_frost",
@@ -4356,7 +4358,7 @@ function syncEffectChoiceGalleryNav(shell){
   next.disabled=!overflow||gallery.scrollLeft+gallery.clientWidth>=gallery.scrollWidth-4;
 }
 
-function requestEffectChoice({title,text,choices,onChoose}){
+function requestEffectChoice({title,text,choices,onChoose,onlineKind="effect"}){
   const overlay=document.getElementById("effectChoiceOverlay");
   const titleEl=document.getElementById("effectChoiceTitle");
   const textEl=document.getElementById("effectChoiceText");
@@ -4367,7 +4369,7 @@ function requestEffectChoice({title,text,choices,onChoose}){
     if(onChoose)onChoose(fallback);
     return;
   }
-  const onlineToken=beginOnlineChoice("effect");
+  const onlineToken=beginOnlineChoice(onlineKind);
   titleEl.textContent=title||"Choix d'effet";
   textEl.textContent=text||"Choisis l'effet à appliquer.";
   const resolvedChoices=choiceList.map((choice,index)=>({choice,index,card:effectChoiceCard(choice)}));
@@ -4520,7 +4522,107 @@ function autoUseRingsider(owner){
   finishRingsiderRecovery(owner,source,selectedIds);
 }
 
-function chooseRps(playerChoice){
+function onlineOpeningRpsWinner(event){
+  const p1Choice=event?.choices?.p1;
+  const p2Choice=event?.choices?.p2;
+  if(!p1Choice||!p2Choice)return null;
+  const result=rpsWinner(p1Choice,p2Choice);
+  if(result==="tie")return "tie";
+  return result==="player"?"p1":"p2";
+}
+
+function displayOnlineOpeningRpsResult(event,ownSlot){
+  const resultBox=document.getElementById("rpsResult");
+  const buttons=document.getElementById("rpsButtons");
+  const instruction=document.getElementById("rpsInstruction");
+  const winnerSlot=onlineOpeningRpsWinner(event);
+  if(!resultBox||!buttons||!instruction||!winnerSlot)return winnerSlot;
+  buttons.style.display="none";
+  instruction.textContent=`${event.choices.p1} contre ${event.choices.p2}`;
+  if(winnerSlot==="tie"){
+    resultBox.innerHTML=`<div class="rps-outcome tie">ÉGALITÉ !</div>`;
+    return winnerSlot;
+  }
+  const playerWon=winnerSlot===ownSlot;
+  resultBox.innerHTML=playerWon
+    ? `<div class="rps-outcome win">GAGNÉ !</div>`
+    : `<div class="rps-outcome lose">PERDU !</div>`;
+  return winnerSlot;
+}
+
+function restartOnlineOpeningRps(event){
+  if(!isOnlineMatch()||G.round!==0||G.openingRps?.id!==event.id)return;
+  const attempt=Number(event.attempt||1)+1;
+  const matchId=G.matchOptions?.onlineMatchId||onlineContext().roomCode||"online";
+  G.openingRps={
+    id:`${matchId}:opening:${attempt}`,
+    attempt,
+    status:"pending",
+    choices:{}
+  };
+  onlineOpeningRpsSubmitting=false;
+  G.matchPhase="opening-rps";
+  markOnlineDirty();
+  render();
+  showRpsOverlay();
+  publishOnlineSnapshotNow();
+}
+
+function handleOnlineOpeningRps(event,ownSlot=onlineContext().playerSlot){
+  if(!isOnlineMatch()||G.round!==0||!event?.id)return;
+  G.openingRps=event;
+  const ownChoice=event.choices?.[ownSlot];
+  if(event.status!=="ready"){
+    if(ownChoice){
+      showRpsOverlay();
+      document.getElementById("rpsButtons").style.display="none";
+      document.getElementById("rpsInstruction").textContent="Choix enregistré. En attente de l'adversaire...";
+    }else{
+      showRpsOverlay();
+    }
+    return;
+  }
+
+  const winnerSlot=displayOnlineOpeningRpsResult(event,ownSlot);
+  if(ownSlot!=="p1"||onlineLastOpeningRpsResolvedId===event.id)return;
+  onlineLastOpeningRpsResolvedId=event.id;
+  if(winnerSlot==="tie"){
+    log(`PFC en ligne : ${event.choices.p1} contre ${event.choices.p2}, égalité.`);
+    setTimeout(()=>restartOnlineOpeningRps(event),950);
+    return;
+  }
+  G.firstStarter=winnerSlot==="p1"?"player":"ai";
+  G.nextStarter=G.firstStarter;
+  log(`PFC en ligne : ${event.choices.p1} contre ${event.choices.p2}. ${winnerSlot==="p1"?"Joueur 1":"Joueur 2"} commence.`);
+  setTimeout(()=>{
+    if(!isOnlineMatch()||G.round!==0||G.openingRps?.id!==event.id)return;
+    hideRpsOverlay();
+    startRound();
+    publishOnlineSnapshotNow();
+  },950);
+}
+
+async function chooseRps(playerChoice){
+  if(isOnlineMatch()&&G.openingRps){
+    const ctx=onlineContext();
+    if(onlineOpeningRpsSubmitting||G.openingRps.status!=="pending"||G.openingRps.choices?.[ctx.playerSlot])return;
+    onlineOpeningRpsSubmitting=true;
+    document.getElementById("rpsButtons").style.display="none";
+    document.getElementById("rpsInstruction").textContent="Choix enregistré. En attente de l'adversaire...";
+    playSound("pfc");
+    try{
+      const room=await window.submitOnlineOpeningRpsChoice?.(G.openingRps.id,playerChoice);
+      onlineOpeningRpsSubmitting=false;
+      const event=room?.matchState?.openingRps;
+      if(event)handleOnlineOpeningRps(event,ctx.playerSlot);
+    }catch(error){
+      onlineOpeningRpsSubmitting=false;
+      console.error("[MULTI] PFC d'ouverture impossible",error);
+      showSystemToast(error?.message||"Synchronisation du pierre-feuille-ciseaux interrompue.");
+      showRpsOverlay();
+    }
+    return;
+  }
   playSound("pfc");
   const choices=["Pierre","Feuille","Ciseaux"];
   const aiChoice=choices[Math.floor(Math.random()*3)];
@@ -4701,6 +4803,8 @@ function startMatch(options={}){
   hidePin();
   hideRpsOverlay();
   onlineLastRevealEventId="";
+  onlineOpeningRpsSubmitting=false;
+  onlineLastOpeningRpsResolvedId="";
   fadeMusic("match",700);
   const aiDeckKeys=legalDeckKeys(options.aiDeckKeys||makeAiDeckKeys());
 
@@ -4753,11 +4857,18 @@ function startMatch(options={}){
 
   // Le PFC n'a lieu qu'une seule fois : au début du match.
   if(G.mode==="online"){
-    G.firstStarter="player";
-    G.nextStarter="player";
-    log("Mode en ligne : Joueur 1 commence.");
+    const matchId=G.matchOptions?.onlineMatchId||G.matchOptions?.roomCode||"online";
+    G.openingRps={
+      id:`${matchId}:opening:1`,
+      attempt:1,
+      status:"pending",
+      choices:{}
+    };
+    G.matchPhase="opening-rps";
+    log("Mode en ligne : pierre-feuille-ciseaux pour déterminer qui commence.");
     markOnlineDirty();
-    startRound();
+    render();
+    showRpsOverlay();
     return;
   }
   showRpsOverlay();
@@ -4998,6 +5109,7 @@ function onlineSnapshotFromGame(){
     wheelSpinId:G.resolving&&G.stat ? `${G.round}:${G.stat}:${G.turnsTaken}` : null,
     pinEvent:G.pinEvent||null,
     revealEvent:G.revealEvent||null,
+    openingRps:G.openingRps||null,
     matchId:G.matchOptions?.onlineMatchId||`${ctx.roomCode}:legacy`,
     lockedStat:G.lockedStat||null,
     over:Boolean(G.over),
@@ -5037,6 +5149,7 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     incomingRevealEvent.id!==onlineLastRevealEventId&&
     incomingRevealEvent.sourceSlot===opponentSlot
   );
+  const incomingOpeningRps=snapshot.openingRps||null;
   onlineApplyingRemote=true;
   G={
     ...(G||{}),
@@ -5073,6 +5186,7 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     winner:snapshot.winner ? (snapshot.winner===ownSlot ? "player" : "ai") : null,
     pinEvent:incomingPinEvent,
     revealEvent:incomingRevealEvent,
+    openingRps:incomingOpeningRps,
     effectMarks:G?.effectMarks||{}
   };
   show("game");
@@ -5106,6 +5220,11 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     showOnlineFinalResult();
   }
   onlineApplyingRemote=false;
+  if(!G.over&&Number(snapshot.round||0)===0&&incomingOpeningRps){
+    handleOnlineOpeningRps(incomingOpeningRps,ownSlot);
+  }else if(Number(snapshot.round||0)>0){
+    hideRpsOverlay();
+  }
   if(!G.over&&G.currentTurn==="player")setTimeout(()=>requestRingsiderRecovery(G.player),80);
 }
 
@@ -5137,11 +5256,11 @@ function applyOnlineRoomSnapshot(room, playerSlot){
 }
 
 function queueOnlineSnapshotPublish(){
-  if(!isOnlineMatch()||onlineApplyingRemote||activeOnlineChoice||!onlineDirty)return;
+  if(!isOnlineMatch()||onlineApplyingRemote||activeOnlineChoice?.kind==="ace-reveal"||!onlineDirty)return;
   if(typeof window.publishOnlineMatchState!=="function")return;
   clearTimeout(onlinePublishTimer);
   onlinePublishTimer=setTimeout(async()=>{
-    if(!isOnlineMatch()||onlineApplyingRemote||activeOnlineChoice||!onlineDirty)return;
+    if(!isOnlineMatch()||onlineApplyingRemote||activeOnlineChoice?.kind==="ace-reveal"||!onlineDirty)return;
     const snapshot=onlineSnapshotFromGame();
     if(!snapshot)return;
     const hash=JSON.stringify(snapshot);
@@ -5862,6 +5981,7 @@ function revealObjectForAceAngel(owner,source){
       title:source.name,
       text:"Choisis l'objet à révéler à ton adversaire.",
       choices:objects.map(card=>({label:card.name,value:card.id})),
+      onlineKind:"ace-reveal",
       onChoose:reveal
     });
     return;
