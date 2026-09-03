@@ -7043,26 +7043,36 @@ button:disabled,
   }
 }
 
+/* Size the left preview from the available height before entering the very
+   compact 720p/768p treatment below. */
+@media (min-width:901px) and (max-height:1023px){
+  #game .left-panel > .preview-panel{
+    top:clamp(100px,13vh,118px) !important;
+    width:clamp(246px,34vh,340px) !important;
+    max-width:calc(100% - 8px) !important;
+  }
+}
+
 /* Short desktop windows need a dedicated left rail: the full preview card and
-   the two discard/deck piles must remain separate at 1280x720. */
-@media (min-width:901px) and (max-height:760px){
+   the two discard/deck piles must remain separate on 720p/768p displays. */
+@media (min-width:901px) and (max-height:820px){
   #game .left-panel{
     --left-bottom:8px;
     --pile-gap:8px;
-    --pile-h:116px;
+    --pile-h:clamp(100px,15vh,116px);
     --pile-w:150px;
   }
 
   #game .left-panel > .preview-panel{
-    top:100px !important;
-    width:246px !important;
+    top:clamp(78px,13vh,100px) !important;
+    width:clamp(176px,32vh,246px) !important;
     max-width:calc(100% + 8px) !important;
   }
 }
 
 /* Restore the generous desktop card preview without reintroducing the
-   pile overlap that occurs in compact 720px-high windows. */
-@media (min-width:901px) and (min-height:761px){
+   pile overlap that occurs in shorter desktop windows. */
+@media (min-width:901px) and (min-height:1024px){
   #game .left-panel > .preview-panel{
     width:min(374px,calc(100% - 16px)) !important;
   }

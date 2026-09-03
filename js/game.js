@@ -11,6 +11,7 @@ let onlineChoiceToken=0;
 let activeOnlineChoice=null;
 let deferredOnlineRoomSnapshot=null;
 let onlineLastPinEventId="";
+let onlineLastRevealEventId="";
 const CARD_DATA = [
   {
     "key": "legende_catcheurs_adam_frost",
@@ -4699,6 +4700,7 @@ function startMatch(options={}){
   hideOptions();
   hidePin();
   hideRpsOverlay();
+  onlineLastRevealEventId="";
   fadeMusic("match",700);
   const aiDeckKeys=legalDeckKeys(options.aiDeckKeys||makeAiDeckKeys());
 
@@ -4995,6 +4997,7 @@ function onlineSnapshotFromGame(){
     stat:G.stat,
     wheelSpinId:G.resolving&&G.stat ? `${G.round}:${G.stat}:${G.turnsTaken}` : null,
     pinEvent:G.pinEvent||null,
+    revealEvent:G.revealEvent||null,
     matchId:G.matchOptions?.onlineMatchId||`${ctx.roomCode}:legacy`,
     lockedStat:G.lockedStat||null,
     over:Boolean(G.over),
@@ -5028,6 +5031,12 @@ function applyOnlineSnapshot(snapshot, playerSlot){
   const shouldShowRemoteWheel=Boolean(snapshot.resolving&&snapshot.stat&&incomingWheelId&&incomingWheelId!==onlineLastWheelSpinId);
   const incomingPinEvent=snapshot.pinEvent||null;
   const shouldShowRemotePin=Boolean(incomingPinEvent?.id&&incomingPinEvent.id!==onlineLastPinEventId);
+  const incomingRevealEvent=snapshot.revealEvent||null;
+  const shouldShowRemoteReveal=Boolean(
+    incomingRevealEvent?.id&&
+    incomingRevealEvent.id!==onlineLastRevealEventId&&
+    incomingRevealEvent.sourceSlot===opponentSlot
+  );
   onlineApplyingRemote=true;
   G={
     ...(G||{}),
@@ -5063,6 +5072,7 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     resolving:Boolean(snapshot.resolving),
     winner:snapshot.winner ? (snapshot.winner===ownSlot ? "player" : "ai") : null,
     pinEvent:incomingPinEvent,
+    revealEvent:incomingRevealEvent,
     effectMarks:G?.effectMarks||{}
   };
   show("game");
@@ -5081,6 +5091,14 @@ function applyOnlineSnapshot(snapshot, playerSlot){
       Number(incomingPinEvent.roll||0),
       winnerSide,
       {visualOnly:true}
+    );
+  }
+  if(shouldShowRemoteReveal){
+    onlineLastRevealEventId=incomingRevealEvent.id;
+    showRevealedObject(
+      {name:incomingRevealEvent.sourceName||"Ace Angel"},
+      incomingRevealEvent.card,
+      incomingRevealEvent.revealerLabel||G.ai.label||"L'adversaire"
     );
   }
   if(G.over){
@@ -5119,11 +5137,11 @@ function applyOnlineRoomSnapshot(room, playerSlot){
 }
 
 function queueOnlineSnapshotPublish(){
-  if(!isOnlineMatch()||onlineApplyingRemote||!onlineDirty)return;
+  if(!isOnlineMatch()||onlineApplyingRemote||activeOnlineChoice||!onlineDirty)return;
   if(typeof window.publishOnlineMatchState!=="function")return;
   clearTimeout(onlinePublishTimer);
   onlinePublishTimer=setTimeout(async()=>{
-    if(!isOnlineMatch()||onlineApplyingRemote||!onlineDirty)return;
+    if(!isOnlineMatch()||onlineApplyingRemote||activeOnlineChoice||!onlineDirty)return;
     const snapshot=onlineSnapshotFromGame();
     if(!snapshot)return;
     const hash=JSON.stringify(snapshot);
@@ -5797,6 +5815,60 @@ function showOpponentHandReveal(source,enemy){
   overlay.classList.add("active");
 }
 
+function showRevealedObject(source,card,revealerLabel="L'adversaire"){
+  const overlay=document.getElementById("handRevealOverlay");
+  const title=document.getElementById("handRevealTitle");
+  const subtitle=document.getElementById("handRevealSubtitle");
+  const grid=document.getElementById("handRevealGrid");
+  if(!overlay||!title||!subtitle||!grid||!card)return;
+  title.textContent="Objet révélé";
+  subtitle.textContent=`${revealerLabel} révèle ${card.name} pour activer ${source.name}.`;
+  grid.innerHTML=cardHTML(card);
+  overlay.classList.add("active");
+}
+
+function revealObjectForAceAngel(owner,source){
+  const objects=owner.hand.filter(card=>card.type==="Objet");
+  if(!objects.length){
+    log(`[EFFET] ${source.name} : aucun objet à révéler en main.`);
+    showEffectFeedback(source,source.name,"Aucun objet à révéler","block");
+    return;
+  }
+  const reveal=cardId=>{
+    const object=owner.hand.find(card=>card.id===cardId&&card.type==="Objet");
+    if(!object)return;
+    owner.cat.mods.Charisme+=2;
+    owner.cat.mods.Vitesse+=1;
+    log(`[EFFET] ${source.name} révèle ${object.name} : +2 Charisme et +1 Vitesse.`);
+    showEffectFeedback(source,source.name,"+2 Charisme / +1 Vitesse","buff");
+    if(isOnlineMatch()){
+      const revealEvent={
+        id:`${G.round}:${source.id}:${object.id}:${Date.now()}`,
+        sourceSlot:localSideToOnlineSlot(owner.side),
+        sourceName:source.name,
+        revealerLabel:owner.label,
+        card:stripOwnerForNetwork(object)
+      };
+      G.revealEvent=revealEvent;
+      onlineLastRevealEventId=revealEvent.id;
+    }else if(owner.side!=="player"){
+      showRevealedObject(source,object,owner.label);
+    }
+    markOnlineDirty();
+    render();
+  };
+  if(owner.side==="player"){
+    requestEffectChoice({
+      title:source.name,
+      text:"Choisis l'objet à révéler à ton adversaire.",
+      choices:objects.map(card=>({label:card.name,value:card.id})),
+      onChoose:reveal
+    });
+    return;
+  }
+  reveal(objects[Math.floor(Math.random()*objects.length)].id);
+}
+
 function closeHandReveal(){
   document.getElementById("handRevealOverlay")?.classList.remove("active");
 }
@@ -5866,13 +5938,7 @@ function applyWrestlerEntryEffect(owner,c){
   }
   if(c.ability==="recoverJaydonOrFenrir")recoverNamedWrestler(owner,c,["Jaydon Ross","Fenrir Strom"]);
   if(c.ability==="revealObjectHandCharSpeed"){
-    const object=owner.hand.find(card=>card.type==="Objet");
-    if(object){
-      owner.cat.mods.Charisme+=2;
-      owner.cat.mods.Vitesse+=1;
-      log(`[EFFET] ${c.name} révèle ${object.name} : +2 Charisme et +1 Vitesse.`);
-      showEffectFeedback(c,c.name,"+2 Charisme / +1 Vitesse","buff");
-    }else log(`[EFFET] ${c.name} : aucun objet à révéler en main.`);
+    revealObjectForAceAngel(owner,c);
   }
   if(c.ability==="firstRoundOpponentMill1"){
     const enemy=owner.side==="player"?G.ai:G.player;
