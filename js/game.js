@@ -5406,21 +5406,53 @@ function addAllStats(s,value){
   STATS.forEach(stat=>s.mods[stat]+=value);
 }
 
+const MAX_STAT_VALUE=10;
+
+function formatStatGains(gains){
+  const entries=Object.entries(gains||{}).filter(([,value])=>value>0);
+  return entries.length
+    ? entries.map(([stat,value])=>`+${value} ${stat}`).join(" / ")
+    : "Stats déjà au maximum";
+}
+
+function mergeStatGains(target,gains){
+  Object.entries(gains||{}).forEach(([stat,value])=>{
+    target[stat]=(target[stat]||0)+value;
+  });
+  return target;
+}
+
+function allocateRandomStatPoints(s,count,value,applyPoint){
+  if(!s||count<=0||value<=0)return {};
+  const gains={};
+  const initial=shuffle(STATS.filter(stat=>score(s,stat)<MAX_STAT_VALUE)).slice(0,count);
+  const queue=initial.flatMap(stat=>Array(value).fill(stat));
+  for(let i=initial.length*value;i<count*value;i++)queue.push(null);
+  while(queue.length){
+    let stat=queue.shift();
+    if(!stat||score(s,stat)>=MAX_STAT_VALUE){
+      const available=STATS.filter(candidate=>score(s,candidate)<MAX_STAT_VALUE);
+      if(!available.length)break;
+      stat=available[Math.floor(Math.random()*available.length)];
+    }
+    applyPoint(stat);
+    gains[stat]=(gains[stat]||0)+1;
+  }
+  return gains;
+}
+
 function addRandomStats(s,count,value=1){
-  const pool=shuffle([...STATS]).slice(0,count);
-  pool.forEach(stat=>s.mods[stat]+=value);
-  return pool;
+  return allocateRandomStatPoints(s,count,value,stat=>s.mods[stat]+=1);
 }
 
 function replaceRoundRandomBonus(s,value){
-  if(!s)return [];
+  if(!s)return {};
   if(s.roundRandomBonus){
     Object.entries(s.roundRandomBonus).forEach(([stat,amount])=>s.mods[stat]-=amount);
   }
-  const [stat]=shuffle([...STATS]).slice(0,1);
-  s.mods[stat]+=value;
-  s.roundRandomBonus={ [stat]: value };
-  return [stat];
+  const gains=addRandomStats(s,1,value);
+  s.roundRandomBonus={...gains};
+  return gains;
 }
 
 function cleanEffectMarks(){
@@ -5554,7 +5586,13 @@ function openingRoundEffectLabel(s){
     firstRoundSpeedCharisma3:"+3 Vitesse / +3 Charisme",
     techniqueRound1:"+3 Technique",
     speedWheel25:"Roulette Vitesse 25%",
-    speedWheel50:"Roulette Vitesse 50%",
+    speedWheel50:"Roulette Vitesse 50%"
+  };
+  return labels[wrestlerAbility(s)]||"";
+}
+
+function persistentFieldEffectLabel(s){
+  const labels={
     techniqueWheel75:"Roulette Technique 75%",
     wheelAutoReroll20:"Relance roulette 20%"
   };
@@ -5700,8 +5738,9 @@ function recoverNamedCardFromDeck(owner,source,names){
 
 function discardUpToThreeForRandomStats(owner,source){
   let discardedCount=0;
+  const totalGains={};
   const finish=()=>{
-    const feedback=discardedCount?`Défausse ${discardedCount} / +${discardedCount*2} stats`:"Aucune défausse";
+    const feedback=discardedCount?`Défausse ${discardedCount} / ${formatStatGains(totalGains)}`:"Aucune défausse";
     log(`[EFFET] ${source.name} : ${feedback}.`);
     showEffectFeedback(source,source.name,feedback,discardedCount?"buff":"block");
     markOnlineDirty();
@@ -5719,10 +5758,10 @@ function discardUpToThreeForRandomStats(owner,source){
     }
     const [card]=owner.hand.splice(index,1);
     owner.grave.push(card);
-    const stat=STATS[Math.floor(Math.random()*STATS.length)];
-    owner.cat.mods[stat]+=2;
+    const gains=addRandomStats(owner.cat,1,2);
+    mergeStatGains(totalGains,gains);
     discardedCount++;
-    log(`[EFFET] ${source.name} défausse ${card.name} : +2 ${stat}.`);
+    log(`[EFFET] ${source.name} défausse ${card.name} : ${formatStatGains(gains)}.`);
     if(discardedCount>=3||!owner.hand.length){
       finish();
       return;
@@ -5738,10 +5777,10 @@ function discardUpToThreeForRandomStats(owner,source){
         if(index<0)break;
         const [discarded]=owner.hand.splice(index,1);
         owner.grave.push(discarded);
-        const stat=STATS[Math.floor(Math.random()*STATS.length)];
-        owner.cat.mods[stat]+=2;
+        const gains=addRandomStats(owner.cat,1,2);
+        mergeStatGains(totalGains,gains);
         discardedCount++;
-        log(`[EFFET] ${source.name} défausse ${discarded.name} : +2 ${stat}.`);
+        log(`[EFFET] ${source.name} défausse ${discarded.name} : ${formatStatGains(gains)}.`);
       }
       finish();
       return;
@@ -5842,7 +5881,12 @@ function applyEntryStatBonus(owner,source,amount,chooseStat){
     render();
   };
   if(!chooseStat){
-    applyStat(STATS[Math.floor(Math.random()*STATS.length)]);
+    const gains=addRandomStats(owner.cat,1,amount);
+    const feedback=formatStatGains(gains);
+    log(`[EFFET] ${source.name} : ${feedback}.`);
+    showEffectFeedback(source,source.name,feedback,Object.keys(gains).length?"buff":"block");
+    markOnlineDirty();
+    render();
     return;
   }
   if(owner.side!=="player"){
@@ -6073,13 +6117,8 @@ function applyWrestlerEntryEffect(owner,c){
     const ownWrestlers=owner.grave.filter(card=>card.type==="Catcheur").length;
     const opposingWrestlers=opponent.grave.filter(card=>card.type==="Catcheur").length;
     if(ownWrestlers>opposingWrestlers){
-      const gains={};
-      for(let i=0;i<5;i++){
-        const stat=STATS[Math.floor(Math.random()*STATS.length)];
-        owner.cat.mods[stat]+=1;
-        gains[stat]=(gains[stat]||0)+1;
-      }
-      const feedback=Object.entries(gains).map(([stat,value])=>`+${value} ${stat}`).join(" / ");
+      const gains=addRandomStats(owner.cat,1,5);
+      const feedback=formatStatGains(gains);
       log(`[EFFET] ${c.name} : ${feedback} (${ownWrestlers} catcheur${ownWrestlers>1?"s":""} au vestiaire contre ${opposingWrestlers}).`);
       showEffectFeedback(c,c.name,feedback,"buff");
     }else{
@@ -6099,12 +6138,9 @@ function applyWrestlerEntryEffect(owner,c){
     }
     const drawn=owner.hand.slice(before);
     const bonuses=drawn.filter(card=>card.type==="Manager");
-    bonuses.forEach(()=>{
-      const stat=STATS[Math.floor(Math.random()*STATS.length)];
-      owner.cat.mods[stat]+=1;
-    });
+    const gains=addRandomStats(owner.cat,1,bonuses.length);
     log(`[EFFET] ${c.name} pioche ${drawn.length} carte${drawn.length>1?"s":""} jusqu'à 6 en main${bonuses.length?` : +${bonuses.length} point${bonuses.length>1?"s":""} aléatoire${bonuses.length>1?"s":""}`:""}.`);
-    showEffectFeedback(c,c.name,`Pioche +${drawn.length}${bonuses.length?` / +${bonuses.length} stat${bonuses.length>1?"s":""}`:""}`,"special");
+    showEffectFeedback(c,c.name,`Pioche +${drawn.length}${bonuses.length?` / ${formatStatGains(gains)}`:""}`,"special");
   }
   if(c.ability==="recoverJaydonOrFenrir")recoverNamedWrestler(owner,c,["Jaydon Ross","Fenrir Strom"]);
   if(c.ability==="revealObjectHandCharSpeed"){
@@ -6159,14 +6195,9 @@ function applyWrestlerEntryEffect(owner,c){
     }
   }
   if(c.ability==="firstRoundRandomStats5"&&isFirstRoundForWrestler(owner.cat)){
-    const gains={};
     owner.cat.firstRoundRandomMods=zeroMods();
-    for(let i=0;i<5;i++){
-      const stat=STATS[Math.floor(Math.random()*STATS.length)];
-      owner.cat.firstRoundRandomMods[stat]+=1;
-      gains[stat]=(gains[stat]||0)+1;
-    }
-    const feedback=Object.entries(gains).map(([stat,value])=>`+${value} ${stat}`).join(" / ");
+    const gains=allocateRandomStatPoints(owner.cat,1,5,stat=>owner.cat.firstRoundRandomMods[stat]+=1);
+    const feedback=formatStatGains(gains);
     log(`[EFFET] ${c.name} : ${feedback}.`);
     showEffectFeedback(c,c.name,feedback,"buff");
   }
@@ -6308,10 +6339,11 @@ function applyRoundManagerEffects(){
       const value=(catAbility==="turnCatRandom3"||catAbility==="turnCharismaMinus1Random3")?3:2;
       const charismaPenalty=catAbility.startsWith("turnCharismaMinus1");
       if(charismaPenalty)owner.cat.mods.Charisme-=1;
-      const [stat]=charismaPenalty
+      const gains=charismaPenalty
         ? addRandomStats(owner.cat,1,value)
         : replaceRoundRandomBonus(owner.cat,value);
-      const feedback=charismaPenalty?`-1 Charisme / +${value} ${stat}`:`+${value} ${stat}`;
+      const gainText=formatStatGains(gains);
+      const feedback=charismaPenalty?`-1 Charisme / ${gainText}`:gainText;
       log(`[EFFET] ${owner.cat.card.name} ${charismaPenalty?"cumule":"relance"} son bonus : ${feedback}.`);
       showEffectFeedback(owner.cat.card,owner.cat.card.name,feedback,charismaPenalty?"special":"buff");
     }
@@ -6331,11 +6363,11 @@ function applyRoundManagerEffects(){
       const max=catAbility==="turnCatRandomPermanent2Max3"?3:5;
       const count=owner.cat.permanentGrowthCount||0;
       if(count<max){
-        const stat=STATS[Math.floor(Math.random()*STATS.length)];
-        owner.cat.mods[stat]+=value;
+        const gains=addRandomStats(owner.cat,1,value);
         owner.cat.permanentGrowthCount=count+1;
-        log(`[EFFET] ${owner.cat.card.name} progresse : +${value} ${stat} (${count+1}/${max}).`);
-        showEffectFeedback(owner.cat.card,owner.cat.card.name,`+${value} ${stat} (${count+1}/${max})`,"buff");
+        const feedback=`${formatStatGains(gains)} (${count+1}/${max})`;
+        log(`[EFFET] ${owner.cat.card.name} progresse : ${feedback}.`);
+        showEffectFeedback(owner.cat.card,owner.cat.card.name,feedback,Object.keys(gains).length?"buff":"block");
       }
     }
     if((catAbility==="turnEnemyRandomPermanent1Max5"||catAbility==="turnEnemyRandomPermanent2Max3")&&opp.cat&&!isCardEffectImmune(opp.cat)){
@@ -6422,13 +6454,13 @@ function applyRoundManagerEffects(){
     const chance=permanentChanceByAbility[supportCard?.ability]||0;
     if(!chance||!owner.cat)return;
     if(Math.random()<chance){
-      const stat=STATS[Math.floor(Math.random()*STATS.length)];
-      owner.cat.mods[stat]+=1;
+      const gains=addRandomStats(owner.cat,1,1);
       owner.cat.permanentMods=normalizeMods(owner.cat.permanentMods);
-      owner.cat.permanentMods[stat]+=1;
+      mergeStatGains(owner.cat.permanentMods,gains);
       owner.cat.card.permanentMods={...owner.cat.permanentMods};
-      log(`[EFFET] ${supportCard.name} inspire ${owner.cat.card.name} : +1 ${stat}.`);
-      showEffectFeedback(owner.cat.card,supportCard.name,`+1 ${stat}`,"buff");
+      const feedback=formatStatGains(gains);
+      log(`[EFFET] ${supportCard.name} inspire ${owner.cat.card.name} : ${feedback}.`);
+      showEffectFeedback(owner.cat.card,supportCard.name,feedback,Object.keys(gains).length?"buff":"block");
     }
   });
   if(!isOnlineMatch())autoUseRingsider(G.ai);
@@ -6446,9 +6478,7 @@ function addTrackedAllStats(effect,s,value){
 }
 
 function addTrackedRandomStats(effect,s,count,value=1){
-  const pool=shuffle([...STATS]).slice(0,count);
-  pool.forEach(stat=>addTrackedStat(effect,s,stat,value));
-  return pool;
+  return allocateRandomStatPoints(s,count,value,stat=>addTrackedStat(effect,s,stat,1));
 }
 
 function discardRandomCards(player,count){
@@ -6507,18 +6537,18 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
     }
     case"mAll3":addTrackedAllStats(effect,s,3*mult);feedback=`+${3*mult} partout`;break;
     case"mRandom":{
-      const stats=addTrackedRandomStats(effect,s,1,mult);
-      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
+      const gains=addTrackedRandomStats(effect,s,1,mult);
+      feedback=formatStatGains(gains);
       break;
     }
     case"mRandom2":{
-      const stats=addTrackedRandomStats(effect,s,2,mult);
-      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
+      const gains=addTrackedRandomStats(effect,s,2,mult);
+      feedback=formatStatGains(gains);
       break;
     }
     case"bellRandomStats2":{
-      const stats=addTrackedRandomStats(effect,s,2,mult);
-      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
+      const gains=addTrackedRandomStats(effect,s,2,mult);
+      feedback=formatStatGains(gains);
       break;
     }
     case"mSave":s.save=true;effect.save=true;feedback="Sauvetage";kind="block";break;
@@ -6847,13 +6877,13 @@ function applyEffect(owner,opp,c){
       break;
     }
     case"mRandom":{
-      const stats=addRandomStats(s,1,mult);
-      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
+      const gains=addRandomStats(s,1,mult);
+      feedback=formatStatGains(gains);
       break;
     }
     case"mRandom2":{
-      const stats=addRandomStats(s,2,mult);
-      feedback=stats.map(stat=>`+${mult} ${stat}`).join(" / ");
+      const gains=addRandomStats(s,2,mult);
+      feedback=formatStatGains(gains);
       break;
     }
     case"mWeakest1Choice":applyWeakestStatChoice(owner,c,mult);return;
@@ -7701,10 +7731,10 @@ function win(winner,loser,reason){
   }
   if(winnerAbility==="growForce")winner.cat.mods.Force++;
   if(winnerAbility==="charismaWinRandom3"&&G.stat==="Charisme"){
-    const stat=STATS[Math.floor(Math.random()*STATS.length)];
-    winner.cat.mods[stat]+=3;
-    log(`[EFFET] ${winner.cat.card.name} : victoire en Charisme, +3 ${stat}.`);
-    showEffectFeedback(winner.cat.card,winner.cat.card.name,`+3 ${stat}`,"buff");
+    const gains=addRandomStats(winner.cat,1,3);
+    const feedback=formatStatGains(gains);
+    log(`[EFFET] ${winner.cat.card.name} : victoire en Charisme, ${feedback}.`);
+    showEffectFeedback(winner.cat.card,winner.cat.card.name,feedback,Object.keys(gains).length?"buff":"block");
   }
   if(winnerAbility==="winTag1Max2"){
     const before=Number.isFinite(winner.tagsRemaining)?winner.tagsRemaining:TAGS_PER_MATCH;
@@ -7911,12 +7941,12 @@ function previewEffectStrip(c){
 
   if(s.save)items.push({label:"Sauvetage",kind:"block"});
   if(owner.pinShield)items.push({label:`Protection -${owner.pinShield}`,kind:"block"});
-  if(owner.man)items.push({label:`Bonus : ${owner.man.name}${owner.managersBlocked?" (annulé)":""}`,kind:owner.managersBlocked?"block":"special"});
-  if(owner.obj)items.push({label:`Objet : ${owner.obj.name}${owner.objectsBlocked?" (annulé)":""}`,kind:owner.objectsBlocked?"block":"special"});
   if(owner.obj&&owner.objTurnsRemaining>1)items.push({label:`Durée : ${owner.objTurnsRemaining} tours`,kind:"special"});
   const ability=wrestlerAbility(s);
   if(ability==="pinBonus")items.push({label:"Tombé +20",kind:"pin"});
   if((ability==="sameStatNext"||ability==="sameStatNextFixed")&&G.lockedStat)items.push({label:`${G.lockedStat} verrouillée`,kind:"special"});
+  const fieldEffect=persistentFieldEffectLabel(s);
+  if(fieldEffect)items.push({label:`Terrain : ${fieldEffect}`,kind:"special"});
   const openingEffect=openingRoundEffectLabel(s);
   if(openingEffect){
     const timing=isMatchRoundOneAbility(ability)?"Round 1":"Premier round";
@@ -7930,7 +7960,9 @@ function previewEffectStrip(c){
 function previewCard(id){
   const c=findCardById(id);
   if(!c)return;
-  document.getElementById("preview").innerHTML=`<div class="preview-title">Carte survolée</div>${cardHTML(c,"",c.id)}${previewEffectStrip(c)}`;
+  document.getElementById("preview").innerHTML=`<div class="preview-title">Carte survolée</div>${cardHTML(c,"",c.id)}`;
+  const effects=document.getElementById("previewEffects");
+  if(effects)effects.innerHTML=previewEffectStrip(c);
 }
 
 function showPileViewer(side="player"){
@@ -9533,10 +9565,10 @@ function applyChallengeWinEffects(winner,loser,stat,onComplete){
     showEffectFeedback(winner.cat.card,winner.cat.card.name,"Victoire +1 Force","buff");
   }
   if(ability==="charismaWinRandom3"&&stat==="Charisme"){
-    const boosted=STATS[Math.floor(Math.random()*STATS.length)];
-    winner.cat.mods[boosted]+=3;
-    log(`[EFFET] ${winner.cat.card.name} : victoire en Charisme, +3 ${boosted}.`);
-    showEffectFeedback(winner.cat.card,winner.cat.card.name,`Victoire +3 ${boosted}`,"buff");
+    const gains=addRandomStats(winner.cat,1,3);
+    const feedback=formatStatGains(gains);
+    log(`[EFFET] ${winner.cat.card.name} : victoire en Charisme, ${feedback}.`);
+    showEffectFeedback(winner.cat.card,winner.cat.card.name,`Victoire : ${feedback}`,Object.keys(gains).length?"buff":"block");
   }
   return resolveNextStatWinEffect(winner,stat,onComplete);
 }

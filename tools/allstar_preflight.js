@@ -95,7 +95,43 @@ function verifyInterfaceFiles() {
   );
 }
 
+function verifyRandomStatAllocator() {
+  const game = read("js/game.js");
+  const start = game.indexOf("const MAX_STAT_VALUE=10;");
+  const end = game.indexOf("function cleanEffectMarks", start);
+  const helperSource = game.slice(start, end);
+  const stats = ["Force", "Vitesse", "Technique", "Charisme"];
+  const score = (state, stat) => state.card.stats[stat] + state.mods[stat];
+  const allocator = Function(
+    "STATS",
+    "shuffle",
+    "score",
+    `${helperSource}\nreturn { addRandomStats };`
+  )(stats, values => [...values], score);
+
+  const state = {
+    card: { stats: { Force: 10, Vitesse: 9, Technique: 8, Charisme: 10 } },
+    mods: { Force: 0, Vitesse: 0, Technique: 0, Charisme: 0 }
+  };
+  const gains = allocator.addRandomStats(state, 1, 5);
+  assert(
+    Object.values(gains).reduce((sum, value) => sum + value, 0) === 3
+      && stats.every(stat => score(state, stat) <= 10)
+      && state.mods.Force === 0
+      && state.mods.Charisme === 0,
+    "Le reliquat aleatoire est redistribue uniquement dans les stats sous 10"
+  );
+
+  const distinctState = {
+    card: { stats: { Force: 5, Vitesse: 5, Technique: 5, Charisme: 5 } },
+    mods: { Force: 0, Vitesse: 0, Technique: 0, Charisme: 0 }
+  };
+  const distinctGains = allocator.addRandomStats(distinctState, 2, 1);
+  assert(Object.keys(distinctGains).length === 2, "Les bonus visant deux stats commencent sur deux stats distinctes");
+}
+
 function verifyRecentEffects() {
+  const html = read("index.html");
   const game = read("js/game.js");
   const css = read("css/style.css");
   const audio = read("js/audio.js");
@@ -135,6 +171,14 @@ function verifyRecentEffects() {
     "Relance Damien Chevallier transmise au proprietaire puis reprise par le resolveur"
   );
   assert(game.includes('winnerAbility==="charismaWinRandom3"&&G.stat==="Charisme"'), "Effet Bernardot execute sur Charisme gagne");
+  assert(
+    game.includes("const MAX_STAT_VALUE=10")
+      && game.includes("function allocateRandomStatPoints")
+      && game.includes("score(s,candidate)<MAX_STAT_VALUE")
+      && game.includes("const gains=addRandomStats(owner.cat,1,2)")
+      && game.includes("const gains=allocateRandomStatPoints(owner.cat,1,5"),
+    "Bonus de statistiques aleatoires repartis sans depasser 10"
+  );
   assert(game.includes('forceWheel50:{stat:"Force",chance:.5}'), "Effet Tony Trivaldo force Force au premier round");
   assert(game.includes("ISO weeks make the challenge rotate") && game.includes("challenge_boss_${G.challenge.weekKey}_"), "Boss ALLSTAR previsualisable et rotation hebdomadaire");
   assert(
@@ -260,9 +304,20 @@ function verifyRecentEffects() {
     game.includes('G.effectMarks[card.id]=[...previous,mark].slice(-5)')
       && game.includes('class="effect-card-stack"')
       && game.includes('class="preview-effect-list"')
+      && html.includes('class="preview-effects-slot" id="previewEffects"')
+      && game.includes('effects.innerHTML=previewEffectStrip(c)')
+      && !game.includes('items.push({label:`Bonus : ${owner.man.name}')
+      && !game.includes('items.push({label:`Objet : ${owner.obj.name}')
       && css.includes('.preview-effect-chip.effect-buff')
       && css.includes('.preview-effect-chip.effect-malus'),
-    "Les effets simultanes sont empiles et tous les etats actifs restent lisibles"
+    "Les effets actifs sont empiles sous la preview sans repeter les cartes equipees"
+  );
+  assert(
+    game.includes('function persistentFieldEffectLabel(s)')
+      && game.includes('techniqueWheel75:"Roulette Technique 75%"')
+      && game.includes('items.push({label:`Terrain : ${fieldEffect}`')
+      && game.includes('find(s=>s&&wrestlerAbility(s)==="techniqueWheel75")'),
+    "Heddi Karaoui influence chaque roulette tant qu'il reste sur le terrain"
   );
   assert(
     game.includes("function requestRingsiderRecovery(owner)")
@@ -351,6 +406,7 @@ verifyRanking();
 verifyPersistence();
 verifyDesktopBuild();
 verifyInterfaceFiles();
+verifyRandomStatAllocator();
 verifyRecentEffects();
 
 console.log("=== ALLSTAR PRE-BETA PREFLIGHT ===");

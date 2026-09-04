@@ -4976,7 +4976,7 @@ button{font-family:inherit;cursor:pointer}
     top:clamp(92px,12vh,118px) !important;
     left:50% !important;
     bottom:auto !important;
-    width:clamp(198px,34vh,272px) !important;
+    width:clamp(198px,28vh,272px) !important;
     max-width:calc(100% - 16px) !important;
     height:auto !important;
     aspect-ratio:112/148 !important;
@@ -4991,15 +4991,28 @@ button{font-family:inherit;cursor:pointer}
     transform:none !important;
   }
 
-  #game .preview-effect-strip{
+  #game .left-panel > .preview-effects-slot{
     position:absolute;
     z-index:12;
-    left:8px;
-    right:8px;
-    bottom:8px;
+    top:calc(clamp(92px,12vh,118px) + clamp(262px,37vh,359px) + 6px);
+    bottom:calc(var(--left-bottom) + var(--pile-h) + var(--pile-h) + var(--pile-gap) + var(--pile-gap));
+    left:50%;
+    width:clamp(198px,28vh,272px);
+    max-width:calc(100% - 16px);
+    display:flex;
+    align-items:flex-start;
+    transform:translateX(-50%);
+  }
+
+  #game .left-panel > .preview-effects-slot:empty{
+    display:none;
+  }
+
+  #game .preview-effect-strip{
+    width:100%;
     display:grid;
     gap:5px;
-    max-height:42%;
+    max-height:100%;
     padding:6px;
     border:2px solid rgba(245,196,50,.72);
     border-radius:7px;
