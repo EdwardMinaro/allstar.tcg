@@ -361,7 +361,7 @@
         "Technique": 6,
         "Charisme": 8
       },
-      "effect": "Premier round : Gagnez 5 points de stats aléatoire.",
+      "effect": "Premier round : Gagnez 5 points de statistiques aléatoires.",
       "renderArt": "assets/card_renders/legende_catcheurs_nilsn.png",
       "musicId": "nilsn",
       "ability": "firstRoundRandomStats5"
@@ -1521,7 +1521,7 @@
         "Technique": 5,
         "Charisme": 6
       },
-      "effect": "1x/match : relance la roulette.",
+      "effect": "Une fois par match : relancez la roulette.",
       "ability": "rerollStat",
       "renderArt": "assets/card_renders/rare_catcheurs_paul_meunier.png",
       "musicId": "paul_meunier"
