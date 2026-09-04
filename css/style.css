@@ -3327,14 +3327,15 @@ button{font-family:inherit;cursor:pointer}
 
 .career-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:16px;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:12px;
   margin:18px 0 22px;
 }
 
 .career-season{
   position:relative;
-  padding:16px;
+  min-width:0;
+  padding:12px;
   border-radius:10px;
   border:3px solid rgba(245,196,50,.42);
   background:
