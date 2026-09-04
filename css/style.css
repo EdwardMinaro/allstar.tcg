@@ -3327,7 +3327,7 @@ button{font-family:inherit;cursor:pointer}
 
 .career-grid{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
   gap:16px;
   margin:18px 0 22px;
 }
@@ -3369,11 +3369,15 @@ button{font-family:inherit;cursor:pointer}
 
 .career-season h3{
   color:#fff;
-  font-size:clamp(22px,1.9vw,31px);
+  min-height:62px;
+  font-size:25px;
   font-weight:1000;
   font-style:italic;
   margin-bottom:14px;
   text-shadow:3px 3px 0 #000;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
 }
 
 .career-opponent{
@@ -4989,24 +4993,31 @@ button{font-family:inherit;cursor:pointer}
   #game .preview-effect-strip{
     position:absolute;
     z-index:12;
-    left:10px;
-    right:10px;
-    bottom:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:7px;
-    min-height:25px;
-    padding:4px 8px;
+    left:8px;
+    right:8px;
+    bottom:8px;
+    display:grid;
+    gap:5px;
+    max-height:42%;
+    padding:6px;
     border:2px solid rgba(245,196,50,.72);
     border-radius:7px;
     background:linear-gradient(180deg,rgba(17,18,25,.94),rgba(4,5,8,.96));
     box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 0 14px rgba(245,196,50,.22),4px 4px 0 rgba(0,0,0,.42);
     color:#fff;
-    pointer-events:none;
+    overflow:auto;
+    scrollbar-width:thin;
+    scrollbar-color:#d9a91d rgba(255,255,255,.08);
   }
 
-  #game .preview-effect-strip span{
+  #game .preview-effect-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
+
+  #game .preview-effect-head span{
     color:#f5c432;
     font-size:clamp(9px,1.2vh,12px);
     font-weight:1000;
@@ -5015,17 +5026,45 @@ button{font-family:inherit;cursor:pointer}
     text-shadow:1px 1px 0 #000;
   }
 
-  #game .preview-effect-strip b{
+  #game .preview-effect-head b{
+    min-width:20px;
+    min-height:20px;
+    display:grid;
+    place-items:center;
+    border-radius:50%;
+    background:#f5c432;
+    color:#08090d;
+    font-size:11px;
+    font-weight:1000;
+  }
+
+  #game .preview-effect-list{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:4px;
+  }
+
+  #game .preview-effect-chip{
     min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    color:#f5dfb3;
-    font-size:clamp(10px,1.3vh,13px);
+    padding:4px 5px;
+    border:1px solid rgba(255,255,255,.2);
+    border-left-width:4px;
+    border-radius:4px;
+    background:#191b23;
+    color:#fff;
+    font-size:clamp(8px,1.05vh,11px);
+    line-height:1.1;
     font-weight:1000;
     text-transform:uppercase;
     text-shadow:1px 1px 0 #000;
+    overflow-wrap:anywhere;
   }
+
+  #game .preview-effect-chip.effect-buff{border-left-color:#63ff77;background:#103119;color:#b8ffc1}
+  #game .preview-effect-chip.effect-malus{border-left-color:#ff4050;background:#390d13;color:#ffbdc2}
+  #game .preview-effect-chip.effect-block{border-left-color:#69b8ff;background:#0d273d;color:#c5e7ff}
+  #game .preview-effect-chip.effect-pin{border-left-color:#c471ff;background:#29103d;color:#e8caff}
+  #game .preview-effect-chip.effect-special{border-left-color:#f5c432;background:#362a09;color:#fff0ae}
 
   #game .left-panel > .player-vestiaire-pile{
     position:absolute !important;
@@ -5893,27 +5932,35 @@ button:disabled,
 }
 
 .effect-card-badge{
-  position:absolute;
-  z-index:9;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%) rotate(-4deg);
-  max-width:92%;
-  padding:5px 9px;
+  max-width:100%;
+  padding:4px 7px;
   border:2px solid #050508;
-  border-radius:8px;
+  border-radius:6px;
   color:#fff;
-  font-size:clamp(10px,1.25vw,16px);
+  font-size:clamp(7px,.72vw,11px);
   font-weight:1000;
   font-style:italic;
-  line-height:1;
-  text-align:center;
+  line-height:1.05;
+  text-align:right;
   text-transform:uppercase;
-  text-shadow:2px 2px 0 #000;
+  text-shadow:1px 1px 0 #000;
   pointer-events:none;
   white-space:normal;
-  box-shadow:4px 4px 0 rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.18) inset;
+  box-shadow:2px 2px 0 rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.18) inset;
   animation:effectBadgePop .42s ease both;
+}
+
+.effect-card-stack{
+  position:absolute;
+  z-index:9;
+  right:3px;
+  bottom:3px;
+  width:calc(100% - 6px);
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:2px;
+  pointer-events:none;
 }
 
 .effect-buff.effect-card-ring{box-shadow:0 0 0 4px rgba(99,255,119,.78),0 0 28px rgba(99,255,119,.65)}
@@ -5943,9 +5990,9 @@ button:disabled,
 }
 
 @keyframes effectBadgePop{
-  0%{opacity:0;transform:translate(-50%,-50%) scale(.55) rotate(-7deg)}
-  70%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(-4deg)}
-  100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-4deg)}
+  0%{opacity:0;transform:translateX(12px) scale(.8)}
+  70%{opacity:1;transform:translateX(-2px) scale(1.04)}
+  100%{opacity:1;transform:translateX(0) scale(1)}
 }
 
 @keyframes effectCardPulse{

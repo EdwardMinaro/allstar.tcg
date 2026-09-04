@@ -97,6 +97,7 @@ function verifyInterfaceFiles() {
 
 function verifyRecentEffects() {
   const game = read("js/game.js");
+  const css = read("css/style.css");
   const audio = read("js/audio.js");
   const multiplayer = read("js/multiplayerClient.js");
   const roomService = read("js/roomService.js");
@@ -123,6 +124,15 @@ function verifyRecentEffects() {
       && game.includes('winnerSlot==="p1"?"player":"ai"')
       && game.includes('winnerSlot==="tie"'),
     "PFC en ligne choisit le premier joueur et rejoue les egalites"
+  );
+  assert(
+    game.includes("wheelRerollEvent:G.wheelRerollEvent||null")
+      && game.includes("requestOnlineWheelRerollChoice(incomingWheelRerollEvent)")
+      && game.includes("resumeOnlineWheelReroll(incomingWheelRerollEvent)")
+      && game.includes('const ownerSlot=localSideToOnlineSlot(reroller.side)')
+      && roomService.includes("submitWheelRerollChoice")
+      && multiplayer.includes("submitOnlineWheelRerollChoice"),
+    "Relance Damien Chevallier transmise au proprietaire puis reprise par le resolveur"
   );
   assert(game.includes('winnerAbility==="charismaWinRandom3"&&G.stat==="Charisme"'), "Effet Bernardot execute sur Charisme gagne");
   assert(game.includes('forceWheel50:{stat:"Force",chance:.5}'), "Effet Tony Trivaldo force Force au premier round");
@@ -240,6 +250,19 @@ function verifyRecentEffects() {
   const roundManagerEffects=game.slice(
     game.indexOf("function applyRoundManagerEffects()"),
     game.indexOf("function addTrackedStat(")
+  );
+  assert(
+    roundManagerEffects.includes('? addRandomStats(owner.cat,1,value)')
+      && roundManagerEffects.includes(': replaceRoundRandomBonus(owner.cat,value)'),
+    "Georges Chevalier cumule son bonus aleatoire a chaque tour"
+  );
+  assert(
+    game.includes('G.effectMarks[card.id]=[...previous,mark].slice(-5)')
+      && game.includes('class="effect-card-stack"')
+      && game.includes('class="preview-effect-list"')
+      && css.includes('.preview-effect-chip.effect-buff')
+      && css.includes('.preview-effect-chip.effect-malus'),
+    "Les effets simultanes sont empiles et tous les etats actifs restent lisibles"
   );
   assert(
     game.includes("function requestRingsiderRecovery(owner)")

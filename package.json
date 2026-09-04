@@ -1,13 +1,13 @@
 {
   "name": "allstar-desktop",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "private": true,
   "description": "ALLSTAR desktop build",
   "author": "ALLSTAR",
   "main": "electron-main.js",
   "scripts": {
     "start": "electron .",
-    "verify": "node tools/audio_exclusivity_test.js && node tools/allstar_audit.js && powershell -NoProfile -ExecutionPolicy Bypass -File tools/audit_card_render_geometry.ps1 && node tools/allstar_preflight.js && node tools/allstar_balance_sim.js",
+    "verify": "node tools/audio_exclusivity_test.js && node tools/online_choice_sync_test.js && node tools/allstar_audit.js && powershell -NoProfile -ExecutionPolicy Bypass -File tools/audit_card_render_geometry.ps1 && node tools/allstar_preflight.js && node tools/allstar_balance_sim.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder --win nsis",
     "publish": "electron-builder --win nsis --publish always"

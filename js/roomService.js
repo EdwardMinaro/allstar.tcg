@@ -170,6 +170,38 @@ class RoomService {
     return this.adapter.writeRoom(update(await this.adapter.getRoom(normalized)));
   }
 
+  async submitWheelRerollChoice(code, playerSlot, eventId, choice) {
+    const normalized = String(code || "").trim().toUpperCase();
+    const allowedChoices = new Set(["reroll", "keep"]);
+    const update = room => {
+      if (!room) throw new Error("Room introuvable.");
+      if (room.status !== "playing") throw new Error("La partie n'est pas active.");
+      if (!room.players?.[playerSlot]) throw new Error("Joueur introuvable.");
+      if (!allowedChoices.has(choice)) throw new Error("Choix de roulette invalide.");
+      const event = room.matchState?.wheelRerollEvent;
+      if (!event || event.id !== eventId || event.status !== "pending") {
+        throw new Error("Cette relance de roulette n'est plus active.");
+      }
+      if (event.ownerSlot !== playerSlot) throw new Error("Cette relance appartient à l'adversaire.");
+      const previousVersion = Number(room.matchState?.version || room.matchState?.updatedAt || 0);
+      const version = Math.max(previousVersion + 1, Date.now());
+      return {
+        ...room,
+        matchState: {
+          ...room.matchState,
+          wheelRerollEvent: { ...event, status: "resolved", choice },
+          version,
+          sourceSlot: playerSlot,
+          updatedAt: version
+        }
+      };
+    };
+    if (typeof this.adapter.updateRoom === "function") {
+      return this.adapter.updateRoom(normalized, update);
+    }
+    return this.adapter.writeRoom(update(await this.adapter.getRoom(normalized)));
+  }
+
   subscribe(code, callback) {
     return this.adapter.subscribe(code, callback);
   }

@@ -407,11 +407,13 @@ function simulateMatch(game, playerDeckKeys, aiDeckKeys, seed) {
   for (let round = 1; round <= 50; round++) {
     draw(player, 1, rng);
     draw(ai, 1, rng);
-    const stat = game.STATS[Math.floor(rng() * game.STATS.length)];
+    let stat = game.STATS[Math.floor(rng() * game.STATS.length)];
     const first = roundStarter === "player" ? player : ai;
     const second = roundStarter === "player" ? ai : player;
     playCards(first, second, game, rng, stat);
     playCards(second, first, game, rng, stat);
+    const techniqueSource = [player, ai].find(side => side.cat?.card?.ability === "techniqueWheel75");
+    if (techniqueSource && rng() < 0.75) stat = "Technique";
     if (player.cat && player.nextAll) {
       addAll(player.cat, player.nextAll);
       player.nextAll = 0;

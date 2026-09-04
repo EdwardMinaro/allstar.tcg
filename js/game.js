@@ -14,6 +14,9 @@ let onlineLastPinEventId="";
 let onlineLastRevealEventId="";
 let onlineOpeningRpsSubmitting=false;
 let onlineLastOpeningRpsResolvedId="";
+let onlineWheelRerollSubmitting=false;
+let onlineLastWheelRerollPromptId="";
+let onlineLastWheelRerollResumeId="";
 const CARD_DATA = [
   {
     "key": "legende_catcheurs_adam_frost",
@@ -4805,6 +4808,9 @@ function startMatch(options={}){
   onlineLastRevealEventId="";
   onlineOpeningRpsSubmitting=false;
   onlineLastOpeningRpsResolvedId="";
+  onlineWheelRerollSubmitting=false;
+  onlineLastWheelRerollPromptId="";
+  onlineLastWheelRerollResumeId="";
   fadeMusic("match",700);
   const aiDeckKeys=legalDeckKeys(options.aiDeckKeys||makeAiDeckKeys());
 
@@ -5110,6 +5116,7 @@ function onlineSnapshotFromGame(){
     pinEvent:G.pinEvent||null,
     revealEvent:G.revealEvent||null,
     openingRps:G.openingRps||null,
+    wheelRerollEvent:G.wheelRerollEvent||null,
     matchId:G.matchOptions?.onlineMatchId||`${ctx.roomCode}:legacy`,
     lockedStat:G.lockedStat||null,
     over:Boolean(G.over),
@@ -5150,6 +5157,19 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     incomingRevealEvent.sourceSlot===opponentSlot
   );
   const incomingOpeningRps=snapshot.openingRps||null;
+  const incomingWheelRerollEvent=snapshot.wheelRerollEvent||null;
+  const shouldPromptWheelReroll=Boolean(
+    incomingWheelRerollEvent?.id&&
+    incomingWheelRerollEvent.status==="pending"&&
+    incomingWheelRerollEvent.ownerSlot===ownSlot&&
+    incomingWheelRerollEvent.id!==onlineLastWheelRerollPromptId
+  );
+  const shouldResumeWheelReroll=Boolean(
+    incomingWheelRerollEvent?.id&&
+    incomingWheelRerollEvent.status==="resolved"&&
+    incomingWheelRerollEvent.resolverSlot===ownSlot&&
+    incomingWheelRerollEvent.id!==onlineLastWheelRerollResumeId
+  );
   onlineApplyingRemote=true;
   G={
     ...(G||{}),
@@ -5187,13 +5207,14 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     pinEvent:incomingPinEvent,
     revealEvent:incomingRevealEvent,
     openingRps:incomingOpeningRps,
+    wheelRerollEvent:incomingWheelRerollEvent,
     effectMarks:G?.effectMarks||{}
   };
   show("game");
   render();
   if(shouldShowRemoteWheel){
     onlineLastWheelSpinId=incomingWheelId;
-    showRemoteWheel(snapshot.stat);
+    showRemoteWheel(snapshot.stat,{keepOpen:shouldPromptWheelReroll});
   }
   if(shouldShowRemotePin){
     onlineLastPinEventId=incomingPinEvent.id;
@@ -5224,6 +5245,22 @@ function applyOnlineSnapshot(snapshot, playerSlot){
     handleOnlineOpeningRps(incomingOpeningRps,ownSlot);
   }else if(Number(snapshot.round||0)>0){
     hideRpsOverlay();
+  }
+  if(!G.over&&shouldPromptWheelReroll){
+    onlineLastWheelRerollPromptId=incomingWheelRerollEvent.id;
+    setTimeout(()=>requestOnlineWheelRerollChoice(incomingWheelRerollEvent),shouldShowRemoteWheel?1850:80);
+  }
+  if(!G.over&&shouldResumeWheelReroll){
+    onlineLastWheelRerollResumeId=incomingWheelRerollEvent.id;
+    setTimeout(()=>resumeOnlineWheelReroll(incomingWheelRerollEvent),80);
+  }
+  if(
+    incomingWheelRerollEvent?.status==="resolved"&&
+    incomingWheelRerollEvent.choice==="keep"&&
+    incomingWheelRerollEvent.ownerSlot===ownSlot&&
+    snapshot.matchPhase!=="reroll"
+  ){
+    closeWheelOverlayVisual();
   }
   if(!G.over&&G.currentTurn==="player")setTimeout(()=>requestRingsiderRecovery(G.player),80);
 }
@@ -5390,7 +5427,10 @@ function cleanEffectMarks(){
   if(!G?.effectMarks)return;
   const now=Date.now();
   Object.keys(G.effectMarks).forEach(id=>{
-    if(G.effectMarks[id].until<=now)delete G.effectMarks[id];
+    const stored=G.effectMarks[id];
+    const marks=(Array.isArray(stored)?stored:[stored]).filter(mark=>mark?.until>now);
+    if(marks.length)G.effectMarks[id]=marks;
+    else delete G.effectMarks[id];
   });
 }
 
@@ -5407,11 +5447,17 @@ function effectClassForKind(kind){
 function showEffectFeedback(card,title,detail="",kind="special",duration=1800){
   if(!G||!card)return;
   G.effectMarks=G.effectMarks||{};
-  G.effectMarks[card.id]={
+  cleanEffectMarks();
+  const previous=Array.isArray(G.effectMarks[card.id])
+    ? G.effectMarks[card.id]
+    : (G.effectMarks[card.id]?[G.effectMarks[card.id]]:[]);
+  const mark={
+    id:`${Date.now()}-${Math.random().toString(36).slice(2)}`,
     label:detail||title,
     className:effectClassForKind(kind),
     until:Date.now()+duration
   };
+  G.effectMarks[card.id]=[...previous,mark].slice(-5);
 
   const toast=document.getElementById("effectToast");
   if(toast){
@@ -5424,18 +5470,22 @@ function showEffectFeedback(card,title,detail="",kind="special",duration=1800){
   if(document.getElementById("game")?.classList.contains("active"))render();
 
   setTimeout(()=>{
-    if(G?.effectMarks?.[card.id]?.until<=Date.now()){
-      delete G.effectMarks[card.id];
-      render();
-    }
+    if(!G?.effectMarks)return;
+    const stored=G.effectMarks[card.id];
+    const remaining=(Array.isArray(stored)?stored:[stored]).filter(item=>item?.until>Date.now());
+    if(remaining.length)G.effectMarks[card.id]=remaining;
+    else delete G.effectMarks[card.id];
+    render();
   },duration+40);
 }
 
 function effectOverlayHTML(c){
   cleanEffectMarks();
-  const mark=G?.effectMarks?.[c?.id];
-  if(!mark)return "";
-  return `<div class="effect-card-ring ${mark.className}"></div><div class="effect-card-badge ${mark.className}">${mark.label}</div>`;
+  const stored=G?.effectMarks?.[c?.id];
+  const marks=Array.isArray(stored)?stored:(stored?[stored]:[]);
+  if(!marks.length)return "";
+  const latest=marks[marks.length-1];
+  return `<div class="effect-card-ring ${latest.className}"></div><div class="effect-card-stack">${marks.map(mark=>`<div class="effect-card-badge ${mark.className}">${escapeHtml(mark.label)}</div>`).join("")}</div>`;
 }
 
 function isFirstRoundForWrestler(s){
@@ -6258,9 +6308,11 @@ function applyRoundManagerEffects(){
       const value=(catAbility==="turnCatRandom3"||catAbility==="turnCharismaMinus1Random3")?3:2;
       const charismaPenalty=catAbility.startsWith("turnCharismaMinus1");
       if(charismaPenalty)owner.cat.mods.Charisme-=1;
-      const [stat]=replaceRoundRandomBonus(owner.cat,value);
+      const [stat]=charismaPenalty
+        ? addRandomStats(owner.cat,1,value)
+        : replaceRoundRandomBonus(owner.cat,value);
       const feedback=charismaPenalty?`-1 Charisme / +${value} ${stat}`:`+${value} ${stat}`;
-      log(`[EFFET] ${owner.cat.card.name} relance son bonus : ${feedback}.`);
+      log(`[EFFET] ${owner.cat.card.name} ${charismaPenalty?"cumule":"relance"} son bonus : ${feedback}.`);
       showEffectFeedback(owner.cat.card,owner.cat.card.name,feedback,charismaPenalty?"special":"buff");
     }
     if((catAbility==="turnEnemyForceMinus1"||catAbility==="turnEnemyForceMinus2")&&opp.cat&&!isCardEffectImmune(opp.cat)){
@@ -7070,21 +7122,61 @@ function aiTurnSequence(){
   run();
 }
 
+function aiCareerCardScore(card,type){
+  const rarityScore={Ultime:80,Legende:34,Rare:16,Standard:0}[card.rarity]||0;
+  const abilityScore=card.ability?8:0;
+  if(type==="Catcheur"){
+    const priorities=Array.isArray(G?.matchOptions?.aiPriorityStats)?G.matchOptions.aiPriorityStats:[];
+    const statTotal=STATS.reduce((sum,stat)=>sum+Number(card.stats?.[stat]||0),0);
+    const priorityScore=priorities.reduce((sum,stat,index)=>sum+Number(card.stats?.[stat]||0)*(priorities.length-index),0);
+    return rarityScore+abilityScore+statTotal+priorityScore;
+  }
+  const strategicAbilityScore={
+    cancelOpponentWrestlerEffects:18,
+    drawNext1:14,
+    mAll3:26,
+    megaphoneRound1:22,
+    mAll1:16,
+    mAll2IfGrave3:18,
+    pinObject30:22,
+    recoverGrave:16,
+    ringsiderRecover1LoseTag:14,
+    ringsiderRecover2LoseTag:20,
+    rerollStat:16,
+    turnDrawChance20:10,
+    turnDrawChance40:18,
+    turnEnemyPinMinus10:15
+  }[card.ability]||0;
+  const priorities=Array.isArray(G?.matchOptions?.aiPriorityStats)?G.matchOptions.aiPriorityStats:[];
+  const priorityScore=cardMatchesCareerStats(card,priorities)?8:0;
+  return rarityScore+abilityScore+strategicAbilityScore+priorityScore;
+}
+
+function aiCardIndexForType(type){
+  const candidates=G.ai.hand
+    .map((card,index)=>({card,index}))
+    .filter(item=>item.card.type===type);
+  if(!candidates.length)return -1;
+  if(Number(G?.matchOptions?.aiDifficulty||0)<7)return candidates[0].index;
+  candidates.sort((a,b)=>aiCareerCardScore(b.card,type)-aiCareerCardScore(a.card,type));
+  return candidates[0].index;
+}
+
 function aiPlayOne(type){
   const ai=G.ai,p=G.player;
   if(type==="Catcheur"){
     if(ai.cat||ai.played.Catcheur)return;
-    const i=ai.hand.findIndex(x=>x.type==="Catcheur");
+    const i=aiCardIndexForType("Catcheur");
     if(i>=0)playCard(ai,p,ai.hand[i],i,true);
   }
   if(type==="Manager"){
     if(!ai.cat||ai.man||ai.played.Manager)return;
-    const i=ai.hand.findIndex(x=>x.type==="Manager");
+    const i=aiCardIndexForType("Manager");
     if(i>=0)playCard(ai,p,ai.hand[i],i,true);
   }
   if(type==="Objet"){
     if(!ai.cat||ai.obj||ai.played.Objet)return;
-    const i=ai.hand.findIndex(x=>x.type==="Objet");
+    const i=aiCardIndexForType("Objet");
     if(i>=0)playCard(ai,p,ai.hand[i],i,true);
   }
 }
@@ -7810,27 +7902,29 @@ function previewEffectStrip(c){
   const found=findCardStateById(c.id);
   if(!found)return "";
   const {owner,state:s}=found;
-  const parts=[];
+  const items=[];
 
   STATS.forEach(stat=>{
-    const value=Number(s.mods?.[stat]||0);
-    if(value)parts.push(`${value>0?"+":""}${value} ${stat}`);
+    const value=score(s,stat)-Number(s.card?.stats?.[stat]||0);
+    if(value)items.push({label:`${value>0?"+":""}${value} ${stat}`,kind:value>0?"buff":"malus"});
   });
 
-  if(s.save)parts.push("Sauvetage");
-  if(owner.pinShield)parts.push(`Protection -${owner.pinShield}`);
-  if(owner.obj&&owner.objTurnsRemaining>1)parts.push(`Objet ${owner.objTurnsRemaining} tours`);
+  if(s.save)items.push({label:"Sauvetage",kind:"block"});
+  if(owner.pinShield)items.push({label:`Protection -${owner.pinShield}`,kind:"block"});
+  if(owner.man)items.push({label:`Bonus : ${owner.man.name}${owner.managersBlocked?" (annulé)":""}`,kind:owner.managersBlocked?"block":"special"});
+  if(owner.obj)items.push({label:`Objet : ${owner.obj.name}${owner.objectsBlocked?" (annulé)":""}`,kind:owner.objectsBlocked?"block":"special"});
+  if(owner.obj&&owner.objTurnsRemaining>1)items.push({label:`Durée : ${owner.objTurnsRemaining} tours`,kind:"special"});
   const ability=wrestlerAbility(s);
-  if(ability==="pinBonus")parts.push("Tombé +20");
-  if((ability==="sameStatNext"||ability==="sameStatNextFixed")&&G.lockedStat)parts.push(`${G.lockedStat} verrouillée`);
+  if(ability==="pinBonus")items.push({label:"Tombé +20",kind:"pin"});
+  if((ability==="sameStatNext"||ability==="sameStatNextFixed")&&G.lockedStat)items.push({label:`${G.lockedStat} verrouillée`,kind:"special"});
   const openingEffect=openingRoundEffectLabel(s);
   if(openingEffect){
     const timing=isMatchRoundOneAbility(ability)?"Round 1":"Premier round";
-    parts.push(`${timing} : ${openingEffect}`);
+    items.push({label:`${timing} : ${openingEffect}`,kind:"buff"});
   }
 
-  if(!parts.length)return "";
-  return `<div class="preview-effect-strip"><span>Actif</span><b>${parts.join(" · ")}</b></div>`;
+  if(!items.length)return "";
+  return `<div class="preview-effect-strip"><div class="preview-effect-head"><span>Effets actifs</span><b>${items.length}</b></div><div class="preview-effect-list">${items.map(item=>`<span class="preview-effect-chip effect-${item.kind}">${escapeHtml(item.label)}</span>`).join("")}</div></div>`;
 }
 
 function previewCard(id){
@@ -7985,6 +8079,77 @@ function rerollRoundStatFor(reroller,currentStat){
   return nextStat;
 }
 
+function wheelRerollerForOnlineEvent(event){
+  const side=onlineSlotToLocalSide(event?.ownerSlot);
+  return side==="player"?G.player:G.ai;
+}
+
+function requestOnlineWheelRerollChoice(event){
+  if(!isOnlineMatch()||!event?.id||G.wheelRerollEvent?.id!==event.id||G.wheelRerollEvent.status!=="pending")return;
+  const reroller=wheelRerollerForOnlineEvent(event);
+  if(reroller?.side!=="player")return;
+  const source=reroller.man?.ability==="rerollStat"?reroller.man:reroller.cat?.card;
+  const overlay=document.getElementById("wheelOverlay");
+  const actions=document.getElementById("wheelRerollActions");
+  const rerollButton=document.getElementById("wheelRerollButton");
+  const keepButton=document.getElementById("wheelKeepButton");
+  const sub=document.getElementById("wheelSubText");
+  if(!overlay||!actions||!rerollButton||!keepButton||!source)return;
+  onlineRemoteWheelHoldOpen=true;
+  overlay.classList.add("active");
+  actions.classList.add("active");
+  if(sub)sub.textContent=`${source.name} peut relancer la roulette.`;
+  const token=beginOnlineChoice("wheel-reroll");
+  const submit=async choice=>{
+    if(onlineWheelRerollSubmitting)return;
+    onlineWheelRerollSubmitting=true;
+    rerollButton.disabled=true;
+    keepButton.disabled=true;
+    endOnlineChoice(token);
+    try{
+      if(typeof window.submitOnlineWheelRerollChoice!=="function")throw new Error("Service de relance en ligne indisponible.");
+      const room=await window.submitOnlineWheelRerollChoice(event.id,choice);
+      const resolved=room?.matchState?.wheelRerollEvent;
+      if(resolved)G.wheelRerollEvent=resolved;
+      actions.classList.remove("active");
+      if(sub)sub.textContent="Choix enregistré. Résolution en cours...";
+    }catch(error){
+      console.error("[MULTI] Choix de relance impossible",error);
+      showSystemToast(error?.message||"Synchronisation de la roulette interrompue.");
+      rerollButton.disabled=false;
+      keepButton.disabled=false;
+    }finally{
+      onlineWheelRerollSubmitting=false;
+    }
+  };
+  rerollButton.disabled=false;
+  keepButton.disabled=false;
+  rerollButton.onclick=()=>submit("reroll");
+  keepButton.onclick=()=>submit("keep");
+}
+
+function resumeOnlineWheelReroll(event){
+  if(!isOnlineMatch()||!event?.id||event.status!=="resolved"||G.wheelRerollEvent?.id!==event.id)return;
+  const reroller=wheelRerollerForOnlineEvent(event);
+  const source=reroller?.man?.ability==="rerollStat"?reroller.man:reroller?.cat?.card;
+  if(!reroller||!source)return;
+  if(event.choice==="reroll"){
+    const next=rerollRoundStatFor(reroller,event.currentStat||G.stat);
+    G.wheelRerollEvent={...event,nextStat:next};
+    G.matchPhase="roulette";
+    showWheelCore(()=>duel(),{forcedStat:next,allowReroll:false});
+    return;
+  }
+  log(`[EFFET] ${source.name} : relance conservée.`);
+  markOnlineDirty();
+  render();
+  setTimeout(()=>{
+    closeWheelOverlayVisual();
+    duel();
+    publishOnlineSnapshotNow();
+  },800);
+}
+
 function resolveRoundRpsAll1(done){
   const candidates=[G.player,G.ai].filter(owner=>
     owner.cat&&
@@ -8037,7 +8202,7 @@ function showWheel(cb){
   resolveRoundRpsAll1(()=>showWheelCore(cb));
 }
 
-function showWheelCore(cb){
+function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
   const ov=document.getElementById("wheelOverlay"),t=document.getElementById("wheelText");
   const splash=ov?.querySelector(".wheel-splash");
   const wheel=ov?.querySelector(".wheel");
@@ -8046,8 +8211,8 @@ function showWheelCore(cb){
   const rerollButton=document.getElementById("wheelRerollButton");
   const keepButton=document.getElementById("wheelKeepButton");
   const statWasLocked=Boolean(G.lockedStat);
-  let finalStat=chooseRoundStat();
-  const autoReroller=!statWasLocked?[G.player,G.ai].map(p=>p.cat).find(s=>s&&wrestlerAbility(s)==="wheelAutoReroll20"):null;
+  let finalStat=forcedStat||chooseRoundStat();
+  const autoReroller=!forcedStat&&!statWasLocked?[G.player,G.ai].map(p=>p.cat).find(s=>s&&wrestlerAbility(s)==="wheelAutoReroll20"):null;
   if(autoReroller&&Math.random()<.2){
     const previous=finalStat;
     finalStat=rollRoundStat();
@@ -8072,14 +8237,7 @@ function showWheelCore(cb){
     wheel.getBoundingClientRect();
   };
   const closeWheel=()=>{
-    ov.classList.remove("active");
-    rerollActions?.classList.remove("active");
-    if(wheel){
-      wheel.classList.remove("spinning","settling");
-      wheel.style.animation="";
-      wheel.style.transition="";
-      wheel.style.transform="";
-    }
+    closeWheelOverlayVisual();
     cb();
   };
   const spinTo=(targetStat,onDone)=>{
@@ -8118,6 +8276,10 @@ function showWheelCore(cb){
     },1750);
   };
   const resolveRerollChoice=()=>{
+    if(!allowReroll){
+      setTimeout(closeWheel,1500);
+      return;
+    }
     const reroller=getRoundReroller();
     if(!reroller){
       setTimeout(closeWheel,1500);
@@ -8145,7 +8307,24 @@ function showWheelCore(cb){
       };
       return;
       }
-    if(isOnlineMatch())return;
+    if(isOnlineMatch()){
+      const ctx=onlineContext();
+      const ownerSlot=localSideToOnlineSlot(reroller.side);
+      G.wheelRerollEvent={
+        id:`${G.matchOptions?.onlineMatchId||ctx.roomCode}:${G.round}:reroll:${Date.now()}`,
+        status:"pending",
+        ownerSlot,
+        resolverSlot:ctx.playerSlot,
+        sourceName:source.name,
+        currentStat:G.stat
+      };
+      G.matchPhase="reroll";
+      onlineLastWheelSpinId=`${G.round}:${G.stat}:${G.turnsTaken}`;
+      markOnlineDirty();
+      render();
+      publishOnlineSnapshotNow();
+      return;
+    }
     setTimeout(()=>{
       const next=rerollRoundStatFor(reroller,G.stat);
       spinTo(next,()=>setTimeout(closeWheel,1300));
@@ -8155,8 +8334,24 @@ function showWheelCore(cb){
 }
 
 let onlineLastWheelSpinId=null;
+let onlineRemoteWheelHoldOpen=false;
 
-function showRemoteWheel(finalStat){
+function closeWheelOverlayVisual(){
+  const overlay=document.getElementById("wheelOverlay");
+  const actions=document.getElementById("wheelRerollActions");
+  const wheel=overlay?.querySelector(".wheel");
+  overlay?.classList.remove("active");
+  actions?.classList.remove("active");
+  onlineRemoteWheelHoldOpen=false;
+  if(wheel){
+    wheel.classList.remove("spinning","settling");
+    wheel.style.animation="";
+    wheel.style.transition="";
+    wheel.style.transform="";
+  }
+}
+
+function showRemoteWheel(finalStat,{keepOpen=false}={}){
   const ov=document.getElementById("wheelOverlay"),t=document.getElementById("wheelText");
   const splash=ov?.querySelector(".wheel-splash");
   const wheel=ov?.querySelector(".wheel");
@@ -8164,6 +8359,7 @@ function showRemoteWheel(finalStat){
   const rerollActions=document.getElementById("wheelRerollActions");
   const statAngles={Force:0,Vitesse:270,Technique:180,Charisme:90};
   if(!ov||!t)return;
+  onlineRemoteWheelHoldOpen=keepOpen;
   rerollActions?.classList.remove("active");
   splash?.classList.remove("stat-force","stat-vitesse","stat-technique","stat-charisme");
   if(sub)sub.textContent="La stat du duel va tomber.";
@@ -8196,7 +8392,9 @@ function showRemoteWheel(finalStat){
     splash?.classList.add(`stat-${String(finalStat).toLowerCase()}`);
     t.textContent=String(finalStat).toUpperCase()+" !";
     if(sub)sub.textContent=`Duel en ${finalStat}.`;
-    setTimeout(()=>ov.classList.remove("active"),1500);
+    setTimeout(()=>{
+      if(!onlineRemoteWheelHoldOpen)closeWheelOverlayVisual();
+    },1500);
   },1750);
 }
 
@@ -8856,8 +9054,8 @@ function profileXpGainForMatch(playerWon, progress){
     const opponent=careerOpponents()[G.careerIndex];
     const key=`career_${G.careerIndex}_${opponent?.name||"adversaire"}`;
     if(!progress.careerXpWins?.[key]){
-      const rewards=[100,200,300,400];
-      return rewards[Math.max(0,Math.min(3,Number(opponent?.season)||0))]||100;
+      const rewards=[100,200,300,400,600];
+      return rewards[Math.max(0,Math.min(rewards.length-1,Number(opponent?.season)||0))]||100;
     }
   }
   return playerWon ? 50 : 25;
@@ -9437,8 +9635,52 @@ const CAREER_SEASONS = [
   { name:"Rookie", count:5 },
   { name:"Challenger", count:5 },
   { name:"Elite", count:5 },
-  { name:"Champion", count:5 }
+  { name:"Champion", count:5 },
+  { name:"Hall of Fame", count:5 }
 ];
+
+const HALL_OF_FAME_DECKS = {
+  heddi_technique: [
+    "ultime_catcheurs_heddi_karaoui", "ultime_catcheurs_heddi_karaoui",
+    "legende_catcheurs_zaeken", "legende_catcheurs_andre_levissieux", "legende_objets_ceinture_de_champion",
+    "rare_catcheurs_drix", "rare_catcheurs_drix", "rare_catcheurs_zaeken", "rare_catcheurs_zaeken",
+    "rare_managers_damien_chevallier", "rare_managers_damien_chevallier", "rare_managers_l_odyssee", "rare_managers_l_odyssee",
+    "standard_catcheurs_boume", "standard_catcheurs_boume", "standard_catcheurs_zaeken", "standard_catcheurs_zaeken",
+    "standard_objets_livre", "standard_objets_livre", "standard_managers_mr_catch"
+  ],
+  marc_endurance: [
+    "ultime_catcheurs_marc_sebire", "ultime_catcheurs_marc_sebire",
+    "legende_catcheurs_yann_skoric", "legende_catcheurs_baadshah_pehalwan_khan", "legende_objets_ceinture_de_champion",
+    "rare_catcheurs_dario_murro", "rare_catcheurs_dario_murro", "rare_catcheurs_koro", "rare_catcheurs_koro",
+    "rare_managers_lord_gideon_salvini", "rare_managers_lord_gideon_salvini", "rare_objets_camera", "rare_objets_camera",
+    "standard_catcheurs_tom_evans", "standard_catcheurs_tom_evans", "standard_catcheurs_erik_inoa", "standard_catcheurs_erik_inoa",
+    "standard_catcheurs_r_man", "standard_catcheurs_r_man", "standard_managers_lord_gideon_salvini"
+  ],
+  mbm_explosion: [
+    "ultime_catcheurs_mbm", "ultime_catcheurs_mbm",
+    "legende_catcheurs_yann_skoric", "legende_managers_mr_ringsider", "legende_objets_ceinture_de_champion",
+    "rare_catcheurs_dario_murro", "rare_catcheurs_dario_murro", "rare_catcheurs_koro", "rare_catcheurs_koro",
+    "rare_objets_caddie", "rare_objets_caddie", "rare_objets_extincteur", "rare_objets_extincteur",
+    "standard_catcheurs_r_man", "standard_catcheurs_r_man", "standard_catcheurs_erik_inoa", "standard_catcheurs_erik_inoa",
+    "standard_managers_lord_gideon_salvini", "standard_managers_lord_gideon_salvini", "standard_managers_loic_bloodykilt"
+  ],
+  lauriana_bonus: [
+    "ultime_catcheurs_princesse_lauriana", "ultime_catcheurs_princesse_lauriana",
+    "legende_catcheurs_heracles", "legende_managers_loic_bloodykilt", "legende_objets_ceinture_de_champion",
+    "rare_catcheurs_queen_phoenixia", "rare_catcheurs_queen_phoenixia", "rare_catcheurs_pauline", "rare_catcheurs_pauline",
+    "rare_managers_pure_tradition", "rare_managers_pure_tradition", "rare_managers_mr_catch", "rare_managers_mr_catch",
+    "standard_catcheurs_lior_divine", "standard_catcheurs_lior_divine", "standard_catcheurs_erik_inoa",
+    "standard_managers_edward_minaro", "standard_managers_edward_minaro", "standard_managers_lord_gideon_salvini", "standard_managers_lord_gideon_salvini"
+  ],
+  tom_second_wind: [
+    "ultime_catcheurs_tom_la_ruffa", "ultime_catcheurs_tom_la_ruffa",
+    "legende_catcheurs_shawn_olsen", "legende_managers_r_man", "legende_objets_sledgehammer",
+    "rare_catcheurs_john_gage", "rare_catcheurs_john_gage", "rare_catcheurs_r_man", "rare_catcheurs_r_man",
+    "rare_managers_mr_ringsider", "rare_managers_mr_ringsider", "rare_managers_pierreluck", "rare_managers_pierreluck",
+    "standard_catcheurs_maffa", "standard_catcheurs_maffa", "standard_catcheurs_ben_damage", "standard_catcheurs_ben_damage",
+    "standard_catcheurs_erik_inoa", "standard_catcheurs_erik_inoa", "standard_objets_barriere"
+  ]
+};
 
 const CAREER_ROSTER = [
   { name:"Angelo Folena", season:0, difficulty:1, archetype:"force_rookie", priorityStats:["Force","Charisme"], legendSlots:0 },
@@ -9463,7 +9705,13 @@ const CAREER_ROSTER = [
   { name:"Nils'N", season:3, difficulty:5, archetype:"champion_speed", priorityStats:["Vitesse","Technique"], legendSlots:3 },
   { name:"Shawn Olsen", season:3, difficulty:5, archetype:"champion_control", priorityStats:["Technique","Charisme"], legendSlots:3 },
   { name:"Tyson Briggs", season:3, difficulty:5, archetype:"champion_pressure", priorityStats:["Force","Vitesse"], legendSlots:3 },
-  { name:"Tom La Ruffa", season:3, difficulty:6, archetype:"ultimate_boss", priorityStats:["Technique","Charisme","Force","Vitesse"], legendSlots:3, ultimateBoss:true }
+  { name:"Adam Frost", season:3, difficulty:6, archetype:"champion_attrition", priorityStats:["Vitesse","Charisme"], legendSlots:3 },
+
+  { name:"Heddi Karaoui", season:4, difficulty:7, archetype:"hall_technique", priorityStats:["Technique","Force"], legendSlots:3, ultimateBoss:true, hallOfFame:true, deckId:"heddi_technique" },
+  { name:"Marc Sebire", season:4, difficulty:7, archetype:"hall_endurance", priorityStats:["Vitesse","Charisme"], legendSlots:3, ultimateBoss:true, hallOfFame:true, deckId:"marc_endurance" },
+  { name:"MBM", season:4, difficulty:7, archetype:"hall_explosion", priorityStats:["Charisme","Vitesse"], legendSlots:3, ultimateBoss:true, hallOfFame:true, deckId:"mbm_explosion" },
+  { name:"Princesse Lauriana", season:4, difficulty:7, archetype:"hall_bonus", priorityStats:["Force","Charisme"], legendSlots:3, ultimateBoss:true, hallOfFame:true, deckId:"lauriana_bonus" },
+  { name:"Tom La Ruffa", season:4, difficulty:8, archetype:"hall_second_wind", priorityStats:["Charisme","Technique","Force","Vitesse"], legendSlots:3, ultimateBoss:true, hallOfFame:true, finalBoss:true, deckId:"tom_second_wind" }
 ];
 
 function careerOpponents(){
@@ -9526,6 +9774,8 @@ function addCareerPool(keys, pool, maxAdds=99){
 
 function careerDeckForOpponent(opponent){
   const entry=opponent;
+  const fixedDeck=HALL_OF_FAME_DECKS[entry.deckId];
+  if(fixedDeck)return legalDeckKeys(fixedDeck);
   const byName=cardsByWrestlerName(entry.name);
   const ownUltimate=byName.find(card=>card.rarity==="Ultime");
   const ownStandard=byName.find(card=>card.rarity==="Standard");
@@ -9576,7 +9826,8 @@ function careerMatchOptions(index){
     aiLabel:opponent.name,
     aiDeckKeys:careerDeckForOpponent(opponent),
     aiDifficulty:opponent.difficulty,
-    aiArchetype:opponent.archetype
+    aiArchetype:opponent.archetype,
+    aiPriorityStats:[...(opponent.priorityStats||[])]
   };
 }
 
@@ -9659,9 +9910,10 @@ function renderCareer(){
       const opponent=opponents[index++];
       const itemIndex=index-1;
       const isBoss=opponent?.ultimateBoss;
+      const isFinalBoss=opponent?.finalBoss;
       const isUnlocked=itemIndex<=unlocked&&opponent&&!opponent.missing;
       const stateClass=isBoss&&!isUnlocked?"boss-locked":isBoss?"boss-final":itemIndex===unlocked?"next":isUnlocked?"cleared":"locked";
-      const label=opponent?.missing?"Carte manquante":isBoss?"Boss final":itemIndex===unlocked?"Prochain combat":isUnlocked?"Débloqué":"À débloquer";
+      const label=opponent?.missing?"Carte manquante":isFinalBoss?"Boss final":isBoss?"Défi Ultime":itemIndex===unlocked?"Prochain combat":isUnlocked?"Débloqué":"À débloquer";
       items.push(`<button class="career-opponent ${stateClass}" ${isUnlocked?`onclick="startCareerMatch(${itemIndex})"`:"disabled"}>
         <b>${opponent?.name||"Adversaire"}</b>
         <span>${label}</span>

@@ -107,6 +107,10 @@ function run() {
   }
 
   const opponents = game.careerOpponents();
+  if (opponents.length !== 25) errors.push(`Carrière: ${opponents.length} adversaires au lieu de 25`);
+  if (opponents.some(opponent => opponent.season === 3 && opponent.name === "Tom La Ruffa")) {
+    errors.push("Carrière: Tom La Ruffa doit rester réservé au Hall of Fame");
+  }
   for (const opponent of opponents) {
     if (!opponent.card) {
       errors.push(`Carrière: carte adversaire manquante pour ${opponent.name}`);
@@ -119,6 +123,15 @@ function run() {
     const counts = rarityCounts(deckCards);
     if ((counts.Rare || 0) > 8) errors.push(`Carrière ${opponent.name}: ${counts.Rare} rares dans le deck`);
     if ((counts.Legende || 0) > 3) errors.push(`Carrière ${opponent.name}: ${counts.Legende} légendaires dans le deck`);
+    if (opponent.hallOfFame) {
+      const ultimateKey = game.cardKey(opponent.card);
+      const centerpieceCopies = deckKeys.filter(key => key === ultimateKey).length;
+      if (opponent.card.rarity !== "Ultime") errors.push(`Hall of Fame ${opponent.name}: la carte maîtresse n'est pas Ultime`);
+      if (centerpieceCopies !== 2) errors.push(`Hall of Fame ${opponent.name}: ${centerpieceCopies}/2 exemplaires de la carte maîtresse`);
+      if ((counts.Legende || 0) !== 3 || (counts.Rare || 0) !== 8) {
+        errors.push(`Hall of Fame ${opponent.name}: composition non optimisée (${counts.Legende || 0} Légendaires, ${counts.Rare || 0} Rares)`);
+      }
+    }
   }
 
   const musicByWrestler = new Set(Object.values(audio.music || {})
