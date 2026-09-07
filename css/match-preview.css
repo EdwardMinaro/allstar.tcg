@@ -15,7 +15,7 @@
     grid-column:1;
     grid-row:1;
     justify-self:center;
-    width:min(374px,calc((100vh - 390px) * 112 / 148)) !important;
+    width:min(374px,calc((100vh - 450px) * 112 / 148)) !important;
     max-width:100% !important;
     transform:none !important;
     margin:0 !important;
