@@ -1,9 +1,9 @@
-/* Keep the preview, active effects and piles in separate layout rows. */
+/* Keep the preview, active effects and piles in separate vertical rows. */
 @media (min-width:901px){
   #game .left-panel{
     display:grid !important;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    grid-template-rows:auto minmax(54px,1fr) clamp(100px,13vh,140px);
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto minmax(54px,1fr) clamp(100px,13vh,140px) clamp(100px,13vh,140px);
     gap:10px !important;
     padding:clamp(80px,11vh,118px) 8px 8px !important;
     min-height:0;
@@ -12,10 +12,10 @@
   #game .left-panel > .preview-panel{
     position:relative !important;
     inset:auto !important;
-    grid-column:1 / -1;
+    grid-column:1;
     grid-row:1;
     justify-self:center;
-    width:min(374px,calc((100vh - 330px) * 112 / 148)) !important;
+    width:min(374px,calc((100vh - 390px) * 112 / 148)) !important;
     max-width:100% !important;
     transform:none !important;
     margin:0 !important;
@@ -23,7 +23,7 @@
   #game .left-panel > .preview-effects-slot{
     position:relative;
     inset:auto;
-    grid-column:1 / -1;
+    grid-column:1;
     grid-row:2;
     justify-self:center;
     width:100%;
@@ -39,14 +39,16 @@
   #game .left-panel > .player-deck-pile{
     position:relative !important;
     inset:auto !important;
-    grid-row:3;
+    grid-column:1;
     width:100% !important;
     height:100% !important;
     margin:0 !important;
     transform:none !important;
+    justify-self:center;
+    max-width:244px;
   }
-  #game .left-panel > .player-vestiaire-pile{grid-column:1;}
-  #game .left-panel > .player-deck-pile{grid-column:2;}
+  #game .left-panel > .player-vestiaire-pile{grid-row:3;}
+  #game .left-panel > .player-deck-pile{grid-row:4;}
   #game .left-panel .pile-body{height:calc(100% - 28px);padding:4px 8px;}
   #game .left-panel .pile-card{height:100%;max-height:90px;width:60%;}
   #game .left-panel .pile-card b{right:-36px;}
