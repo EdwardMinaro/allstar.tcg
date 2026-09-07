@@ -345,11 +345,24 @@ function maybeLaunchOnlineMatch(room) {
   }
 }
 
+let onlineMatchPublishQueue = Promise.resolve();
+
 async function publishOnlineMatchState(matchState) {
   if (!multiplayer.room?.roomCode || !multiplayer.playerSlot) return null;
-  const room = await multiplayerService().updateMatchState(multiplayer.room.roomCode, multiplayer.playerSlot, matchState);
-  multiplayer.room = room;
-  return room;
+  const roomCode = multiplayer.room.roomCode;
+  const playerSlot = multiplayer.playerSlot;
+  const service = multiplayerService();
+  const snapshot = structuredClone(matchState);
+  // A slow pre-choice update must finish before the resolved choice is sent.
+  const operation = onlineMatchPublishQueue.then(async () => {
+    const room = await service.updateMatchState(roomCode, playerSlot, snapshot);
+    if (multiplayer.room?.roomCode === roomCode && multiplayer.playerSlot === playerSlot) {
+      multiplayer.room = room;
+    }
+    return room;
+  });
+  onlineMatchPublishQueue = operation.catch(() => undefined);
+  return operation;
 }
 
 async function submitOnlineOpeningRpsChoice(eventId, choice) {
