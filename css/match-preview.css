@@ -1,9 +1,13 @@
 /* Keep the preview, active effects and piles in separate vertical rows. */
 @media (min-width:901px){
+  #game{
+    --match-pile-width:clamp(184px,12.6vw,222px);
+    --match-pile-height:clamp(132px,15.9vh,168px);
+  }
   #game .left-panel{
     display:grid !important;
     grid-template-columns:minmax(0,1fr);
-    grid-template-rows:auto minmax(54px,1fr) clamp(100px,13vh,140px) clamp(100px,13vh,140px);
+    grid-template-rows:auto minmax(54px,1fr) var(--match-pile-height) var(--match-pile-height);
     gap:10px !important;
     padding:clamp(80px,11vh,118px) 8px 8px !important;
     min-height:0;
@@ -15,7 +19,7 @@
     grid-column:1;
     grid-row:1;
     justify-self:center;
-    width:min(374px,calc((100vh - 450px) * 112 / 148)) !important;
+    width:min(340px,calc((100vh - var(--match-pile-height) - var(--match-pile-height) - clamp(80px,11vh,118px) - 110px) * 112 / 148)) !important;
     max-width:100% !important;
     transform:none !important;
     margin:0 !important;
@@ -40,16 +44,31 @@
     position:relative !important;
     inset:auto !important;
     grid-column:1;
-    width:100% !important;
+    width:var(--match-pile-width) !important;
     height:100% !important;
     margin:0 !important;
     transform:none !important;
     justify-self:center;
-    max-width:244px;
+    max-width:100%;
   }
   #game .left-panel > .player-vestiaire-pile{grid-row:3;}
   #game .left-panel > .player-deck-pile{grid-row:4;}
-  #game .left-panel .pile-body{height:calc(100% - 28px);padding:4px 8px;}
-  #game .left-panel .pile-card{height:100%;max-height:90px;width:60%;}
-  #game .left-panel .pile-card b{right:-36px;}
+  #game .left-panel > .pile-panel,
+  #game .enemy-piles > .pile-panel{
+    width:var(--match-pile-width) !important;
+    height:var(--match-pile-height) !important;
+  }
+  #game .pile-body{
+    height:calc(100% - 28px);
+    padding:8px 46px 8px 20px !important;
+    justify-content:center;
+  }
+  #game .pile-card{
+    height:100% !important;
+    width:auto !important;
+    aspect-ratio:76 / 104;
+    max-height:none;
+    background-size:contain !important;
+  }
+  #game .pile-card b{right:-38px !important;bottom:12px !important;}
 }
