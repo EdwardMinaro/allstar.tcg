@@ -1,5 +1,7 @@
 const AUDIO_LIBRARY = {
   music: {
+    agathe_aries: { label: "Agathe Aries", wrestler: "Agathe Aries", src: "assets/audio/music/agathe_aries.mp3" },
+    g_king: { label: "G KING", wrestler: "G KING", src: "assets/audio/music/g_king.wav" },
     menu: { label: "Menu principal", src: "assets/audio/music/menu.mp3" },
     match: { label: "Match", src: "assets/audio/music/match.mp3" },
     tension: { label: "Tension", src: "assets/audio/music/tension.mp3" },

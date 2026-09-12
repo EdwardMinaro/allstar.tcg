@@ -339,7 +339,8 @@ function verifyRecentEffects() {
     "ringsiderRecover1LoseTag",
     "ringsiderRecover2LoseTag",
   ]);
-  const graveRecoveryCards = cards.filter(card => /récup/i.test(card.effect || "") && /vestiaire/i.test(card.effect || ""));
+  // Maxxy captures the defeated opponent INTO the grave; no selection from the grave occurs.
+  const graveRecoveryCards = cards.filter(card => card.ability!=="winCaptureOpponent" && /récup/i.test(card.effect || "") && /vestiaire/i.test(card.effect || ""));
   assert(
     graveRecoveryCards.every(card => {
       const randomRecovery = /récup[^.!?]*(?:aléatoire|au hasard)/i.test(card.effect || "");

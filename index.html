@@ -239,10 +239,16 @@
   <div class="menu-wrap">
     <div class="menu-card career-menu-card">
       <h1 class="logo small-logo">Carrière</h1>
-      <p class="subtitle" id="careerStatus"></p>
-      <div class="career-grid" id="careerGrid"></div>
-      <div class="shop-actions">
-        <button class="small-btn" onclick="startUnlockedCareerMatch()">Lancer le prochain combat</button>
+      <div class="career-layout">
+        <aside class="career-focus" aria-label="Deck sélectionné">
+          <div class="career-master-card" id="careerMasterCard"></div>
+          <div class="career-deck-summary" id="careerDeckSummary"></div>
+        </aside>
+        <div class="career-seasons" id="careerGrid" aria-label="Saisons de carrière"></div>
+      </div>
+      <p class="career-status" id="careerStatus" aria-live="polite"></p>
+      <div class="shop-actions career-actions">
+        <button class="small-btn" id="careerReadyButton" onclick="startSelectedCareerMatch()">Prêt</button>
         <button class="small-btn dark" onclick="showMenu()">Retour</button>
       </div>
     </div>

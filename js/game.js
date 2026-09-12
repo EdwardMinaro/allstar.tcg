@@ -379,7 +379,7 @@ const CARD_DATA = [
       "Technique": 6,
       "Charisme": 8
     },
-    "effect": "Premier round : Gagnez 5 points de stats aléatoire.",
+    "effect": "Premier round : Gagnez 5 points de statistiques aléatoires.",
     "renderArt": "assets/card_renders/legende_catcheurs_nilsn.png",
     "musicId": "nilsn",
     "ability": "firstRoundRandomStats5"
@@ -1539,7 +1539,7 @@ const CARD_DATA = [
       "Technique": 5,
       "Charisme": 6
     },
-    "effect": "1x/match : relance la roulette.",
+    "effect": "Une fois par match : relancez la roulette.",
     "ability": "rerollStat",
     "renderArt": "assets/card_renders/rare_catcheurs_paul_meunier.png",
     "musicId": "paul_meunier"
@@ -3184,6 +3184,128 @@ const CARD_DATA = [
     "effect": "Victoire : Tombé +5.",
     "ability": "pinObject5",
     "renderArt": "assets/card_renders/standard_objets_table.png"
+  },
+  {
+    "key": "rare_catcheurs_yacine_osmani",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Yacine Osmani",
+    "stats": {
+      "Force": 7,
+      "Vitesse": 7,
+      "Technique": 5,
+      "Charisme": 5
+    },
+    "effect": "Tour 1 : +1 à chaque statistiques. Puis Chaque tour, perd 1 point dans une statistique et gagne un point dans une autre statistique.",
+    "renderArt": "assets/card_renders/rare_catcheurs_yacine_osmani.png",
+    "ability": "firstRoundAll1ThenRandomTransfer"
+  },
+  {
+    "key": "legende_catcheurs_yacine_osmani",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Yacine Osmani",
+    "stats": {
+      "Force": 8,
+      "Vitesse": 8,
+      "Technique": 6,
+      "Charisme": 6
+    },
+    "effect": "Tour 1 : +2 à chaque statistiques. Puis Chaque tour, perd 1 point dans une statistique et gagne un point dans une autre statistique.",
+    "renderArt": "assets/card_renders/legende_catcheurs_yacine_osmani.png",
+    "ability": "firstRoundAll2ThenRandomTransfer"
+  },
+  {
+    "key": "rare_catcheurs_maxxy",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Maxxy",
+    "stats": {
+      "Force": 3,
+      "Vitesse": 7,
+      "Technique": 7,
+      "Charisme": 7
+    },
+    "effect": "Victoire : Récupérez le catcheur adverse dans votre vestiaire.",
+    "renderArt": "assets/card_renders/rare_catcheurs_maxxy.png",
+    "ability": "winCaptureOpponent"
+  },
+  {
+    "key": "rare_catcheurs_the_iconic_charlie",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "The Iconic Charlie",
+    "stats": {
+      "Force": 4,
+      "Vitesse": 8,
+      "Technique": 5,
+      "Charisme": 7
+    },
+    "effect": "Tour 1 : + 2 Technique et +2 Charisme",
+    "renderArt": "assets/card_renders/rare_catcheurs_the_iconic_charlie.png",
+    "ability": "firstRoundCharTech2"
+  },
+  {
+    "key": "standard_catcheurs_agathe_aries",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "Agathe Aries",
+    "stats": {
+      "Force": 4,
+      "Vitesse": 6,
+      "Technique": 6,
+      "Charisme": 8
+    },
+    "effect": "",
+    "renderArt": "assets/card_renders/standard_catcheurs_agathe_aries.png",
+    "musicId": "agathe_aries"
+  },
+  {
+    "key": "legende_catcheurs_agathe_aries",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Agathe Aries",
+    "stats": {
+      "Force": 5,
+      "Vitesse": 7,
+      "Technique": 7,
+      "Charisme": 9
+    },
+    "effect": "Apparition : Copie l'effet du catcheur adverse",
+    "renderArt": "assets/card_renders/legende_catcheurs_agathe_aries.png",
+    "ability": "entryCopyOpponentAbility",
+    "musicId": "agathe_aries"
+  },
+  {
+    "key": "standard_catcheurs_g_king",
+    "type": "Catcheur",
+    "rarity": "Standard",
+    "name": "G KING",
+    "stats": {
+      "Force": 8,
+      "Vitesse": 3,
+      "Technique": 6,
+      "Charisme": 7
+    },
+    "effect": "",
+    "renderArt": "assets/card_renders/standard_catcheurs_g_king.png",
+    "musicId": "g_king"
+  },
+  {
+    "key": "legende_catcheurs_g_king",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "G KING",
+    "stats": {
+      "Force": 9,
+      "Vitesse": 4,
+      "Technique": 7,
+      "Charisme": 8
+    },
+    "effect": "Apparition : Si votre adversaire est équipé de carte bonus ou objets, inversez leurs effets.",
+    "renderArt": "assets/card_renders/legende_catcheurs_g_king.png",
+    "ability": "entryInvertOpponentSupports",
+    "musicId": "g_king"
   }
 ];
 
@@ -3233,6 +3355,11 @@ function legalDeckKeys(keys, maxCards=20){
 }
 
 const EFFECT_REGISTRY = {
+  firstRoundAll1ThenRandomTransfer: { timing:"round", text:"Tour 1 : +1 partout. Ensuite, transfère aléatoirement 1 point entre deux statistiques différentes." },
+  firstRoundAll2ThenRandomTransfer: { timing:"round", text:"Tour 1 : +2 partout. Ensuite, transfère aléatoirement 1 point entre deux statistiques différentes." },
+  winCaptureOpponent: { timing:"win", text:"Victoire : le catcheur vaincu rejoint votre vestiaire." },
+  entryCopyOpponentAbility: { timing:"entry", text:"Apparition : copie l'effet du catcheur adverse présent." },
+  entryInvertOpponentSupports: { timing:"entry", text:"Apparition : inverse les effets des bonus et objets adverses déjà équipés." },
   bossSecondWind: { timing:"defeat", text:"Une fois par partie, retour immédiat sur le ring avec +3 Force et +3 Vitesse." },
   cancelObjects: { timing:"entry", text:"Annule les objets adverses actifs." },
   cancelAllObjects: { timing:"entry", text:"Annule tous les objets actifs." },
@@ -4301,6 +4428,7 @@ function drawStartOfRound(){
     const bonus=Number(p.nextDrawBonus||0);
     p.nextDrawBonus=0;
     draw(p,1+bonus);
+    if(p.nextDiscardBonus){discardRandomCards(p,p.nextDiscardBonus);p.nextDiscardBonus=0;}
     if(p.hand.length>before){
       playSound("pioche");
       log(`${p.label} pioche ${p.hand.length-before} carte${p.hand.length-before>1?"s":""}.`);
@@ -4486,6 +4614,7 @@ function chooseRingsiderCards(owner,source,selectedIds=[]){
 function requestRingsiderRecovery(owner){
   const source=owner?.man;
   if(!G||G.over||G.resolving||G.discarding||G.currentTurn!=="player"||owner!==G.player)return;
+  if(source?.ability==="invertedSupport"&&isRingsiderRecoveryAbility(source.originalAbility))return useInvertedRingsider(owner,false);
   if(!source||!isRingsiderRecoveryAbility(source.ability)||owner.managersBlocked)return;
   if(owner.ringsiderDecisionRound===G.round)return;
   const currentTags=Number.isFinite(owner.tagsRemaining)?owner.tagsRemaining:TAGS_PER_MATCH;
@@ -4515,6 +4644,7 @@ function requestRingsiderRecovery(owner){
 
 function autoUseRingsider(owner){
   const source=owner?.man;
+  if(source?.ability==="invertedSupport"&&isRingsiderRecoveryAbility(source.originalAbility))return useInvertedRingsider(owner,true);
   if(!source||!isRingsiderRecoveryAbility(source.ability)||owner.managersBlocked)return;
   if(owner.ringsiderDecisionRound===G.round)return;
   const currentTags=Number.isFinite(owner.tagsRemaining)?owner.tagsRemaining:TAGS_PER_MATCH;
@@ -5069,8 +5199,26 @@ function stripOwnerForNetwork(value){
   return JSON.parse(JSON.stringify(value,(key,val)=>key==="owner"?undefined:val));
 }
 
+function remapTrackedLocalSides(value,sourceSide,localSide){
+  if(!["player","ai"].includes(sourceSide)||sourceSide===localSide)return;
+  const flip=side=>side==="player"?"ai":side==="ai"?"player":side;
+  const visited=new Set();
+  const walk=node=>{
+    if(!node||typeof node!=="object"||visited.has(node))return;
+    visited.add(node);
+    if(Array.isArray(node.supportDeltas))for(const delta of node.supportDeltas){
+      if(delta&&["player","ai"].includes(delta.side))delta.side=flip(delta.side);
+    }
+    if(node.objEffect&&["player","ai"].includes(node.objEffect.targetSide))node.objEffect.targetSide=flip(node.objEffect.targetSide);
+    for(const child of Object.values(node))walk(child);
+  };
+  walk(value);
+}
+
 function restoreOnlineSide(side, localSide){
   const restored=stripOwnerForNetwork(side||{});
+  const sourceSide=restored.side;
+  remapTrackedLocalSides(restored,sourceSide,localSide);
   restored.side=localSide;
   restored.played=restored.played||{Catcheur:false,Manager:false,Objet:false};
   restored.oncePerMatch=restored.oncePerMatch||{};
@@ -5380,6 +5528,152 @@ function announceTurn(){
 
 function zeroMods(){return {Force:0,Vitesse:0,Technique:0,Charisme:0}}
 
+function applyYacineTransfer(owner){
+  const s=owner.cat,ability=wrestlerAbility(s);
+  if(!s||!["firstRoundAll1ThenRandomTransfer","firstRoundAll2ThenRandomTransfer"].includes(ability)||G.round<=s.enteredRound||s.transferRound===G.round)return;
+  s.transferRound=G.round;
+  const pairs=STATS.flatMap(from=>STATS.filter(to=>to!==from&&score(s,from)>0&&score(s,to)<MAX_STAT_VALUE).map(to=>[from,to]));
+  if(!pairs.length)return;
+  const [from,to]=pairs[Math.floor(Math.random()*pairs.length)];
+  s.mods[from]-=1;s.mods[to]+=1;
+  log(`[EFFET] ${s.card.name} : -1 ${from} / +1 ${to}.`);
+  showEffectFeedback(s.card,s.card.name,`-1 ${from} / +1 ${to}`,"special");
+}
+
+function captureDefeatedWrestler(winner,loser,card){
+  // A save, second wind or return-to-deck effect takes precedence: never duplicate a live card.
+  const index=loser.grave.indexOf(card);
+  if(index<0)return false;
+  loser.grave.splice(index,1);winner.grave.push(card);
+  log(`[EFFET] ${winner.cat?.card.name||"Maxxy"} récupère ${card.name} dans son vestiaire.`);
+  showEffectFeedback(winner.cat?.card||card,"Victoire",`${card.name} récupéré`,"special");
+  markOnlineDirty();return true;
+}
+
+function supportNumericState(owner,opp){
+  return [owner,opp].map(p=>({side:p.side,catId:p.cat?.card.id,mods:normalizeMods(p.cat?.mods),permanent:normalizeMods(p.cat?.permanentMods),pin:Number(p.cat?.pin||0),shield:Number(p.pinShield||0),duration:Number(p.objectDurationBonus||0)}));
+}
+
+function resetSupportForPlay(card){
+  if(card.originalAbility)card.ability=card.originalAbility;
+  delete card.originalAbility;delete card.supportDeltas;
+}
+
+function useInvertedRingsider(owner,automatic){
+  if(owner.managersBlocked||owner.ringsiderDecisionRound===G.round||!owner.hand.length||Number(owner.tagsRemaining??TAGS_PER_MATCH)>=TAGS_PER_MATCH)return;
+  const source=owner.man;owner.ringsiderDecisionRound=G.round;
+  const apply=id=>{
+    if(owner.man!==source||source.ability!=="invertedSupport")return;
+    const index=owner.hand.findIndex(c=>c.id===id);
+    if(index>=0){owner.grave.push(...owner.hand.splice(index,1));owner.tagsRemaining=Math.min(TAGS_PER_MATCH,Number(owner.tagsRemaining||0)+1);log(`[EFFET INVERSÉ] ${source.name} : défausse 1 carte, récupère 1 TAG.`);}
+    markOnlineDirty();render();
+  };
+  // Both versions permit "up to" their recovery count; one discarded card is enough for the inverted exchange.
+  if(automatic)return apply(owner.hand[owner.hand.length-1].id);
+  requestEffectChoice({title:source.name,text:"Effet inversé : défausser une carte pour récupérer 1 TAG ?",choices:[...owner.hand.map(c=>({label:c.name,value:c.id})),{label:"Passer",value:"pass"}],onChoose:apply});
+}
+
+function recordSupportDelta(card,before,owner,opp){
+  const after=supportNumericState(owner,opp);
+  card.supportDeltas=card.supportDeltas||[];
+  after.forEach((now,i)=>{
+    const old=before[i];
+    let delta=card.supportDeltas.find(d=>d.side===now.side&&d.catId===now.catId);
+    if(!delta){delta={side:now.side,catId:now.catId,mods:zeroMods(),permanent:zeroMods(),pin:0,shield:0,duration:0};card.supportDeltas.push(delta);}
+    STATS.forEach(stat=>{delta.mods[stat]+=now.mods[stat]-old.mods[stat];delta.permanent[stat]+=now.permanent[stat]-old.permanent[stat];});
+    ["pin","shield","duration"].forEach(key=>delta[key]+=now[key]-old[key]);
+  });
+}
+
+function invertOpponentSupports(owner){
+  const opp=owner.side==="player"?G.ai:G.player;
+  if(isCardEffectImmune(opp.cat))return;
+  for(const slot of ["man","obj"]){
+    const card=opp[slot];if(!card)continue;
+    const restoring=card.ability==="invertedSupport";
+    const ability=restoring?card.originalAbility:card.ability;
+    if(slot==="man"){
+      const duration=opp.objectDurationBonus;
+      // Release cancellation without erasing the duration modifier before reversing it.
+      const original=card.ability;card.ability=ability;
+      releaseSupportEffects(opp,owner);card.ability=original;opp.objectDurationBonus=duration;
+    }
+    if(slot==="obj"&&opp.objEffect){
+      const effect=opp.objEffect;
+      Object.entries(effect.mods||{}).forEach(([stat,value])=>{if(opp.cat)opp.cat.mods[stat]-=2*value;effect.mods[stat]=-value;});
+      if(opp.cat)opp.cat.pin-=2*Number(effect.pin||0);
+      opp.pinShield=Number(opp.pinShield||0)-2*Number(effect.pinShield||0);
+      effect.pin=-Number(effect.pin||0);effect.pinShield=-Number(effect.pinShield||0);
+      if(effect.save&&opp.cat){opp.cat.save=false;effect.save=false;}
+    }
+    for(const delta of card.supportDeltas||[]){
+      const target=delta.side==="player"?G.player:G.ai;
+      if(target.cat?.card.id===delta.catId){
+        STATS.forEach(stat=>{
+          target.cat.mods[stat]-=2*delta.mods[stat];
+          target.cat.permanentMods=normalizeMods(target.cat.permanentMods);
+          target.cat.permanentMods[stat]-=2*delta.permanent[stat];
+          delta.mods[stat]*=-1;delta.permanent[stat]*=-1;
+        });
+        target.cat.card.permanentMods={...target.cat.permanentMods};
+        target.cat.pin-=2*delta.pin;delta.pin*=-1;
+      }
+      target.pinShield=Number(target.pinShield||0)-2*delta.shield;delta.shield*=-1;
+      target.objectDurationBonus=Number(target.objectDurationBonus||0)-2*delta.duration;delta.duration*=-1;
+    }
+    if(ability==="drawNext1"){
+      if(restoring){opp.nextDrawBonus=Number(opp.nextDrawBonus||0)+Number(opp.nextDiscardBonus||0);opp.nextDiscardBonus=0;}
+      else{opp.nextDiscardBonus=Number(opp.nextDiscardBonus||0)+Number(opp.nextDrawBonus||0);opp.nextDrawBonus=0;}
+    }
+    card.originalAbility=ability;card.ability=restoring?ability:"invertedSupport";
+    if(restoring&&["cancelObjects","cancelAllObjects","cancelObjectsManagers","cancelOpponentWrestlerEffects"].includes(ability))applyEffect(opp,owner,card);
+    log(`[EFFET] ${owner.cat.card.name} : ${card.name}, effets ${restoring?"rétablis":"inversés"}.`);
+    showEffectFeedback(opp.cat?.card||card,card.name,restoring?"Effets rétablis":"Effets inversés","special");
+  }
+  markOnlineDirty();
+}
+
+function applyInvertedObject(owner,opp,c){
+  const count=supportEffectMultiplier(owner,c);
+  switch(c.originalAbility){
+    case "drawNext1":owner.nextDiscardBonus=Number(owner.nextDiscardBonus||0)+count;break;
+    case "recoverGrave":{
+      const discardOne=remaining=>{
+        if(!remaining||!owner.hand.length||owner.obj!==c)return;
+        if(owner.side!=="player"){discardRandomCards(owner,remaining);return;}
+        requestEffectChoice({title:c.name,text:"Effet inversé : choisis une carte de ta main à envoyer au vestiaire.",choices:owner.hand.map(card=>({label:card.name,value:card.id})),onChoose:id=>{
+          if(owner.obj!==c)return;
+          const index=owner.hand.findIndex(card=>card.id===id);
+          if(index>=0)owner.grave.push(...owner.hand.splice(index,1));
+          markOnlineDirty();render();discardOne(remaining-1);
+        }});
+      };
+      discardOne(count);break;
+    }
+    case "opponentDiscard1":case "opponentDiscardRandom1":draw(owner,count);break;
+  }
+  markOnlineDirty();
+}
+
+function applyInvertedSupportRound(owner,opp){
+  const card=owner.man;if(card?.ability!=="invertedSupport"||!owner.cat)return;
+  const before=supportNumericState(owner,opp),ability=card.originalAbility;
+  const chance={turnDrawChance20:.2,turnDrawChance40:.4}[ability];
+  if(chance&&Math.random()<chance)discardRandomCards(owner,1);
+  if(ability==="bonusPureTraditionDrawTeam")discardRandomCards(owner,["Romain Lestrange","Zaeken"].includes(owner.cat.card.name)?2:1);
+  if(ability==="turnEnemyPinMinus10")opp.pinShield=Number(opp.pinShield||0)-10;
+  if(ability==="turnOpponentDiscardWorldCharisma"){
+    draw(owner,1);
+    if(["Kyle Hoxton","Drix","Saitovic"].includes(owner.cat.card.name)&&opp.cat&&!isCardEffectImmune(opp.cat))opp.cat.mods.Charisme+=1;
+  }
+  const permanentChance={turnRandomPermanent10:.1,turnRandomPermanent20:.2,turnRandomPermanent30:.3}[ability];
+  if(permanentChance&&Math.random()<permanentChance){
+    const stats=STATS.filter(stat=>score(owner.cat,stat)>0);
+    if(stats.length){const stat=stats[Math.floor(Math.random()*stats.length)];owner.cat.mods[stat]--;owner.cat.permanentMods=normalizeMods(owner.cat.permanentMods);owner.cat.permanentMods[stat]--;owner.cat.card.permanentMods={...owner.cat.permanentMods};}
+  }
+  recordSupportDelta(card,before,owner,opp);
+}
+
 function normalizeMods(mods){
   const out=zeroMods();
   STATS.forEach(stat=>out[stat]=Number(mods?.[stat]||0));
@@ -5530,6 +5824,8 @@ function isMatchRoundOneForWrestler(s){
 
 function isMatchRoundOneAbility(ability){
   return [
+    "firstRoundAll1ThenRandomTransfer",
+    "firstRoundAll2ThenRandomTransfer",
     "firstRoundSpeed1Technique2",
     "firstRoundSpeedTechnique1",
     "firstRoundSpeedTechnique2",
@@ -6088,9 +6384,21 @@ function closeHandReveal(){
 }
 
 function applyWrestlerEntryEffect(owner,c){
-  if(owner.wrestlerEffectsBlocked&&c.ability){
+  if(owner.wrestlerEffectsBlocked&&c.ability&&c.ability!=="entryInvertOpponentSupports"){
     log(`[EFFET] ${c.name} est annulé par le bonus adverse.`);
     showEffectFeedback(c,c.name,"Effet annulé","block");
+    return;
+  }
+  if(c.ability==="entryCopyOpponentAbility"){
+    const opponent=owner.side==="player"?G.ai:G.player;
+    const copied=wrestlerAbility(opponent.cat);
+    owner.cat.copiedAbility=copied&&copied!=="entryCopyOpponentAbility"?copied:null;
+    log(`[EFFET] ${c.name} : ${owner.cat.copiedAbility?`copie l'effet de ${opponent.cat.card.name}`:"aucun effet adverse à copier"}.`);
+    if(owner.cat.copiedAbility)applyWrestlerEntryEffect(owner,{...c,ability:owner.cat.copiedAbility});
+    return;
+  }
+  if(c.ability==="entryInvertOpponentSupports"){
+    invertOpponentSupports(owner);
     return;
   }
   if(c.ability==="entryMelusineGraveSpeedTechnique1Each"){
@@ -6335,6 +6643,8 @@ function applyRoundManagerEffects(){
         break;
     }
     const catAbility=wrestlerAbility(owner.cat);
+    applyYacineTransfer(owner);
+    applyInvertedSupportRound(owner,opp);
     if(["turnCatRandom2","turnCatRandom3","turnCharismaMinus1Random2","turnCharismaMinus1Random3"].includes(catAbility)){
       const value=(catAbility==="turnCatRandom3"||catAbility==="turnCharismaMinus1Random3")?3:2;
       const charismaPenalty=catAbility.startsWith("turnCharismaMinus1");
@@ -6402,6 +6712,7 @@ function applyRoundManagerEffects(){
         showEffectFeedback(owner.cat.card,owner.cat.card.name,"+1 Force / Tombé +20","buff");
       }
     }
+    const managerBefore=owner.man?supportNumericState(owner,opp):null;
     if(owner.man?.ability==="bonusPureTraditionDrawTeam"){
       const amount=["Romain Lestrange","Zaeken"].includes(owner.cat?.card?.name)?2:1;
       const before=owner.hand.length;
@@ -6450,9 +6761,11 @@ function applyRoundManagerEffects(){
     }
 
     const permanentChanceByAbility={turnRandomPermanent10:0.1,turnRandomPermanent20:0.2,turnRandomPermanent30:0.3};
+    if(owner.man&&managerBefore)recordSupportDelta(owner.man,managerBefore,owner,opp);
     const supportCard=permanentChanceByAbility[owner.man?.ability]?owner.man:owner.cat?.card;
-    const chance=permanentChanceByAbility[supportCard?.ability]||0;
+    const chance=permanentChanceByAbility[supportCard===owner.man?supportCard?.ability:catAbility]||0;
     if(!chance||!owner.cat)return;
+    const permanentBefore=supportNumericState(owner,opp);
     if(Math.random()<chance){
       const gains=addRandomStats(owner.cat,1,1);
       owner.cat.permanentMods=normalizeMods(owner.cat.permanentMods);
@@ -6462,6 +6775,7 @@ function applyRoundManagerEffects(){
       log(`[EFFET] ${supportCard.name} inspire ${owner.cat.card.name} : ${feedback}.`);
       showEffectFeedback(owner.cat.card,supportCard.name,feedback,Object.keys(gains).length?"buff":"block");
     }
+    if(supportCard===owner.man)recordSupportDelta(supportCard,permanentBefore,owner,opp);
   });
   if(!isOnlineMatch())autoUseRingsider(G.ai);
 }
@@ -6493,6 +6807,7 @@ function discardRandomCards(player,count){
 }
 
 function applyTrackedObjectEffect(owner,opp,c,choice=null){
+  if(c.ability==="invertedSupport")return applyInvertedObject(owner,opp,c);
   const s=owner.cat;
   if(!s)return;
   if(isCardEffectImmune(s)){
@@ -6680,7 +6995,7 @@ function revertActiveObject(owner,sendToGrave=true,preserveNextDraw=false){
       if(effect.pin)target.pin-=effect.pin;
       if(effect.save)target.save=false;
     }
-    if(effect.pinShield)owner.pinShield=Math.max(0,(owner.pinShield||0)-effect.pinShield);
+    if(effect.pinShield)owner.pinShield=(owner.pinShield||0)-effect.pinShield;
   }
   if(owner.obj?.ability==="drawNext1"&&!preserveNextDraw)owner.nextDrawBonus=0;
   if(owner.obj&&sendToGrave)owner.grave.push(owner.obj);
@@ -6716,6 +7031,7 @@ function releaseSupportEffects(owner,opp){
 
 function wrestlerAbility(s){
   if(!s||s.owner?.wrestlerEffectsBlocked)return null;
+  if(s.card?.ability==="entryCopyOpponentAbility")return s.copiedAbility||null;
   return s.card?.ability || null;
 }
 
@@ -6806,7 +7122,10 @@ function applyWeakestStatChoice(owner,source,amount){
   const minimum=Math.min(...Object.values(scores));
   const weakest=STATS.filter(stat=>scores[stat]===minimum);
   const apply=stat=>{
-    wrestler.mods[stat]+=amount;
+    const opp=owner.side==="player"?G.ai:G.player,before=supportNumericState(owner,opp);
+    const applied=source.ability==="invertedSupport"?-amount:amount;
+    wrestler.mods[stat]+=applied;
+    recordSupportDelta(source,before,owner,opp);
     log(`[EFFET] ${source.name} : +${amount} ${stat}.`);
     showEffectFeedback(wrestler.card,source.name,`+${amount} ${stat}`,"buff");
     markOnlineDirty();
@@ -6825,6 +7144,13 @@ function applyWeakestStatChoice(owner,source,amount){
 }
 
 function applyEffect(owner,opp,c){
+  if(["mWeakest1Choice","mWeakest2Choice"].includes(c.ability))return applyEffectUntracked(owner,opp,c);
+  const before=supportNumericState(owner,opp);
+  applyEffectUntracked(owner,opp,c);
+  recordSupportDelta(c,before,owner,opp);
+}
+
+function applyEffectUntracked(owner,opp,c){
   let s=owner.cat;
   if(!s)return;
   let feedback="";
@@ -6984,6 +7310,9 @@ function playPlayer(idx){
 }
 
 function triggerLudovicSupportDiscard(player,opponent,playedCard){
+  if(opponent?.man?.ability==="invertedSupport"&&opponent.man.originalAbility==="opponentDiscardOnSupport"&&(playedCard.type==="Manager"||playedCard.type==="Objet")){
+    draw(opponent,1);return;
+  }
   if(opponent?.man?.ability!=="opponentDiscardOnSupport")return;
   if(playedCard.type!=="Manager"&&playedCard.type!=="Objet")return;
   if(!player.hand.length){
@@ -7073,6 +7402,7 @@ function playCard(p,opp,c,idx,announce=false){
       return announce&&log(`${c.name} est annulé.`);
     }
     if(p.man)return announce&&log("Ce catcheur a déjà un bonus.");
+    resetSupportForPlay(c);
     p.man=c;
     p.played.Manager=true;
     p.cat.managers++;
@@ -7094,8 +7424,9 @@ function playCard(p,opp,c,idx,announce=false){
     if(p.obj){
       return announce&&log("Un objet est déjà actif.");
     }
+    resetSupportForPlay(c);
     p.obj=c;
-    p.objTurnsRemaining=1+Number(p.objectDurationBonus||0);
+    p.objTurnsRemaining=Math.max(1,1+Number(p.objectDurationBonus||0));
     p.objLastActivationRound=G.round;
     p.objExtraDrawQueued=false;
     p.played.Objet=true;
@@ -7338,9 +7669,11 @@ function score(s,stat){
   if(alexKissInGrave)v+=1;
   const rManLegendaryActive=!immune&&s.owner?.man?.ability==="mAll2IfGrave3"&&s.owner.grave.filter(card=>card.type==="Catcheur").length>=3;
   if(rManLegendaryActive)v+=2;
+  if(!immune&&s.owner?.man?.ability==="invertedSupport"&&s.owner.man.originalAbility==="mAll2IfGrave3"&&s.owner.grave.filter(card=>card.type==="Catcheur").length>=3)v-=2;
   const ability=wrestlerAbility(s);
   if(!ability)return v;
   const firstRound=isRoundEffectActive(s);
+  if((ability==="firstRoundAll1ThenRandomTransfer"||ability==="firstRoundAll2ThenRandomTransfer")&&firstRound)v+=ability==="firstRoundAll2ThenRandomTransfer"?2:1;
   if(ability==="firstRoundRandomStats5"&&firstRound)v+=Number(s.firstRoundRandomMods?.[stat]||0);
   if(ability==="speedPlus"&&stat==="Vitesse")v+=2;
   if(ability==="firstRoundSpeed2"&&firstRound&&stat==="Vitesse")v+=2;
@@ -7436,12 +7769,15 @@ function statAbilityFeedback(s,stat){
   return null;
 }
 
-function rerollLostDuelWithObject(loser){
+function rerollLostDuelWithObject(loser,invertedVictory=false){
   const object=loser?.obj;
-  if(!object||object.ability!=="rerollOnLoss"||loser.objRerollRound===G.round)return false;
+  const eligible=invertedVictory
+    ? object?.ability==="invertedSupport"&&object.originalAbility==="rerollOnLoss"
+    : object?.ability==="rerollOnLoss";
+  if(!eligible||loser.objRerollRound===G.round)return false;
   loser.objRerollRound=G.round;
   G.matchPhase="roulette";
-  log(`[EFFET] ${object.name} : ${loser.cat.card.name} a perdu le duel, la roulette est relancée.`);
+  log(`[EFFET] ${object.name} : ${loser.cat.card.name} a ${invertedVictory?"gagné":"perdu"} le duel, la roulette est relancée${invertedVictory?" (effet inversé)":""}.`);
   showEffectFeedback(loser.cat.card,object.name,"Relance de la roulette","special",2400);
   markOnlineDirty();
   render();
@@ -7543,6 +7879,7 @@ function duel(){
   const winner=ps>as?G.player:G.ai;
   const loser=ps>as?G.ai:G.player;
   if(rerollLostDuelWithObject(loser))return;
+  if(rerollLostDuelWithObject(winner,true))return;
   const finishDuel=()=>{
     if(G.mode==="challenge"&&G.challenge){
       if(ps>as)return challengePlayerWinsRound(ps-as,stat);
@@ -7559,9 +7896,9 @@ const REPEATABLE_EXTENDED_OBJECT_ABILITIES=new Set(["drawNext1","recoverGrave","
 function reactivateExtendedObjects(afterDraw){
   [G.player,G.ai].forEach(p=>{
     const object=p.obj;
-    if(!object||!REPEATABLE_EXTENDED_OBJECT_ABILITIES.has(object.ability))return;
+    if(!object||!REPEATABLE_EXTENDED_OBJECT_ABILITIES.has(object.originalAbility||object.ability))return;
     if(p.objTurnsRemaining<=0||p.objLastActivationRound===G.round)return;
-    const isDrawBonus=object.ability==="drawNext1";
+    const isDrawBonus=(object.originalAbility||object.ability)==="drawNext1";
     if(isDrawBonus!==afterDraw)return;
     p.objLastActivationRound=G.round;
     if(isDrawBonus)p.objExtraDrawQueued=true;
@@ -7786,7 +8123,9 @@ function win(winner,loser,reason){
       setTimeout(startRound,1100);
       return;
     }
+    const captured=winnerAbility==="winCaptureOpponent"?loser.cat?.card:null;
     clearWrestler(loser);
+    if(captured)captureDefeatedWrestler(winner,loser,captured);
     attemptPin(winner,loser,objectPinBonus);
     if(returnWinnerToHand)returnActiveWrestlerToHand(winner,returnSource);
   };
@@ -7810,7 +8149,13 @@ function attemptPin(p,target,objectPinBonus=0){
     0;
   const bonus=(p.cat?.pin||0)+abilityBonus+Number(objectPinBonus||0);
   const shield=target?.pinShield||0;
-  if(target)target.pinShield=0;
+  if(target){
+    target.pinShield=0;
+    if(target.objEffect)target.objEffect.pinShield=0;
+    for(const p of [G.player,G.ai])for(const c of [p.man,p.obj]){
+      for(const delta of c?.supportDeltas||[])if(delta.side===target.side)delta.shield=0;
+    }
+  }
   const chance=Math.max(0,Math.min(100,base+bonus-shield));
   const roll=Math.floor(Math.random()*100)+1;
   if(isOnlineMatch()){
@@ -9896,6 +10241,93 @@ function startUnlockedCareerMatch(){
   startCareerMatch(unlocked);
 }
 
+const CAREER_ARCHETYPE_DETAILS = {
+  force_rookie:["Impact direct","Un jeu simple et offensif qui cherche à imposer la Force dès les premiers duels."],
+  technique_rookie:["Premiers contrôles","Un deck accessible qui ralentit le rythme et privilégie la Technique."],
+  speed_rookie:["Démarrage rapide","Une composition vive qui met la pression en Vitesse avant que le match ne s'installe."],
+  power_rookie:["Puissance brute","Des catcheurs solides et des soutiens directs pour gagner les confrontations de Force."],
+  balanced_rookie:["Fondamentaux","Un deck équilibré, sans faiblesse majeure, qui récompense les bonnes décisions."],
+  technique_control:["Contrôle technique","Neutralise les avantages adverses et prépare des duels favorables en Technique."],
+  power_pin:["Pression au tombé","Accumule la Force et transforme chaque victoire en menace immédiate de tombé."],
+  speed_pressure:["Course en tête","Prend rapidement l'initiative et entretient la pression grâce à la Vitesse."],
+  roulette_control:["Maîtrise de la roulette","Oriente les statistiques disputées pour provoquer les confrontations qu'il préfère."],
+  momentum:["Montée en puissance","Enchaîne les bonus et devient plus dangereux à mesure que le match avance."],
+  technique_elite:["Précision élite","Une mécanique technique exigeante qui punit les ouvertures laissées par l'adversaire."],
+  speed_elite:["Tempo élite","Dicte le rythme avec des accélérations et des réponses rapides aux changements de situation."],
+  random_growth:["Croissance imprévisible","Distribue ses gains de statistiques pour construire une menace difficile à anticiper."],
+  manager_synergy:["Synergie de vestiaire","Ses bonus se complètent pour renforcer la carte maîtresse et verrouiller le match."],
+  control_elite:["Contrôle total","Réduit les options adverses et gagne par accumulation d'avantages techniques."],
+  champion_power:["Champion de puissance","Une ligne de catcheurs lourde qui cherche à dominer chaque duel de Force."],
+  champion_speed:["Champion de vitesse","Maintient un tempo élevé et multiplie les occasions de prendre l'avantage."],
+  champion_control:["Champion tactique","Un deck précis qui protège ses ressources et dérègle les plans adverses."],
+  champion_pressure:["Pression constante","Force des choix difficiles à chaque tour et convertit vite la moindre erreur."],
+  champion_attrition:["Guerre d'usure","Résiste, épuise les ressources opposées et prend le contrôle sur la durée."],
+  hall_technique:["Lucha implacable","Heddi verrouille la roulette sur son terrain et empile des bonus techniques persistants."],
+  hall_endurance:["Endurance légendaire","Marc absorbe la pression, se renforce et transforme les longs matchs en avantage."],
+  hall_explosion:["Explosion statistique","MBM redistribue ses gains jusqu'à la limite et peut renverser un round en un instant."],
+  hall_bonus:["Cour royale","Lauriana coordonne catcheurs et bonus pour construire une puissance collective redoutable."],
+  hall_second_wind:["Dernier combat","Le boss final dispose de réponses dans chaque statistique et refuse de rester au sol."]
+};
+
+const careerUiState={selectedIndex:null,openSeason:null};
+
+function careerStateClass(opponent,itemIndex,unlocked){
+  const isUnlocked=itemIndex<=unlocked&&opponent&&!opponent.missing;
+  if(opponent?.ultimateBoss&&!isUnlocked)return "boss-locked";
+  if(opponent?.ultimateBoss)return "boss-final";
+  if(itemIndex===unlocked)return "next";
+  return isUnlocked?"cleared":"locked";
+}
+
+function careerStateLabel(opponent,itemIndex,unlocked){
+  if(opponent?.missing)return "Carte manquante";
+  if(opponent?.finalBoss)return "Boss final";
+  if(opponent?.ultimateBoss)return itemIndex<=unlocked?"Défi ultime":"Défi verrouillé";
+  if(itemIndex===unlocked)return "Prochain combat";
+  return itemIndex<unlocked?"Terminé":"À débloquer";
+}
+
+function careerDeckSummaryHTML(opponent,itemIndex,unlocked){
+  if(!opponent)return `<div class="career-summary-empty">Aucun adversaire disponible.</div>`;
+  const details=CAREER_ARCHETYPE_DETAILS[opponent.archetype]||["Deck de carrière","Un adversaire construit autour de sa carte maîtresse."];
+  const isUnlocked=itemIndex<=unlocked&&!opponent.missing;
+  return `<div class="career-summary-head">
+      <div class="career-summary-kicker">Stratégie</div>
+      <div class="career-access ${isUnlocked?"available":"unavailable"}">${isUnlocked?"Combat disponible":careerStateLabel(opponent,itemIndex,unlocked)}</div>
+    </div>
+    <h2>${escapeHtml(details[0])}</h2>
+    <p>${escapeHtml(details[1])}</p>
+    <div class="career-summary-meta">
+      <span class="career-summary-difficulty"><small>Difficulté</small><b>${opponent.difficulty}</b></span>
+      <span class="career-summary-priority"><small>Terrain favori</small><b>${escapeHtml((opponent.priorityStats||[]).join(" / "))}</b></span>
+    </div>`;
+}
+
+function selectCareerSeason(seasonIndex){
+  if(careerUiState.openSeason===Number(seasonIndex)){
+    careerUiState.openSeason=-1;
+    renderCareer();
+    return;
+  }
+  careerUiState.openSeason=Number(seasonIndex);
+  const opponents=careerOpponents();
+  const firstIndex=CAREER_SEASONS.slice(0,careerUiState.openSeason).reduce((sum,season)=>sum+season.count,0);
+  const seasonEnd=firstIndex+(CAREER_SEASONS[careerUiState.openSeason]?.count||0);
+  if(careerUiState.selectedIndex<firstIndex||careerUiState.selectedIndex>=seasonEnd)careerUiState.selectedIndex=firstIndex;
+  renderCareer();
+}
+
+function selectCareerOpponent(index){
+  careerUiState.selectedIndex=Number(index);
+  careerUiState.openSeason=careerOpponents()[careerUiState.selectedIndex]?.season??0;
+  renderCareer();
+}
+
+function startSelectedCareerMatch(){
+  if(!Number.isInteger(careerUiState.selectedIndex))return;
+  startCareerMatch(careerUiState.selectedIndex);
+}
+
 function restartCurrentMatch(){
   const options=replayMatchOptions();
   hidePin();
@@ -9934,29 +10366,56 @@ function renderCareer(){
   const grid=document.getElementById("careerGrid");
   if(!grid)return;
   const opponents=careerOpponents();
-  const unlocked=Number(playerState.careerUnlocked)||0;
+  const lastOpponent=opponents.findLastIndex(opponent=>opponent&&!opponent.missing);
+  const unlocked=Math.min(Number(playerState.careerUnlocked)||0,lastOpponent);
+  if(!Number.isInteger(careerUiState.selectedIndex)||!opponents[careerUiState.selectedIndex])careerUiState.selectedIndex=Math.max(0,unlocked);
+  if(!Number.isInteger(careerUiState.openSeason))careerUiState.openSeason=opponents[careerUiState.selectedIndex]?.season??0;
+  const selected=opponents[careerUiState.selectedIndex];
+  const master=document.getElementById("careerMasterCard");
+  const summary=document.getElementById("careerDeckSummary");
+  const ready=document.getElementById("careerReadyButton");
+  const status=document.getElementById("careerStatus");
+  if(master)master.innerHTML=selected?.card?cardHTML(selected.card):`<div class="preview-empty">Carte indisponible</div>`;
+  if(summary)summary.innerHTML=careerDeckSummaryHTML(selected,careerUiState.selectedIndex,unlocked);
+  if(ready){
+    const canStart=careerUiState.selectedIndex<=unlocked&&selected&&!selected.missing;
+    ready.disabled=!canStart;
+    ready.textContent=canStart?"Prêt":"Verrouillé";
+  }
+  if(status)status.textContent="";
   let index=0;
   grid.innerHTML=CAREER_SEASONS.map((season,seasonIndex)=>{
     const items=[];
     for(let i=0;i<season.count;i++){
       const opponent=opponents[index++];
       const itemIndex=index-1;
-      const isBoss=opponent?.ultimateBoss;
-      const isFinalBoss=opponent?.finalBoss;
-      const isUnlocked=itemIndex<=unlocked&&opponent&&!opponent.missing;
-      const stateClass=isBoss&&!isUnlocked?"boss-locked":isBoss?"boss-final":itemIndex===unlocked?"next":isUnlocked?"cleared":"locked";
-      const label=opponent?.missing?"Carte manquante":isFinalBoss?"Boss final":isBoss?"Défi Ultime":itemIndex===unlocked?"Prochain combat":isUnlocked?"Débloqué":"À débloquer";
-      items.push(`<button class="career-opponent ${stateClass}" ${isUnlocked?`onclick="startCareerMatch(${itemIndex})"`:"disabled"}>
+      const stateClass=careerStateClass(opponent,itemIndex,unlocked);
+      const label=careerStateLabel(opponent,itemIndex,unlocked);
+      const selectedClass=itemIndex===careerUiState.selectedIndex?"selected":"";
+      items.push(`<button class="career-opponent ${stateClass} ${selectedClass}" onclick="selectCareerOpponent(${itemIndex})" aria-pressed="${itemIndex===careerUiState.selectedIndex}">
         <b>${opponent?.name||"Adversaire"}</b>
         <span>${label}</span>
-        ${opponent&&!opponent.missing?`<small>Difficulté ${opponent.difficulty} - ${opponent.archetype.replace(/_/g," ")}</small>`:""}
+        ${opponent&&!opponent.missing?`<small>Difficulté ${opponent.difficulty} · ${(opponent.priorityStats||[]).join(" / ")}</small>`:""}
       </button>`);
     }
-    return `<div class="career-season">
-      <h2>Saison ${seasonIndex+1}</h2>
-      <h3>${season.name}</h3>
-      ${items.join("")}
-    </div>`;
+    const isOpen=seasonIndex===careerUiState.openSeason;
+    const startIndex=CAREER_SEASONS.slice(0,seasonIndex).reduce((sum,item)=>sum+item.count,0);
+    const completed=opponents.slice(startIndex,startIndex+season.count).filter((opponent,offset)=>{
+      const opponentIndex=startIndex+offset;
+      const key=`career_${opponentIndex}_${opponent?.name||"adversaire"}`;
+      return opponentIndex<unlocked||Boolean(playerState.profileProgress?.careerXpWins?.[key]);
+    }).length;
+    const progress=Math.round((completed/season.count)*100);
+    const progressLabel=completed>=season.count?"Terminée":completed>0?`${completed} victoire${completed>1?"s":""}`:"À conquérir";
+    return `<section class="career-season ${isOpen?"open":""}">
+      <button class="career-season-toggle" onclick="selectCareerSeason(${seasonIndex})" aria-expanded="${isOpen}">
+        <span class="career-season-number">Saison ${seasonIndex+1}</span>
+        <strong>${escapeHtml(season.name)}</strong>
+        <span class="career-season-progress" aria-label="Progression : ${completed} combats sur ${season.count}"><b>${progressLabel}</b><i><em style="width:${progress}%"></em></i></span>
+        <span class="career-season-chevron" aria-hidden="true"></span>
+      </button>
+      <div class="career-season-drawer" ${isOpen?"":"hidden"}>${items.join("")}</div>
+    </section>`;
   }).join("");
 }
 
@@ -10471,6 +10930,9 @@ Object.assign(window,{
   openTicketBooster,
   startCareerMatch,
   startUnlockedCareerMatch,
+  selectCareerSeason,
+  selectCareerOpponent,
+  startSelectedCareerMatch,
   restartCurrentMatch,
   startNextCareerMatch,
   startOnlineMatchFromRoom,

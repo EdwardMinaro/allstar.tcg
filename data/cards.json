@@ -3166,6 +3166,128 @@
       "effect": "Victoire : Tombé +5.",
       "ability": "pinObject5",
       "renderArt": "assets/card_renders/standard_objets_table.png"
+    },
+    {
+      "key": "rare_catcheurs_yacine_osmani",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Yacine Osmani",
+      "stats": {
+        "Force": 7,
+        "Vitesse": 7,
+        "Technique": 5,
+        "Charisme": 5
+      },
+      "effect": "Tour 1 : +1 à chaque statistiques. Puis Chaque tour, perd 1 point dans une statistique et gagne un point dans une autre statistique.",
+      "renderArt": "assets/card_renders/rare_catcheurs_yacine_osmani.png",
+      "ability": "firstRoundAll1ThenRandomTransfer"
+    },
+    {
+      "key": "legende_catcheurs_yacine_osmani",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Yacine Osmani",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 8,
+        "Technique": 6,
+        "Charisme": 6
+      },
+      "effect": "Tour 1 : +2 à chaque statistiques. Puis Chaque tour, perd 1 point dans une statistique et gagne un point dans une autre statistique.",
+      "renderArt": "assets/card_renders/legende_catcheurs_yacine_osmani.png",
+      "ability": "firstRoundAll2ThenRandomTransfer"
+    },
+    {
+      "key": "rare_catcheurs_maxxy",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Maxxy",
+      "stats": {
+        "Force": 3,
+        "Vitesse": 7,
+        "Technique": 7,
+        "Charisme": 7
+      },
+      "effect": "Victoire : Récupérez le catcheur adverse dans votre vestiaire.",
+      "renderArt": "assets/card_renders/rare_catcheurs_maxxy.png",
+      "ability": "winCaptureOpponent"
+    },
+    {
+      "key": "rare_catcheurs_the_iconic_charlie",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "The Iconic Charlie",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 8,
+        "Technique": 5,
+        "Charisme": 7
+      },
+      "effect": "Tour 1 : + 2 Technique et +2 Charisme",
+      "renderArt": "assets/card_renders/rare_catcheurs_the_iconic_charlie.png",
+      "ability": "firstRoundCharTech2"
+    },
+    {
+      "key": "standard_catcheurs_agathe_aries",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "Agathe Aries",
+      "stats": {
+        "Force": 4,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 8
+      },
+      "effect": "",
+      "renderArt": "assets/card_renders/standard_catcheurs_agathe_aries.png",
+      "musicId": "agathe_aries"
+    },
+    {
+      "key": "legende_catcheurs_agathe_aries",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Agathe Aries",
+      "stats": {
+        "Force": 5,
+        "Vitesse": 7,
+        "Technique": 7,
+        "Charisme": 9
+      },
+      "effect": "Apparition : Copie l'effet du catcheur adverse",
+      "renderArt": "assets/card_renders/legende_catcheurs_agathe_aries.png",
+      "ability": "entryCopyOpponentAbility",
+      "musicId": "agathe_aries"
+    },
+    {
+      "key": "standard_catcheurs_g_king",
+      "type": "Catcheur",
+      "rarity": "Standard",
+      "name": "G KING",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 3,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "",
+      "renderArt": "assets/card_renders/standard_catcheurs_g_king.png",
+      "musicId": "g_king"
+    },
+    {
+      "key": "legende_catcheurs_g_king",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "G KING",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 4,
+        "Technique": 7,
+        "Charisme": 8
+      },
+      "effect": "Apparition : Si votre adversaire est équipé de carte bonus ou objets, inversez leurs effets.",
+      "renderArt": "assets/card_renders/legende_catcheurs_g_king.png",
+      "ability": "entryInvertOpponentSupports",
+      "musicId": "g_king"
     }
   ]
 }

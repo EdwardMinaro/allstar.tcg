@@ -3321,83 +3321,335 @@ button{font-family:inherit;cursor:pointer}
 }
 
 .career-menu-card{
-  width:min(1320px,94vw);
-  padding:clamp(22px,2.6vw,34px);
+  width:min(1540px,96vw);
+  height:min(920px,calc(100dvh - 32px));
+  max-height:calc(100dvh - 32px);
+  padding:16px 24px 12px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:
+    linear-gradient(90deg,rgba(213,43,51,.07),transparent 25%,transparent 75%,rgba(44,130,186,.07)),
+    #0e0f17;
 }
 
-.career-grid{
+.career-menu-card > .small-logo{
+  flex:0 0 auto;
+  min-height:72px;
+  padding:8px 24px;
+  margin-bottom:12px !important;
+  font-size:clamp(38px,4vw,58px);
+}
+
+.career-layout{
+  min-height:0;
+  flex:1 1 auto;
   display:grid;
-  grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:12px;
-  margin:18px 0 22px;
+  grid-template-columns:minmax(320px,.78fr) minmax(600px,1.8fr);
+  gap:24px;
+  text-align:left;
+}
+
+.career-focus{
+  position:relative;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  border:2px solid rgba(245,196,50,.5);
+  border-radius:8px;
+  background:#0a0b11;
+  box-shadow:9px 9px 0 rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.04);
+  overflow:hidden;
+}
+
+.career-focus::before{
+  content:"CARTE MAÎTRESSE";
+  position:absolute;
+  z-index:2;
+  top:13px;
+  left:16px;
+  padding:5px 9px;
+  border-left:3px solid #d52b33;
+  background:rgba(5,6,10,.86);
+  color:#ffd35d;
+  font-size:10px;
+  font-weight:1000;
+  text-transform:uppercase;
+  display:none;
+}
+
+.career-master-card{
+  flex:1 1 auto;
+  min-height:290px;
+  padding:14px 12px 10px;
+  border:0;
+  border-radius:0;
+  background:
+    radial-gradient(circle at 50% 22%,rgba(255,211,93,.19),transparent 42%),
+    linear-gradient(135deg,transparent 0 47%,rgba(255,255,255,.025) 47% 49%,transparent 49% 100%),
+    linear-gradient(180deg,#191e29,#090a10);
+  background-size:auto,36px 36px,auto;
+  box-shadow:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.career-master-card .game-card{
+  width:auto !important;
+  height:min(calc(100% - 2px),540px) !important;
+  max-width:calc(100% - 4px) !important;
+  aspect-ratio:82/110 !important;
+  pointer-events:none;
+  transform:none;
+}
+
+.career-master-card .game-card.rendered .full-card-art{
+  object-fit:contain;
+}
+
+.career-deck-summary{
+  position:relative;
+  flex:0 0 auto;
+  min-height:165px;
+  padding:14px 17px 16px;
+  border:0;
+  border-top:2px solid rgba(245,196,50,.46);
+  border-radius:0;
+  background:
+    linear-gradient(90deg,#d52b33 0 5px,transparent 5px),
+    linear-gradient(110deg,rgba(31,35,46,.99),rgba(11,12,18,.99));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  overflow:hidden;
+}
+
+.career-summary-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.career-summary-kicker{
+  color:#ffd35d;
+  font-size:11px;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+
+.career-deck-summary h2{
+  margin:5px 0 6px;
+  color:#fff;
+  font-size:20px;
+  line-height:1;
+  text-transform:uppercase;
+  text-shadow:2px 2px 0 #000;
+}
+
+.career-deck-summary p{
+  margin:0 0 12px;
+  color:#ddd7cc;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.28;
+}
+
+.career-summary-meta{
+  display:grid;
+  grid-template-columns:88px minmax(0,1fr);
+  gap:8px;
+}
+
+.career-summary-meta span{
+  min-width:0;
+  min-height:43px;
+  padding:6px 10px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#090a0f;
+  color:#9bd5ff;
+  font-size:9px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+
+.career-summary-meta small{
+  display:block;
+  color:#9bd5ff;
+  font-size:8px;
+}
+
+.career-summary-meta b{
+  display:block;
+  color:#fff;
+  font-size:13px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.career-summary-difficulty b{
+  color:#ffd35d;
+  font-size:19px;
+  line-height:1;
+}
+
+.career-access{
+  flex:0 0 auto;
+  padding:4px 8px;
+  border:1px solid rgba(121,239,159,.34);
+  border-radius:4px;
+  background:rgba(23,86,49,.22);
+  color:#79ef9f;
+  font-size:9px;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+
+.career-access.unavailable{
+  border-color:rgba(155,155,162,.25);
+  background:rgba(90,90,97,.12);
+  color:#aaaab1;
+}
+
+.career-seasons{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  overflow:auto;
+  padding:1px 8px 8px 1px;
+  scrollbar-color:#e5a51d #090a0f;
 }
 
 .career-season{
   position:relative;
   min-width:0;
-  padding:12px;
-  border-radius:10px;
-  border:3px solid rgba(245,196,50,.42);
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.06),transparent 30%),
-    linear-gradient(180deg,rgba(29,32,43,.96),rgba(5,6,10,.98));
-  box-shadow:8px 8px 0 rgba(0,0,0,.42),inset 0 0 0 1px rgba(255,255,255,.08);
+  flex:0 0 auto;
+  border:1px solid rgba(245,196,50,.38);
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(27,31,42,.98),rgba(8,9,14,.98));
+  box-shadow:6px 6px 0 rgba(0,0,0,.3),inset 0 0 0 1px rgba(255,255,255,.04);
   overflow:hidden;
 }
 
-.career-season:before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(90deg,transparent,rgba(245,196,50,.08),transparent);
-  pointer-events:none;
+.career-season.open{
+  border:2px solid #e6b42e;
+  background:
+    linear-gradient(90deg,rgba(213,43,51,.11),transparent 38%),
+    linear-gradient(180deg,rgba(31,36,49,.99),rgba(8,9,14,.99));
 }
 
-.career-season h2,
-.career-season h3{
-  position:relative;
-  margin:0;
+.career-season-toggle{
+  width:100%;
+  min-height:61px;
+  padding:8px 18px;
+  border:0;
+  background:transparent;
+  display:grid;
+  grid-template-columns:112px minmax(0,1fr) 124px 30px;
+  gap:12px;
+  align-items:center;
+  color:#fff;
+  text-align:left;
+}
+
+.career-season-number{
+  color:#ffd35d;
+  font-size:12px;
+  font-weight:1000;
   text-transform:uppercase;
 }
 
-.career-season h2{
-  color:#ffd35d;
-  font-size:17px;
+.career-season-toggle strong{
+  min-width:0;
+  font-size:22px;
   font-weight:1000;
   font-style:italic;
-  text-shadow:2px 2px 0 #000;
+  text-transform:uppercase;
+  text-shadow:3px 3px 0 #000;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
-.career-season h3{
-  color:#fff;
-  min-height:62px;
-  font-size:25px;
-  font-weight:1000;
-  font-style:italic;
-  margin-bottom:14px;
-  text-shadow:3px 3px 0 #000;
+.career-season-progress{
   display:flex;
-  align-items:flex-start;
-  justify-content:center;
+  flex-direction:column;
+  gap:5px;
+  align-items:stretch;
+  color:#e8dcc2;
+  font-size:9px;
+  font-weight:1000;
+  text-align:left;
+  text-transform:uppercase;
 }
+
+.career-season-progress i{
+  width:100%;
+  height:7px;
+  border-radius:4px;
+  background:#08090d;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.16),1px 1px 0 rgba(0,0,0,.5);
+  overflow:hidden;
+}
+
+.career-season-progress em{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#d52b33,#ffd35d);
+}
+
+.career-season-chevron{
+  position:relative;
+  width:27px;
+  height:27px;
+  border:1px solid rgba(255,211,93,.42);
+  border-radius:50%;
+  color:#ffd35d;
+  background:rgba(255,211,93,.06);
+  transition:transform .18s ease;
+}
+
+.career-season-chevron::before{
+  content:"";
+  position:absolute;
+  width:7px;
+  height:7px;
+  top:8px;
+  left:9px;
+  border-right:2px solid currentColor;
+  border-bottom:2px solid currentColor;
+  transform:rotate(45deg);
+}
+
+.career-season.open .career-season-chevron{transform:rotate(180deg)}
+
+.career-season-drawer{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:9px;
+  padding:2px 12px 12px;
+}
+
+.career-season-drawer[hidden]{display:none}
 
 .career-opponent{
   width:100%;
-  height:72px;
-  margin:0 0 10px;
-  padding:8px 10px;
-  border-radius:8px;
-  border:3px solid rgba(255,255,255,.1);
-  background:linear-gradient(180deg,#172331,#07111a);
-  box-shadow:5px 5px 0 rgba(0,0,0,.36);
+  min-width:0;
+  height:108px;
+  margin:0;
+  padding:9px 7px;
+  border-radius:4px;
+  border:2px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg,#182636,#08121c);
+  box-shadow:4px 4px 0 rgba(0,0,0,.34);
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
-}
-
-.career-opponent:last-child{
-  margin-bottom:0;
+  cursor:pointer;
 }
 
 .career-opponent b,
@@ -3412,14 +3664,14 @@ button{font-family:inherit;cursor:pointer}
 
 .career-opponent b{
   color:#fff;
-  font-size:clamp(13px,1.05vw,18px);
+  font-size:14px;
   font-weight:1000;
   text-shadow:2px 2px 0 #000;
 }
 
 .career-opponent span{
   color:#f6d986;
-  font-size:11px;
+  font-size:9px;
   font-weight:1000;
   letter-spacing:.02em;
 }
@@ -3429,7 +3681,7 @@ button{font-family:inherit;cursor:pointer}
   width:100%;
   margin-top:2px;
   color:#7fc7ff;
-  font-size:9px;
+  font-size:8px;
   font-weight:900;
   text-transform:uppercase;
   white-space:nowrap;
@@ -3440,7 +3692,7 @@ button{font-family:inherit;cursor:pointer}
 .career-opponent.next{
   border-color:#ffd35d;
   background:linear-gradient(180deg,#213047,#0b1724);
-  box-shadow:5px 5px 0 rgba(0,0,0,.42),0 0 24px rgba(245,196,50,.28);
+  box-shadow:4px 4px 0 rgba(0,0,0,.42),0 0 18px rgba(245,196,50,.24);
 }
 
 .career-opponent.cleared{
@@ -3448,7 +3700,7 @@ button{font-family:inherit;cursor:pointer}
 }
 
 .career-opponent.locked{
-  opacity:.45;
+  opacity:.52;
   background:linear-gradient(180deg,#171820,#08090d);
 }
 
@@ -3463,12 +3715,42 @@ button{font-family:inherit;cursor:pointer}
   background:
     radial-gradient(circle at 50% 8%,rgba(255,211,93,.28),transparent 42%),
     linear-gradient(180deg,#2b1f12,#0b0a0d);
-  box-shadow:5px 5px 0 rgba(0,0,0,.42),0 0 30px rgba(245,196,50,.34);
+  box-shadow:4px 4px 0 rgba(0,0,0,.42),0 0 24px rgba(245,196,50,.3);
 }
 
 .career-opponent.locked b,
 .career-opponent.locked span{
   color:#b6b6bd;
+}
+
+.career-opponent.selected{
+  border-color:#fff4bd;
+  outline:3px solid #d52b33;
+  outline-offset:-6px;
+  opacity:1;
+  transform:translateY(-2px);
+  box-shadow:5px 7px 0 rgba(0,0,0,.4),0 0 20px rgba(213,43,51,.24);
+}
+
+.career-status{
+  min-height:12px;
+  margin:2px 0 0;
+  color:#ffcf66;
+  font-size:12px;
+  font-weight:900;
+}
+
+.career-actions{
+  flex:0 0 auto;
+  margin-top:0;
+}
+
+.career-actions .small-btn{min-width:180px}
+
+.career-actions .small-btn:disabled{
+  opacity:.45;
+  filter:grayscale(1);
+  cursor:not-allowed;
 }
 
 .challenge-menu-card{
@@ -3712,8 +3994,40 @@ button{font-family:inherit;cursor:pointer}
 }
 
 @media (max-width:900px){
-  .career-grid{
+  #career .menu-wrap{
+    align-items:flex-start;
+    padding:10px;
+    overflow:auto;
+  }
+  #career .career-menu-card{
+    width:100%;
+    height:auto;
+    max-height:none;
+    min-height:calc(100dvh - 20px);
+    overflow:visible;
+  }
+  .career-layout{
     grid-template-columns:1fr;
+  }
+  .career-focus{
+    grid-template-rows:minmax(440px,62vh) auto;
+  }
+  .career-deck-summary{
+    min-height:190px;
+  }
+  .career-season-drawer{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .career-season-toggle{
+    grid-template-columns:76px minmax(0,1fr) 36px 18px;
+    padding-inline:10px;
+  }
+  .career-season-toggle strong{font-size:18px}
+  .career-actions{
+    position:sticky;
+    bottom:0;
+    padding:10px 0;
+    background:rgba(10,10,16,.96);
   }
   .challenge-layout{
     grid-template-columns:1fr;
@@ -3730,6 +4044,14 @@ button{font-family:inherit;cursor:pointer}
   .booster-ticket-grid{
     grid-template-columns:1fr;
   }
+}
+
+@media (max-width:560px){
+  .career-season-drawer{grid-template-columns:1fr}
+  .career-season-toggle{grid-template-columns:66px minmax(0,1fr) 30px 16px}
+  .career-season-toggle strong{font-size:16px}
+  .career-summary-meta{grid-template-columns:1fr 1fr}
+  .career-summary-meta span:last-child{grid-column:1/-1}
 }
 
 .shop-menu-card,
