@@ -4843,6 +4843,23 @@ button{font-family:inherit;cursor:pointer}
   text-transform:uppercase;
 }
 
+.deck-effect-filter label{
+  width:50px;
+  color:#d9c99c;
+  font-size:10px;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+
+.deck-effect-filter select{
+  width:min(280px,calc(100% - 54px));
+  height:30px;
+  background:#141720;
+  color:#f7f1df;
+  border-color:rgba(255,211,93,.5);
+  font-size:12px;
+}
+
 .deck-filter-chip{
   min-height:24px;
   padding:3px 6px;

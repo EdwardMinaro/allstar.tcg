@@ -10664,7 +10664,45 @@ function setDeckPreview(cardOrKey){
   preview.innerHTML=card ? `<div class="deck-preview-card">${cardHTML(card,"","")}</div>` : `<div class="preview-empty">Survole une carte</div>`;
 }
 
-const deckInventoryFilters={type:"",rarity:"",stat:""};
+// Une carte peut appartenir à plusieurs familles ; les identifiants d'effet
+// évitent de dépendre de la formulation affichée sur son visuel.
+const DECK_EFFECT_FAMILIES=[
+  {id:"stats",label:"Bonus de stats",test:ability=>/^(?:bellRandomStats2|bonus(?:EquippedForceSpeed2|OdysseeTechForceTeam|PassionForceCharTeam|PfiCharSpeedTeam)|bossSecondWind|charismaWinRandom3|drawToSixBonusStats|entry(?:DiscardUpTo3RandomStat2|IfTrevorInGraveFTV1|MelusineGraveSpeedTechnique1Each|RandomStat3|RandomStats5IfMoreWrestlersGrave|StatChoice3)|first(?:Round(?!OpponentMill1)|WinAll1)|graveElAmnesicoAll1|m(?:All|Char|Force|Random|Technique|Vitesse|Weakest)|managerOwnedTechForceSpeed1|matchRoundOneAll1|next(?:EntryAll1|SpeedOnFirstLoss)|object(?:Choice|Owned)|pinObject20|reveal(?:CharlieEachRoundForcePin|DanEachRoundTechSpeed2|ObjectHandCharSpeed)|round(?:2|4|Rps)|secondPlayer|starter|techniqueRound1|turn(?:CatRandom|CharismaMinus1|RandomPermanent)|winSpeedCharisma1)/.test(ability)},
+  {id:"malus",label:"Malus de stats",test:ability=>/^(?:entryEnemy|lossEnemy|turnEnemy(?:Force|Random|Speed)|turnOpponentDiscardWorldCharisma|winNextEnemy)/.test(ability)},
+  {id:"draw",label:"Pioche",test:ability=>/draw|megaphoneRound1/i.test(ability)},
+  {id:"discard",label:"Défausse",test:ability=>/discard|mill|megaphoneRound1/i.test(ability)},
+  {id:"recover",label:"Récupération",test:ability=>/recover|winCaptureOpponent|bossSecondWind|entryPlaySupportFromGrave/i.test(ability)},
+  {id:"cancel",label:"Annulation",test:ability=>/cancel|immuneOtherCardEffects|entryResetEnemyStatMods/i.test(ability)},
+  {id:"pin",label:"Tombé",test:ability=>/pin/i.test(ability)},
+  {id:"defense",label:"Protection / survie",test:ability=>/pinShield|pinDual|turnEnemyPinMinus10|firstLossDeck|bossSecondWind|immuneOtherCardEffects|lossReturnEnemyWrestlerToHand/i.test(ability)},
+  {id:"wheel",label:"Roulette / duel",test:ability=>/wheel|reroll|sameStatNext|roundRpsAll1/i.test(ability)},
+  {id:"tag",label:"Tag",test:ability=>/tag/i.test(ability)},
+  {id:"deck",label:"Manipulation du deck",test:ability=>/tutor|entryRecoverFactionDeck|recoverBonusDeck|recoverJaydonOrFenrir|firstRoundOpponentMill1/i.test(ability)},
+  {id:"support",label:"Bonus / objets",test:ability=>/objectExtra|doubleEquipped|bonusEquipped|managerOwned|objectOwned|opponentDiscardOnSupport|entryPlaySupportFromGrave/i.test(ability)},
+  {id:"copy",label:"Copie / inversion",test:ability=>/copy|invert/i.test(ability)},
+  {id:"reveal",label:"Révélation",test:ability=>/^reveal/i.test(ability)},
+  {id:"none",label:"Sans effet",test:()=>false},
+  {id:"other",label:"Autres effets",test:()=>false}
+];
+const deckInventoryFilters={type:"",rarity:"",stat:"",effect:""};
+
+function deckEffectFamilies(card){
+  const ability=String(card?.ability||"");
+  if(!ability)return ["none"];
+  const families=DECK_EFFECT_FAMILIES.filter(family=>family.test(ability)).map(family=>family.id);
+  return families.length?families:["other"];
+}
+
+function updateDeckEffectFilter(){
+  const select=document.getElementById("deckEffectFilter");
+  if(!select)return;
+  if(select.options.length===1){
+    DECK_EFFECT_FAMILIES
+      .filter(family=>CARD_DATA.some(card=>deckEffectFamilies(card).includes(family.id)))
+      .forEach(family=>select.add(new Option(family.label,family.id)));
+  }
+  select.value=deckInventoryFilters.effect;
+}
 
 function normalizeDeckFilterText(value){
   return String(value||"")
@@ -10678,6 +10716,7 @@ function updateDeckFilterControls(){
     const filter=button.dataset.deckFilter;
     button.classList.toggle("active",deckInventoryFilters[filter]===button.dataset.filterValue);
   });
+  updateDeckEffectFilter();
 }
 
 function setDeckInventoryFilter(filter,value){
@@ -10698,6 +10737,7 @@ function renderDeckInventory(deck){
     if(search&&!searchable.includes(search))return false;
     if(deckInventoryFilters.type&&card.type!==deckInventoryFilters.type)return false;
     if(deckInventoryFilters.rarity&&card.rarity!==deckInventoryFilters.rarity)return false;
+    if(deckInventoryFilters.effect&&!deckEffectFamilies(card).includes(deckInventoryFilters.effect))return false;
     return true;
   });
   poolCards.sort((a,b)=>{

@@ -542,6 +542,12 @@
                 <button class="deck-filter-chip" type="button" data-deck-filter="stat" data-filter-value="Technique" onclick="setDeckInventoryFilter('stat','Technique')">Technique</button>
                 <button class="deck-filter-chip" type="button" data-deck-filter="stat" data-filter-value="Charisme" onclick="setDeckInventoryFilter('stat','Charisme')">Charisme</button>
               </div>
+              <div class="deck-filter-group deck-effect-filter">
+                <label for="deckEffectFilter">Effet</label>
+                <select id="deckEffectFilter" onchange="setDeckInventoryFilter('effect',this.value)">
+                  <option value="">Toutes les familles</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="deck-card-pool" id="deckCardPool"></div>
