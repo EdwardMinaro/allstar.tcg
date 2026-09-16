@@ -7709,11 +7709,11 @@ button:disabled,
   #game .options-menu .current-track{grid-row:10}
 }
 
-/* The in-match controls behave as one centered toolbar instead of three
-   independent elements positioned with viewport calculations. */
+/* Keep music controls above the round/duel overlays (z-index:50), including
+   while the opponent plays, while the options modal remains above them. */
 #game .game-utility-controls{
   position:absolute;
-  z-index:30;
+  z-index:55;
   top:26px;
   left:0;
   width:clamp(314px,19vw,374px);
