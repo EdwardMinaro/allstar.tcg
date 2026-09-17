@@ -3338,18 +3338,21 @@ function normalizeDeckCards(cards){
 }
 function legalDeckKeys(keys, maxCards=20){
   const used={};
-  const rarityCount={Rare:0,Legende:0};
-  const rarityLimit={Rare:8,Legende:3};
+  let rares=0,legendSlots=0,ultimates=0;
   const result=[];
   normalizeDeckCards(keys).forEach(key=>{
     if(result.length>=maxCards)return;
     const card=cardByKey(key);
     if(!card)return;
     if((used[key]||0)>=2)return;
-    if(rarityLimit[card.rarity] && rarityCount[card.rarity]>=rarityLimit[card.rarity])return;
+    if(card.rarity==="Rare"&&rares>=8)return;
+    if((card.rarity==="Legende"||card.rarity==="Ultime")&&legendSlots>=3)return;
+    if(card.rarity==="Ultime"&&ultimates>=1)return;
     result.push(key);
     used[key]=(used[key]||0)+1;
-    if(rarityLimit[card.rarity])rarityCount[card.rarity]++;
+    if(card.rarity==="Rare")rares++;
+    if(card.rarity==="Legende"||card.rarity==="Ultime")legendSlots++;
+    if(card.rarity==="Ultime")ultimates++;
   });
   return result;
 }
@@ -4849,11 +4852,12 @@ function renderDeckSelect(){
     const active=deck.id===deckState.selectedId;
     const message=deckLaunchMessage(deck);
     const rareCount=deckRarityCount(deck,"Rare");
-    const legendCount=deckRarityCount(deck,"Legende");
+    const legendCount=deckLegendSlotCount(deck);
+    const ultimateCount=deckRarityCount(deck,"Ultime");
     return `<button class="deck-select-row ${active?"active":""}" onclick="selectLaunchDeck('${escapeAttr(deck.id)}')">
       <span>${deck.name}</span>
       <b>${deck.cards.length}/20 cartes</b>
-      <small>Rares ${rareCount}/8 · Légendaires ${legendCount}/3${message?` · ${message}`:""}</small>
+      <small>Rares ${rareCount}/8 · Légendaires/Ultimes ${legendCount}/3 · Ultimes ${ultimateCount}/1${message?` · ${message}`:""}</small>
     </button>`;
   }).join("");
   const selected=selectedDeck();
@@ -9008,21 +9012,16 @@ function starterStandardCards(){
 function autoDeckFromCollection(){
   const keys=[];
   const perCard={};
-  const rarityLimit={Rare:8,Legende:3};
-  const rarityCount={Rare:0,Legende:0};
   for(const card of CARD_DATA){
     const key=cardKey(card);
     const owned=ownedCount(key);
     for(let i=0;i<owned;i++){
-      if(keys.length>=20)break;
       if((perCard[key]||0)>=2)break;
-      if(rarityLimit[card.rarity] && rarityCount[card.rarity]>=rarityLimit[card.rarity])break;
       keys.push(key);
       perCard[key]=(perCard[key]||0)+1;
-      if(rarityLimit[card.rarity])rarityCount[card.rarity]++;
     }
   }
-  return keys;
+  return legalDeckKeys(keys);
 }
 
 function claimLimitedGiftCampaign(){
@@ -9951,14 +9950,14 @@ function challengeDeckForBoss(boss){
     name:boss.name,
     season:boss.rarity==="Standard"?0:boss.rarity==="Rare"?1:boss.rarity==="Legende"?2:3,
     priorityStats:stats,
-    legendSlots:boss.rarity==="Legende"?2:boss.rarity==="Ultime"?3:0,
+    legendSlots:boss.rarity==="Legende"||boss.rarity==="Ultime"?2:0,
     ultimateBoss:boss.rarity==="Ultime"
   };
   addCareerKey(keys,boss,boss.rarity==="Ultime"?1:2);
   addCareerPool(keys, careerSupportPool(entry,boss.rarity==="Standard"?"Standard":"Rare"), 8);
   // Le catcheur légendaire est déjà le pic de difficulté du défi : son appui
   // reste volontairement Standard/Rare pour éviter un cumul impraticable.
-  if(boss.rarity==="Ultime")addCareerPool(keys, careerSupportPool(entry,"Legende"), 3);
+  if(boss.rarity==="Ultime")addCareerPool(keys, careerSupportPool(entry,"Legende"), 2);
   addCareerPool(keys, careerSupportPool(entry,"Standard"), 20);
   return legalDeckKeys(keys);
 }
@@ -10021,40 +10020,40 @@ const CAREER_SEASONS = [
 
 const HALL_OF_FAME_DECKS = {
   heddi_technique: [
-    "ultime_catcheurs_heddi_karaoui", "ultime_catcheurs_heddi_karaoui",
-    "legende_catcheurs_zaeken", "legende_catcheurs_andre_levissieux", "legende_objets_ceinture_de_champion",
+    "ultime_catcheurs_heddi_karaoui", "standard_managers_mr_catch",
+    "legende_catcheurs_zaeken", "standard_managers_edward_minaro", "legende_objets_ceinture_de_champion",
     "rare_catcheurs_drix", "rare_catcheurs_drix", "rare_catcheurs_zaeken", "rare_catcheurs_zaeken",
     "rare_managers_damien_chevallier", "rare_managers_damien_chevallier", "rare_managers_l_odyssee", "rare_managers_l_odyssee",
     "standard_catcheurs_boume", "standard_catcheurs_boume", "standard_catcheurs_zaeken", "standard_catcheurs_zaeken",
     "standard_objets_livre", "standard_objets_livre", "standard_managers_mr_catch"
   ],
   marc_endurance: [
-    "ultime_catcheurs_marc_sebire", "ultime_catcheurs_marc_sebire",
-    "legende_catcheurs_yann_skoric", "legende_catcheurs_baadshah_pehalwan_khan", "legende_objets_ceinture_de_champion",
+    "ultime_catcheurs_marc_sebire", "standard_managers_lord_gideon_salvini",
+    "legende_catcheurs_yann_skoric", "standard_objets_barriere", "legende_objets_ceinture_de_champion",
     "rare_catcheurs_dario_murro", "rare_catcheurs_dario_murro", "rare_catcheurs_koro", "rare_catcheurs_koro",
     "rare_managers_lord_gideon_salvini", "rare_managers_lord_gideon_salvini", "rare_objets_camera", "rare_objets_camera",
     "standard_catcheurs_tom_evans", "standard_catcheurs_tom_evans", "standard_catcheurs_erik_inoa", "standard_catcheurs_erik_inoa",
     "standard_catcheurs_r_man", "standard_catcheurs_r_man", "standard_managers_lord_gideon_salvini"
   ],
   mbm_explosion: [
-    "ultime_catcheurs_mbm", "ultime_catcheurs_mbm",
-    "legende_catcheurs_yann_skoric", "legende_managers_mr_ringsider", "legende_objets_ceinture_de_champion",
+    "ultime_catcheurs_mbm", "standard_managers_loic_bloodykilt",
+    "legende_catcheurs_yann_skoric", "standard_objets_chaise", "legende_objets_ceinture_de_champion",
     "rare_catcheurs_dario_murro", "rare_catcheurs_dario_murro", "rare_catcheurs_koro", "rare_catcheurs_koro",
     "rare_objets_caddie", "rare_objets_caddie", "rare_objets_extincteur", "rare_objets_extincteur",
     "standard_catcheurs_r_man", "standard_catcheurs_r_man", "standard_catcheurs_erik_inoa", "standard_catcheurs_erik_inoa",
     "standard_managers_lord_gideon_salvini", "standard_managers_lord_gideon_salvini", "standard_managers_loic_bloodykilt"
   ],
   lauriana_bonus: [
-    "ultime_catcheurs_princesse_lauriana", "ultime_catcheurs_princesse_lauriana",
-    "legende_catcheurs_heracles", "legende_managers_loic_bloodykilt", "legende_objets_ceinture_de_champion",
+    "ultime_catcheurs_princesse_lauriana", "standard_catcheurs_erik_inoa",
+    "legende_catcheurs_heracles", "standard_managers_mr_catch", "legende_objets_ceinture_de_champion",
     "rare_catcheurs_queen_phoenixia", "rare_catcheurs_queen_phoenixia", "rare_catcheurs_pauline", "rare_catcheurs_pauline",
     "rare_managers_pure_tradition", "rare_managers_pure_tradition", "rare_managers_mr_catch", "rare_managers_mr_catch",
     "standard_catcheurs_lior_divine", "standard_catcheurs_lior_divine", "standard_catcheurs_erik_inoa",
     "standard_managers_edward_minaro", "standard_managers_edward_minaro", "standard_managers_lord_gideon_salvini", "standard_managers_lord_gideon_salvini"
   ],
   tom_second_wind: [
-    "ultime_catcheurs_tom_la_ruffa", "ultime_catcheurs_tom_la_ruffa",
-    "legende_catcheurs_shawn_olsen", "legende_managers_r_man", "legende_objets_sledgehammer",
+    "ultime_catcheurs_tom_la_ruffa", "standard_objets_barriere",
+    "legende_catcheurs_shawn_olsen", "standard_managers_mr_catch", "legende_objets_sledgehammer",
     "rare_catcheurs_john_gage", "rare_catcheurs_john_gage", "rare_catcheurs_r_man", "rare_catcheurs_r_man",
     "rare_managers_mr_ringsider", "rare_managers_mr_ringsider", "rare_managers_pierreluck", "rare_managers_pierreluck",
     "standard_catcheurs_maffa", "standard_catcheurs_maffa", "standard_catcheurs_ben_damage", "standard_catcheurs_ben_damage",
@@ -10087,11 +10086,11 @@ const CAREER_ROSTER = [
   { name:"Tyson Briggs", season:3, difficulty:5, archetype:"champion_pressure", priorityStats:["Force","Vitesse"], legendSlots:3 },
   { name:"Adam Frost", season:3, difficulty:6, archetype:"champion_attrition", priorityStats:["Vitesse","Charisme"], legendSlots:3 },
 
-  { name:"Heddi Karaoui", season:4, difficulty:7, archetype:"hall_technique", priorityStats:["Technique","Force"], legendSlots:3, ultimateBoss:true, hallOfFame:true, deckId:"heddi_technique" },
-  { name:"Marc Sebire", season:4, difficulty:7, archetype:"hall_endurance", priorityStats:["Vitesse","Charisme"], legendSlots:3, ultimateBoss:true, hallOfFame:true, deckId:"marc_endurance" },
-  { name:"MBM", season:4, difficulty:7, archetype:"hall_explosion", priorityStats:["Charisme","Vitesse"], legendSlots:3, ultimateBoss:true, hallOfFame:true, deckId:"mbm_explosion" },
-  { name:"Princesse Lauriana", season:4, difficulty:7, archetype:"hall_bonus", priorityStats:["Force","Charisme"], legendSlots:3, ultimateBoss:true, hallOfFame:true, deckId:"lauriana_bonus" },
-  { name:"Tom La Ruffa", season:4, difficulty:8, archetype:"hall_second_wind", priorityStats:["Charisme","Technique","Force","Vitesse"], legendSlots:3, ultimateBoss:true, hallOfFame:true, finalBoss:true, deckId:"tom_second_wind" }
+  { name:"Heddi Karaoui", season:4, difficulty:7, archetype:"hall_technique", priorityStats:["Technique","Force"], legendSlots:2, ultimateBoss:true, hallOfFame:true, deckId:"heddi_technique" },
+  { name:"Marc Sebire", season:4, difficulty:7, archetype:"hall_endurance", priorityStats:["Vitesse","Charisme"], legendSlots:2, ultimateBoss:true, hallOfFame:true, deckId:"marc_endurance" },
+  { name:"MBM", season:4, difficulty:7, archetype:"hall_explosion", priorityStats:["Charisme","Vitesse"], legendSlots:2, ultimateBoss:true, hallOfFame:true, deckId:"mbm_explosion" },
+  { name:"Princesse Lauriana", season:4, difficulty:7, archetype:"hall_bonus", priorityStats:["Force","Charisme"], legendSlots:2, ultimateBoss:true, hallOfFame:true, deckId:"lauriana_bonus" },
+  { name:"Tom La Ruffa", season:4, difficulty:8, archetype:"hall_second_wind", priorityStats:["Charisme","Technique","Force","Vitesse"], legendSlots:2, ultimateBoss:true, hallOfFame:true, finalBoss:true, deckId:"tom_second_wind" }
 ];
 
 function careerOpponents(){
@@ -10166,7 +10165,7 @@ function careerDeckForOpponent(opponent){
   addCareerKey(keys,ownStandard,2);
   addCareerKey(keys,ownRare,2);
 
-  let legendsToAdd=entry.legendSlots||0;
+  let legendsToAdd=Math.min(entry.legendSlots||0,entry.ultimateBoss?2:3);
   while(legendsToAdd>0&&ownLegend){
     addCareerKey(keys,ownLegend,1);
     legendsToAdd--;
@@ -10626,10 +10625,15 @@ function deckRarityCount(deck, rarity){
   return deck.cards.filter(key=>cardByKey(key)?.rarity===rarity).length;
 }
 
+function deckLegendSlotCount(deck){
+  return deckRarityCount(deck,"Legende")+deckRarityCount(deck,"Ultime");
+}
+
 function deckRuleMessage(deck, key=null){
   if(deck.cards.length > 20)return "Maximum 20 cartes dans un deck.";
   if(deckRarityCount(deck,"Rare") > 8)return "Maximum 8 cartes Rares dans un deck.";
-  if(deckRarityCount(deck,"Legende") > 3)return "Maximum 3 cartes Légendaires dans un deck.";
+  if(deckRarityCount(deck,"Ultime") > 1)return "Maximum 1 carte Ultime dans un deck.";
+  if(deckLegendSlotCount(deck) > 3)return "Maximum 3 cartes Légendaires et Ultimes réunies dans un deck.";
   const counts={};
   for(const cardKeyValue of deck.cards){
     counts[cardKeyValue]=(counts[cardKeyValue]||0)+1;
@@ -10640,7 +10644,8 @@ function deckRuleMessage(deck, key=null){
     if(deck.cards.length >= 20)return "Maximum 20 cartes dans un deck.";
     if(cardCount(deck,key) >= 2)return "Maximum 2 exemplaires d'une même carte.";
     if(card?.rarity==="Rare" && deckRarityCount(deck,"Rare") >= 8)return "Maximum 8 cartes Rares dans un deck.";
-    if(card?.rarity==="Legende" && deckRarityCount(deck,"Legende") >= 3)return "Maximum 3 cartes Légendaires dans un deck.";
+    if(card?.rarity==="Ultime" && deckRarityCount(deck,"Ultime") >= 1)return "Maximum 1 carte Ultime dans un deck.";
+    if((card?.rarity==="Legende"||card?.rarity==="Ultime") && deckLegendSlotCount(deck) >= 3)return "Maximum 3 cartes Légendaires et Ultimes réunies dans un deck.";
   }
   return "";
 }
@@ -10775,7 +10780,7 @@ function renderSelectedDeck(deck){
   const nameInput=document.getElementById("deckName");
   if(!grid || !meta || !nameInput)return;
   nameInput.value=deck?.name||"";
-  meta.textContent=deck ? `${deck.cards.length}/20 cartes - Rares ${deckRarityCount(deck,"Rare")}/8 - Légendaires ${deckRarityCount(deck,"Legende")}/3` : "Aucun deck sélectionné";
+  meta.textContent=deck ? `${deck.cards.length}/20 cartes - Rares ${deckRarityCount(deck,"Rare")}/8 - Légendaires/Ultimes ${deckLegendSlotCount(deck)}/3 - Ultimes ${deckRarityCount(deck,"Ultime")}/1` : "Aucun deck sélectionné";
   if(!deck){
     grid.innerHTML=`<div class="deck-empty-note">Crée un deck pour commencer.</div>`;
     return;

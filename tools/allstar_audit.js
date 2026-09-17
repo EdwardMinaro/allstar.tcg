@@ -44,6 +44,7 @@ return {
   cardByKey,
   careerOpponents,
   careerDeckForOpponent,
+  challengeDeckForBoss,
   deckRuleMessage
 };`
   )(documentStub, windowStub);
@@ -122,15 +123,23 @@ function run() {
     if (!deckCards.some(card => card.type === "Catcheur")) errors.push(`Carrière ${opponent.name}: deck sans catcheur`);
     const counts = rarityCounts(deckCards);
     if ((counts.Rare || 0) > 8) errors.push(`Carrière ${opponent.name}: ${counts.Rare} rares dans le deck`);
-    if ((counts.Legende || 0) > 3) errors.push(`Carrière ${opponent.name}: ${counts.Legende} légendaires dans le deck`);
+    if ((counts.Ultime || 0) > 1) errors.push(`Carrière ${opponent.name}: ${counts.Ultime} ultimes dans le deck`);
+    if ((counts.Legende || 0) + (counts.Ultime || 0) > 3) errors.push(`Carrière ${opponent.name}: trop de légendaires et d'ultimes dans le deck`);
     if (opponent.hallOfFame) {
       const ultimateKey = game.cardKey(opponent.card);
       const centerpieceCopies = deckKeys.filter(key => key === ultimateKey).length;
       if (opponent.card.rarity !== "Ultime") errors.push(`Hall of Fame ${opponent.name}: la carte maîtresse n'est pas Ultime`);
-      if (centerpieceCopies !== 2) errors.push(`Hall of Fame ${opponent.name}: ${centerpieceCopies}/2 exemplaires de la carte maîtresse`);
-      if ((counts.Legende || 0) !== 3 || (counts.Rare || 0) !== 8) {
+      if (centerpieceCopies !== 1) errors.push(`Hall of Fame ${opponent.name}: ${centerpieceCopies}/1 exemplaire de la carte maîtresse`);
+      if ((counts.Legende || 0) !== 2 || (counts.Rare || 0) !== 8) {
         errors.push(`Hall of Fame ${opponent.name}: composition non optimisée (${counts.Legende || 0} Légendaires, ${counts.Rare || 0} Rares)`);
       }
+    }
+  }
+  for(const boss of game.CARD_DATA.filter(card=>card.rarity==="Ultime")){
+    const deckKeys=game.challengeDeckForBoss(boss);
+    const counts=rarityCounts(deckKeys.map(game.cardByKey).filter(Boolean));
+    if(deckKeys.length!==20 || (counts.Ultime||0)!==1 || (counts.Legende||0)>2 || (counts.Rare||0)>8){
+      errors.push(`Défi ${boss.name}: composition illégale (${deckKeys.length} cartes, ${counts.Ultime||0} Ultime, ${counts.Legende||0} Légendaires, ${counts.Rare||0} Rares)`);
     }
   }
 
