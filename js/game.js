@@ -4421,6 +4421,9 @@ function draw(p,n=1){
 }
 
 function hasCat(hand){return hand.some(c=>c.type==="Catcheur")}
+function needsStartingWrestler(player){
+  return !player?.cat&&!hasCat(player?.hand||[]);
+}
 
 function drawStartOfRound(){
   [G.player,G.ai].forEach(p=>{
@@ -4972,12 +4975,12 @@ function startMatch(options={}){
   draw(G.ai,5);
 
   // Mulligan uniquement au début de partie si aucun catcheur.
-  while(!hasCat(G.player.hand)){
+  while(needsStartingWrestler(G.player)){
     G.player.deck.push(...G.player.hand.splice(0));
     shuffle(G.player.deck);
     draw(G.player,5);
   }
-  while(!hasCat(G.ai.hand)){
+  while(needsStartingWrestler(G.ai)){
     G.ai.deck.push(...G.ai.hand.splice(0));
     shuffle(G.ai.deck);
     draw(G.ai,5);
