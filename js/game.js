@@ -4165,14 +4165,20 @@ function renderProfileStats(profile, connected){
 }
 
 const CARD_SLEEVES=[
-  {id:"classic",label:"Classique",filter:"none"},
-  {id:"halloween",label:"Halloween",filter:"hue-rotate(-28deg) saturate(2.3)"}
+  {id:"classic",label:"Classique",filter:"none",art:"assets/branding/allstars_card_back.png"},
+  {id:"halloween",label:"Halloween",filter:"none",art:"assets/branding/allstars_card_back_halloween.png"}
 ];
 function normalizeSleeveId(id){return CARD_SLEEVES.some(item=>item.id===id)?id:"classic"}
 function selectedCardSleeve(){loadPlayerState();return normalizeSleeveId(playerState.sleeveId)}
 function sleeveFilter(id){return CARD_SLEEVES.find(item=>item.id===normalizeSleeveId(id)).filter}
+function sleeveArt(id){return `url('${new URL(CARD_SLEEVES.find(item=>item.id===normalizeSleeveId(id)).art,document.baseURI).href}')`}
+function setSleeveStyle(el,id){
+  if(!el?.style)return;
+  el.style.setProperty("--card-back-filter",sleeveFilter(id));
+  el.style.setProperty("--card-back-art",sleeveArt(id));
+}
 function renderSleevePicker(){
-  return `<section class="sleeve-picker"><h3>Protège-cartes</h3><p>Choisis le dos de tes cartes pour tes prochaines parties.</p><div class="sleeve-options">${CARD_SLEEVES.map(item=>`<button type="button" class="sleeve-option${normalizeSleeveId(playerState.sleeveId)===item.id?" selected":""}" aria-pressed="${normalizeSleeveId(playerState.sleeveId)===item.id}" onclick="selectCardSleeve('${item.id}')"><span class="sleeve-preview" style="--card-back-filter:${item.filter}"></span><strong>${item.label}</strong><small>${normalizeSleeveId(playerState.sleeveId)===item.id?"Équipé":"Choisir"}</small></button>`).join("")}</div></section>`;
+  return `<section class="sleeve-picker"><h3>Protège-cartes</h3><p>Choisis le dos de tes cartes pour tes prochaines parties.</p><div class="sleeve-options">${CARD_SLEEVES.map(item=>`<button type="button" class="sleeve-option${normalizeSleeveId(playerState.sleeveId)===item.id?" selected":""}" aria-pressed="${normalizeSleeveId(playerState.sleeveId)===item.id}" onclick="selectCardSleeve('${item.id}')"><span class="sleeve-preview" style="--card-back-filter:${item.filter};--card-back-art:${sleeveArt(item.id)}"></span><strong>${item.label}</strong><small>${normalizeSleeveId(playerState.sleeveId)===item.id?"Équipé":"Choisir"}</small></button>`).join("")}</div></section>`;
 }
 function selectCardSleeve(id){
   if(!CARD_SLEEVES.some(item=>item.id===id))return;
@@ -4183,15 +4189,15 @@ function selectCardSleeve(id){
 }
 function applyCardSleeves(){
   const own=normalizeSleeveId(playerState.sleeveId);
-  document.body?.style?.setProperty("--card-back-filter",sleeveFilter(own));
+  setSleeveStyle(document.body,own);
   if(!G)return;
   let enemy=G.ai?.sleeveId||"classic";
   if(isOnlineMatch()){
     const ctx=onlineContext();
     enemy=window.getOnlineMultiplayerContext?.()?.room?.players?.[ctx.opponentSlot]?.profile?.sleeveId||enemy;
   }
-  document.querySelectorAll("#game .left-panel .pile-card").forEach(el=>el.style.setProperty("--card-back-filter",sleeveFilter(own)));
-  document.querySelectorAll("#enemyHand,#game .enemy-piles .pile-card").forEach(el=>el.style.setProperty("--card-back-filter",sleeveFilter(enemy)));
+  document.querySelectorAll("#game .left-panel .pile-card").forEach(el=>setSleeveStyle(el,own));
+  document.querySelectorAll("#enemyHand,#game .enemy-piles .pile-card").forEach(el=>setSleeveStyle(el,enemy));
 }
 
 async function selectProfileTitle(title){

@@ -1,0 +1,7 @@
+# Dos Halloween — citrouille
+
+Retouche réalisée avec l'outil de génération d'images intégré, depuis `assets/branding/allstars_card_back.png`. Résultat : `assets/branding/allstars_card_back_halloween.png`. L'original reste intact. Le choix sauvegardé `halloween` charge désormais ce visuel, sans filtre supplémentaire.
+
+## Consigne de retouche
+
+Use case: precise-object-edit. Edit target: the provided ALLSTAR playing card back. Create a Halloween sibling variant of exactly this card back. Preserve its portrait 650:930 aspect ratio, full edge-to-edge composition, black textured leather panels, diagonal grooves, concentric central medallion, thin decorative lines, beveled frame and placement of every element. Shift the gold metal accents to glowing warm orange/copper (the user approved the orange recolor). Replace ONLY the central five-pointed star inside the medallion with one small sculpted metallic orange jack-o-lantern pumpkin with carved eyes and smile, centered and fitting entirely within the circle, similar visual weight to the old star. Retain black negative space around the pumpkin. Elegant dark wrestling trading card aesthetic, dimensional metallic highlights matching existing material. No extra pumpkins or bats, no words, no letters, no new decoration, no new border, no mockup, no perspective change, no background outside the card. Keep original border and proportions intact.
