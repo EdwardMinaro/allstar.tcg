@@ -7,6 +7,7 @@ const AUDIO_LIBRARY = {
     tension: { label: "Tension", src: "assets/audio/music/tension.mp3" },
     victoire: { label: "Victoire", src: "assets/audio/music/victoire.mp3" },
     defaite: { label: "Défaite", src: "assets/audio/music/defaite.mp3" },
+    halloween_2026: { label: "Halloween 2026", src: "assets/audio/music/halloween_2026.mp3", seasonal: true },
     adam_frost: {
       label: "Adam Frost",
       wrestler: "Adam Frost",
@@ -347,6 +348,15 @@ const AUDIO_LIBRARY = {
     erreur: { label: "Erreur", src: "assets/audio/sfx/erreur.mp3" }
   }
 };
+
+const HALLOWEEN_AUDIO_SEASON = {
+  startsAt: Date.parse("2026-10-29T00:00:00+01:00"),
+  endsAt: Date.parse("2026-11-20T00:00:00+01:00")
+};
+
+function isHalloweenAudioSeasonActive(now = Date.now()) {
+  return Number(now) >= HALLOWEEN_AUDIO_SEASON.startsAt && Number(now) < HALLOWEEN_AUDIO_SEASON.endsAt;
+}
 
 class AudioManager {
   constructor(library) {
@@ -713,6 +723,7 @@ class AudioManager {
 const audioManager = new AudioManager(AUDIO_LIBRARY);
 window.AUDIO_LIBRARY = AUDIO_LIBRARY;
 window.audioManager = audioManager;
+window.isHalloweenAudioSeasonActive = isHalloweenAudioSeasonActive;
 
 function initAudioOptions() {
   const wrestlerTracks = Object.entries(AUDIO_LIBRARY.music)
@@ -801,5 +812,6 @@ function toggleThemePause() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initAudioOptions();
-  audioManager.playWrestlerRadio();
+  if (isHalloweenAudioSeasonActive()) audioManager.playMusic("halloween_2026");
+  else audioManager.playWrestlerRadio();
 });

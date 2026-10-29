@@ -1231,6 +1231,119 @@ button{font-family:inherit;cursor:pointer}
   isolation:isolate;
 }
 
+.halloween-cosmetic{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  overflow:hidden;
+}
+.halloween-cosmetic[hidden],
+.halloween-event-badge[hidden],
+.booster-pack.halloween[hidden]{display:none!important}
+
+.halloween-active .home-stage:after{
+  background:
+    radial-gradient(circle at 18% 22%,rgba(255,111,0,.24),transparent 24%),
+    radial-gradient(circle at 82% 16%,rgba(121,55,214,.3),transparent 27%),
+    radial-gradient(circle,#55475f 2px,transparent 3px) 0 0/26px 26px,
+    linear-gradient(180deg,rgba(29,4,38,.2),rgba(0,0,0,.68));
+  opacity:.52;
+}
+
+.halloween-active .home-light.red{
+  background:linear-gradient(120deg,rgba(255,103,0,.9),rgba(255,72,0,.25) 42%,transparent 68%);
+}
+
+.halloween-active .home-light.blue{
+  background:linear-gradient(240deg,rgba(121,55,214,.92),rgba(67,31,135,.3) 42%,transparent 68%);
+}
+
+.halloween-bat,
+.halloween-pumpkin{
+  position:absolute;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.7));
+  user-select:none;
+}
+
+.halloween-bat{font-size:46px;animation:halloweenFloat 4.8s ease-in-out infinite alternate}
+.halloween-bat.bat-one{left:11%;top:12%;transform:rotate(-18deg)}
+.halloween-bat.bat-two{right:12%;top:18%;font-size:38px;animation-delay:-2.1s;transform:rotate(16deg)}
+.halloween-pumpkin{bottom:4%;font-size:76px}
+.halloween-pumpkin.pumpkin-one{left:7%;transform:rotate(-7deg)}
+.halloween-pumpkin.pumpkin-two{right:7%;transform:rotate(7deg)}
+
+.halloween-event-badge{
+  position:absolute;
+  top:24px;
+  right:24px;
+  z-index:8;
+  padding:8px 18px;
+  border:2px solid #ff8a1f;
+  border-radius:999px;
+  color:#ffe4b5;
+  background:linear-gradient(180deg,rgba(65,17,74,.96),rgba(21,7,28,.96));
+  box-shadow:0 0 22px rgba(255,104,0,.55),0 6px 0 rgba(0,0,0,.45);
+  font-weight:1000;
+  font-style:italic;
+  letter-spacing:.08em;
+}
+
+/* Seasonal skin: keep the layout untouched and only swap the palette. */
+body.halloween-active{
+  --btn-blue-top:#ff9f2f;
+  --btn-blue-bottom:#b84800;
+  --btn-blue-border:#4b1900;
+  --btn-gold-top:#ffb23f;
+  --btn-gold-bottom:#d76005;
+  --btn-gold-border:#5b2100;
+  background:#030303;
+}
+
+body.halloween-active .screen{
+  background:#030303!important;
+}
+
+body.halloween-active #menu,
+body.halloween-active #homeOptionsScreen{
+  background:
+    radial-gradient(circle at 18% 12%,rgba(255,111,0,.28),transparent 24%),
+    radial-gradient(circle at 84% 16%,rgba(255,111,0,.18),transparent 25%),
+    linear-gradient(180deg,#020202,#080503 52%,#020202)!important;
+}
+
+body.halloween-active .home-light.blue{
+  background:linear-gradient(240deg,rgba(255,116,20,.72),rgba(151,54,0,.22) 42%,transparent 68%);
+}
+
+body.halloween-active .home-action,
+body.halloween-active .duel-choice,
+body.halloween-active #menu .home-quick-actions button,
+body.halloween-active .home-control-trigger,
+body.halloween-active .next-track-button,
+body.halloween-active .settings,
+body.halloween-active .home-options-tabs button,
+body.halloween-active #game .game-options-tabs button,
+body.halloween-active .leaderboard-tab{
+  border-color:#5b2100!important;
+  background:linear-gradient(180deg,#ff9f2f,#b84800)!important;
+  color:#fff7ea!important;
+  box-shadow:0 0 0 2px rgba(255,210,139,.34) inset,6px 6px 0 rgba(0,0,0,.48)!important;
+  text-shadow:2px 2px 0 #351000!important;
+}
+
+body.halloween-active .home-action:hover,
+body.halloween-active .duel-choice:hover,
+body.halloween-active #menu .home-quick-actions button:hover{
+  border-color:#ffd18b!important;
+  filter:brightness(1.08);
+}
+
+@keyframes halloweenFloat{
+  from{translate:0 -5px;rotate:-4deg}
+  to{translate:16px 12px;rotate:7deg}
+}
+
 .home-stage:before{
   content:"";
   position:absolute;
@@ -4179,6 +4292,24 @@ button{font-family:inherit;cursor:pointer}
 .booster-pack.classic{border-color:#a47427}
 .booster-pack.premium{border-color:#1e77d4}
 .booster-pack.champion{border-color:#ffd35d;background:linear-gradient(180deg,#3a2708,#0b0a08)}
+.booster-pack.halloween{
+  grid-column:1/-1;
+  min-height:138px;
+  border-color:#ff7b1a;
+  background:
+    radial-gradient(circle at 86% 30%,rgba(131,67,216,.46),transparent 31%),
+    linear-gradient(120deg,#341039,#120914 58%,#3c1807);
+  box-shadow:8px 8px 0 rgba(0,0,0,.42),0 0 24px rgba(255,104,0,.25);
+}
+.booster-pack.halloween:before{
+  inset:10px 54% 10px 14px;
+  opacity:.42;
+  filter:hue-rotate(248deg) saturate(1.35);
+}
+.booster-pack.halloween span,
+.booster-pack.halloween b,
+.booster-pack.halloween small{margin-left:48%}
+.booster-pack.halloween b{color:#ffad3d}
 
 .shop-actions{
   display:flex;
@@ -8320,4 +8451,56 @@ button:disabled,
   height:100% !important;
   object-fit:contain !important;
   object-position:center !important;
+}
+
+/* Halloween swaps the home effects in place, without moving the menu. */
+body.halloween-active #menu .crowd-flashes,
+body.halloween-active #menu .stage-spotlight{
+  display:none!important;
+}
+
+body.halloween-active #menu .halloween-cosmetic{
+  z-index:4;
+}
+
+body.halloween-active #menu .home-stage:before{
+  border-color:rgba(255,132,40,.32)!important;
+  background:linear-gradient(180deg,rgba(14,12,11,.96),rgba(2,2,2,.98))!important;
+}
+
+body.halloween-active #menu .home-stage:after{
+  background:
+    radial-gradient(circle,rgba(255,125,38,.22) 2px,transparent 3px) 0 0/26px 26px,
+    linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.62))!important;
+  opacity:.42;
+}
+
+body.halloween-active #menu .halloween-bat{
+  font-size:34px;
+  opacity:.82;
+}
+
+body.halloween-active #menu .halloween-bat.bat-one{
+  left:14%;
+  top:17%;
+}
+
+body.halloween-active #menu .halloween-bat.bat-two{
+  right:14%;
+  top:20%;
+  font-size:30px;
+}
+
+body.halloween-active #menu .halloween-pumpkin{
+  bottom:18px;
+  font-size:88px;
+  filter:drop-shadow(0 12px 4px rgba(0,0,0,.72)) drop-shadow(0 0 16px rgba(255,113,20,.48));
+}
+
+body.halloween-active #menu .halloween-pumpkin.pumpkin-one{
+  left:38px;
+}
+
+body.halloween-active #menu .halloween-pumpkin.pumpkin-two{
+  right:38px;
 }

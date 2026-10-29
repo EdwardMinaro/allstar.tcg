@@ -2,6 +2,14 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
+## Nouveautés de la version 0.2.26
+
+- L'événement Halloween est disponible du 29 octobre au 19 novembre inclus : ambiance noire et orange, musique d'accueil spéciale et pack Halloween à 666 crédits.
+- Cinq cartes exclusives rejoignent temporairement le jeu : Ben Damage, Melusine, Black Sam, Hades et Ultima Sombra.
+- L'éditeur de decks peut maintenant filtrer les cartes par famille d'effet.
+- Les cartes Ultimes occupent désormais une place Légendaire dans la limite du deck, avec une seule Ultime maximum.
+- Les commandes musicales restent utilisables pendant le tour adverse.
+
 ## Installation
 
 1. Téléchargez `ALLSTAR-Setup-...exe` dans les fichiers de cette release.

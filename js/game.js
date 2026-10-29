@@ -3306,6 +3306,87 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/legende_catcheurs_g_king.png",
     "ability": "entryInvertOpponentSupports",
     "musicId": "g_king"
+  },
+    {
+      "key": "rare_catcheurs_ben_damage_halloween",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Ben Damage",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 3,
+        "Technique": 4,
+        "Charisme": 9
+      },
+      "effect": "Apparition : Copie les changements de statistique du catcheur adverse.",
+      "renderArt": "assets/card_renders/rare_catcheurs_ben_damage_halloween.png",
+      "ability": "entryCopyOpponentStatChanges",
+      "musicId": "ben_damage",
+      "exclusiveEvent": "halloween_2026"
+    },
+    {
+      "key": "rare_catcheurs_melusine_halloween",
+    "type": "Catcheur",
+    "rarity": "Rare",
+    "name": "Melusine",
+    "stats": {
+      "Force": 10,
+      "Vitesse": 1,
+      "Technique": 4,
+      "Charisme": 9
+    },
+    "effect": "Chaque tour, perdez un point dans une statistique aléatoire, et gagnez +2 dans une autre statistique.",
+    "renderArt": "assets/card_renders/rare_catcheurs_melusine_halloween.png",
+    "ability": "turnRandomTransfer2",
+    "exclusiveEvent": "halloween_2026"
+  },
+  {
+    "key": "legende_catcheurs_black_sam_halloween",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Black Sam",
+    "stats": {
+      "Force": 10,
+      "Vitesse": 4,
+      "Technique": 6,
+      "Charisme": 8
+    },
+    "effect": "S'il affronte un catcheur de rareté inférieure à la sienne : +30 au tombé.",
+    "renderArt": "assets/card_renders/legende_catcheurs_black_sam_halloween.png",
+    "ability": "pinLowerRarity30",
+    "exclusiveEvent": "halloween_2026"
+  },
+  {
+    "key": "legende_catcheurs_hades_halloween",
+    "type": "Catcheur",
+    "rarity": "Legende",
+    "name": "Hades",
+    "stats": {
+      "Force": 9,
+      "Vitesse": 6,
+      "Technique": 6,
+      "Charisme": 7
+    },
+    "effect": "Apparition : Lancez un dé, votre adversaire perd un nombre correspondant à la valeur du dé dans une statistique aléatoire.",
+    "renderArt": "assets/card_renders/legende_catcheurs_hades_halloween.png",
+    "ability": "entryDieEnemyRandomStatLoss",
+    "exclusiveEvent": "halloween_2026"
+  },
+  {
+    "key": "ultime_catcheurs_ultima_sombra_halloween",
+    "type": "Catcheur",
+    "rarity": "Ultime",
+    "name": "Ultima Sombra",
+    "stats": {
+      "Force": 8,
+      "Vitesse": 5,
+      "Technique": 6,
+      "Charisme": 9
+    },
+    "effect": "Une fois par match : gagne +2 sur un duel de Force ou impose une relance.",
+    "renderArt": "assets/card_renders/ultime_catcheurs_ultima_sombra_halloween.png",
+    "ability": "ultimateForceOrReroll",
+    "exclusiveEvent": "halloween_2026"
   }
 ];
 
@@ -3387,6 +3468,8 @@ const EFFECT_REGISTRY = {
   entryRecoverFactionDeck: { timing:"entry", text:"À l'arrivée : récupérez The World, Drix, Kyle Hoxton ou Saitovic depuis votre deck.", choice:true },
   entryResetEnemyStatMods: { timing:"entry", text:"À l'arrivée : annule les modifications de statistiques du catcheur adverse." },
   entryMelusineGraveSpeedTechnique1Each: { timing:"entry", text:"À l'arrivée : +1 Vitesse et +1 Technique par Mélusine ou Mélusine Aconit dans votre vestiaire." },
+  entryCopyOpponentStatChanges: { timing:"entry", text:"À l'arrivée : copie les changements de statistiques du catcheur adverse." },
+  entryDieEnemyRandomStatLoss: { timing:"entry", text:"À l'arrivée : lance un dé ; le catcheur adverse perd cette valeur dans une statistique aléatoire." },
   doubleEquippedSupportUpToRare: { timing:"continuous", text:"Double les valeurs numériques du Bonus ou de l'Objet Standard ou Rare équipé." },
   firstLossDeck: { timing:"defeat", text:"Une fois par match, annule la première défaite et reste sur le terrain." },
   firstRoundCharTech: { timing:"round1", text:"+1 Charisme et +1 Technique au round 1." },
@@ -3448,6 +3531,7 @@ const EFFECT_REGISTRY = {
   immuneOtherCardEffects: { timing:"passive", text:"Insensible aux effets des autres cartes." },
   pinBonus: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +20." },
   pinBonus40: { timing:"pin", text:"Si l'adversaire a au moins 2 KO : tombé +40." },
+  pinLowerRarity30: { timing:"pin", text:"Contre un catcheur de rareté inférieure : tombé +30." },
   pinDual20Shield10: { timing:"entry", text:"+20 Tombé et -10 au prochain tombé adverse." },
   pinObject10: { timing:"object", text:"Tombé +10." },
   pinObject20: { timing:"object", text:"+2 Charisme ou +20 Tombé.", choice:true },
@@ -3501,6 +3585,7 @@ const EFFECT_REGISTRY = {
   turnCharismaMinus1Random3: { timing:"round", text:"Chaque tour : -1 Charisme et +3 dans une stat aléatoire." },
   turnCatRandomPermanent1Max5: { timing:"round", text:"Chaque tour : +1 dans une stat aléatoire, cumulable 5 fois." },
   turnCatRandomPermanent2Max3: { timing:"round", text:"Chaque tour : +2 dans une stat aléatoire, cumulable 3 fois." },
+  turnRandomTransfer2: { timing:"round", text:"Chaque tour : -1 dans une statistique aléatoire et +2 dans une autre." },
   turnEnemyRandomPermanent1Max5: { timing:"round", text:"Chaque tour : -1 dans une stat adverse aléatoire, cumulable 5 fois." },
   turnEnemyRandomPermanent2Max3: { timing:"round", text:"Chaque tour : -2 dans une stat adverse aléatoire, cumulable 3 fois." },
   turnEnemyForceMinus1: { timing:"round", text:"Chaque tour : -1 Force adverse." },
@@ -3521,7 +3606,8 @@ const EFFECT_REGISTRY = {
   winNextEnemyTechniqueMinus3: { timing:"win", text:"Après victoire : prochain catcheur adverse -3 Technique." },
   winNextEnemySpeedMinus2: { timing:"win", text:"Après victoire : prochain catcheur adverse -2 Vitesse." },
   winNextEnemySpeedMinus3: { timing:"win", text:"Après victoire : prochain catcheur adverse -3 Vitesse." },
-  winSpeedCharisma1: { timing:"win", text:"Après victoire : +1 Vitesse et +1 Charisme." }
+  winSpeedCharisma1: { timing:"win", text:"Après victoire : +1 Vitesse et +1 Charisme." },
+  ultimateForceOrReroll: { timing:"roulette", text:"Une fois par match : +2 lors d'un duel de Force ou relance la roulette.", choice:true }
 };
 
 function runAllstarAudit(){
@@ -3569,7 +3655,7 @@ function makeDeck(keys){
 function makeAiDeckKeys(){
   const catcheurs=CARD_DATA.filter(card=>card.type==="Catcheur"&&card.rarity==="Standard").map(cardKey);
   const supports=CARD_DATA.filter(card=>card.type!=="Catcheur"&&card.rarity==="Standard").map(cardKey);
-  const rares=CARD_DATA.filter(card=>card.type==="Catcheur"&&card.rarity==="Rare").map(cardKey);
+  const rares=CARD_DATA.filter(card=>card.type==="Catcheur"&&card.rarity==="Rare"&&!card.exclusiveEvent).map(cardKey);
   const base=legalDeckKeys([...shuffle([...catcheurs]),...shuffle([...supports]),...shuffle([...rares])]);
   if(base.some(key=>cardByKey(key)?.type==="Catcheur"))return base;
   return legalDeckKeys([CARD_DATA.find(card=>card.type==="Catcheur"),...base].map(card=>typeof card==="string"?card:cardKey(card)));
@@ -3611,6 +3697,7 @@ function fadeMusic(id,duration=800){if(isWrestlerMusic(id))sound()?.fadeMusic(id
 function showMenu(){
   hideOptions();
   if(G?.mode==="online"&&G?.over)window.closeOnlineSession?.();
+  applyHalloweenTheme();
   show("menu");
   playMusic("menu");
 }
@@ -5537,14 +5624,18 @@ function zeroMods(){return {Force:0,Vitesse:0,Technique:0,Charisme:0}}
 
 function applyYacineTransfer(owner){
   const s=owner.cat,ability=wrestlerAbility(s);
-  if(!s||!["firstRoundAll1ThenRandomTransfer","firstRoundAll2ThenRandomTransfer"].includes(ability)||G.round<=s.enteredRound||s.transferRound===G.round)return;
+  const transferGain=ability==="turnRandomTransfer2"?2:["firstRoundAll1ThenRandomTransfer","firstRoundAll2ThenRandomTransfer"].includes(ability)?1:0;
+  if(!s||!transferGain||G.round<=s.enteredRound||s.transferRound===G.round)return;
   s.transferRound=G.round;
   const pairs=STATS.flatMap(from=>STATS.filter(to=>to!==from&&score(s,from)>0&&score(s,to)<MAX_STAT_VALUE).map(to=>[from,to]));
   if(!pairs.length)return;
   const [from,to]=pairs[Math.floor(Math.random()*pairs.length)];
-  s.mods[from]-=1;s.mods[to]+=1;
-  log(`[EFFET] ${s.card.name} : -1 ${from} / +1 ${to}.`);
-  showEffectFeedback(s.card,s.card.name,`-1 ${from} / +1 ${to}`,"special");
+  s.mods[from]-=1;
+  const before=score(s,to);
+  s.mods[to]+=Math.min(transferGain,Math.max(0,MAX_STAT_VALUE-before));
+  const gained=score(s,to)-before;
+  log(`[EFFET] ${s.card.name} : -1 ${from} / +${gained} ${to}.`);
+  showEffectFeedback(s.card,s.card.name,`-1 ${from} / +${gained} ${to}`,"special");
 }
 
 function captureDefeatedWrestler(winner,loser,card){
@@ -6406,6 +6497,32 @@ function applyWrestlerEntryEffect(owner,c){
   }
   if(c.ability==="entryInvertOpponentSupports"){
     invertOpponentSupports(owner);
+    return;
+  }
+  if(c.ability==="entryCopyOpponentStatChanges"){
+    const opponent=owner.side==="player"?G.ai:G.player;
+    if(!opponent?.cat){
+      log(`[EFFET] ${c.name} : aucun changement adverse à copier.`);
+      return;
+    }
+    const copied=normalizeMods(opponent.cat.mods);
+    STATS.forEach(stat=>owner.cat.mods[stat]+=copied[stat]);
+    const details=STATS.filter(stat=>copied[stat]).map(stat=>`${copied[stat]>0?"+":""}${copied[stat]} ${stat}`).join(" / ");
+    log(`[EFFET] ${c.name} copie les changements de ${opponent.cat.card.name}${details?` : ${details}`:" : aucun changement"}.`);
+    showEffectFeedback(c,c.name,details||"Aucun changement","special");
+    return;
+  }
+  if(c.ability==="entryDieEnemyRandomStatLoss"){
+    const opponent=owner.side==="player"?G.ai:G.player;
+    if(!opponent?.cat||isCardEffectImmune(opponent.cat)){
+      log(`[EFFET] ${c.name} : aucun catcheur adverse vulnérable sur le ring.`);
+      return;
+    }
+    const roll=Math.floor(Math.random()*6)+1;
+    const stat=STATS[Math.floor(Math.random()*STATS.length)];
+    opponent.cat.mods[stat]-=roll;
+    log(`[EFFET] ${c.name} obtient ${roll} au dé : ${opponent.cat.card.name} perd ${roll} ${stat}.`);
+    showEffectFeedback(opponent.cat.card,c.name,`-${roll} ${stat} (dé : ${roll})`,"malus",2400);
     return;
   }
   if(c.ability==="entryMelusineGraveSpeedTechnique1Each"){
@@ -7711,6 +7828,7 @@ function score(s,stat){
   if(ability==="secondPlayerTechnique2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&stat==="Technique")v+=2;
   if(ability==="secondPlayerTechniqueCharisma2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Technique"||stat==="Charisme"))v+=2;
   if(ability==="forcePlus"&&!s.forcePlusUsed&&stat==="Force")v+=2;
+  if(ability==="ultimateForceOrReroll"&&s.ultimateForceBonusRound===G.round&&stat==="Force")v+=2;
   if(ability==="charismaPlus"&&stat==="Charisme")v++;
   if(ability==="objectOwnedSpeed2"&&s.owner?.obj&&stat==="Vitesse")v+=2;
   if(ability==="objectOwnedSpeedCharisma2"&&s.owner?.obj&&(stat==="Vitesse"||stat==="Charisme"))v+=2;
@@ -7770,6 +7888,7 @@ function statAbilityFeedback(s,stat){
   if(ability==="secondPlayerTechnique2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&stat==="Technique")return "Second +2 Technique";
   if(ability==="secondPlayerTechniqueCharisma2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Technique"||stat==="Charisme"))return `Second +2 ${stat}`;
   if(ability==="forcePlus"&&!s.forcePlusUsed&&stat==="Force")return "+2 Force";
+  if(ability==="ultimateForceOrReroll"&&s.ultimateForceBonusRound===G.round&&stat==="Force")return "+2 Force";
   if(ability==="charismaPlus"&&stat==="Charisme")return "+1 Charisme";
   if(ability==="objectOwnedSpeed2"&&s.owner?.obj&&stat==="Vitesse")return "+2 Vitesse";
   if(ability==="objectOwnedSpeedCharisma2"&&s.owner?.obj&&(stat==="Vitesse"||stat==="Charisme"))return `+2 ${stat}`;
@@ -8044,6 +8163,13 @@ function resolveNextStatWinEffect(winner,currentStat,onComplete){
   return true;
 }
 
+function lowerRarityPinBonus(winner,loser){
+  return wrestlerAbility(winner?.cat)==="pinLowerRarity30"
+    &&winner?.cat?.card&&loser?.cat?.card
+    &&rarityRank(loser.cat.card.rarity)>rarityRank(winner.cat.card.rarity)
+    ?30:0;
+}
+
 function win(winner,loser,reason){
   playSound("victoire_duel");
   log(`<b>${winner.label}</b> gagne le duel.`);
@@ -8120,6 +8246,11 @@ function win(winner,loser,reason){
 
     // A victory can trigger a pin before the winning object's end-of-round effect expires.
     const objectPinBonus=Number(winner.objEffect?.pin||0);
+    const rarityPinBonus=lowerRarityPinBonus(winner,loser);
+    if(rarityPinBonus){
+      log(`[EFFET] ${winner.cat.card.name} affronte une rareté inférieure : tombé +30.`);
+      showEffectFeedback(winner.cat.card,winner.cat.card.name,"Tombé +30","pin");
+    }
     const defeatPrevented=preventFirstDefeat(loser);
     const returnWinnerToHand=loserAbility==="lossReturnEnemyWrestlerToHand";
     const returnSource=loser.cat?.card||null;
@@ -8133,7 +8264,7 @@ function win(winner,loser,reason){
     const captured=winnerAbility==="winCaptureOpponent"?loser.cat?.card:null;
     clearWrestler(loser);
     if(captured)captureDefeatedWrestler(winner,loser,captured);
-    attemptPin(winner,loser,objectPinBonus);
+    attemptPin(winner,loser,objectPinBonus+rarityPinBonus);
     if(returnWinnerToHand)returnActiveWrestlerToHand(winner,returnSource);
   };
 
@@ -8449,7 +8580,17 @@ function chooseRoundStat(){
 }
 
 function getRoundReroller(){
-  return [G.player,G.ai].find(p=>(wrestlerAbility(p.cat)==="rerollStat"||p.man?.ability==="rerollStat")&&!p.rerollUsed);
+  return [G.player,G.ai].find(p=>(wrestlerAbility(p.cat)==="rerollStat"||wrestlerAbility(p.cat)==="ultimateForceOrReroll"||p.man?.ability==="rerollStat")&&!p.rerollUsed);
+}
+
+function acceptUltimateForceBonus(owner,currentStat=G.stat){
+  if(!owner?.cat||wrestlerAbility(owner.cat)!=="ultimateForceOrReroll"||currentStat!=="Force"||owner.rerollUsed)return false;
+  owner.rerollUsed=true;
+  owner.cat.ultimateForceBonusRound=G.round;
+  log(`[EFFET] ${owner.cat.card.name} conserve la Force et gagne +2 pour ce duel.`);
+  showEffectFeedback(owner.cat.card,owner.cat.card.name,"Duel de Force +2","buff",2200);
+  markOnlineDirty();
+  return true;
 }
 
 function rerollRoundStatFor(reroller,currentStat){
@@ -8482,7 +8623,9 @@ function requestOnlineWheelRerollChoice(event){
   onlineRemoteWheelHoldOpen=true;
   overlay.classList.add("active");
   actions.classList.add("active");
-  if(sub)sub.textContent=`${source.name} peut relancer la roulette.`;
+  const ultimateForce=wrestlerAbility(reroller.cat)==="ultimateForceOrReroll"&&event.currentStat==="Force";
+  if(sub)sub.textContent=ultimateForce?`${source.name} choisit : +2 Force ou relance.`:`${source.name} peut relancer la roulette.`;
+  keepButton.textContent=ultimateForce?"Garder (+2 Force)":"Conserver";
   const token=beginOnlineChoice("wheel-reroll");
   const submit=async choice=>{
     if(onlineWheelRerollSubmitting)return;
@@ -8524,6 +8667,7 @@ function resumeOnlineWheelReroll(event){
     showWheelCore(()=>duel(),{forcedStat:next,allowReroll:false});
     return;
   }
+  acceptUltimateForceBonus(reroller,event.currentStat||G.stat);
   log(`[EFFET] ${source.name} : relance conservée.`);
   markOnlineDirty();
   render();
@@ -8608,7 +8752,7 @@ function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
   markOnlineDirty();
   rerollActions?.classList.remove("active");
   if(rerollButton)rerollButton.onclick=null;
-  if(keepButton)keepButton.onclick=null;
+  if(keepButton){keepButton.onclick=null;keepButton.textContent="Conserver";}
   splash?.classList.remove("stat-force","stat-vitesse","stat-technique","stat-charisme");
   if(sub)sub.textContent="La stat du duel va tomber.";
   ov?.classList.add("active");
@@ -8673,7 +8817,9 @@ function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
     if(reroller.side==="player"){
       const onlineToken=beginOnlineChoice("reroll");
       rerollActions?.classList.add("active");
-      if(sub)sub.textContent=`${source.name} peut relancer la roulette.`;
+      const ultimateForce=wrestlerAbility(reroller.cat)==="ultimateForceOrReroll"&&G.stat==="Force";
+      if(sub)sub.textContent=ultimateForce?`${source.name} choisit : +2 Force ou relance.`:`${source.name} peut relancer la roulette.`;
+      if(keepButton)keepButton.textContent=ultimateForce?"Garder (+2 Force)":"Conserver";
       if(rerollButton)rerollButton.onclick=()=>{
         rerollActions?.classList.remove("active");
         endOnlineChoice(onlineToken);
@@ -8684,6 +8830,7 @@ function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
       if(keepButton)keepButton.onclick=()=>{
         rerollActions?.classList.remove("active");
         endOnlineChoice(onlineToken);
+        acceptUltimateForceBonus(reroller,G.stat);
         log(`[EFFET] ${source.name} : relance conservée.`);
         markOnlineDirty();
         publishResolvedOnlineChoice();
@@ -8710,6 +8857,11 @@ function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
       return;
     }
     setTimeout(()=>{
+      if(acceptUltimateForceBonus(reroller,G.stat)){
+        render();
+        setTimeout(closeWheel,800);
+        return;
+      }
       const next=rerollRoundStatFor(reroller,G.stat);
       spinTo(next,()=>setTimeout(closeWheel,1300));
     },900);
@@ -8944,6 +9096,39 @@ const BOOSTERS = {
   }
 };
 
+const HALLOWEEN_EVENT = {
+  id:"halloween_2026",
+  label:"Pack Halloween",
+  price:666,
+  startsAt:Date.parse("2026-10-29T00:00:00+01:00"),
+  endsAt:Date.parse("2026-11-20T00:00:00+01:00"),
+  exclusives:[
+    {key:"rare_catcheurs_ben_damage_halloween",chance:.20},
+    {key:"rare_catcheurs_melusine_halloween",chance:.20},
+    {key:"legende_catcheurs_black_sam_halloween",chance:.10},
+    {key:"legende_catcheurs_hades_halloween",chance:.10},
+    {key:"ultime_catcheurs_ultima_sombra_halloween",chance:.01}
+  ]
+};
+
+function isHalloweenEventActive(now=Date.now()){
+  return Number(now)>=HALLOWEEN_EVENT.startsAt&&Number(now)<HALLOWEEN_EVENT.endsAt;
+}
+
+function isEventExclusiveCard(card){
+  return Boolean(card?.exclusiveEvent);
+}
+
+function applyHalloweenTheme(now=Date.now()){
+  const active=isHalloweenEventActive(now);
+  document.body?.classList.toggle("halloween-active",active);
+  const cosmetic=document.getElementById("halloweenCosmetic");
+  const badge=document.getElementById("halloweenEventBadge");
+  if(cosmetic)cosmetic.hidden=!active;
+  if(badge)badge.hidden=!active;
+  return active;
+}
+
 const LEVEL_REWARDS = [
   { level:5, type:"ticket", booster:"classic", label:"Booster Classique" },
   { level:10, type:"card", card:"rare_catcheurs_kevin_avanti", label:"Kevin Avanti (Rare)" },
@@ -9134,8 +9319,8 @@ function addCardsToCollection(cards){
   return newCardKeys;
 }
 
-function rarityPool(rarity){
-  return CARD_DATA.filter(card=>card.rarity===rarity);
+function rarityPool(rarity,{includeEventExclusives=false}={}){
+  return CARD_DATA.filter(card=>card.rarity===rarity&&(includeEventExclusives||!isEventExclusiveCard(card)));
 }
 
 function randomFrom(list){
@@ -9168,10 +9353,26 @@ function generateBooster(id){
   return shuffle(cards).map(card=>({...card,id:Math.random().toString(36).slice(2)}));
 }
 
+function pickHalloweenExclusive(roll=Math.random()){
+  let cursor=0;
+  for(const entry of HALLOWEEN_EVENT.exclusives){
+    cursor+=entry.chance;
+    if(roll<cursor)return cardByKey(entry.key)||null;
+  }
+  return null;
+}
+
+function generateHalloweenBooster(roll=Math.random()){
+  const cards=generateBooster("premium");
+  const exclusive=pickHalloweenExclusive(roll);
+  if(exclusive)cards[0]={...cloneCard(exclusive),id:Math.random().toString(36).slice(2)};
+  return shuffle(cards);
+}
+
 function ensureBoosterHasWrestler(cards, preferredRarity="Legende"){
   if(cards.some(card=>card.type==="Catcheur"))return cards;
-  const pool=CARD_DATA.filter(card=>card.type==="Catcheur"&&card.rarity===preferredRarity);
-  cards[0]={...cloneCard(randomFrom(pool.length?pool:CARD_DATA.filter(card=>card.type==="Catcheur"))),id:Math.random().toString(36).slice(2)};
+  const pool=CARD_DATA.filter(card=>card.type==="Catcheur"&&card.rarity===preferredRarity&&!card.exclusiveEvent);
+  cards[0]={...cloneCard(randomFrom(pool.length?pool:CARD_DATA.filter(card=>card.type==="Catcheur"&&!card.exclusiveEvent))),id:Math.random().toString(36).slice(2)};
   return cards;
 }
 
@@ -9201,6 +9402,24 @@ function buyBooster(id){
   const newCardKeys=addCardsToCollection(cards);
   savePlayerState();
   openBooster(cards,booster.label,newCardKeys);
+}
+
+function buyHalloweenBooster(){
+  loadPlayerState();
+  if(!isHalloweenEventActive()){
+    renderShop();
+    setShopStatus("Le Pack Halloween n'est plus disponible.");
+    return;
+  }
+  if(playerState.credits<HALLOWEEN_EVENT.price){
+    setShopStatus(`Il manque ${HALLOWEEN_EVENT.price-playerState.credits} crédits pour ouvrir ce booster.`);
+    return;
+  }
+  playerState.credits-=HALLOWEEN_EVENT.price;
+  const cards=generateHalloweenBooster();
+  const newCardKeys=addCardsToCollection(cards);
+  savePlayerState();
+  openBooster(cards,HALLOWEEN_EVENT.label,newCardKeys);
 }
 
 function openTicketBooster(id){
@@ -9244,8 +9463,11 @@ function setShopStatus(message){
   if(el)el.textContent=message;
 }
 
-function renderShop(){
+function renderShop(now=Date.now()){
   loadPlayerState();
+  applyHalloweenTheme(now);
+  const halloweenButton=document.getElementById("halloweenBoosterButton");
+  if(halloweenButton)halloweenButton.hidden=!isHalloweenEventActive(now);
   updateCreditDisplays();
   renderBoosterTickets();
   setShopStatus("");
@@ -9672,7 +9894,7 @@ function hashString(value){
 function weeklyChallengeBoss(){
   const weekKey=challengeWeekKey();
   const pool=CARD_DATA
-    .filter(card=>card.type==="Catcheur"&&CHALLENGE_HP_BY_RARITY[card.rarity])
+    .filter(card=>card.type==="Catcheur"&&CHALLENGE_HP_BY_RARITY[card.rarity]&&(!card.exclusiveEvent||isHalloweenEventActive()))
     .sort((a,b)=>rarityRank(a.rarity)-rarityRank(b.rarity)||String(a.name).localeCompare(String(b.name))||cardKey(a).localeCompare(cardKey(b)));
   const boss=pool[hashString(`ALLSTAR-${weekKey}`)%Math.max(1,pool.length)]||CARD_DATA.find(card=>card.type==="Catcheur");
   return {weekKey,boss,bossKey:boss?cardKey(boss):null};
@@ -10102,7 +10324,7 @@ function careerOpponents(){
 }
 
 function cardsByWrestlerName(name){
-  return CARD_DATA.filter(card=>card.type==="Catcheur"&&card.name===name);
+  return CARD_DATA.filter(card=>card.type==="Catcheur"&&card.name===name&&!card.exclusiveEvent);
 }
 
 function findCareerWrestlerCard(name, preferredRarity){
@@ -10176,7 +10398,7 @@ function careerDeckForOpponent(opponent){
   const rareTarget=Math.min(8, entry.season===0 ? 6 : 6 + entry.season);
   const rarePool=[
     ...byName.filter(card=>card.rarity==="Rare"),
-    ...CARD_DATA.filter(card=>card.type==="Catcheur"&&card.rarity==="Rare"&&cardMatchesCareerStats(card,entry.priorityStats)),
+    ...CARD_DATA.filter(card=>card.type==="Catcheur"&&card.rarity==="Rare"&&!card.exclusiveEvent&&cardMatchesCareerStats(card,entry.priorityStats)),
     ...careerSupportPool(entry,"Rare")
   ];
   while(keys.filter(key=>cardByKey(key)?.rarity==="Rare").length<rareTarget&&keys.length<20){
@@ -10672,8 +10894,8 @@ function setDeckPreview(cardOrKey){
 // Une carte peut appartenir à plusieurs familles ; les identifiants d'effet
 // évitent de dépendre de la formulation affichée sur son visuel.
 const DECK_EFFECT_FAMILIES=[
-  {id:"stats",label:"Bonus de stats",test:ability=>/^(?:bellRandomStats2|bonus(?:EquippedForceSpeed2|OdysseeTechForceTeam|PassionForceCharTeam|PfiCharSpeedTeam)|bossSecondWind|charismaWinRandom3|drawToSixBonusStats|entry(?:DiscardUpTo3RandomStat2|IfTrevorInGraveFTV1|MelusineGraveSpeedTechnique1Each|RandomStat3|RandomStats5IfMoreWrestlersGrave|StatChoice3)|first(?:Round(?!OpponentMill1)|WinAll1)|graveElAmnesicoAll1|m(?:All|Char|Force|Random|Technique|Vitesse|Weakest)|managerOwnedTechForceSpeed1|matchRoundOneAll1|next(?:EntryAll1|SpeedOnFirstLoss)|object(?:Choice|Owned)|pinObject20|reveal(?:CharlieEachRoundForcePin|DanEachRoundTechSpeed2|ObjectHandCharSpeed)|round(?:2|4|Rps)|secondPlayer|starter|techniqueRound1|turn(?:CatRandom|CharismaMinus1|RandomPermanent)|winSpeedCharisma1)/.test(ability)},
-  {id:"malus",label:"Malus de stats",test:ability=>/^(?:entryEnemy|lossEnemy|turnEnemy(?:Force|Random|Speed)|turnOpponentDiscardWorldCharisma|winNextEnemy)/.test(ability)},
+  {id:"stats",label:"Bonus de stats",test:ability=>/^(?:bellRandomStats2|bonus(?:EquippedForceSpeed2|OdysseeTechForceTeam|PassionForceCharTeam|PfiCharSpeedTeam)|bossSecondWind|charismaWinRandom3|drawToSixBonusStats|entry(?:CopyOpponentStatChanges|DiscardUpTo3RandomStat2|IfTrevorInGraveFTV1|MelusineGraveSpeedTechnique1Each|RandomStat3|RandomStats5IfMoreWrestlersGrave|StatChoice3)|first(?:Round(?!OpponentMill1)|WinAll1)|graveElAmnesicoAll1|m(?:All|Char|Force|Random|Technique|Vitesse|Weakest)|managerOwnedTechForceSpeed1|matchRoundOneAll1|next(?:EntryAll1|SpeedOnFirstLoss)|object(?:Choice|Owned)|pinObject20|reveal(?:CharlieEachRoundForcePin|DanEachRoundTechSpeed2|ObjectHandCharSpeed)|round(?:2|4|Rps)|secondPlayer|starter|techniqueRound1|turn(?:CatRandom|CharismaMinus1|RandomPermanent|RandomTransfer)|ultimateForceOrReroll|winSpeedCharisma1)/.test(ability)},
+  {id:"malus",label:"Malus de stats",test:ability=>/^(?:entryDieEnemy|entryEnemy|lossEnemy|turnEnemy(?:Force|Random|Speed)|turnOpponentDiscardWorldCharisma|winNextEnemy)/.test(ability)},
   {id:"draw",label:"Pioche",test:ability=>/draw|megaphoneRound1/i.test(ability)},
   {id:"discard",label:"Défausse",test:ability=>/discard|mill|megaphoneRound1/i.test(ability)},
   {id:"recover",label:"Récupération",test:ability=>/recover|winCaptureOpponent|bossSecondWind|entryPlaySupportFromGrave/i.test(ability)},

@@ -64,6 +64,13 @@
 
 <section id="menu" class="screen">
   <div class="home-stage">
+    <div class="halloween-cosmetic" id="halloweenCosmetic" aria-hidden="true" hidden>
+      <span class="halloween-bat bat-one">&#x1F987;</span>
+      <span class="halloween-bat bat-two">&#x1F987;</span>
+      <span class="halloween-pumpkin pumpkin-one">&#x1F383;</span>
+      <span class="halloween-pumpkin pumpkin-two">&#x1F383;</span>
+    </div>
+    <div class="halloween-event-badge" id="halloweenEventBadge" hidden>HALLOWEEN · PACK 666</div>
     <button class="home-control-trigger" type="button" onclick="toggleHomeQuickPanel()" aria-label="Ouvrir le menu rapide" aria-expanded="false">&#9881;</button>
     <div class="home-quick-overlay" id="homeQuickPanel" onclick="if(event.target===this)closeHomeQuickPanel()">
       <section class="home-quick-panel" role="dialog" aria-modal="true" aria-label="Menu rapide">
@@ -588,6 +595,11 @@
           <span>Pack Champion</span>
           <b>1000 crédits</b>
           <small>5 cartes - 1 Légende garantie</small>
+        </button>
+        <button class="booster-pack halloween" id="halloweenBoosterButton" onclick="buyHalloweenBooster()" hidden>
+          <span>Pack Halloween</span>
+          <b>666 crédits</b>
+          <small>5 cartes · Rares 20 % · Légendaires 10 % · Ultime 1 %</small>
         </button>
       </div>
       <div class="booster-ticket-grid" id="boosterTicketGrid"></div>

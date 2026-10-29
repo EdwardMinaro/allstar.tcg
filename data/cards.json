@@ -3288,6 +3288,87 @@
       "renderArt": "assets/card_renders/legende_catcheurs_g_king.png",
       "ability": "entryInvertOpponentSupports",
       "musicId": "g_king"
+    },
+    {
+      "key": "rare_catcheurs_ben_damage_halloween",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Ben Damage",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 3,
+        "Technique": 4,
+        "Charisme": 9
+      },
+      "effect": "Apparition : Copie les changements de statistique du catcheur adverse.",
+      "renderArt": "assets/card_renders/rare_catcheurs_ben_damage_halloween.png",
+      "ability": "entryCopyOpponentStatChanges",
+      "musicId": "ben_damage",
+      "exclusiveEvent": "halloween_2026"
+    },
+    {
+      "key": "rare_catcheurs_melusine_halloween",
+      "type": "Catcheur",
+      "rarity": "Rare",
+      "name": "Melusine",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 1,
+        "Technique": 4,
+        "Charisme": 9
+      },
+      "effect": "Chaque tour, perdez un point dans une statistique aléatoire, et gagnez +2 dans une autre statistique.",
+      "renderArt": "assets/card_renders/rare_catcheurs_melusine_halloween.png",
+      "ability": "turnRandomTransfer2",
+      "exclusiveEvent": "halloween_2026"
+    },
+    {
+      "key": "legende_catcheurs_black_sam_halloween",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Black Sam",
+      "stats": {
+        "Force": 10,
+        "Vitesse": 4,
+        "Technique": 6,
+        "Charisme": 8
+      },
+      "effect": "S'il affronte un catcheur de rareté inférieure à la sienne : +30 au tombé.",
+      "renderArt": "assets/card_renders/legende_catcheurs_black_sam_halloween.png",
+      "ability": "pinLowerRarity30",
+      "exclusiveEvent": "halloween_2026"
+    },
+    {
+      "key": "legende_catcheurs_hades_halloween",
+      "type": "Catcheur",
+      "rarity": "Legende",
+      "name": "Hades",
+      "stats": {
+        "Force": 9,
+        "Vitesse": 6,
+        "Technique": 6,
+        "Charisme": 7
+      },
+      "effect": "Apparition : Lancez un dé, votre adversaire perd un nombre correspondant à la valeur du dé dans une statistique aléatoire.",
+      "renderArt": "assets/card_renders/legende_catcheurs_hades_halloween.png",
+      "ability": "entryDieEnemyRandomStatLoss",
+      "exclusiveEvent": "halloween_2026"
+    },
+    {
+      "key": "ultime_catcheurs_ultima_sombra_halloween",
+      "type": "Catcheur",
+      "rarity": "Ultime",
+      "name": "Ultima Sombra",
+      "stats": {
+        "Force": 8,
+        "Vitesse": 5,
+        "Technique": 6,
+        "Charisme": 9
+      },
+      "effect": "Une fois par match : gagne +2 sur un duel de Force ou impose une relance.",
+      "renderArt": "assets/card_renders/ultime_catcheurs_ultima_sombra_halloween.png",
+      "ability": "ultimateForceOrReroll",
+      "exclusiveEvent": "halloween_2026"
     }
   ]
 }
