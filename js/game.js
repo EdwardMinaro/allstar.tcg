@@ -9169,7 +9169,7 @@ let halloweenAnnouncementSeen=false;
 
 function showHalloweenAnnouncement(){
   if(!isHalloweenEventActive()||halloweenAnnouncementSeen)return;
-  try{if(localStorage.getItem("allstarHalloween2026Announcement"))return}catch{}
+  try{if(localStorage.getItem("allstarHalloween2026OfficialAnnouncement"))return}catch{}
   const overlay=document.getElementById("halloweenAnnouncement");
   if(overlay)overlay.classList.add("active");
 }
@@ -9177,7 +9177,7 @@ function showHalloweenAnnouncement(){
 function closeHalloweenAnnouncement(){
   document.getElementById("halloweenAnnouncement")?.classList.remove("active");
   halloweenAnnouncementSeen=true;
-  try{localStorage.setItem("allstarHalloween2026Announcement","seen")}catch{}
+  try{localStorage.setItem("allstarHalloween2026OfficialAnnouncement","seen")}catch{}
 }
 
 function scheduleHalloweenBats(){

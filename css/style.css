@@ -8510,7 +8510,7 @@ body.halloween-active :is(#menu,#saveScreen) .halloween-bat.bat-flash{
   border-color:#f18a22!important;
 }
 .halloween-announcement h2{color:#ffae47}
-.halloween-announcement p{line-height:1.5}
+.halloween-announcement .level-reward-item small{line-height:1.5;text-transform:none;font-weight:600}
 
 body.halloween-active :is(#menu,#saveScreen) .halloween-bat.bat-one{
   left:14%;

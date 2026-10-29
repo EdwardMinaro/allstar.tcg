@@ -862,13 +862,22 @@
 </div>
 
 <div class="overlay" id="halloweenAnnouncement" role="dialog" aria-modal="true" aria-labelledby="halloweenAnnouncementTitle">
-  <div class="splash halloween-announcement">
-    <h2 id="halloweenAnnouncementTitle">Halloween s'invite sur le ring !</h2>
-    <p>Du 29 octobre au 19 novembre inclus, retrouvez le Pack Halloween dans la boutique pour 666 crédits.</p>
-    <p>Chaque paquet contient 5 cartes, avec une chance de découvrir Ben Damage, Melusine, Black Sam, Hades ou Ultima Sombra en édition Halloween.</p>
-    <p>Cadeau de connexion : recevez aussi le protège-carte Halloween à citrouille lors de votre première connexion pendant l'événement. Il restera ensuite dans votre inventaire ! Retrouvez-le dans Profil → Protège-cartes.</p>
-    <p>Bonne chance et bon Halloween !</p>
-    <button class="small-btn" onclick="closeHalloweenAnnouncement()">C'est parti !</button>
+  <div class="splash level-reward-splash halloween-announcement">
+    <h2 class="big-text" id="halloweenAnnouncementTitle">Communiqué officiel</h2>
+    <p class="level-reward-federation">Fédération ALLSTAR</p>
+    <p class="sub-text">Halloween s'invite sur le ring !<br>Du 29 octobre au 19 novembre inclus</p>
+    <div class="level-reward-list">
+      <div class="level-reward-item">Pack Halloween — 666 crédits
+        <small>Disponible en boutique : 5 cartes par paquet, avec une chance de découvrir une carte exclusive parmi Ben Damage, Melusine, Black Sam, Hades et Ultima Sombra.</small>
+      </div>
+      <div class="level-reward-item">Cadeau exclusif — Protège-carte Halloween
+        <small>Offert lors de votre première connexion pendant l'événement, puis conservé définitivement dans votre inventaire. Équipez-le dans Profil → Protège-cartes.</small>
+      </div>
+      <div class="level-reward-item">Le rock d'Halloween entre dans l'arène
+        <small>10 morceaux à retrouver dans les options audio. Cochez Halloween, Catcheurs ou les deux pour composer votre ambiance, même après l'événement.</small>
+      </div>
+    </div>
+    <div class="overlay-actions"><button class="small-btn" type="button" onclick="closeHalloweenAnnouncement()">Continuer</button></div>
   </div>
 </div>
 <script src="js/audio.js"></script>
