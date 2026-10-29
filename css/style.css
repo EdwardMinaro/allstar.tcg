@@ -8454,35 +8454,37 @@ button:disabled,
 }
 
 /* Halloween swaps the home effects in place, without moving the menu. */
-body.halloween-active #menu .crowd-flashes,
-body.halloween-active #menu .stage-spotlight:before{
+body.halloween-active :is(#menu,#saveScreen) .crowd-flashes,
+body.halloween-active :is(#menu,#saveScreen) .stage-spotlight:before{
   display:none!important;
 }
 
-body.halloween-active #menu .halloween-cosmetic{
+body.halloween-active :is(#menu,#saveScreen) .halloween-cosmetic{
   z-index:4;
 }
 
-body.halloween-active #menu .home-stage:before{
+body.halloween-active :is(#menu,#saveScreen) .home-stage:before{
   border-color:rgba(255,132,40,.32)!important;
-  background:linear-gradient(180deg,rgba(14,12,11,.96),rgba(2,2,2,.98))!important;
+  background:
+    linear-gradient(90deg,transparent 0 22%,rgba(255,178,85,.4) 22% 22.5%,#080706 22.5% 77.5%,rgba(255,178,85,.4) 77.5% 78%,transparent 78%),
+    linear-gradient(180deg,#6b310e,#321607)!important;
 }
 
-body.halloween-active #menu .home-stage:after{
+body.halloween-active :is(#menu,#saveScreen) .home-stage:after{
   background:
     radial-gradient(circle,rgba(255,125,38,.22) 2px,transparent 3px) 0 0/26px 26px,
     linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.62))!important;
   opacity:.42;
 }
 
-body.halloween-active #menu .halloween-bat{
+body.halloween-active :is(#menu,#saveScreen) .halloween-bat{
   font-size:34px;
   opacity:0;
   animation:none;
   transform:none;
 }
 
-body.halloween-active #menu .halloween-bat.bat-flash{
+body.halloween-active :is(#menu,#saveScreen) .halloween-bat.bat-flash{
   animation:halloweenBatFlash 1.3s ease-out both;
 }
 
@@ -8500,27 +8502,32 @@ body.halloween-active #menu .halloween-bat.bat-flash{
 .halloween-announcement h2{color:#ffae47}
 .halloween-announcement p{line-height:1.5}
 
-body.halloween-active #menu .halloween-bat.bat-one{
+body.halloween-active :is(#menu,#saveScreen) .halloween-bat.bat-one{
   left:14%;
   top:17%;
 }
 
-body.halloween-active #menu .halloween-bat.bat-two{
+body.halloween-active :is(#menu,#saveScreen) .halloween-bat.bat-two{
   right:14%;
   top:20%;
   font-size:30px;
 }
 
-body.halloween-active #menu .halloween-pumpkin{
+body.halloween-active :is(#menu,#saveScreen) .halloween-pumpkin{
   bottom:18px;
   font-size:88px;
   filter:drop-shadow(0 12px 4px rgba(0,0,0,.72)) drop-shadow(0 0 16px rgba(255,113,20,.48));
 }
 
-body.halloween-active #menu .halloween-pumpkin.pumpkin-one{
+body.halloween-active :is(#menu,#saveScreen) .halloween-pumpkin.pumpkin-one{
   left:38px;
 }
 
-body.halloween-active #menu .halloween-pumpkin.pumpkin-two{
+body.halloween-active :is(#menu,#saveScreen) .halloween-pumpkin.pumpkin-two{
   right:38px;
+}
+
+body.halloween-active #saveScreen .save-panel{
+  background:linear-gradient(180deg,rgba(8,7,6,.95),rgba(2,2,2,.96));
+  border-color:rgba(255,152,48,.32);
 }

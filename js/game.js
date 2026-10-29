@@ -9143,7 +9143,7 @@ function scheduleHalloweenBats(){
       halloweenBatTimer=null;
       return;
     }
-    if(document.getElementById("menu")?.classList.contains("active")){
+    if(document.querySelector("#menu.active,#saveScreen.active")){
       document.querySelectorAll(".halloween-bat").forEach(bat=>{
         bat.style.left=`${8+Math.random()*80}%`;
         bat.style.top=`${10+Math.random()*64}%`;
@@ -9162,8 +9162,7 @@ function scheduleHalloweenBats(){
 function applyHalloweenTheme(now=Date.now()){
   const active=isHalloweenEventActive(now);
   document.body?.classList.toggle("halloween-active",active);
-  const cosmetic=document.getElementById("halloweenCosmetic");
-  if(cosmetic)cosmetic.hidden=!active;
+  document.querySelectorAll(".halloween-cosmetic").forEach(cosmetic=>cosmetic.hidden=!active);
   if(active)scheduleHalloweenBats();
   else{
     clearTimeout(halloweenBatTimer);
@@ -11291,6 +11290,7 @@ Object.assign(window,{
   closeSessionModal
 });
 document.addEventListener("DOMContentLoaded", ()=>{
+  applyHalloweenTheme();
   runAllstarAudit();
   wireSaveScreen();
   wireDisplayOptions();
