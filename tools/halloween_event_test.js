@@ -17,11 +17,33 @@ return {
   CARD_DATA,HALLOWEEN_EVENT,EFFECT_REGISTRY,STATS,cardByKey,cardKey,state,score,
   isHalloweenEventActive,rarityPool,pickHalloweenExclusive,generateHalloweenBooster,
   applyWrestlerEntryEffect,applyYacineTransfer,lowerRarityPinBonus,acceptUltimateForceBonus,
+  claimHalloweenSleeveGift,ownsCardSleeve,equippedCardSleeve,serializedPlayerState,mergePlayerStateForHydration,
+  player(value){playerState=value;},
   game(value){G=value;}
 };
 `)(documentStub,{},()=>0,()=>{});
 
 assert.equal(game.HALLOWEEN_EVENT.price,666);
+const beforeEvent=Date.parse("2026-10-28T23:59:59+01:00");
+const duringEvent=Date.parse("2026-10-29T00:00:00+01:00");
+const afterEvent=Date.parse("2026-11-20T00:00:00+01:00");
+const inventoryState={loaded:true,sleeveId:"halloween",cosmeticInventory:{sleeves:{}}};
+game.player(inventoryState);
+assert.equal(game.claimHalloweenSleeveGift(beforeEvent),false);
+assert.equal(game.equippedCardSleeve(),"classic","An unowned sleeve cannot be equipped, even in a legacy save");
+assert.equal(game.claimHalloweenSleeveGift(duringEvent),true);
+const firstAcquisition=JSON.stringify(inventoryState.cosmeticInventory);
+assert.equal(game.claimHalloweenSleeveGift(duringEvent+5000),false,"The login gift must only be granted once");
+assert.equal(JSON.stringify(inventoryState.cosmeticInventory),firstAcquisition);
+assert.equal(game.claimHalloweenSleeveGift(afterEvent),false);
+assert.equal(game.equippedCardSleeve(),"halloween","An acquired sleeve stays usable after the event");
+const savedGift=game.serializedPlayerState();
+assert.equal(savedGift.cosmeticInventory.sleeves.halloween.source,"halloween_2026_login_gift");
+const mergedGift=game.mergePlayerStateForHydration({...savedGift,savedAt:1},{savedAt:2,cosmeticInventory:{sleeves:{}}});
+assert.ok(mergedGift.cosmeticInventory.sleeves.halloween,"A newer save without the cosmetic must not erase ownership");
+game.player({loaded:true,sleeveId:"classic",cosmeticInventory:{sleeves:{}}});
+assert.equal(game.claimHalloweenSleeveGift(afterEvent),false,"A first connection after November 19 must not grant the gift");
+assert.equal(game.ownsCardSleeve("halloween"),false);
 assert.equal(game.isHalloweenEventActive(Date.parse("2026-10-29T00:00:00+01:00")),true);
 assert.equal(game.isHalloweenEventActive(Date.parse("2026-11-19T23:59:59+01:00")),true);
 assert.equal(game.isHalloweenEventActive(Date.parse("2026-11-20T00:00:00+01:00")),false);

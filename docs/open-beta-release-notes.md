@@ -6,6 +6,7 @@ Cette version permet de tester publiquement le jeu complet : carrière, duel con
 
 - L'événement Halloween est disponible du 29 octobre au 19 novembre inclus : ambiance noire et orange, musique d'accueil spéciale et pack Halloween à 666 crédits.
 - Cinq cartes exclusives rejoignent temporairement le jeu : Ben Damage, Melusine, Black Sam, Hades et Ultima Sombra.
+- Un protège-carte Halloween à citrouille est offert à la première connexion entre le 29 octobre et le 19 novembre 2026 inclus. Une fois reçu, cet objet cosmétique reste dans votre inventaire et peut être équipé dans le profil, même après l'événement.
 - L'éditeur de decks peut maintenant filtrer les cartes par famille d'effet.
 - Les cartes Ultimes occupent désormais une place Légendaire dans la limite du deck, avec une seule Ultime maximum.
 - Les commandes musicales restent utilisables pendant le tour adverse.

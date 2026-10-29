@@ -4169,7 +4169,9 @@ const CARD_SLEEVES=[
   {id:"halloween",label:"Halloween",filter:"none",art:"assets/branding/allstars_card_back_halloween.png"}
 ];
 function normalizeSleeveId(id){return CARD_SLEEVES.some(item=>item.id===id)?id:"classic"}
-function selectedCardSleeve(){loadPlayerState();return normalizeSleeveId(playerState.sleeveId)}
+function ownsCardSleeve(id){return id==="classic"||Boolean(playerState.cosmeticInventory?.sleeves?.[id])}
+function equippedCardSleeve(){return ownsCardSleeve(playerState.sleeveId)?normalizeSleeveId(playerState.sleeveId):"classic"}
+function selectedCardSleeve(){loadPlayerState();return equippedCardSleeve()}
 function sleeveFilter(id){return CARD_SLEEVES.find(item=>item.id===normalizeSleeveId(id)).filter}
 function sleeveArt(id){return `url('${new URL(CARD_SLEEVES.find(item=>item.id===normalizeSleeveId(id)).art,document.baseURI).href}')`}
 function setSleeveStyle(el,id){
@@ -4178,17 +4180,18 @@ function setSleeveStyle(el,id){
   el.style.setProperty("--card-back-art",sleeveArt(id));
 }
 function renderSleevePicker(){
-  return `<section class="sleeve-picker"><h3>Protège-cartes</h3><p>Choisis le dos de tes cartes pour tes prochaines parties.</p><div class="sleeve-options">${CARD_SLEEVES.map(item=>`<button type="button" class="sleeve-option${normalizeSleeveId(playerState.sleeveId)===item.id?" selected":""}" aria-pressed="${normalizeSleeveId(playerState.sleeveId)===item.id}" onclick="selectCardSleeve('${item.id}')"><span class="sleeve-preview" style="--card-back-filter:${item.filter};--card-back-art:${sleeveArt(item.id)}"></span><strong>${item.label}</strong><small>${normalizeSleeveId(playerState.sleeveId)===item.id?"Équipé":"Choisir"}</small></button>`).join("")}</div></section>`;
+  return `<section class="sleeve-picker"><h3>Protège-cartes</h3><p>Choisis parmi les objets cosmétiques de ton inventaire. Le protège-carte Halloween est offert à ta première connexion du 29 octobre au 19 novembre 2026 inclus.</p><div class="sleeve-options">${CARD_SLEEVES.map(item=>{const owned=ownsCardSleeve(item.id),equipped=equippedCardSleeve()===item.id;return `<button type="button" class="sleeve-option${equipped?" selected":""}" aria-pressed="${equipped}" ${owned?"":"disabled"} onclick="selectCardSleeve('${item.id}')"><span class="sleeve-preview" style="--card-back-filter:${item.filter};--card-back-art:${sleeveArt(item.id)}"></span><strong>${item.label}</strong><small>${!owned?"Non obtenu":equipped?"Équipé":"Choisir"}</small></button>`}).join("")}</div></section>`;
 }
 function selectCardSleeve(id){
   if(!CARD_SLEEVES.some(item=>item.id===id))return;
   loadPlayerState();
+  if(!ownsCardSleeve(id))return;
   playerState.sleeveId=id;
   savePlayerState();
   renderProfileContent();
 }
 function applyCardSleeves(){
-  const own=normalizeSleeveId(playerState.sleeveId);
+  const own=equippedCardSleeve();
   setSleeveStyle(document.body,own);
   if(!G)return;
   let enemy=G.ai?.sleeveId||"classic";
@@ -4305,6 +4308,7 @@ let cloudSaveHydrating=false;
 function serializedPlayerState(){
   return {
     sleeveId:normalizeSleeveId(playerState.sleeveId),
+    cosmeticInventory:playerState.cosmeticInventory||{sleeves:{}},
     credits:playerState.credits,
     collection:playerState.collection||{},
     boosterTickets:playerState.boosterTickets||{},
@@ -4394,6 +4398,7 @@ function mergePlayerStateForHydration(remotePlayer,localPlayer){
   return {
     ...remotePlayer,
     sleeveId:normalizeSleeveId(localIsNewer ? localPlayer.sleeveId : remotePlayer.sleeveId),
+    cosmeticInventory:{sleeves:{...(remotePlayer.cosmeticInventory?.sleeves||{}),...(localPlayer.cosmeticInventory?.sleeves||{})}},
     credits:localIsNewer ? Number(localPlayer.credits)||0 : Number(remotePlayer.credits)||0,
     collection:mergeSavedCounts(remotePlayer.collection,localPlayer.collection),
     boosterTickets:mergeSavedCounts(remotePlayer.boosterTickets,localPlayer.boosterTickets),
@@ -9253,6 +9258,7 @@ const LIMITED_GIFT_CAMPAIGN = {
 
 let playerState = {
   sleeveId:"classic",
+  cosmeticInventory:{sleeves:{}},
   credits: 0,
   collection: {},
   boosterTickets: {},
@@ -9307,6 +9313,15 @@ function claimLimitedGiftCampaign(){
   return {cards:[gift],title:campaign.title,newCardKeys};
 }
 
+function claimHalloweenSleeveGift(now=Date.now()){
+  if(!isHalloweenEventActive(now))return false;
+  playerState.cosmeticInventory=playerState.cosmeticInventory||{};
+  playerState.cosmeticInventory.sleeves=playerState.cosmeticInventory.sleeves||{};
+  if(playerState.cosmeticInventory.sleeves.halloween)return false;
+  playerState.cosmeticInventory.sleeves.halloween={acquiredAt:Number(now),source:"halloween_2026_login_gift"};
+  return true;
+}
+
 function loadPlayerState(){
   if(playerState.loaded)return;
   try{
@@ -9314,6 +9329,7 @@ function loadPlayerState(){
     if(saved){
       playerState={
         sleeveId:normalizeSleeveId(saved.sleeveId),
+        cosmeticInventory:saved.cosmeticInventory||{sleeves:{}},
         credits:Number(saved.credits ?? saved["crédits"])||0,
         collection:saved.collection||{},
         boosterTickets:saved.boosterTickets||{},
@@ -9352,7 +9368,10 @@ function loadPlayerState(){
     addCardsToCollection(welcomeCards);
   }
   const limitedGift=claimLimitedGiftCampaign();
+  const sleeveGift=claimHalloweenSleeveGift();
+  if(!ownsCardSleeve(playerState.sleeveId))playerState.sleeveId="classic";
   savePlayerState();
+  if(sleeveGift)setTimeout(()=>showSystemToast("Cadeau Halloween obtenu : retrouve ton protège-carte à citrouille dans Profil → Protège-cartes.",6000),650);
   const revealLimitedGift=limitedGift ? ()=>showOfficialCommunique(
     "50 joueurs : merci à toute la communauté ALLSTAR !",
     [{title:"Cadeau Exclusif",label:"La carte Ultime Marc Sebire rejoint votre collection."}],
@@ -9367,6 +9386,7 @@ function savePlayerState(){
   try{
     localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify({
       sleeveId:normalizeSleeveId(playerState.sleeveId),
+      cosmeticInventory:playerState.cosmeticInventory||{sleeves:{}},
       credits:playerState.credits,
       collection:playerState.collection,
       boosterTickets:playerState.boosterTickets||{},
