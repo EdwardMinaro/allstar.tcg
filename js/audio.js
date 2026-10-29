@@ -709,7 +709,7 @@ class AudioManager {
   showMusicToast(item) {
     const toast = document.getElementById("musicToast");
     const name = document.getElementById("musicToastName");
-    if (!toast || !name || !item?.wrestler) return;
+    if (!toast || !name || (!item?.wrestler && !item?.seasonal)) return;
 
     clearTimeout(this.toastTimer);
     name.textContent = item.label || item.wrestler;
@@ -727,7 +727,7 @@ window.isHalloweenAudioSeasonActive = isHalloweenAudioSeasonActive;
 
 function initAudioOptions() {
   const wrestlerTracks = Object.entries(AUDIO_LIBRARY.music)
-    .filter(([, item]) => item.wrestler)
+    .filter(([, item]) => item.wrestler || item.seasonal)
     .sort(([, a], [, b]) => a.label.localeCompare(b.label, "fr", { sensitivity: "base" }));
 
   document.querySelectorAll(".music-select-control").forEach(select => {
