@@ -9166,9 +9166,11 @@ function isEventExclusiveCard(card){
 
 let halloweenBatTimer=null;
 let halloweenAnnouncementSeen=false;
+let startupRewardsPending=false;
 
 function showHalloweenAnnouncement(){
-  if(!isHalloweenEventActive()||halloweenAnnouncementSeen)return;
+  if(!isHalloweenEventActive()||halloweenAnnouncementSeen||startupRewardsPending)return;
+  if(!document.getElementById("menu")?.classList.contains("active"))return;
   try{if(localStorage.getItem("allstarHalloween2026OfficialAnnouncement"))return}catch{}
   const overlay=document.getElementById("halloweenAnnouncement");
   if(overlay)overlay.classList.add("active");
@@ -9368,16 +9370,20 @@ function loadPlayerState(){
     addCardsToCollection(welcomeCards);
   }
   const limitedGift=claimLimitedGiftCampaign();
-  const sleeveGift=claimHalloweenSleeveGift();
+  claimHalloweenSleeveGift();
   if(!ownsCardSleeve(playerState.sleeveId))playerState.sleeveId="classic";
   savePlayerState();
-  if(sleeveGift)setTimeout(()=>showSystemToast("Cadeau Halloween obtenu : retrouve ton protège-carte à citrouille dans Profil → Protège-cartes.",6000),650);
+  startupRewardsPending=Boolean(welcomeCards||limitedGift);
+  const finishStartupRewards=()=>{
+    startupRewardsPending=false;
+    showHalloweenAnnouncement();
+  };
   const revealLimitedGift=limitedGift ? ()=>showOfficialCommunique(
     "50 joueurs : merci à toute la communauté ALLSTAR !",
     [{title:"Cadeau Exclusif",label:"La carte Ultime Marc Sebire rejoint votre collection."}],
-    ()=>openBooster(limitedGift.cards,limitedGift.title,limitedGift.newCardKeys)
+    ()=>openBooster(limitedGift.cards,limitedGift.title,limitedGift.newCardKeys,finishStartupRewards)
   ) : null;
-  if(welcomeCards)setTimeout(()=>openBooster(welcomeCards,"Pack Champion offert",new Set(),revealLimitedGift),450);
+  if(welcomeCards)setTimeout(()=>openBooster(welcomeCards,"Pack Champion offert",new Set(),revealLimitedGift||finishStartupRewards),450);
   else if(revealLimitedGift)setTimeout(revealLimitedGift,450);
 }
 
@@ -10808,9 +10814,7 @@ function enterSavedGame(){
   try{
     loadPlayerState();
     loadDeckState();
-    hideOptions();
-    show("menu");
-    playMusic("menu");
+    showMenu();
   }catch(error){
     setSaveStatus(`Impossible d'ouvrir la partie : ${error?.message||"erreur inconnue"}.`);
   }

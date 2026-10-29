@@ -388,7 +388,7 @@ function verifyRecentEffects() {
       && game.includes("50 joueurs : merci à toute la communauté ALLSTAR !")
       && game.includes('title:"Cadeau Exclusif"')
       && game.includes("La carte Ultime Marc Sebire rejoint votre collection.")
-      && game.includes("openBooster(welcomeCards,\"Pack Champion offert\",new Set(),revealLimitedGift)"),
+      && game.includes("openBooster(welcomeCards,\"Pack Champion offert\",new Set(),revealLimitedGift||finishStartupRewards)"),
     "Cadeau Marc Sebire unique, annonce officiellement puis revele sans chevauchement"
   );
   assert(
