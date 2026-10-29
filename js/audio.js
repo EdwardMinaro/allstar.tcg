@@ -1,22 +1,22 @@
 const HALLOWEEN_TRACKS = [
   [0,"Graveyard Shift Warriors"],
-  [222,"Witchfire"],
-  [508,"Night Hunters"],
-  [741,"Forever Yours"],
-  [1050,"Metal Eagles"],
-  [1327,"Monster Mash: Battle Royale"],
-  [1559,"Halloween Steel"],
-  [1849,"Demons at the Crossroads"],
-  [2083,"Rise of the Damned"],
-  [2343,"Born for the Hammer"]
+  [222.445,"Witchfire"],
+  [509.045,"Night Hunters"],
+  [741.98,"Forever Yours"],
+  [1051.995,"Metal Eagles"],
+  [1330.105,"Monster Mash: Battle Royale"],
+  [1562.375,"Halloween Steel"],
+  [1852.46,"Demons at the Crossroads"],
+  [2086.72,"Rise of the Damned"],
+  [2347.005,"Born for the Hammer"]
 ];
-const HALLOWEEN_AUDIO_END = 2575;
+const HALLOWEEN_AUDIO_END = 2579.44;
 
 const AUDIO_LIBRARY = {
   music: {
     ...Object.fromEntries(HALLOWEEN_TRACKS.map(([start,label],index)=>{
       const id=`halloween_${String(index+1).padStart(2,"0")}`;
-      return [id,{label,playlist:"halloween",seasonal:true,start,src:`assets/audio/music/halloween/${id}.mp3`}];
+      return [id,{label,playlist:"halloween",seasonal:true,start,src:`assets/audio/music/halloween/${id}.mp3?v=cuts2`}];
     })),
     agathe_aries: { label: "Agathe Aries", wrestler: "Agathe Aries", src: "assets/audio/music/agathe_aries.mp3" },
     g_king: { label: "G KING", wrestler: "G KING", src: "assets/audio/music/g_king.wav" },
