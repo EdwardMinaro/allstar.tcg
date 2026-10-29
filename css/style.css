@@ -8463,6 +8463,16 @@ body.halloween-active :is(#menu,#saveScreen) .halloween-cosmetic{
   z-index:4;
 }
 
+body.halloween-active :is(#menu,#saveScreen) .stage-spotlight{
+  width:88px;
+  bottom:18px;
+  z-index:1!important;
+}
+
+body.halloween-active :is(#menu,#saveScreen) .stage-spotlight:after{
+  bottom:44px!important;
+}
+
 body.halloween-active :is(#menu,#saveScreen) .home-stage:before{
   border-color:rgba(255,132,40,.32)!important;
   background:
