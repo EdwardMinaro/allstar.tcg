@@ -70,7 +70,6 @@
       <span class="halloween-pumpkin pumpkin-one">&#x1F383;</span>
       <span class="halloween-pumpkin pumpkin-two">&#x1F383;</span>
     </div>
-    <div class="halloween-event-badge" id="halloweenEventBadge" hidden>HALLOWEEN · PACK 666</div>
     <button class="home-control-trigger" type="button" onclick="toggleHomeQuickPanel()" aria-label="Ouvrir le menu rapide" aria-expanded="false">&#9881;</button>
     <div class="home-quick-overlay" id="homeQuickPanel" onclick="if(event.target===this)closeHomeQuickPanel()">
       <section class="home-quick-panel" role="dialog" aria-modal="true" aria-label="Menu rapide">
@@ -846,6 +845,15 @@
   </div>
 </div>
 
+<div class="overlay" id="halloweenAnnouncement" role="dialog" aria-modal="true" aria-labelledby="halloweenAnnouncementTitle">
+  <div class="splash halloween-announcement">
+    <h2 id="halloweenAnnouncementTitle">Halloween s'invite sur le ring !</h2>
+    <p>Du 29 octobre au 19 novembre inclus, retrouvez le Pack Halloween dans la boutique pour 666 crédits.</p>
+    <p>Chaque paquet contient 5 cartes, avec une chance de découvrir Ben Damage, Melusine, Black Sam, Hades ou Ultima Sombra en édition Halloween.</p>
+    <p>Bonne chance et bon Halloween !</p>
+    <button class="small-btn" onclick="closeHalloweenAnnouncement()">C'est parti !</button>
+  </div>
+</div>
 <script src="js/audio.js"></script>
 <script src="js/firebaseConfig.js"></script>
 <script src="js/firebaseService.js"></script>

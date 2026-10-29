@@ -8455,7 +8455,7 @@ button:disabled,
 
 /* Halloween swaps the home effects in place, without moving the menu. */
 body.halloween-active #menu .crowd-flashes,
-body.halloween-active #menu .stage-spotlight{
+body.halloween-active #menu .stage-spotlight:before{
   display:none!important;
 }
 
@@ -8477,8 +8477,28 @@ body.halloween-active #menu .home-stage:after{
 
 body.halloween-active #menu .halloween-bat{
   font-size:34px;
-  opacity:.82;
+  opacity:0;
+  animation:none;
+  transform:none;
 }
+
+body.halloween-active #menu .halloween-bat.bat-flash{
+  animation:halloweenBatFlash 1.3s ease-out both;
+}
+
+@keyframes halloweenBatFlash{
+  0%,100%{opacity:0;transform:translateY(8px) rotate(var(--bat-rotation,0deg)) scale(.8)}
+  18%,52%{opacity:.9;transform:translateY(0) rotate(var(--bat-rotation,0deg)) scale(1)}
+  70%{opacity:.3}
+}
+
+.halloween-announcement{
+  max-width:620px;
+  background:linear-gradient(180deg,#201006,#080604)!important;
+  border-color:#f18a22!important;
+}
+.halloween-announcement h2{color:#ffae47}
+.halloween-announcement p{line-height:1.5}
 
 body.halloween-active #menu .halloween-bat.bat-one{
   left:14%;

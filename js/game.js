@@ -3699,6 +3699,7 @@ function showMenu(){
   if(G?.mode==="online"&&G?.over)window.closeOnlineSession?.();
   applyHalloweenTheme();
   show("menu");
+  showHalloweenAnnouncement();
   playMusic("menu");
 }
 function showDuelMenu(){show("duel")}
@@ -9119,13 +9120,56 @@ function isEventExclusiveCard(card){
   return Boolean(card?.exclusiveEvent);
 }
 
+let halloweenBatTimer=null;
+let halloweenAnnouncementSeen=false;
+
+function showHalloweenAnnouncement(){
+  if(!isHalloweenEventActive()||halloweenAnnouncementSeen)return;
+  try{if(localStorage.getItem("allstarHalloween2026Announcement"))return}catch{}
+  const overlay=document.getElementById("halloweenAnnouncement");
+  if(overlay)overlay.classList.add("active");
+}
+
+function closeHalloweenAnnouncement(){
+  document.getElementById("halloweenAnnouncement")?.classList.remove("active");
+  halloweenAnnouncementSeen=true;
+  try{localStorage.setItem("allstarHalloween2026Announcement","seen")}catch{}
+}
+
+function scheduleHalloweenBats(){
+  if(halloweenBatTimer!==null)return;
+  const flash=()=>{
+    if(!document.body?.classList.contains("halloween-active")){
+      halloweenBatTimer=null;
+      return;
+    }
+    if(document.getElementById("menu")?.classList.contains("active")){
+      document.querySelectorAll(".halloween-bat").forEach(bat=>{
+        bat.style.left=`${8+Math.random()*80}%`;
+        bat.style.top=`${10+Math.random()*64}%`;
+        bat.style.right="auto";
+        bat.style.setProperty("--bat-rotation",`${-25+Math.random()*50}deg`);
+        bat.classList.remove("bat-flash");
+        void bat.offsetWidth;
+        bat.classList.add("bat-flash");
+      });
+    }
+    halloweenBatTimer=setTimeout(flash,2400+Math.random()*5200);
+  };
+  halloweenBatTimer=setTimeout(flash,800+Math.random()*1800);
+}
+
 function applyHalloweenTheme(now=Date.now()){
   const active=isHalloweenEventActive(now);
   document.body?.classList.toggle("halloween-active",active);
   const cosmetic=document.getElementById("halloweenCosmetic");
-  const badge=document.getElementById("halloweenEventBadge");
   if(cosmetic)cosmetic.hidden=!active;
-  if(badge)badge.hidden=!active;
+  if(active)scheduleHalloweenBats();
+  else{
+    clearTimeout(halloweenBatTimer);
+    halloweenBatTimer=null;
+    document.getElementById("halloweenAnnouncement")?.classList.remove("active");
+  }
   return active;
 }
 
