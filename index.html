@@ -289,7 +289,12 @@
 
             <button class="mute-button-control" type="button">Couper le son</button>
 
-            <label for="homeMusicSelect">Themes catcheurs</label>
+            <fieldset class="music-playlists"><legend>Playlists</legend>
+              <label><input type="checkbox" class="music-playlist-control" data-playlist="wrestlers"> Catcheurs</label>
+              <label><input type="checkbox" class="music-playlist-control" data-playlist="halloween"> Halloween</label>
+            </fieldset>
+            <span class="music-playlist-status" aria-live="polite"></span>
+            <label for="homeMusicSelect">Morceau</label>
             <select id="homeMusicSelect" class="music-select-control"></select>
             <div class="audio-controls">
               <button class="music-play-control" type="button">Play</button>
@@ -366,7 +371,12 @@
 
       <button id="muteButton" class="mute-button-control" type="button">Couper le son</button>
 
-      <label for="musicSelect">Thèmes catcheurs</label>
+      <fieldset class="music-playlists"><legend>Playlists</legend>
+        <label><input type="checkbox" class="music-playlist-control" data-playlist="wrestlers"> Catcheurs</label>
+        <label><input type="checkbox" class="music-playlist-control" data-playlist="halloween"> Halloween</label>
+      </fieldset>
+      <span class="music-playlist-status" aria-live="polite"></span>
+      <label for="musicSelect">Morceau</label>
       <select id="musicSelect" class="music-select-control"></select>
       <div class="audio-controls">
         <button id="musicPlayButton" class="music-play-control" type="button">Play</button>

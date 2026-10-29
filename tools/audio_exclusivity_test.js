@@ -4,6 +4,7 @@ const path = require("path");
 const vm = require("vm");
 
 const audioInstances = [];
+const audioStorage=new Map();
 
 class MockAudio {
   constructor(src) {
@@ -12,10 +13,12 @@ class MockAudio {
     this.currentTime = 0;
     this.volume = 1;
     this.dataset = {};
+    this.listeners={};
     audioInstances.push(this);
   }
 
-  addEventListener() {}
+  addEventListener(name,callback) { (this.listeners[name]??=[]).push(callback); }
+  emit(name) { for(const callback of this.listeners[name]||[])callback(); }
 
   play() {
     this.paused = false;
@@ -33,7 +36,7 @@ class MockAudio {
 const context = {
   Audio: MockAudio,
   console,
-  localStorage: { getItem: () => null, setItem: () => {} },
+  localStorage: { getItem: key => audioStorage.get(key)||null, setItem: (key,value) => audioStorage.set(key,value) },
   document: {
     addEventListener: () => {},
     getElementById: () => null,
@@ -65,18 +68,15 @@ async function run() {
     "Le fond Halloween doit rester actif jusqu'au 19 novembre inclus");
   assert.strictEqual(context.window.isHalloweenAudioSeasonActive(Date.parse("2026-11-20T00:00:00+01:00")), false,
     "Le fond Halloween doit s'arrêter le 20 novembre");
-  assert.ok(context.window.AUDIO_LIBRARY.music.halloween_2026,
-    "La musique Halloween doit être déclarée dans la bibliothèque audio");
-  manager.startMusic("halloween_2026");
-  assert.strictEqual(manager.currentMusicId, "halloween_2026",
-    "La musique Halloween doit pouvoir démarrer comme fond d'accueil");
-  assert.strictEqual(manager.music.loop, true,
-    "Le long fond Halloween doit boucler si le joueur reste dans l'ambiance");
+  const halloweenIds=Object.keys(context.window.AUDIO_LIBRARY.music).filter(id=>context.window.AUDIO_LIBRARY.music[id].playlist==="halloween");
+  assert.equal(halloweenIds.length,10);
+  manager.settings.playlists={wrestlers:true,halloween:false};
+  manager.startMusic("halloween_01");
+  assert.strictEqual(manager.music.loop, false,"Les morceaux Halloween doivent s'enchaîner sans boucler individuellement");
   const firstNormalId = manager.playNextWrestlerMusic(0, true);
   assert.ok(context.window.AUDIO_LIBRARY.music[firstNormalId]?.wrestler,
     "Musique suivante doit quitter Halloween pour un thème de catcheur normal");
-  assert.strictEqual(manager.playPreviousWrestlerMusic(0, true), "halloween_2026",
-    "Musique précédente doit permettre de revenir au fond Halloween");
+  assert.equal(manager.playPreviousWrestlerMusic(0,true),null,"Précédente doit ignorer l'historique d'une playlist décochée");
   audioInstances.forEach(audio => audio.resolvePlay?.());
   await flushPromises();
   assert.strictEqual(audioInstances.filter(audio => !audio.paused).length, 1,
@@ -85,6 +85,35 @@ async function run() {
   audioInstances.length = 0;
   manager.wrestlerHistory = [];
   manager.wrestlerQueue = [];
+
+  manager.setPlaylistEnabled("halloween",true);
+  manager.setPlaylistEnabled("wrestlers",false);
+  assert.equal(manager.playlistMusicIds().length,10);
+  manager.playMusic("halloween_01",true);
+  assert.equal(manager.currentMusicId,"halloween_01");
+  manager.music.emit("ended");
+  assert.ok(manager.currentMusicId.startsWith("halloween_"),"Fin de morceau : rester dans la playlist Halloween seule");
+  const beforePrevious=manager.currentMusicId;
+  manager.playPreviousWrestlerMusic(0,true);
+  assert.equal(manager.currentMusicId,"halloween_01");
+  assert.notEqual(beforePrevious,manager.currentMusicId);
+  assert.equal(manager.setPlaylistEnabled("halloween",false),false,"Au moins une playlist doit rester cochée");
+  assert.equal(manager.loadSettings().playlists.wrestlers,false,"Playlist sauvegardée après redémarrage");
+  manager.toggleMusicPause();
+  manager.setPlaylistEnabled("wrestlers",true);
+  manager.setPlaylistEnabled("halloween",false);
+  assert.equal(manager.music,null,"Un changement de playlist ne doit pas relancer une musique mise en pause");
+  assert.equal(context.window.AUDIO_LIBRARY.music[manager.pendingMusicId].wrestler!==undefined,true);
+  manager.stopMusic();
+  manager.setPlaylistEnabled("halloween",true);
+  assert.equal(manager.music,null,"Un changement de playlist ne doit pas relancer après Stop");
+  const enabled=manager.playlistMusicIds();
+  assert.ok(enabled.some(id=>id.startsWith("halloween_"))&&enabled.some(id=>context.window.AUDIO_LIBRARY.music[id].wrestler),"Les deux playlists doivent pouvoir se mélanger");
+  audioInstances.forEach(audio=>audio.resolvePlay?.());
+  await flushPromises();
+  audioInstances.length=0;
+  manager.wrestlerHistory=[];
+  manager.wrestlerQueue=[];
 
   const ids = manager.wrestlerMusicIds().slice(0, 3);
   assert.strictEqual(ids.length, 3, "Trois thèmes sont nécessaires pour le test");

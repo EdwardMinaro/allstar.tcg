@@ -1,5 +1,23 @@
+const HALLOWEEN_TRACKS = [
+  [0,"Graveyard Shift Warriors"],
+  [222,"Witchfire"],
+  [508,"Night Hunters"],
+  [741,"Forever Yours"],
+  [1050,"Metal Eagles"],
+  [1327,"Monster Mash: Battle Royale"],
+  [1559,"Halloween Steel"],
+  [1849,"Demons at the Crossroads"],
+  [2083,"Rise of the Damned"],
+  [2343,"Born for the Hammer"]
+];
+const HALLOWEEN_AUDIO_END = 2575;
+
 const AUDIO_LIBRARY = {
   music: {
+    ...Object.fromEntries(HALLOWEEN_TRACKS.map(([start,label],index)=>{
+      const id=`halloween_${String(index+1).padStart(2,"0")}`;
+      return [id,{label,playlist:"halloween",seasonal:true,start,src:`assets/audio/music/halloween/${id}.mp3`}];
+    })),
     agathe_aries: { label: "Agathe Aries", wrestler: "Agathe Aries", src: "assets/audio/music/agathe_aries.mp3" },
     g_king: { label: "G KING", wrestler: "G KING", src: "assets/audio/music/g_king.wav" },
     menu: { label: "Menu principal", src: "assets/audio/music/menu.mp3" },
@@ -7,7 +25,6 @@ const AUDIO_LIBRARY = {
     tension: { label: "Tension", src: "assets/audio/music/tension.mp3" },
     victoire: { label: "Victoire", src: "assets/audio/music/victoire.mp3" },
     defaite: { label: "Défaite", src: "assets/audio/music/defaite.mp3" },
-    halloween_2026: { label: "Halloween 2026", src: "assets/audio/music/halloween_2026.mp3", seasonal: true },
     adam_frost: {
       label: "Adam Frost",
       wrestler: "Adam Frost",
@@ -379,9 +396,14 @@ class AudioManager {
   }
 
   loadSettings() {
-    const defaults = { musicVolume: 0.7, sfxVolume: 0.85, muted: false };
+    const defaults = { musicVolume: 0.7, sfxVolume: 0.85, muted: false, playlists:{wrestlers:true,halloween:isHalloweenAudioSeasonActive()} };
     try {
-      return { ...defaults, ...JSON.parse(localStorage.getItem(this.storageKey) || "{}") };
+      const saved=JSON.parse(localStorage.getItem(this.storageKey) || "{}");
+      const playlists={...defaults.playlists,...saved.playlists};
+      playlists.wrestlers=Boolean(playlists.wrestlers);
+      playlists.halloween=Boolean(playlists.halloween);
+      if(!playlists.wrestlers&&!playlists.halloween)playlists.wrestlers=true;
+      return { ...defaults, ...saved, playlists };
     } catch {
       return defaults;
     }
@@ -419,6 +441,36 @@ class AudioManager {
       .map(([id]) => id);
   }
 
+  isTrackEnabled(id) {
+    const item=this.library.music[id];
+    if(item?.playlist==="halloween")return this.settings.playlists.halloween;
+    if(item?.wrestler)return this.settings.playlists.wrestlers;
+    return false;
+  }
+
+  playlistMusicIds() {
+    return Object.keys(this.library.music).filter(id=>this.isTrackEnabled(id));
+  }
+
+  setPlaylistEnabled(playlist,enabled) {
+    if(!["wrestlers","halloween"].includes(playlist))return false;
+    const next={...this.settings.playlists,[playlist]:Boolean(enabled)};
+    if(!next.wrestlers&&!next.halloween)return false;
+    this.settings.playlists=next;
+    this.wrestlerQueue=[];
+    this.wrestlerHistory=this.wrestlerHistory.filter(id=>this.isTrackEnabled(id));
+    this.saveSettings();
+    if(this.currentMusicId&&!this.isTrackEnabled(this.currentMusicId)){
+      const paused=this.musicPausedByUser||Boolean(this.music?.paused);
+      this.stopMusic(false);
+      if(paused)this.pendingMusicId=this.firstWrestlerMusicId();
+      else this.playNextWrestlerMusic(500);
+    }
+    if(this.pendingMusicId&&!this.isTrackEnabled(this.pendingMusicId))this.pendingMusicId=null;
+    this.updateNowPlaying();
+    return true;
+  }
+
   shuffleList(list) {
     const copy = [...list];
     for (let i = copy.length - 1; i > 0; i--) {
@@ -429,7 +481,7 @@ class AudioManager {
   }
 
   refillWrestlerQueue(excludeId = null) {
-    const ids = this.wrestlerMusicIds();
+    const ids = this.playlistMusicIds();
     this.wrestlerQueue = this.shuffleList(ids);
     if (excludeId && this.wrestlerQueue.length > 1 && this.wrestlerQueue[0] === excludeId) {
       this.wrestlerQueue.push(this.wrestlerQueue.shift());
@@ -459,7 +511,8 @@ class AudioManager {
   }
 
   playPreviousWrestlerMusic(duration = 800, manual = true) {
-    const previousId = this.wrestlerHistory.pop();
+    let previousId = this.wrestlerHistory.pop();
+    while(previousId&&!this.isTrackEnabled(previousId))previousId=this.wrestlerHistory.pop();
     if (!previousId) return null;
     const currentId = this.currentMusicId;
     if (currentId && currentId !== previousId) this.wrestlerQueue.unshift(currentId);
@@ -479,7 +532,7 @@ class AudioManager {
   attachMusicEvents(audio, id, item) {
     if (!audio) return;
     audio.dataset.crossfadeArmed = "0";
-    if (item.wrestler) {
+    if (item.wrestler || item.playlist) {
       audio.addEventListener("ended", () => {
         if (this.music === audio) this.playNextWrestlerMusic(1200);
       }, { once: true });
@@ -500,7 +553,7 @@ class AudioManager {
     if (!item) return;
 
     const requestId = ++this.musicRequestId;
-    const music = this.createAudio(item.src, !item.wrestler);
+    const music = this.createAudio(item.src, !item.wrestler && !item.playlist);
     this.music = music;
     this.currentMusicId = id;
     if (music) music.volume = fadeInDuration ? 0 : this.effectiveVolume("music");
@@ -530,6 +583,7 @@ class AudioManager {
   playMusic(id, manual = false) {
     const item = this.library.music[id];
     if (!item) return;
+    if((item.wrestler||item.playlist)&&!this.isTrackEnabled(id))return;
     if (this.musicStoppedByUser && !manual) return;
     if (manual) {
       this.musicStoppedByUser = false;
@@ -618,6 +672,7 @@ class AudioManager {
   fadeMusic(id, duration = 800, manual = false, rememberHistory = true) {
     const next = this.library.music[id];
     if (!next) return;
+    if((next.wrestler||next.playlist)&&!this.isTrackEnabled(id))return;
     if (this.musicStoppedByUser && !manual) return;
     if (manual) this.musicStoppedByUser = false;
     if (this.currentMusicId === id) return;
@@ -704,6 +759,7 @@ class AudioManager {
     document.querySelectorAll(".mute-button-control").forEach(button => {
       button.textContent = this.settings.muted ? "Remettre le son" : "Couper le son";
     });
+    if(this.currentMusicId)syncMusicSelects(this.currentMusicId);
   }
 
   showMusicToast(item) {
@@ -725,15 +781,33 @@ window.AUDIO_LIBRARY = AUDIO_LIBRARY;
 window.audioManager = audioManager;
 window.isHalloweenAudioSeasonActive = isHalloweenAudioSeasonActive;
 
-function initAudioOptions() {
-  const wrestlerTracks = Object.entries(AUDIO_LIBRARY.music)
-    .filter(([, item]) => item.wrestler || item.seasonal)
-    .sort(([, a], [, b]) => a.label.localeCompare(b.label, "fr", { sensitivity: "base" }));
+function renderMusicPlaylists() {
+  document.querySelectorAll(".music-playlist-control").forEach(input=>{
+    input.checked=audioManager.settings.playlists[input.dataset.playlist];
+  });
+  document.querySelectorAll(".music-select-control").forEach(select=>{
+    const selected=audioManager.currentMusicId||audioManager.pendingMusicId||select.value;
+    select.innerHTML=[
+      ["wrestlers","Catcheurs",audioManager.wrestlerMusicIds()],
+      ["halloween","Halloween",Object.keys(AUDIO_LIBRARY.music).filter(id=>AUDIO_LIBRARY.music[id].playlist==="halloween")]
+    ].filter(([key])=>audioManager.settings.playlists[key]).map(([key,label,ids])=>{
+      const sorted=key==="halloween"?ids:ids.sort((a,b)=>AUDIO_LIBRARY.music[a].label.localeCompare(AUDIO_LIBRARY.music[b].label,"fr",{sensitivity:"base"}));
+      return `<optgroup label="${label}">${sorted.map(id=>`<option value="${id}">${AUDIO_LIBRARY.music[id].label}</option>`).join("")}</optgroup>`;
+    }).join("");
+    if(audioManager.isTrackEnabled(selected))select.value=selected;
+  });
+}
 
+function initAudioOptions() {
+  renderMusicPlaylists();
+  document.querySelectorAll(".music-playlist-control").forEach(input=>{
+    input.addEventListener("change",()=>{
+      const accepted=audioManager.setPlaylistEnabled(input.dataset.playlist,input.checked);
+      renderMusicPlaylists();
+      document.querySelectorAll(".music-playlist-status").forEach(el=>el.textContent=accepted?"":"Garde au moins une playlist cochée.");
+    });
+  });
   document.querySelectorAll(".music-select-control").forEach(select => {
-    select.innerHTML = wrestlerTracks
-      .map(([id, item]) => `<option value="${id}">${item.label}</option>`)
-      .join("");
     select.addEventListener("change", () => {
       syncMusicSelects(select.value);
       if (audioManager.currentMusicId) audioManager.fadeMusic(select.value, 500);
@@ -812,6 +886,6 @@ function toggleThemePause() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initAudioOptions();
-  if (isHalloweenAudioSeasonActive()) audioManager.playMusic("halloween_2026");
+  if (isHalloweenAudioSeasonActive() && audioManager.settings.playlists.halloween) audioManager.playMusic("halloween_01");
   else audioManager.playWrestlerRadio();
 });

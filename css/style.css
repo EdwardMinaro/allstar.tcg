@@ -8582,3 +8582,9 @@ body.halloween-active .profile-highlights > div{
   background:linear-gradient(180deg,#1c1008,#090706)!important;
 }
 body.halloween-active .profile-active-title{color:#ffd0a0}
+.music-playlists{display:flex;flex-wrap:wrap;gap:10px 18px;margin:0;padding:8px 10px;border:1px solid #80602d;border-radius:6px}
+.music-playlists legend{font-size:13px;font-weight:800}
+.music-playlists label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.music-playlists input{accent-color:#ec8b25;width:16px;height:16px}
+.music-playlist-status{font-size:12px;color:#ffc776}
+.music-playlist-status:empty{display:none}

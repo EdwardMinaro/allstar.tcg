@@ -5,6 +5,7 @@ Cette version permet de tester publiquement le jeu complet : carrière, duel con
 ## Nouveautés de la version 0.2.26
 
 - L'événement Halloween est disponible du 29 octobre au 19 novembre inclus : ambiance noire et orange, musique d'accueil spéciale et pack Halloween à 666 crédits.
+- Le lecteur propose deux playlists à cocher, Catcheurs et Halloween, séparément ou ensemble. Les 10 morceaux Halloween sont sélectionnables individuellement ; les préférences sont conservées au redémarrage.
 - Cinq cartes exclusives rejoignent temporairement le jeu : Ben Damage, Melusine, Black Sam, Hades et Ultima Sombra.
 - Un protège-carte Halloween à citrouille est offert à la première connexion entre le 29 octobre et le 19 novembre 2026 inclus. Une fois reçu, cet objet cosmétique reste dans votre inventaire et peut être équipé dans le profil, même après l'événement.
 - L'éditeur de decks peut maintenant filtrer les cartes par famille d'effet.

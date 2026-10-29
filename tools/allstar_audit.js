@@ -52,8 +52,9 @@ return {
 
 function loadAudio() {
   const source = read(audioPath);
+  const tracks = source.match(/const HALLOWEEN_TRACKS = (\[[\s\S]*?\n\]);/);
   const match = source.match(/const AUDIO_LIBRARY = (\{[\s\S]*?\n\};)/);
-  return match ? Function(`return ${match[1].replace(/;$/, "")}`)() : { music: {} };
+  return match ? Function("HALLOWEEN_TRACKS",`return ${match[1].replace(/;$/, "")}`)(tracks?JSON.parse(tracks[1]):[]) : { music: {} };
 }
 
 function rarityCounts(cards) {
