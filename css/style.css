@@ -8541,3 +8541,44 @@ body.halloween-active #saveScreen .save-panel{
   background:linear-gradient(180deg,rgba(8,7,6,.95),rgba(2,2,2,.96));
   border-color:rgba(255,152,48,.32);
 }
+
+/* Cosmetic choices tint only the back artwork, leaving counters readable. */
+.card-back,.pile-card{background:transparent!important;isolation:isolate}
+.card-back:before,.pile-card:before,.sleeve-preview:before{
+  content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;
+  background:#0b0908 url("../assets/branding/allstars_card_back.png") center/cover no-repeat;
+  filter:var(--card-back-filter,none);pointer-events:none;
+}
+.sleeve-picker{margin-top:20px;padding:16px;border:2px solid #69532a;border-radius:10px;background:#101014}
+.sleeve-picker h3{margin:0 0 6px}.sleeve-picker p{margin:0 0 14px;color:#ddd}
+.sleeve-options{display:flex;gap:16px;flex-wrap:wrap}
+.sleeve-option{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 20px;border:2px solid #555;border-radius:8px;background:#18181c;color:#fff}
+.sleeve-option.selected{border-color:#ff9c2b;box-shadow:0 0 0 2px #ff9c2b inset}
+.sleeve-preview{position:relative;isolation:isolate;display:block;width:70px;height:100px;border-radius:6px}
+.sleeve-option small{color:#ffc776}
+
+/* Seasonal colors on the surrounding interface, never on card artwork. */
+body.halloween-active :is(.menu-card,.profile-identity-panel,.profile-level-panel,.profile-rank-panel,.profile-record,.profile-highlights,.collection-toolbar,.collection-preview,.collection-summary,.deck-hub,.deck-editor-shell,.options-block,.challenge-panel,.career-focus,.career-season,.multi-panel,.home-quick-panel,.sleeve-picker){
+  background:linear-gradient(180deg,#1c1008,#090706)!important;
+  border-color:#a85719!important;
+}
+body.halloween-active :is(.profile-xp-fill,.profile-action,.leaderboard-tab.active,.home-options-tabs button.active,.action-btn,.tag-btn){
+  background:linear-gradient(180deg,#ff9f2f,#b84800)!important;
+  border-color:#a85719!important;
+}
+body.halloween-active :is(.collection-toolbar,.deck-inventory-filters,.profile-title-picker,.account-form,.options-block) :is(input,select){
+  background-color:#100b07!important;border-color:#a85719!important;color:#fff2df;
+}
+body.halloween-active :is(.pile-title,.journal-title,.log-title){background:linear-gradient(180deg,#e87819,#873706)!important}
+body.halloween-active :is(#career,#challenge,#deckSelect,#homeOptionsScreen,#decks,#shop,#collection,#profileScreen,#multi) .small-logo{
+  background:linear-gradient(180deg,#ffae41,#c7590b)!important;
+  border-color:#ec9130!important;
+}
+body.halloween-active .options-return-fixed{
+  background:linear-gradient(180deg,#ffae41,#c7590b)!important;
+  border-color:#ec9130!important;
+}
+body.halloween-active .profile-highlights > div{
+  background:linear-gradient(180deg,#1c1008,#090706)!important;
+}
+body.halloween-active .profile-active-title{color:#ffd0a0}

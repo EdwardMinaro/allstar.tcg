@@ -4164,6 +4164,36 @@ function renderProfileStats(profile, connected){
   `;
 }
 
+const CARD_SLEEVES=[
+  {id:"classic",label:"Classique",filter:"none"},
+  {id:"halloween",label:"Halloween",filter:"hue-rotate(-28deg) saturate(2.3)"}
+];
+function normalizeSleeveId(id){return CARD_SLEEVES.some(item=>item.id===id)?id:"classic"}
+function selectedCardSleeve(){loadPlayerState();return normalizeSleeveId(playerState.sleeveId)}
+function sleeveFilter(id){return CARD_SLEEVES.find(item=>item.id===normalizeSleeveId(id)).filter}
+function renderSleevePicker(){
+  return `<section class="sleeve-picker"><h3>Protège-cartes</h3><p>Choisis le dos de tes cartes pour tes prochaines parties.</p><div class="sleeve-options">${CARD_SLEEVES.map(item=>`<button type="button" class="sleeve-option${normalizeSleeveId(playerState.sleeveId)===item.id?" selected":""}" aria-pressed="${normalizeSleeveId(playerState.sleeveId)===item.id}" onclick="selectCardSleeve('${item.id}')"><span class="sleeve-preview" style="--card-back-filter:${item.filter}"></span><strong>${item.label}</strong><small>${normalizeSleeveId(playerState.sleeveId)===item.id?"Équipé":"Choisir"}</small></button>`).join("")}</div></section>`;
+}
+function selectCardSleeve(id){
+  if(!CARD_SLEEVES.some(item=>item.id===id))return;
+  loadPlayerState();
+  playerState.sleeveId=id;
+  savePlayerState();
+  renderProfileContent();
+}
+function applyCardSleeves(){
+  const own=normalizeSleeveId(playerState.sleeveId);
+  document.body?.style?.setProperty("--card-back-filter",sleeveFilter(own));
+  if(!G)return;
+  let enemy=G.ai?.sleeveId||"classic";
+  if(isOnlineMatch()){
+    const ctx=onlineContext();
+    enemy=window.getOnlineMultiplayerContext?.()?.room?.players?.[ctx.opponentSlot]?.profile?.sleeveId||enemy;
+  }
+  document.querySelectorAll("#game .left-panel .pile-card").forEach(el=>el.style.setProperty("--card-back-filter",sleeveFilter(own)));
+  document.querySelectorAll("#enemyHand,#game .enemy-piles .pile-card").forEach(el=>el.style.setProperty("--card-back-filter",sleeveFilter(enemy)));
+}
+
 async function selectProfileTitle(title){
   loadPlayerState();
   const progress=window.AllstarRankingService.normalizeProgress(playerState.profileProgress||profileUiState.profile||{});
@@ -4190,7 +4220,7 @@ function renderProfileContent(message="", isError=false){
   const uid=escapeHtml(user?.uid ? `${user.uid.slice(0,8)}...` : "local");
   const statusClass=isError ? "profile-status profile-error" : "profile-status";
   const progress=window.AllstarRankingService.normalizeProgress(profile);
-  const stats=renderProfileStats(progress, Boolean(user));
+  const stats=renderProfileStats(progress, Boolean(user))+renderSleevePicker();
   if(user){
     root.innerHTML=`
       <div class="profile-stats-shell">
@@ -4268,6 +4298,7 @@ let cloudSaveSyncTimer=null;
 let cloudSaveHydrating=false;
 function serializedPlayerState(){
   return {
+    sleeveId:normalizeSleeveId(playerState.sleeveId),
     credits:playerState.credits,
     collection:playerState.collection||{},
     boosterTickets:playerState.boosterTickets||{},
@@ -4356,6 +4387,7 @@ function mergePlayerStateForHydration(remotePlayer,localPlayer){
   const localIsNewer=Number(localPlayer.savedAt||0)>Number(remotePlayer.savedAt||0);
   return {
     ...remotePlayer,
+    sleeveId:normalizeSleeveId(localIsNewer ? localPlayer.sleeveId : remotePlayer.sleeveId),
     credits:localIsNewer ? Number(localPlayer.credits)||0 : Number(remotePlayer.credits)||0,
     collection:mergeSavedCounts(remotePlayer.collection,localPlayer.collection),
     boosterTickets:mergeSavedCounts(remotePlayer.boosterTickets,localPlayer.boosterTickets),
@@ -8364,6 +8396,7 @@ function render(){
   document.getElementById("playerGrave").textContent=G.player.grave.length;
 
   document.getElementById("enemyHand").innerHTML=Array.from({length:G.ai.hand.length}).map(()=>`<div class="card-back"></div>`).join("");
+  applyCardSleeves();
   const playerHand=document.getElementById("playerHand");
   playerHand.classList.toggle("discarding",G.discarding==="player");
   const discardPrompt=document.getElementById("discardPrompt");
@@ -9213,6 +9246,7 @@ const LIMITED_GIFT_CAMPAIGN = {
 };
 
 let playerState = {
+  sleeveId:"classic",
   credits: 0,
   collection: {},
   boosterTickets: {},
@@ -9273,6 +9307,7 @@ function loadPlayerState(){
     const saved=JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)||"null");
     if(saved){
       playerState={
+        sleeveId:normalizeSleeveId(saved.sleeveId),
         credits:Number(saved.credits ?? saved["crédits"])||0,
         collection:saved.collection||{},
         boosterTickets:saved.boosterTickets||{},
@@ -9325,6 +9360,7 @@ function savePlayerState(){
   playerState.savedAt=Date.now();
   try{
     localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify({
+      sleeveId:normalizeSleeveId(playerState.sleeveId),
       credits:playerState.credits,
       collection:playerState.collection,
       boosterTickets:playerState.boosterTickets||{},
@@ -9340,6 +9376,7 @@ function savePlayerState(){
   }catch{
     // Progression is optional in restrictive environments.
   }
+  applyCardSleeves();
   updateCreditDisplays();
   if(document.getElementById("shop")?.classList.contains("active"))renderBoosterTickets();
   queueCloudSave();
@@ -11235,6 +11272,7 @@ function confirmDeleteDeck(){
 }
 
 Object.assign(window,{
+  selectedCardSleeve,
   startNewSave,
   loadExistingSave,
   deleteExistingSave,

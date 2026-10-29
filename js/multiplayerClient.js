@@ -157,7 +157,7 @@ async function localOnlineIdentity() {
   }
   const progress = window.AllstarRankingService.normalizeProgress(profile || localRankedProgress());
   const rank = window.AllstarRankingService.rankForProgress(progress);
-  return { uid:user?.uid || "", name:profile?.pseudo || user?.displayName || "Joueur classé", title:progress.title, elo:progress.elo, rankedMatches:progress.rankedMatches, currentRankId:progress.currentRankId, rankProtection:progress.rankProtection, wins:progress.wins, losses:progress.losses, hallOfFame:Boolean(progress.hallOfFame), rank:rank.label };
+  return { sleeveId:window.selectedCardSleeve?.()||"classic", uid:user?.uid || "", name:profile?.pseudo || user?.displayName || "Joueur classé", title:progress.title, elo:progress.elo, rankedMatches:progress.rankedMatches, currentRankId:progress.currentRankId, rankProtection:progress.rankProtection, wins:progress.wins, losses:progress.losses, hallOfFame:Boolean(progress.hallOfFame), rank:rank.label };
 }
 
 let multiLeaderboardEntries = [];
