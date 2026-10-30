@@ -2,7 +2,11 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Nouveautés de la version 0.2.30
+## Nouveautés de la version 0.2.31
+
+- À l'ouverture du lien mobile, un écran aux couleurs du jeu propose « Jouer » et « Installer ». L'installation est proposée directement lorsque le navigateur le permet ; sinon un guide Android/iPhone et un bouton de copie du lien accompagnent le joueur. Cet écran est ignoré depuis l'application déjà installée.
+
+## Nouveautés précédentes — version 0.2.30
 
 - Sur mobile, la musique et les sons se suspendent lorsque le jeu passe en arrière-plan. La musique reprend à la même position au retour, sauf si le joueur l'avait mise en pause ou arrêtée.
 

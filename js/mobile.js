@@ -2,6 +2,7 @@
   if(new URLSearchParams(location.search).get("mobile")!=="1")return;
   document.documentElement.classList.add("mobile-touch");
   document.addEventListener("pointerup",()=>{
+    if(document.getElementById('mobileEntryScreen'))return;
     try{void window.parent.requestAllstarLandscape?.()}catch{}
   },{once:true});
   let suppressGestureClickUntil=0;

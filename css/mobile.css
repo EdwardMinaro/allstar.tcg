@@ -1,5 +1,19 @@
 /* Opt-in iframe only: the desktop's layout and assets remain the reference. */
 html.mobile-touch{touch-action:manipulation}
+#mobileEntryScreen{position:fixed;inset:0;z-index:1000;background:#08080d;width:100vw;height:100vh}
+#mobileEntryScreen [hidden]{display:none!important}
+#mobileEntryScreen .save-panel{max-height:calc(100vh - 72px);overflow:auto}
+#mobileEntryScreen .save-logo-img{flex-shrink:0}
+#mobileInstallGuide{width:100%;max-width:760px;text-align:left;font-family:Arial,sans-serif}
+#mobileInstallGuide h1{margin:4px 0 16px;color:#ffd65c;text-align:center;font-size:32px;text-transform:uppercase}
+#mobileInstallGuide ol{padding-left:32px;margin:0;font-size:23px;line-height:1.4}
+#mobileInstallGuide li+li{margin-top:10px}
+#mobileInstallGuide p{font-size:21px;line-height:1.4}
+#mobileInstallGuide .mobile-install-external{padding:12px 16px;background:rgba(0,0,0,.45);border-radius:8px}
+#mobileEntryScreen:has(#mobileInstallGuide:not([hidden])) .save-logo-img{max-height:15vh}
+#mobileInstallGuide .mobile-install-actions{display:flex;gap:16px;justify-content:center}
+#mobileInstallGuide .home-action{min-height:70px;font-size:24px;flex:1}
+#mobileInstallStatus{min-height:1.4em;margin:14px 0 0;text-align:center;color:#ffe7a1;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
 html.mobile-touch #game .options-menu{max-height:90vh;overflow:auto}
 html.mobile-touch #game .action-btn{min-height:74px}
 html.mobile-touch #game .game-utility-controls>button{min-width:70px;min-height:70px}
@@ -17,12 +31,12 @@ html.mobile-touch #game .hand::-webkit-scrollbar{display:none}
 html.mobile-touch #game .hand-panel{padding:0 6px!important}
 html.mobile-touch #game .left-panel{padding-top:calc(clamp(80px,11vh,118px) + 18px)!important}
 /* Larger home targets and floating panels; no match grid or ring changes. */
-html.mobile-touch :is(#menu,#saveScreen) .home-stage:before{bottom:16px!important}
+html.mobile-touch :is(#menu,#saveScreen,#mobileEntryScreen) .home-stage:before{bottom:16px!important}
 html.mobile-touch #menu .home-main-actions{width:min(840px,74vw);max-width:none;gap:14px;align-self:center;margin-left:0!important;margin-right:0!important}
 html.mobile-touch #menu .home-main-actions .home-action{min-height:84px;font-size:34px}
 html.mobile-touch #menu .home-main-actions .home-action.primary{min-height:96px}
 html.mobile-touch #menu .home-control-trigger{width:100px;height:100px;font-size:44px}
-html.mobile-touch #saveScreen .account-actions .home-action{min-height:88px;font-size:30px}
+html.mobile-touch :is(#saveScreen,#mobileEntryScreen) .account-actions .home-action{min-height:88px;font-size:30px}
 html.mobile-touch #menu .home-quick-panel{width:min(880px,calc(100vw - 64px));max-height:calc(100vh - 48px);overflow:auto;padding:26px}
 html.mobile-touch #menu .home-quick-panel-head{font-size:32px}
 html.mobile-touch #menu .home-quick-actions button{min-height:110px;font-size:26px}

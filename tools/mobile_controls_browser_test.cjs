@@ -10,6 +10,7 @@ const assert=require('assert/strict');
 (async()=>{const b=await puppeteer.launch({executablePath:chrome,headless:true,pipe:true,args:['--no-sandbox']});try{
 const p=await b.newPage();await p.setViewport({width:844,height:390,isMobile:true,hasTouch:true});await p.goto(testUrl+'/');const f=await(await p.$('iframe')).contentFrame();await f.waitForSelector('#mobileCardViewer');
 assert.equal(await p.$('#toolbar'),null,'No permanent test toolbar');
+if(await f.$('#mobileEntryPlay'))await f.$eval('#mobileEntryPlay',el=>el.click());
 assert.equal(await p.$eval('#stage',el=>el.getBoundingClientRect().top),0,'Game uses the full available height');
 const manifest=await p.evaluate(async()=>await(await fetch(document.querySelector('link[rel="manifest"]').href)).json());
 assert.equal(manifest.display,'fullscreen');assert.equal(manifest.orientation,'landscape');

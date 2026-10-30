@@ -5282,22 +5282,22 @@ body.halloween-active #menu .home-quick-actions button:hover{
 }
 
 /* Home lights final cleanup: keep only cones emitted from the projectors. */
-#saveScreen .home-light,
+:is(#saveScreen,#mobileEntryScreen) .home-light,
 #menu .home-light{
   display:none !important;
 }
 
-#saveScreen .stage-spotlight,
+:is(#saveScreen,#mobileEntryScreen) .stage-spotlight,
 #menu .stage-spotlight{
   z-index:4 !important;
 }
 
-#saveScreen .stage-spotlight:before,
+:is(#saveScreen,#mobileEntryScreen) .stage-spotlight:before,
 #menu .stage-spotlight:before{
   z-index:3 !important;
 }
 
-#saveScreen .stage-spotlight:after,
+:is(#saveScreen,#mobileEntryScreen) .stage-spotlight:after,
 #menu .stage-spotlight:after{
   left:50% !important;
   bottom:56px !important;
@@ -5317,7 +5317,7 @@ body.halloween-active #menu .home-quick-actions button:hover{
   z-index:1 !important;
 }
 
-#saveScreen .stage-spotlight:before,
+:is(#saveScreen,#mobileEntryScreen) .stage-spotlight:before,
 #menu .stage-spotlight:before{
   opacity:1 !important;
   background:
@@ -5326,7 +5326,7 @@ body.halloween-active #menu .home-quick-actions button:hover{
   box-shadow:0 10px 0 rgba(0,0,0,.58),0 0 36px rgba(255,214,92,.70) !important;
 }
 
-#saveScreen .stage-spotlight:after,
+:is(#saveScreen,#mobileEntryScreen) .stage-spotlight:after,
 #menu .stage-spotlight:after{
   background:linear-gradient(0deg,
     rgba(255,236,164,.66) 0%,
@@ -8456,47 +8456,47 @@ button:disabled,
 }
 
 /* Halloween swaps the home effects in place, without moving the menu. */
-body.halloween-active :is(#menu,#saveScreen) .crowd-flashes,
-body.halloween-active :is(#menu,#saveScreen) .stage-spotlight:before{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .crowd-flashes,
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .stage-spotlight:before{
   display:none!important;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .halloween-cosmetic{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .halloween-cosmetic{
   z-index:4;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .stage-spotlight{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .stage-spotlight{
   width:88px;
   bottom:18px;
   z-index:1!important;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .stage-spotlight:after{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .stage-spotlight:after{
   bottom:44px!important;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .home-stage:before{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .home-stage:before{
   border-color:rgba(255,132,40,.32)!important;
   background:
     linear-gradient(90deg,transparent 0 22%,rgba(255,178,85,.4) 22% 22.5%,#080706 22.5% 77.5%,rgba(255,178,85,.4) 77.5% 78%,transparent 78%),
     linear-gradient(180deg,#6b310e,#321607)!important;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .home-stage:after{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .home-stage:after{
   background:
     radial-gradient(circle,rgba(255,125,38,.22) 2px,transparent 3px) 0 0/26px 26px,
     linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.62))!important;
   opacity:.42;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .halloween-bat{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .halloween-bat{
   font-size:34px;
   opacity:0;
   animation:none;
   transform:none;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .halloween-bat.bat-flash{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .halloween-bat.bat-flash{
   animation:halloweenBatFlash 1.3s ease-out both;
 }
 
@@ -8514,32 +8514,32 @@ body.halloween-active :is(#menu,#saveScreen) .halloween-bat.bat-flash{
 .halloween-announcement h2{color:#ffae47}
 .halloween-announcement .level-reward-item small{line-height:1.5;text-transform:none;font-weight:600}
 
-body.halloween-active :is(#menu,#saveScreen) .halloween-bat.bat-one{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .halloween-bat.bat-one{
   left:14%;
   top:17%;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .halloween-bat.bat-two{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .halloween-bat.bat-two{
   right:14%;
   top:20%;
   font-size:30px;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .halloween-pumpkin{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .halloween-pumpkin{
   bottom:18px;
   font-size:88px;
   filter:drop-shadow(0 12px 4px rgba(0,0,0,.72)) drop-shadow(0 0 16px rgba(255,113,20,.48));
 }
 
-body.halloween-active :is(#menu,#saveScreen) .halloween-pumpkin.pumpkin-one{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .halloween-pumpkin.pumpkin-one{
   left:38px;
 }
 
-body.halloween-active :is(#menu,#saveScreen) .halloween-pumpkin.pumpkin-two{
+body.halloween-active :is(#menu,#saveScreen,#mobileEntryScreen) .halloween-pumpkin.pumpkin-two{
   right:38px;
 }
 
-body.halloween-active #saveScreen .save-panel{
+body.halloween-active :is(#saveScreen,#mobileEntryScreen) .save-panel{
   background:linear-gradient(180deg,rgba(8,7,6,.95),rgba(2,2,2,.96));
   border-color:rgba(255,152,48,.32);
 }
