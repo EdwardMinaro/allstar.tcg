@@ -40,7 +40,12 @@ await f.evaluate(()=>{show('homeOptionsScreen');setHomeOptionsTab('shortcuts')})
 await f.evaluate(()=>setHomeOptionsTab('general'));
 assert.equal(await f.$$('.mobile-landscape-button').then(a=>a.length),0,'Redundant landscape setting removed');
 assert.equal(await f.$$('.desktop-save-export').then(a=>a.length),0,'PC export is not exposed on mobile');
-await f.evaluate(()=>{window.transferOpened=0;window.openAccountTransfer=()=>transferOpened++;[...document.querySelectorAll('#homeOptionsScreen button')].find(el=>el.textContent.includes('ancienne sauvegarde PC')).click()});
+const saveTab=await rect('#homeSaveOptionsTab'),saveTabPoint=await outer(saveTab.x+saveTab.width/2,saveTab.y+saveTab.height/2);
+await p.touchscreen.tap(saveTabPoint.x,saveTabPoint.y);
+assert.equal(await f.$eval('#homeSaveOptionsTab',el=>el.getAttribute('aria-selected')),'true');
+assert.equal(await f.$eval('.home-general-options',el=>el.hidden),true);
+await p.screenshot({path:output+'/mobile-save-options.png'});
+await f.evaluate(()=>{window.transferOpened=0;window.openAccountTransfer=()=>transferOpened++;document.querySelector('#homeOptionsScreen .save-recovery-options button[onclick="openAccountTransfer()"]').click()});
 assert.equal(await f.evaluate(()=>transferOpened),1,'PC recovery remains accessible in mobile options');
 assert.equal(await f.$eval('#accountSaveStatus',el=>el.hidden),true,'Guest has no misleading cloud-save confirmation');
 
@@ -62,9 +67,19 @@ await desktop.reload();await desktop.waitForFunction(()=>[...document.querySelec
 assert.equal(await desktop.$$('.desktop-save-export').then(a=>a.length),2,'Native desktop exposes export in home and match options');
 await desktop.setViewport({width:1360,height:768});
 await desktop.evaluate(()=>{setActiveScreen('homeOptionsScreen');setHomeOptionsTab('general')});
+assert.equal(await desktop.$eval('#homeOptionsScreen .desktop-save-export',button=>button.getBoundingClientRect().width),0,'Backup tools are absent from General');
+await desktop.click('#homeSaveOptionsTab');
 assert.equal(await desktop.$eval('#homeOptionsScreen .desktop-save-export',button=>getComputedStyle(button).display!=='none'&&button.getBoundingClientRect().width>0),true);
 await desktop.$eval('#homeOptionsScreen .desktop-save-export',button=>button.scrollIntoView({block:'center'}));
 assert.equal(await desktop.$eval('#homeOptionsScreen .desktop-save-export',button=>{const r=button.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight}),true,'Export is reachable at 1360x768');
 await desktop.screenshot({path:output+'/desktop-export-options.png'});
+await desktop.evaluate(()=>{setActiveScreen('game');toggleOptions();setOptionsTab('saves')});
+assert.equal(await desktop.$eval('#saveOptionsTab',el=>el.getAttribute('aria-selected')),'true');
+assert.equal(await desktop.$eval('#saveRecoveryOptions',el=>el.hidden),false);
+assert.equal(await desktop.$eval('#optionsMenu .audio-options',el=>getComputedStyle(el).display),'none');
+await desktop.evaluate(()=>setOptionsTab('shortcuts'));
+assert.equal(await desktop.$eval('#saveRecoveryOptions',el=>el.hidden),true);
+await desktop.evaluate(()=>setOptionsTab('general'));
+assert.notEqual(await desktop.$eval('#optionsMenu .audio-options',el=>getComputedStyle(el).display),'none');
 console.log('Mobile import kept, redundant landscape setting removed, PC-only export visibility and exact assembly verified. Own hand:',oldCard.height,'->',newCard.height);
 }finally{await b.close()}})().catch(e=>{console.error(e);process.exitCode=1});

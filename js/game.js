@@ -3852,28 +3852,29 @@ function resetQuickShortcuts(){
 }
 function setOptionsTab(tab="general"){
   const shortcuts=tab==="shortcuts";
+  const saves=tab==="saves";
   const menu=document.getElementById("optionsMenu");
   const section=document.getElementById("shortcutOptions");
-  menu?.classList.toggle("shortcut-tab-active",shortcuts);
+  menu?.classList.toggle("shortcut-tab-active",shortcuts||saves);
   if(section)section.hidden=!shortcuts;
-  const generalTab=document.getElementById("generalOptionsTab");
-  const shortcutsTab=document.getElementById("shortcutsOptionsTab");
-  generalTab?.classList.toggle("active",!shortcuts);
-  shortcutsTab?.classList.toggle("active",shortcuts);
-  generalTab?.setAttribute("aria-selected",shortcuts?"false":"true");
-  shortcutsTab?.setAttribute("aria-selected",shortcuts?"true":"false");
+  const saveSection=document.getElementById("saveRecoveryOptions");
+  if(saveSection)saveSection.hidden=!saves;
+  for(const [name,id] of [["general","generalOptionsTab"],["shortcuts","shortcutsOptionsTab"],["saves","saveOptionsTab"]]){
+    const button=document.getElementById(id),active=name===(shortcuts?"shortcuts":saves?"saves":"general");
+    button?.classList.toggle("active",active);button?.setAttribute("aria-selected",String(active));
+  }
 }
 function setHomeOptionsTab(tab="general"){
   const shortcuts=tab==="shortcuts";
-  document.querySelectorAll(".home-general-options").forEach(section=>{section.hidden=shortcuts});
+  const saves=tab==="saves";
+  document.querySelectorAll(".home-general-options").forEach(section=>{section.hidden=shortcuts||saves});
   const section=document.querySelector(".shortcut-options-home");
   if(section)section.hidden=!shortcuts;
-  const generalTab=document.getElementById("homeGeneralOptionsTab");
-  const shortcutsTab=document.getElementById("homeShortcutsOptionsTab");
-  generalTab?.classList.toggle("active",!shortcuts);
-  shortcutsTab?.classList.toggle("active",shortcuts);
-  generalTab?.setAttribute("aria-selected",shortcuts?"false":"true");
-  shortcutsTab?.setAttribute("aria-selected",shortcuts?"true":"false");
+  const saveSection=document.querySelector(".save-options-home");if(saveSection)saveSection.hidden=!saves;
+  for(const [name,id] of [["general","homeGeneralOptionsTab"],["shortcuts","homeShortcutsOptionsTab"],["saves","homeSaveOptionsTab"]]){
+    const button=document.getElementById(id),active=name===(shortcuts?"shortcuts":saves?"saves":"general");
+    button?.classList.toggle("active",active);button?.setAttribute("aria-selected",String(active));
+  }
 }
 function wireQuickShortcuts(){
   document.querySelectorAll("[data-shortcut-action]").forEach(button=>{

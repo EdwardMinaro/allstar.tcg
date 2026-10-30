@@ -17,16 +17,7 @@
     if(sessionActions)section.append(sessionActions);
     else section.remove();
   });
-  const generalOptions=document.querySelector('#homeOptionsScreen .display-options');
-  if(generalOptions){
-    const transfer=document.createElement('button');
-    transfer.type='button';transfer.className='mobile-option-button mobile-transfer-button';
-    transfer.textContent='Récupérer une ancienne sauvegarde PC';
-    transfer.onclick=()=>window.openAccountTransfer?.();
-    const block=document.createElement('div');block.className='mobile-save-options';
-    const title=document.createElement('strong');title.textContent='Sauvegarde PC';
-    block.append(title,transfer);generalOptions.prepend(block);
-  }
+  document.querySelectorAll('.desktop-save-export').forEach(button=>button.remove());
   let gesture=null,lastTap=null;
   function excluded(target){
     return !target?.closest||Boolean(target.closest('button,a,input,select,textarea,label,summary,[role="button"],[contenteditable="true"],.game-card,.hand,.log,.inventory-card,.deck-thumb'));

@@ -2,6 +2,11 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
+## Options de secours — version 0.2.37
+
+- Un troisième onglet « Sauvegardes », à côté des touches rapides ou gestes tactiles, regroupe les outils de secours : export sur ordinateur et récupération depuis un fichier.
+- Ces outils restent accessibles dans les options du menu et en partie. Le parcours de première liaison PC / téléphone et les protections des sauvegardes restent identiques.
+
 ## Première liaison PC / téléphone — version 0.2.36
 
 - La première connexion mobile d'un compte dont la liaison n'a pas encore été confirmée ouvre un parcours guidé avant de charger ou d'enregistrer la progression. « Plus tard » revient à la connexion sans activer la synchronisation.

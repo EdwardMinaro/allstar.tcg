@@ -58,6 +58,7 @@ html.mobile-touch #menu .home-quick-close{width:80px;height:80px;font-size:42px}
 html.mobile-touch #homeOptionsScreen .options-page-card{width:min(1200px,calc(100vw - 64px));max-height:calc(100vh - 36px);overflow:auto}
 html.mobile-touch #homeOptionsScreen .options-page-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
 html.mobile-touch #homeOptionsScreen .shortcut-options-home{grid-column:1/-1}
+html.mobile-touch .save-recovery-options p{font-size:23px}
 html.mobile-touch #homeOptionsScreen button{min-height:76px;font-size:26px}
 html.mobile-touch #homeOptionsScreen .options-return-fixed{min-width:180px;z-index:40}
 html.mobile-touch #homeOptionsScreen .home-options-title{font-size:26px}
@@ -72,8 +73,6 @@ html.mobile-touch #game .options-menu .audio-options label{font-size:22px}
 .mobile-gesture-title{font-size:26px;font-weight:900;color:var(--gold)}
 .mobile-gesture-row{display:flex;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid #ffffff30;font-size:22px}
 .mobile-gesture-row strong{color:var(--gold)}
-.mobile-save-options{display:grid;gap:14px;grid-column:1/-1;text-align:left}
-.mobile-save-options>strong{font-size:24px}
 .mobile-option-button{min-height:70px;padding:14px;border-radius:10px;border:2px solid #111;background:var(--gold);font-size:24px;font-weight:900}
 #mobileCardViewer{display:none;position:fixed;inset:0;z-index:140;background:rgba(0,0,0,.95);align-items:center;justify-content:center;gap:50px;padding:25px}
 #mobileCardViewer.active{display:flex}
