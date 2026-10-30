@@ -89,11 +89,30 @@ fs.mkdirSync(output, { recursive: true });
     await tap(iphone.frame, '#mobileEntryInstall');
     assert.match(await iphone.frame.$eval('#mobileInstallSteps', el => el.textContent), /Safari.*Partager.*Sur l’écran d’accueil/);
     await iphone.p.screenshot({ path: output + '/guide-iphone.png' });
+    for (const [device, ua, target] of [
+      ['android', 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Instagram 350.0.0 Android', 'Chrome'],
+      ['iphone', 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile Instagram 350.0.0', 'Safari']
+    ]) {
+      const ig = await page(ua);
+      assert.equal(await ig.frame.$eval('#mobileInstagramNotice', el => el.hidden), false);
+      await tap(ig.frame, '#mobileEntryInstall');
+      await ig.frame.waitForSelector('#mobileInstallGuide', {visible:true});
+      const steps = await ig.frame.$eval('#mobileInstallSteps', el => el.textContent);
+      assert.match(steps, /menu ⋯ ou ⋮ d’Instagram/);
+      assert.ok(steps.includes(target));
+      assert.match(steps, /touche à nouveau Installer/);
+      await ig.p.evaluate(() => Object.defineProperty(navigator, 'clipboard', { configurable:true, value:{writeText:async value=>{window.copiedLink=value}} }));
+      await tap(ig.frame, '#mobileInstallCopy');
+      await ig.frame.waitForFunction(target=>document.getElementById('mobileInstallStatus').textContent.includes(`Ouvre ${target}`),{},target);
+      assert.equal(await ig.p.evaluate(()=>copiedLink),'https://allstar-mobile-65102.web.app/');
+      await ig.p.screenshot({path:output+`/guide-instagram-${device}.png`});
+      await ig.p.close();
+    }
     const installed = await page(null, true);
     assert.equal(await installed.frame.$('#mobileEntryScreen'), null, 'Installed launch skips installation gate');
     const desktop = await browser.newPage();
     await desktop.goto(f.url().split('?')[0]);
     assert.equal(await desktop.$('#mobileEntryScreen'), null, 'Desktop connection is unchanged');
-    console.log('Mobile entry: Android/iPhone guides, delayed install availability, dismissal, appinstalled, Play/login, installed/desktop isolation OK. Native prompts simulated; no physical iPhone test.');
+    console.log('Mobile entry: Android/iPhone and Instagram guides, copy, delayed install availability, dismissal, appinstalled, Play/login, installed/desktop isolation OK. Native prompts and Instagram user agents simulated; no physical iPhone test.');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

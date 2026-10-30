@@ -2,7 +2,11 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Nouveautés de la version 0.2.31
+## Nouveautés de la version 0.2.32
+
+- Lorsque le lien est reconnu comme ouvert dans Instagram, l'accueil et le bouton « Installer » expliquent comment l'ouvrir dans un navigateur externe, avec copie du lien et consignes Android/iPhone. L'aide générique mentionne aussi Instagram si son navigateur n'est pas reconnu.
+
+## Nouveautés précédentes — version 0.2.31
 
 - À l'ouverture du lien mobile, un écran aux couleurs du jeu propose « Jouer » et « Installer ». L'installation est proposée directement lorsque le navigateur le permet ; sinon un guide Android/iPhone et un bouton de copie du lien accompagnent le joueur. Cet écran est ignoré depuis l'application déjà installée.
 
