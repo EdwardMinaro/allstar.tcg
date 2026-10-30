@@ -2,7 +2,11 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Nouveautés de la version 0.2.29
+## Nouveautés de la version 0.2.30
+
+- Sur mobile, la musique et les sons se suspendent lorsque le jeu passe en arrière-plan. La musique reprend à la même position au retour, sauf si le joueur l'avait mise en pause ou arrêtée.
+
+## Nouveautés précédentes — version 0.2.29
 
 - Le profil présente les protège-cartes non possédés en grisé avec un badge. Leur mode d'obtention s'affiche au survol, au clavier ou au toucher, centré sous les choix. Le texte d'explication permanent est retiré.
 

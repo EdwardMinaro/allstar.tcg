@@ -1,6 +1,6 @@
 {
   "name": "allstar-desktop",
-  "version": "0.2.29",
+  "version": "0.2.30",
   "private": true,
   "description": "ALLSTAR desktop build",
   "author": "ALLSTAR",
@@ -9,9 +9,9 @@
     "mobile:preview": "node tools/mobile_preview_server.cjs",
     "test:accounts": "node tools/account_save_test.js && node tools/desktop_save_export_test.cjs",
     "test:mobile": "node tools/mobile_controls_browser_test.cjs",
-    "test:mobile-audio": "node tools/mobile_audio_browser_test.cjs",
+    "test:mobile-audio": "node tools/mobile_audio_visibility_test.cjs && node tools/mobile_audio_browser_test.cjs",
     "start": "electron .",
-    "verify": "node tools/audio_exclusivity_test.js && node tools/online_choice_sync_test.js && node tools/online_recovery_order_test.js && node tools/new_cards_test.js && node tools/halloween_event_test.js && node tools/deck_effect_filter_test.js && node tools/deck_rarity_rule_test.js && node tools/challenge_ultimate_boss_test.js && node tools/allstar_audit.js && powershell -NoProfile -ExecutionPolicy Bypass -File tools/audit_card_render_geometry.ps1 && node tools/allstar_preflight.js && node tools/allstar_balance_sim.js",
+    "verify": "node tools/audio_exclusivity_test.js && node tools/mobile_audio_visibility_test.cjs && node tools/online_choice_sync_test.js && node tools/online_recovery_order_test.js && node tools/new_cards_test.js && node tools/halloween_event_test.js && node tools/deck_effect_filter_test.js && node tools/deck_rarity_rule_test.js && node tools/challenge_ultimate_boss_test.js && node tools/allstar_audit.js && powershell -NoProfile -ExecutionPolicy Bypass -File tools/audit_card_render_geometry.ps1 && node tools/allstar_preflight.js && node tools/allstar_balance_sim.js",
     "pack": "electron-builder --dir",
     "dist": "electron-builder --win nsis",
     "publish": "electron-builder --win nsis --publish always"

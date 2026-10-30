@@ -394,6 +394,44 @@ class AudioManager {
     this.wrestlerFuture = [];
     this.storageKey = "catchCardsAudio";
     this.settings = this.loadSettings();
+    this.mobileVisibilityAudio = /(?:^|[?&])mobile=1(?:&|$)/.test(window.location?.search || "");
+    this.pageAudioHidden = false;
+    this.resumeAfterVisibility = false;
+    this.activeSounds = new Set();
+    if (this.mobileVisibilityAudio) {
+      document.addEventListener("visibilitychange", () => this.setPageAudioHidden(document.hidden));
+      window.addEventListener("pagehide", () => this.setPageAudioHidden(true));
+      window.addEventListener("pageshow", () => this.setPageAudioHidden(document.hidden));
+    }
+  }
+
+  isPageAudioSuspended() {
+    return this.mobileVisibilityAudio && (this.pageAudioHidden || document.hidden === true);
+  }
+
+  setPageAudioHidden(hidden) {
+    if (!this.mobileVisibilityAudio) return;
+    if (hidden) {
+      if (this.pageAudioHidden) return;
+      this.pageAudioHidden = true;
+      this.resumeAfterVisibility = Boolean(this.music && (!this.music.paused || this.pendingMusicId)
+        && !this.musicPausedByUser && !this.musicStoppedByUser);
+      ++this.musicRequestId;
+      clearInterval(this.fadeTimer);
+      clearInterval(this.crossfadeTimer);
+      this.music?.pause();
+      for (const sound of this.activeSounds) sound.pause();
+      this.activeSounds.clear();
+    } else {
+      this.pageAudioHidden = false;
+      const resume = this.resumeAfterVisibility;
+      this.resumeAfterVisibility = false;
+      if (resume && !this.musicPausedByUser && !this.musicStoppedByUser) {
+        if (this.music) this.music.volume = this.effectiveVolume("music");
+        this.resumeCurrentMusic();
+      }
+    }
+    this.updateNowPlaying();
   }
 
   loadSettings() {
@@ -423,6 +461,7 @@ class AudioManager {
     const audio = new Audio(src);
     audio.preload = "none";
     audio.loop = loop;
+    audio.addEventListener("play", () => { if (this.isPageAudioSuspended()) audio.pause(); });
     audio.addEventListener("error", () => {}, { once: true });
     return audio;
   }
@@ -511,6 +550,7 @@ class AudioManager {
   }
 
   playNextWrestlerMusic(duration = 1600, manual = false) {
+    if (this.isPageAudioSuspended()) return null;
     if ((this.musicStoppedByUser||this.musicPausedByUser) && !manual) return null;
     if (manual) {
       this.musicStoppedByUser = false;
@@ -523,6 +563,7 @@ class AudioManager {
   }
 
   playPreviousWrestlerMusic(duration = 800, manual = true) {
+    if (this.isPageAudioSuspended()) return null;
     let previousId = this.wrestlerHistory.pop();
     while(previousId&&!this.isTrackEnabled(previousId))previousId=this.wrestlerHistory.pop();
     // Even at the start of a session, Previous must remain usable.
@@ -563,6 +604,7 @@ class AudioManager {
   }
 
   startMusic(id, fadeInDuration = 0) {
+    if (this.isPageAudioSuspended()) { if (!this.music) this.pendingMusicId = id; return; }
     const item = this.library.music[id];
     if (!item) return;
 
@@ -580,6 +622,7 @@ class AudioManager {
     this.attachMusicEvents(music, id, item);
     music.play()
       .then(() => {
+        if (this.isPageAudioSuspended()) { music.pause(); return; }
         if (requestId !== this.musicRequestId || this.music !== music) {
           if(this.music!==music){music.pause();music.currentTime=0;}
           return;
@@ -596,6 +639,7 @@ class AudioManager {
   }
 
   playMusic(id, manual = false) {
+    if (this.isPageAudioSuspended()) { if (!this.music) this.pendingMusicId = id; return; }
     const item = this.library.music[id];
     if (!item) return;
     if((item.wrestler||item.playlist)&&!this.isTrackEnabled(id))return;
@@ -620,6 +664,7 @@ class AudioManager {
   }
 
   unlockAndPlay() {
+    if (this.isPageAudioSuspended()) return;
     if (this.musicStoppedByUser || this.musicPausedByUser) return;
     if (this.music && !this.music.paused) {
       this.unlocked = true;
@@ -630,11 +675,14 @@ class AudioManager {
   }
 
   resumeCurrentMusic() {
+    if (this.isPageAudioSuspended()) return;
     const music=this.music,requestId=this.musicRequestId;
     if(!music)return;
     music.play().then(()=>{
+      if(this.isPageAudioSuspended()){music.pause();return;}
       if(this.music!==music||this.musicRequestId!==requestId){if(this.music!==music)music.pause();return;}
       this.unlocked=true;this.pendingMusicId=null;
+      this.updateNowPlaying();
     }).catch(()=>{
       if(this.music===music&&this.musicRequestId===requestId)this.pendingMusicId=this.currentMusicId;
     });
@@ -643,6 +691,7 @@ class AudioManager {
   stopMusic(manual = true) {
     if (manual) {
       this.musicStoppedByUser = true;
+      this.resumeAfterVisibility = false;
       this.musicPausedByUser = false;
     }
     clearInterval(this.fadeTimer);
@@ -661,6 +710,7 @@ class AudioManager {
   }
 
   toggleMusicPause() {
+    if (this.isPageAudioSuspended()) return;
     if (this.music && !this.music.paused) {
       clearInterval(this.fadeTimer);
       clearInterval(this.crossfadeTimer);
@@ -679,6 +729,7 @@ class AudioManager {
       this.musicStoppedByUser = false;
       this.musicPausedByUser = false;
       music.play().then(() => {
+        if (this.isPageAudioSuspended()) { music.pause(); return; }
         if (requestId !== this.musicRequestId || this.music !== music) {
           if(this.music!==music){music.pause();music.currentTime=0;}
           return;
@@ -701,6 +752,7 @@ class AudioManager {
   }
 
   fadeMusic(id, duration = 800, manual = false, rememberHistory = true) {
+    if (this.isPageAudioSuspended()) return;
     const next = this.library.music[id];
     if (!next) return;
     if((next.wrestler||next.playlist)&&!this.isTrackEnabled(id))return;
@@ -718,7 +770,7 @@ class AudioManager {
     const startedAt = performance.now();
     const targetVolume = this.effectiveVolume("music");
     const timer = setInterval(() => {
-      if (this.music !== audio) {
+      if (this.music !== audio || this.isPageAudioSuspended()) {
         clearInterval(timer);
         return;
       }
@@ -726,9 +778,11 @@ class AudioManager {
       audio.volume = targetVolume * progress;
       if (progress >= 1) clearInterval(timer);
     }, 40);
+    this.fadeTimer = timer;
   }
 
   playSfx(id) {
+    if (this.isPageAudioSuspended()) return;
     if (id === "victoire_duel" && this.library.sfx.victoire_duel_alt) {
       this.victorySfxFlip = !this.victorySfxFlip;
       id = this.victorySfxFlip ? "victoire_duel" : "victoire_duel_alt";
@@ -737,6 +791,9 @@ class AudioManager {
     if (!item) return;
     const sound = this.createAudio(item.src, false);
     if (!sound) return;
+    this.activeSounds.add(sound);
+    sound.addEventListener("ended", () => this.activeSounds.delete(sound), { once: true });
+    sound.addEventListener("pause", () => this.activeSounds.delete(sound), { once: true });
     sound.volume = this.effectiveVolume("sfx");
     if (item.maxDuration) {
       sound.addEventListener("play", () => setTimeout(() => {
@@ -744,7 +801,8 @@ class AudioManager {
         sound.currentTime = 0;
       }, item.maxDuration), { once: true });
     }
-    sound.play().catch(() => {});
+    sound.play().then(() => { if (this.isPageAudioSuspended()) sound.pause(); })
+      .catch(() => this.activeSounds.delete(sound));
   }
 
   setMusicVolume(value) {
