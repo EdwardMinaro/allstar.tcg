@@ -3997,7 +3997,7 @@ async function showInstalledVersion(){
   const target=document.getElementById("appVersion");
   if(!target)return;
   if(new URLSearchParams(location.search).get("mobile")==="1"){
-    target.textContent="Bêta ouverte - Version mobile";
+    target.textContent="Bêta ouverte - Version mobile test";
     return;
   }
   try{
