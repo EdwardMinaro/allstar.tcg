@@ -6,6 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/match-preview.css">
+<link rel="stylesheet" href="css/online-lobby.css">
+<link rel="stylesheet" href="css/mobile.css">
 </head>
 <body>
 <div class="screen-transition" id="screenTransition" aria-hidden="true"></div>
@@ -674,13 +676,16 @@
 <section id="multi" class="screen">
   <div class="menu-wrap">
     <div class="menu-card multi-menu-card">
-      <h1 class="logo small-logo">Jouer en ligne</h1>
-      <p class="subtitle" id="multiStatus"></p>
+      <header class="multi-lobby-header">
+        <div><p class="multi-lobby-kicker">ALLSTAR · L'arène en ligne</p><h1 class="multi-lobby-title">Jouer en ligne</h1></div>
+        <span class="multi-lobby-emblem" aria-hidden="true">VS</span>
+      </header>
+      <p class="multi-status-line" id="multiStatus" role="status"></p>
       <div class="multi-actions" id="multiMainActions">
-        <button class="small-btn" type="button" onclick="quickMatch()">Partie rapide</button>
-        <button class="small-btn" type="button" onclick="quickRankedMatch()">Partie class&eacute;e</button>
-        <button class="small-btn" type="button" onclick="showCustomMatchOptions()">Partie personnalis&eacute;e</button>
-        <button class="small-btn" type="button" onclick="showOnlineLeaderboard()">Classements</button>
+        <button class="small-btn multi-mode" type="button" onclick="quickMatch()"><span class="multi-mode-kicker">Sans classement</span><strong>Partie rapide</strong><span class="multi-mode-description">Un adversaire, un match, sans enjeu d'ELO.</span></button>
+        <button class="small-btn multi-mode multi-mode-ranked" type="button" onclick="quickRankedMatch()"><span class="multi-mode-kicker">Compétition</span><strong>Partie classée</strong><span class="multi-mode-description">Défends ton rang et vise le sommet.</span></button>
+        <button class="small-btn multi-mode" type="button" onclick="showCustomMatchOptions()"><span class="multi-mode-kicker">Entre amis</span><strong>Partie personnalisée</strong><span class="multi-mode-description">Crée un salon ou rejoins-le avec un code.</span></button>
+        <button class="small-btn multi-mode" type="button" onclick="showOnlineLeaderboard()"><span class="multi-mode-kicker">Palmarès</span><strong>Classements</strong><span class="multi-mode-description">Retrouve les joueurs et leurs records.</span></button>
       </div>
       <div class="multi-actions" id="multiCustomActions" hidden>
         <button class="small-btn" type="button" onclick="quickRankedMatch()">Match rapide classé</button>
@@ -690,13 +695,13 @@
       </div>
       <div class="multi-room-panel" id="multiRoomPanel">
         <div id="roomCodePanel">
-          <div class="room-code-label">Code de room</div>
+          <div class="room-code-label">Code du salon</div>
           <div class="room-code" id="roomCodeDisplay">----</div>
           <div class="room-state" id="roomStateDisplay">En attente...</div>
         </div>
         <div class="match-search" id="matchSearchDisplay" hidden>
-          <strong id="matchSearchTimer">00:00</strong>
-          <span id="matchSearchState">Recherche d'adversaire en cours</span>
+          <div class="match-search-clock"><span>Temps de recherche</span><strong id="matchSearchTimer">00:00</strong></div>
+          <div class="match-search-message"><span class="match-search-kicker"><i aria-hidden="true"></i> Mise en relation</span><span id="matchSearchState">Recherche d'adversaire en cours</span></div>
           <div class="match-search-actions" id="matchSearchActions">
             <button class="small-btn danger" type="button" onclick="cancelOnlineMatchmaking()">Annuler la recherche</button>
           </div>
@@ -719,7 +724,7 @@
         <div class="leaderboard-list" id="leaderboardList"></div>
         <button class="small-btn dark" type="button" onclick="showOnlineModes()">Retour</button>
       </div>
-      <div class="multi-log" id="multiLog"></div>
+      <details class="multi-activity"><summary>Activité du salon</summary><div class="multi-log" id="multiLog"></div></details>
       <button class="small-btn dark" id="multiExitButton" type="button" onclick="showMenu()">Retour</button>
     </div>
   </div>
@@ -880,6 +885,24 @@
     <div class="overlay-actions"><button class="small-btn" type="button" onclick="closeHalloweenAnnouncement()">Continuer</button></div>
   </div>
 </div>
+<div id="accountSaveStatus" role="status" aria-live="polite" hidden></div>
+<div class="overlay" id="accountTransferOverlay" role="dialog" aria-modal="true" aria-labelledby="accountTransferTitle">
+  <div class="splash level-reward-splash">
+    <h2 id="accountTransferTitle">Transférer ma sauvegarde PC</h2>
+    <p>Choisissez le fichier de sauvegarde du PC. Les données seront comparées avant toute modification du compte.</p>
+    <input id="accountTransferFile" type="file" accept=".json,application/json" onchange="reviewAccountTransfer(this.files[0])">
+    <div id="accountTransferReview" aria-live="polite"></div>
+    <div class="overlay-actions"><button id="accountTransferConfirm" class="small-btn" hidden onclick="confirmAccountTransfer()">Utiliser cette sauvegarde sur mon compte</button><button class="small-btn dark" onclick="document.getElementById('accountTransferOverlay').classList.remove('active')">Fermer</button></div>
+  </div>
+</div>
+<div class="overlay" id="accountSaveConflict" role="dialog" aria-modal="true" aria-labelledby="accountSaveConflictTitle">
+  <div class="splash level-reward-splash">
+    <h2 id="accountSaveConflictTitle">Progression du compte modifiée</h2>
+    <p>Un autre appareil a enregistré une progression. Chargez celle du compte pour continuer ici.</p>
+    <p id="accountSaveConflictMessage"></p>
+    <div class="overlay-actions"><button class="small-btn" onclick="reloadAccountProgress()">Charger la progression du compte</button></div>
+  </div>
+</div>
 <script src="js/audio.js"></script>
 <script src="js/firebaseConfig.js"></script>
 <script src="js/firebaseService.js"></script>
@@ -894,5 +917,6 @@
 <script src="js/roomService.js"></script>
 <script src="js/multiplayerClient.js"></script>
 <script src="js/game.js"></script>
+<script src="js/mobile.js"></script>
 </body>
 </html>

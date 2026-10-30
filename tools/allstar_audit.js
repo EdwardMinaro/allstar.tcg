@@ -166,7 +166,7 @@ function run() {
   if (missingThemes.length) warnings.push(`Thèmes manquants ou non branchés: ${missingThemes.join(", ")}`);
 
   const musicMissingFiles = Object.values(audio.music || {})
-    .filter(item => item.src && !fs.existsSync(path.join(root, item.src)))
+    .filter(item => item.src && !fs.existsSync(path.join(root, item.src.split(/[?#]/)[0])))
     .map(item => `${item.label || item.src} -> ${item.src}`);
   musicMissingFiles.forEach(item => warnings.push(`Audio placeholder/introuvable: ${item}`));
 

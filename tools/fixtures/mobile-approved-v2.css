@@ -1,0 +1,19 @@
+/* Opt-in iframe only: the desktop's layout and assets remain the reference. */
+html.mobile-touch{touch-action:manipulation}
+html.mobile-touch #game .options-menu{max-height:90vh;overflow:auto}
+html.mobile-touch #game .action-btn{min-height:74px}
+html.mobile-touch #game .game-utility-controls>button{min-width:70px;min-height:70px}
+html.mobile-touch input,html.mobile-touch select{font-size:24px!important;min-height:48px}
+#mobileCardViewer{display:none;position:fixed;inset:0;z-index:140;background:rgba(0,0,0,.95);align-items:center;justify-content:center;gap:50px;padding:25px}
+#mobileCardViewer.active{display:flex}
+#mobileCardViewer .mobile-card-content{height:94%;aspect-ratio:112/148}
+#mobileCardViewer .game-card{width:100%!important;height:100%!important;transform:none!important;position:relative!important;inset:auto!important;max-width:none!important;max-height:none!important}
+.mobile-card-actions{display:flex;flex-direction:column;gap:24px}
+.mobile-card-actions button{min-width:210px;min-height:90px;border:3px solid #111;border-radius:12px;background:var(--gold);font-size:32px;font-weight:900}
+.mobile-card-actions button[hidden]{display:none}
+#accountSaveStatus{position:fixed;bottom:3px;left:50%;transform:translateX(-50%);z-index:130;padding:5px 12px;max-width:95vw;background:#111e;border:1px solid #d4a630;border-radius:6px;color:#fff;font-size:12px;text-align:center;pointer-events:none}
+html.mobile-touch #accountSaveStatus{font-size:20px}
+#accountSaveConflict{z-index:150}
+#accountTransferOverlay{z-index:155}
+#accountTransferConfirm[hidden]{display:none}
+#accountTransferReview{margin-top:18px;line-height:1.5}

@@ -1,0 +1,64 @@
+/* Opt-in iframe only: the desktop's layout and assets remain the reference. */
+html.mobile-touch{touch-action:manipulation}
+html.mobile-touch #game .options-menu{max-height:90vh;overflow:auto}
+html.mobile-touch #game .action-btn{min-height:74px}
+html.mobile-touch #game .game-utility-controls>button{min-width:70px;min-height:70px}
+html.mobile-touch input,html.mobile-touch select{font-size:24px!important;min-height:48px}
+/* Enlarge only the player's hand inside its existing reserved row. */
+html.mobile-touch #game .hand .game-card{
+  height:140px!important;width:auto!important;aspect-ratio:112/148;
+  flex:0 0 auto;transform:none!important;
+}
+html.mobile-touch #game .hand{
+  max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;
+  justify-content:flex-start;padding:0 6px!important;scrollbar-width:none;
+}
+html.mobile-touch #game .hand::-webkit-scrollbar{display:none}
+html.mobile-touch #game .hand-panel{padding:0 6px!important}
+html.mobile-touch #game .left-panel{padding-top:calc(clamp(80px,11vh,118px) + 18px)!important}
+/* Larger home targets and floating panels; no match grid or ring changes. */
+html.mobile-touch :is(#menu,#saveScreen) .home-stage:before{bottom:16px!important}
+html.mobile-touch #menu .home-main-actions{width:min(840px,74vw);max-width:none;gap:14px;align-self:center;margin-left:0!important;margin-right:0!important}
+html.mobile-touch #menu .home-main-actions .home-action{min-height:84px;font-size:34px}
+html.mobile-touch #menu .home-main-actions .home-action.primary{min-height:96px}
+html.mobile-touch #menu .home-control-trigger{width:100px;height:100px;font-size:44px}
+html.mobile-touch #saveScreen .account-actions .home-action{min-height:88px;font-size:30px}
+html.mobile-touch #menu .home-quick-panel{width:min(880px,calc(100vw - 64px));max-height:calc(100vh - 48px);overflow:auto;padding:26px}
+html.mobile-touch #menu .home-quick-panel-head{font-size:32px}
+html.mobile-touch #menu .home-quick-actions button{min-height:110px;font-size:26px}
+html.mobile-touch #menu .home-quick-actions button b{font-size:38px}
+html.mobile-touch #menu .home-quick-close{width:80px;height:80px;font-size:42px}
+html.mobile-touch #homeOptionsScreen .options-page-card{width:min(1200px,calc(100vw - 64px));max-height:calc(100vh - 36px);overflow:auto}
+html.mobile-touch #homeOptionsScreen .options-page-grid{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+html.mobile-touch #homeOptionsScreen .shortcut-options-home{grid-column:1/-1}
+html.mobile-touch #homeOptionsScreen button{min-height:76px;font-size:26px}
+html.mobile-touch #homeOptionsScreen .options-return-fixed{min-width:180px;z-index:40}
+html.mobile-touch #homeOptionsScreen .home-options-title{font-size:26px}
+html.mobile-touch #homeOptionsScreen .audio-options label{font-size:23px}
+html.mobile-touch #game .options-menu{
+  width:min(1120px,calc(100vw - 48px))!important;left:50%!important;top:50%!important;
+  transform:translate(-50%,-50%)!important;max-height:calc(100vh - 36px);padding:24px!important;
+}
+html.mobile-touch #game .options-menu button{min-height:76px;font-size:24px!important}
+html.mobile-touch #game .options-menu .game-options-close{width:80px!important;height:80px!important;font-size:40px!important}
+html.mobile-touch #game .options-menu .audio-options label{font-size:22px}
+.mobile-gesture-title{font-size:26px;font-weight:900;color:var(--gold)}
+.mobile-gesture-row{display:flex;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid #ffffff30;font-size:22px}
+.mobile-gesture-row strong{color:var(--gold)}
+.mobile-landscape-options{display:grid;gap:14px;grid-column:1/-1;text-align:left}
+.mobile-landscape-options>strong{font-size:24px}
+.mobile-landscape-button{min-height:70px;padding:14px;border-radius:10px;border:2px solid #111;background:var(--gold);font-size:24px;font-weight:900}
+.mobile-landscape-status{font-size:20px;line-height:1.4;margin:0}
+#mobileCardViewer{display:none;position:fixed;inset:0;z-index:140;background:rgba(0,0,0,.95);align-items:center;justify-content:center;gap:50px;padding:25px}
+#mobileCardViewer.active{display:flex}
+#mobileCardViewer .mobile-card-content{height:94%;aspect-ratio:112/148}
+#mobileCardViewer .game-card{width:100%!important;height:100%!important;transform:none!important;position:relative!important;inset:auto!important;max-width:none!important;max-height:none!important}
+.mobile-card-actions{display:flex;flex-direction:column;gap:24px}
+.mobile-card-actions button{min-width:210px;min-height:90px;border:3px solid #111;border-radius:12px;background:var(--gold);font-size:32px;font-weight:900}
+.mobile-card-actions button[hidden]{display:none}
+#accountSaveStatus{position:fixed;bottom:3px;left:50%;transform:translateX(-50%);z-index:130;padding:5px 12px;max-width:95vw;background:#111e;border:1px solid #d4a630;border-radius:6px;color:#fff;font-size:12px;text-align:center;pointer-events:none}
+html.mobile-touch #accountSaveStatus{font-size:20px}
+#accountSaveConflict{z-index:150}
+#accountTransferOverlay{z-index:155}
+#accountTransferConfirm[hidden]{display:none}
+#accountTransferReview{margin-top:18px;line-height:1.5}

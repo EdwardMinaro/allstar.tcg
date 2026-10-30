@@ -2,6 +2,9 @@
 node_modules/
 dist/
 outputs/
+web-dist/
+.firebase-cli/
+gha-creds-*.json
 
 # Local tooling and operating-system files
 .DS_Store
