@@ -29,15 +29,6 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Verify the release candidate
-        run: npm run verify
-
-      - name: Verify account saves
-        run: npm run test:accounts
-
       - name: Restrict production publishing to main
         shell: pwsh
         run: |
@@ -53,6 +44,27 @@ jobs:
           }
           "version=$version" >> $env:GITHUB_OUTPUT
           "tag=v$version" >> $env:GITHUB_OUTPUT
+
+      - name: Validate the version tag before building
+        shell: pwsh
+        run: |
+          $tag = "${{ steps.version.outputs.tag }}"
+          if (git tag --list $tag) {
+            $tagCommit = git rev-list -n 1 $tag
+            if ($tagCommit -ne $env:GITHUB_SHA) {
+              throw "Version $tag is already used by another commit. Increase the version in package.json and package-lock.json."
+            }
+          }
+          node -e "const p=require('./package.json'),l=require('./package-lock.json');if(p.version!==l.version||p.version!==l.packages[''].version)throw Error('Package versions do not match')"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify the release candidate
+        run: npm run verify
+
+      - name: Verify account saves
+        run: npm run test:accounts
 
       - name: Build the Windows release
         run: npm run dist -- --publish never

@@ -2,7 +2,17 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Nouveautés de la version 0.2.26
+## Nouveautés de la version 0.2.27
+
+- ALLSTAR est désormais accessible sur téléphone en paysage : [ouvrir ALLSTAR Mobile](https://allstar-mobile-65102.web.app/). L'ajout à l'écran d'accueil permet de le lancer depuis son icône.
+- Les comptes partagent leur collection, leurs decks, leurs crédits et leur progression entre PC et téléphone. Les sauvegardes du compte sont lues sur le serveur, avec protection contre l'écrasement par un appareil resté sur une ancienne progression. Le mode invité reste local.
+- Commandes tactiles : aperçu et bouton Jouer sur les cartes, balayage pour changer de musique et double toucher pour mettre en pause ou reprendre.
+- Sur mobile, les boutons des menus et les cartes de sa propre main sont agrandis en conservant l'assemblage du plateau.
+- Le salon de jeu en ligne adopte une nouvelle présentation commune au PC et au mobile.
+- La navigation musicale est corrigée : démarrage Halloween aléatoire, historique précédent/suivant cohérent et pause conservée.
+- Les prochaines publications Windows et mobile utilisent le même lancement GitHub ; l'application mobile se met à jour à sa réouverture sans réinstallation.
+
+## Événement Halloween — depuis la version 0.2.26
 
 - L'événement Halloween est disponible du 29 octobre au 19 novembre inclus : ambiance noire et orange, musique d'accueil spéciale et pack Halloween à 666 crédits.
 - Le lecteur propose deux playlists à cocher, Catcheurs et Halloween, séparément ou ensemble. Les 10 morceaux Halloween sont sélectionnables individuellement ; les préférences sont conservées au redémarrage.
