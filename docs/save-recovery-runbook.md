@@ -15,6 +15,22 @@ Ce processus fait partie du projet. Il a été conservé après l'incident du 30
 
 Ces contrôles sont ceux de cette version cliente. Ils ne rendent pas les anciennes versions incapables d'écrire à distance ; les règles Firestore existantes n'ont pas été durcies pendant cette intervention. L'historique dans le document du compte utilise les permissions actuelles et ne constitue pas une sauvegarde administrative indépendante ou un verrou immuable côté serveur. Ne pas annoncer une garantie absolue ou un blocage distant déjà déployé. Aucune nouvelle règle, fonction serveur, permission ou facturation n'est configurée par les outils ci-dessous.
 
+## Première liaison guidée depuis 0.2.36
+
+Le téléphone ne peut pas lire le disque du PC ni détecter à lui seul une ancienne copie locale. La première connexion mobile sans liaison confirmée présente donc un guide avant d'activer la session de jeu. Un compte nouvellement créé sur PC reçoit aussi ce guide ; un compte créé directement sur téléphone démarre normalement.
+
+1. Mettre à jour l'application PC et le site mobile. Sur PC, vérifier la progression puis utiliser **Préparer pour le téléphone** dans les options ou dans le dialogue de protection. Une copie protégée du même compte peut être préparée sans charger la progression partielle du serveur.
+2. Sur téléphone, choisir **Récupérer depuis le PC**. La copie préparée est récupérée sur le même compte, sans transport manuel de fichier. La préparation n'a modifié que les métadonnées de liaison et conserve la première copie PC séparément.
+3. Comparer le récapitulatif et confirmer. Les cartes sont conservées avec le nombre maximal par carte, la carrière avec l'avancement le plus élevé, les cosmétiques acquis et les decks des deux copies sont conservés. Les crédits et tickets viennent de la copie PC choisie : aucune addition ni maximum automatique pour ces ressources dépensables.
+
+**Plus tard** revient à la connexion sans écriture de progression ni activation de la synchronisation. Si le joueur confirme explicitement que la copie actuelle du compte est correcte, un second écran avec case à cocher est requis ; une copie manifestement incomplète ne peut pas être choisie ainsi. Les modifications concurrentes du compte interrompent la confirmation.
+
+L'export PC reste disponible en secours. Avant liaison, une copie préparée est liée au compte et à son empreinte exacte ; les autres fichiers ordinaires restent suspendus. Après liaison, un export est une copie personnelle, pas une autorisation de réimporter un ancien état. Les récupérations exceptionnelles examinées conservent leur procédure ci-dessous. Une progression effectivement modifiée après préparation invalide la copie en attente, mais conserve le premier secours PC.
+
+La première progression confirmée est retenue dans `cloudSaveHistory.verifiedSource`, en plus de la référence initiale et des cinq copies récentes au maximum, avec les mêmes limites de taille. L'outil d'inspection reconnaît aussi cette référence, `pcSaveBackup` et `pendingPcTransfer.bundle`. Après confirmation, la synchronisation normale du compte reprend sans refaire d'export/import à chaque changement d'appareil.
+
+Ces protections nécessitent les clients à jour. Une ancienne version PC peut toujours écrire avec les règles Firestore existantes. Les tests automatiques simulent l'authentification et les transactions ; un compte témoin doit vérifier le parcours réel après publication avant d'annoncer sa validation en conditions réelles.
+
 ## 1. Conserver les sources
 
 En cas de perte signalée : garder ALLSTAR fermé sur les deux appareils, ne pas refaire d'import, ne pas réinstaller et ne pas vider les données. Conserver le JSON exporté, même s'il est incomplet.

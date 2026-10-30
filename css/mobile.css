@@ -1,5 +1,17 @@
 /* Opt-in iframe only: the desktop's layout and assets remain the reference. */
 html.mobile-touch{touch-action:manipulation}
+#accountSaveSetup .splash{width:min(1040px,94vw);max-height:92vh;overflow:auto}
+#accountSaveSetup [hidden],#pcProtectedExport[hidden]{display:none!important}
+#accountSaveSetup .save-setup-steps{text-align:left;line-height:1.4;padding-left:30px}
+#accountSaveSetup .save-setup-steps li+li{margin-top:8px}
+#accountSaveSetup .save-setup-warning{padding:12px;border:1px solid #cfa944;border-radius:8px;background:#251b09}
+#accountSaveSetupConfirmCurrent{text-align:left;padding:14px;border:1px solid #cfa944;border-radius:8px}
+#accountSaveSetupConfirmCurrent button{margin-top:14px}
+html.mobile-touch #accountSaveSetup .splash{font-size:22px;width:min(1220px,94vw);max-height:94vh}
+html.mobile-touch #accountSaveSetup .small-btn{min-height:76px;font-size:23px;padding:14px 18px}
+html.mobile-touch #accountTransferOverlay .splash{font-size:22px;width:min(1180px,94vw);max-height:94vh;overflow:auto}
+html.mobile-touch #accountTransferOverlay .small-btn{min-height:76px;font-size:23px;padding:14px 18px}
+#accountSaveSetupAcknowledged{width:28px;height:28px;min-height:28px!important;vertical-align:middle;margin-right:10px}
 #mobileEntryScreen{position:fixed;inset:0;z-index:1000;background:#08080d;width:100vw;height:100vh}
 #mobileEntryScreen [hidden]{display:none!important}
 #mobileEntryScreen .save-panel{max-height:calc(100vh - 72px);overflow:auto}

@@ -1,13 +1,14 @@
 {
   "name": "allstar-desktop",
-  "version": "0.2.35",
+  "version": "0.2.36",
   "private": true,
   "description": "ALLSTAR desktop build",
   "author": "ALLSTAR",
   "main": "electron-main.js",
   "scripts": {
     "mobile:preview": "node tools/mobile_preview_server.cjs",
-    "test:accounts": "node tools/account_save_test.js && node tools/desktop_save_export_test.cjs && node tools/recover_account_save_test.cjs",
+    "test:accounts": "node tools/account_save_test.js && node tools/desktop_save_export_test.cjs && node tools/recover_account_save_test.cjs && node tools/save_setup_test.cjs",
+    "test:save-setup-browser": "node tools/save_setup_browser_test.cjs",
     "test:mobile": "node tools/mobile_controls_browser_test.cjs",
     "test:mobile-install": "node tools/mobile_install_browser_test.cjs",
     "test:mobile-audio": "node tools/mobile_audio_visibility_test.cjs && node tools/mobile_audio_browser_test.cjs",

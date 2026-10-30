@@ -20,14 +20,19 @@ function candidates(input){
     const h=value?.cloudSaveHistory;
     if(!h)return;
     if(h.schema!==1||h.accountUid!==uid)throw Error('Invalid recovery history identity.');
-    for(const [name,point] of [['baseline',h.baseline],...(h.recent||[]).map((point,i)=>['recent-'+i,point])]){
+    for(const [name,point] of [['baseline',h.baseline],...(h.verifiedSource?[['verified-source',h.verifiedSource]]:[]),...(h.recent||[]).map((point,i)=>['recent-'+i,point])]){
       if(point?.accountUid!==uid)throw Error('History point belongs to another account.');
       add(point.playerState,point.deckState,uid,{...source,history:name,revision:point.revision,capturedAt:point.capturedAt});
     }
   }
+  function preparedCopies(value,uid,source){
+    const backup=value?.pcSaveBackup,bundle=value?.pendingPcTransfer?.bundle;
+    if(backup){if(backup.accountUid!==uid)throw Error('PC backup identity mismatch.');add(backup.playerState,backup.deckState,uid,{...source,copy:'prepared-PC-backup',archived:backup.recovery});}
+    if(bundle){if(bundle.accountUid!==uid)throw Error('Prepared PC transfer identity mismatch.');add(bundle.playerState,bundle.deckState,uid,{...source,copy:'pending-PC-link',archived:bundle.recovery});}
+  }
   if(!Array.isArray(input)){
     if(input?.format==='allstar-local-recovery-v1')input=[{key:'allstarsRecovery',json:input}];
-    else {const uid=input?.uid||input?.cloudSaveHistory?.accountUid;history(input,uid,{kind:'cloud-document'});return found;}
+    else {const uid=input?.uid||input?.cloudSaveHistory?.accountUid||input?.pcSaveBackup?.accountUid||input?.pendingPcTransfer?.bundle?.accountUid;history(input,uid,{kind:'cloud-document'});preparedCopies(input,uid,{kind:'cloud-document'});return found;}
   }
   const rows=[...input].sort((a,b)=>(a.sequence||0)-(b.sequence||0));
   for(const row of rows){
@@ -51,6 +56,7 @@ function candidates(input){
       add(profile?.playerState,profile?.deckState||profile?.decks,uid,{...source,copy:'cached-cloud'});
       add(profile?.mobileMigrationBackup?.playerState,profile?.mobileMigrationBackup?.deckState,uid,{...source,copy:'pre-transfer-backup'});
       history(profile,uid,source);
+      preparedCopies(profile,uid,source);
     }
   }
   return found;

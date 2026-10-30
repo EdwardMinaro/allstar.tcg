@@ -36,6 +36,9 @@ const point={accountUid:'owner-A',playerState:player,deckState:decks,revision:4}
 const history=tool.candidates({cloudSaveHistory:{schema:1,accountUid:'owner-A',baseline:point,recent:[{...point,revision:5}]}});
 assert.equal(history.length,2);assert.equal(history[1].source.revision,5);
 assert.throws(()=>tool.candidates({uid:'wrong-owner',cloudSaveHistory:{schema:1,accountUid:'owner-A'}}),/identity/);
+const pcCopies=tool.candidates({uid:'owner-A',pcSaveBackup:{accountUid:'owner-A',playerState:player,deckState:decks},pendingPcTransfer:{bundle:{accountUid:'owner-A',playerState:player,deckState:decks}}});
+assert.equal(pcCopies.length,2);assert.equal(pcCopies[1].source.copy,'pending-PC-link');
+assert.throws(()=>tool.candidates({uid:'owner-B',pcSaveBackup:{accountUid:'owner-A',playerState:player}}),/identity/);
 const temp=fs.mkdtempSync(path.join(os.tmpdir(),'allstar-recovery-tool-'));
 try{
  const input=path.join(temp,'records.json'),out=path.join(temp,'candidates'),save=path.join(temp,'save.json');

@@ -4053,7 +4053,7 @@ function escapeHtml(value){
   }[char]));
 }
 function profileErrorMessage(error){
-  if(error?.code==="allstar/save-protection")return error.message;
+  if(error?.code==="allstar/save-protection"||error?.code==="allstar/save-setup-required")return error.message;
   const code=String(error?.code || error?.message || "");
   if(code.includes("auth/email-already-in-use"))return "Cette adresse est déjà utilisée.";
   if(code.includes("auth/invalid-email"))return "Adresse e-mail invalide.";
@@ -4330,8 +4330,9 @@ const ACCOUNT_TRANSFER_SUSPENDED=true;
 const APPROVED_ACCOUNT_RECOVERY_HASHES=["a22cb039ac10a6661a8c5c636186b37b7ae508eec7dbc21e8d7194df6978a628","6e907bfca896440a5d4d72dd190eecf0fa5c22be827e1e9862bed1af7cfd188c"];
 const ACCOUNT_TRANSFER_PAUSE_MESSAGE="Le transfert de sauvegarde ordinaire est temporairement suspendu. Seuls les fichiers de récupération vérifiés et fournis par l’équipe ALLSTAR sont acceptés. Conservez votre export original. Aucun import n’a été effectué.";
 let accountTransferCommitting=false;
+let pcLinkPreparing=false;
 let accountTransferReviewRequest=0;
-async function approvedAccountRecoveryHash(bundle){
+async function accountTransferHash(bundle){
   if(!window.crypto?.subtle)return null;
   function stable(value){
     if(Array.isArray(value))return value.map(stable);
@@ -4340,16 +4341,31 @@ async function approvedAccountRecoveryHash(bundle){
   }
   const digest=await window.crypto.subtle.digest("SHA-256",new TextEncoder().encode(JSON.stringify(stable(bundle))));
   const hash=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,"0")).join("");
+  return hash;
+}
+async function approvedAccountRecoveryHash(bundle){
+  const hash=await accountTransferHash(bundle);
   return APPROVED_ACCOUNT_RECOVERY_HASHES.includes(hash)?hash:null;
 }
+function preparedPcExport(player,decks,uid){
+  if(player?.profileProgress?.uid&&player.profileProgress.uid!==uid)throw new Error("La copie locale correspond à un autre compte. Elle n’a pas été exportée.");
+  const source=JSON.parse(JSON.stringify({playerState:player,deckState:decks}));
+  const retiredCards={};
+  for(const [key,n] of Object.entries(source.playerState.collection||{}))if(!cardByKey(key)){
+    if(key!=="legende_managers_yann_le_kersaudec")throw new Error("Une ancienne carte doit être vérifiée par l’équipe ALLSTAR avant l’export.");
+    retiredCards[key]=n;delete source.playerState.collection[key];
+  }
+  source.playerState.profileProgress=window.AllstarRankingService.normalizeProgress(source.playerState.profileProgress||{});
+  return validateAccountTransfer({format:"allstar-account-transfer-v1",accountUid:uid,createdAt:Date.now(),...source,recovery:{retiredCards}},uid);
+}
 function buildAccountTransferExport(){
+  if(accountSaveSession?.blocked&&accountSaveSession.pcSource&&window.AllstarDesktop?.isElectron){
+    const source=accountSaveSession.pcSource;
+    return preparedPcExport(source.playerState,source.deckState,accountSaveSession.uid);
+  }
   if(!accountSaveSession||accountSaveSession.blocked||cloudSaveHydrating)throw new Error("Connectez-vous à votre compte ALLSTAR et terminez sa vérification avant d’exporter sa sauvegarde.");
   loadPlayerState();loadDeckState();
-  const bundle=JSON.parse(JSON.stringify({
-    format:"allstar-account-transfer-v1",accountUid:accountSaveSession.uid,createdAt:Date.now(),
-    playerState:serializedPlayerState(),deckState:serializedDeckState()
-  }));
-  return validateAccountTransfer(bundle,accountSaveSession.uid);
+  return preparedPcExport(serializedPlayerState(),serializedDeckState(),accountSaveSession.uid);
 }
 async function exportAccountSave(){
   const desktop=window.AllstarDesktop;
@@ -4360,12 +4376,65 @@ async function exportAccountSave(){
     const session=accountSaveSession;
     const user=await window.AllstarAuthService?.getCurrentUser?.();
     if(!session||session!==accountSaveSession||user?.uid!==session.uid)throw new Error("Connectez-vous à votre compte ALLSTAR avant d’exporter sa sauvegarde.");
-    const result=await desktop.exportSave(JSON.stringify(buildAccountTransferExport()));
-    if(!result?.canceled)showSystemToast(ACCOUNT_TRANSFER_SUSPENDED
-      ? "Sauvegarde exportée. Conservez ce fichier ; les imports sont temporairement suspendus."
-      : "Sauvegarde exportée. Vous pouvez l’importer sur mobile avec le même compte ALLSTAR.",6000);
+    const bundle=buildAccountTransferExport();
+    const generation=session.generation;
+    const remote=await window.AllstarSaveService.loadPlayerData(session.uid);
+    if(session!==accountSaveSession||generation!==session.generation)throw new Error("La progression ou le compte a changé. Recommencez l’export.");
+    const result=await desktop.exportSave(JSON.stringify(bundle));
+    if(result?.canceled)return;
+    if(window.AllstarSaveService.isAccountLinkComplete(remote)){showSystemToast("Copie de secours exportée. La synchronisation du compte est déjà activée.",6000);return;}
+    await window.AllstarSaveService.registerPcSaveExport(session.uid,bundle,await accountTransferHash(bundle),window.AllstarSaveService.progressionToken(remote),window.AllstarSaveService.migrationProfileToken(remote));
+    showSystemToast("Sauvegarde PC exportée et vérifiée pour ce compte. Sur téléphone, choisissez ce fichier dans le parcours de liaison.",9000);
+    const status=document.getElementById("pcProtectedExportStatus");
+    if(status)status.textContent="Fichier exporté et vérifié. Transférez-le sur le téléphone, puis choisissez-le dans le parcours de liaison.";
   }catch(error){showSystemToast(error.message||"Impossible d’exporter la sauvegarde.",6000);}
   finally{buttons.forEach(button=>button.disabled=false);}
+}
+async function preparePcAccountLink(){
+  const status=document.getElementById("pcProtectedExportStatus");
+  if(!window.AllstarDesktop?.isElectron||pcLinkPreparing)return;
+  pcLinkPreparing=true;
+  const buttons=document.querySelectorAll('.desktop-save-link,#pcProtectedExport button[onclick="preparePcAccountLink()"]');
+  buttons.forEach(button=>button.disabled=true);
+  try{
+    const session=accountSaveSession,user=await window.AllstarAuthService?.getCurrentUser?.();
+    if(!session||user?.uid!==session.uid)throw new Error("Connectez-vous au même compte ALLSTAR sur le PC.");
+    const bundle=buildAccountTransferExport();
+    const generation=session.generation;
+    const remote=await window.AllstarSaveService.loadPlayerData(session.uid);
+    if(session!==accountSaveSession||generation!==session.generation)throw new Error("La progression ou le compte a changé. Recommencez la préparation.");
+    await window.AllstarSaveService.registerPcSaveExport(session.uid,bundle,await accountTransferHash(bundle),window.AllstarSaveService.progressionToken(remote),window.AllstarSaveService.migrationProfileToken(remote));
+    const message="Sauvegarde PC préparée sans remplacer la progression du compte. Sur téléphone, touchez « Récupérer depuis le PC » puis vérifiez le récapitulatif.";
+    if(status)status.textContent=message;showSystemToast(message,10000);
+  }catch(error){if(status)status.textContent=error.message;showSystemToast(error.message,8000);}
+  finally{pcLinkPreparing=false;buttons.forEach(button=>button.disabled=false);}
+}
+async function receivePreparedPcSave(){
+  const session=accountSaveSession,status=document.getElementById("accountSaveSetupStatus");
+  if(!session)return;
+  try{
+    const user=await window.AllstarAuthService.getCurrentUser();
+    if(user?.uid!==session.uid)throw new Error("Reconnectez-vous au même compte ALLSTAR.");
+    const remote=await window.AllstarSaveService.loadPlayerData(session.uid);
+    if(session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
+    const prepared=remote?.pendingPcTransfer;
+    if(!prepared?.bundle)throw new Error("Aucune copie PC n’est encore préparée. Sur le PC à jour, utilisez « Préparer pour le téléphone », puis revenez ici.");
+    validateAccountTransfer(prepared.bundle,session.uid);
+    if(await accountTransferHash(prepared.bundle)!==prepared.hash)throw new Error("La copie préparée n’a pas pu être vérifiée. Aucun transfert effectué.");
+    if(session.setup)session.setupRemote=remote;
+    document.getElementById("accountSaveSetup")?.classList.remove("active");
+    openAccountTransfer();
+    document.getElementById("accountTransferFile").hidden=true;
+    const title=document.getElementById("accountTransferTitle"),description=document.getElementById("accountTransferDescription");
+    if(title)title.textContent="Confirmer la liaison PC / téléphone";
+    if(description)description.textContent="La copie préparée sur votre PC a été retrouvée. Vérifiez les deux progressions avant de confirmer.";
+    const text=JSON.stringify(prepared.bundle);
+    await reviewAccountTransfer({size:new TextEncoder().encode(text).length,text:async()=>text});
+  }catch(error){if(status)status.textContent=error.message;}
+}
+function closeAccountTransfer(){
+  document.getElementById("accountTransferOverlay")?.classList.remove("active");
+  if(accountSaveSession?.setup)showAccountSaveSetup(accountSaveSession.setupRemote);
 }
 function validateAccountTransfer(bundle,uid){
   if(bundle?.format!=="allstar-account-transfer-v1"||bundle.accountUid!==uid)throw new Error("Cette sauvegarde ne correspond pas au compte connecté.");
@@ -4383,6 +4452,10 @@ function openAccountTransfer(){
   document.getElementById("accountTransferReview").textContent=ACCOUNT_TRANSFER_SUSPENDED?ACCOUNT_TRANSFER_PAUSE_MESSAGE:"";
   document.getElementById("accountTransferConfirm").hidden=true;
   document.getElementById("accountTransferFile").disabled=false;
+  document.getElementById("accountTransferFile").hidden=false;
+  const title=document.getElementById("accountTransferTitle"),description=document.getElementById("accountTransferDescription");
+  if(title)title.textContent="Transférer ma sauvegarde PC";
+  if(description)description.textContent="Choisissez le fichier de sauvegarde du PC. Les données seront comparées avant toute modification du compte.";
   document.getElementById("accountTransferFile").value="";
   document.getElementById("accountTransferOverlay").classList.add("active");
 }
@@ -4407,6 +4480,25 @@ function buildAccountTransferData(bundle,remote){
   return {...earned,playerState:player,deckState:decks,collection:player.collection,decks,
     mobileMigrationBackup:remote?.mobileMigrationBackup||{createdAt:player.savedAt,playerState:remotePlayerState(remote),deckState:remoteDeckState(remote),profileProgress:cloud}};
 }
+function buildLinkedPcTransferData(bundle,remote){
+  const linked=JSON.parse(JSON.stringify(bundle)),pc=linked.playerState,cloud=remotePlayerState(remote)||{};
+  pc.collection=mergeSavedCounts(cloud.collection,pc.collection);
+  pc.careerUnlocked=Math.max(Number(pc.careerUnlocked)||0,Number(cloud.careerUnlocked)||0);
+  pc.cosmeticInventory={...cloud.cosmeticInventory,...pc.cosmeticInventory,sleeves:{...cloud.cosmeticInventory?.sleeves,...pc.cosmeticInventory?.sleeves}};
+  pc.limitedRewards={...cloud.limitedRewards,...pc.limitedRewards};
+  pc.settledOnlineMatches={...cloud.settledOnlineMatches,...pc.settledOnlineMatches};
+  pc.starterGranted=Boolean(pc.starterGranted||cloud.starterGranted);pc.welcomeClaimed=Boolean(pc.welcomeClaimed||cloud.welcomeClaimed);
+  const decks=linked.deckState.decks;
+  for(const deck of remoteDeckState(remote)?.decks||[]){
+    const same=decks.find(d=>d.id===deck.id);
+    if(same&&JSON.stringify({name:same.name,cards:same.cards})===JSON.stringify({name:deck.name,cards:deck.cards}))continue;
+    const copy=JSON.parse(JSON.stringify(deck));
+    if(same){let n=1;while(decks.some(d=>d.id===`${deck.id}_mobile_${n}`))n++;copy.id=`${deck.id}_mobile_${n}`;copy.name=`${copy.name||"Deck"} (mobile)`;}
+    decks.push(copy);
+  }
+  // Wallet/tickets use the explicitly selected PC source, never a sum or max.
+  return buildAccountTransferData(linked,remote);
+}
 async function reviewAccountTransfer(file){
   if(accountTransferCommitting)return;
   const request=++accountTransferReviewRequest;
@@ -4419,17 +4511,21 @@ async function reviewAccountTransfer(file){
     const session=accountSaveSession;
     if(!session)throw new Error("Reconnectez-vous au compte ALLSTAR.");
     const bundle=validateAccountTransfer(JSON.parse(await file.text()),session.uid);
-    const recoveryHash=await approvedAccountRecoveryHash(bundle);
-    if(ACCOUNT_TRANSFER_SUSPENDED&&!recoveryHash)throw new Error(ACCOUNT_TRANSFER_PAUSE_MESSAGE);
+    const fileHash=await accountTransferHash(bundle);
     if(request!==accountTransferReviewRequest)return;
     if(session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
     clearTimeout(cloudSaveSyncTimer);await accountSaveChain.catch(()=>{});
     const remote=await window.AllstarSaveService.loadPlayerData(session.uid);
     if(request!==accountTransferReviewRequest)return;
     if(session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
+    const reviewed=APPROVED_ACCOUNT_RECOVERY_HASHES.includes(fileHash);
+    const linkedPc=!reviewed&&remote?.pendingPcTransfer?.hash===fileHash&&!window.AllstarSaveService.isAccountLinkComplete(remote);
+    const recoveryHash=reviewed||linkedPc?fileHash:null;
+    if(ACCOUNT_TRANSFER_SUSPENDED&&!recoveryHash)throw new Error(ACCOUNT_TRANSFER_PAUSE_MESSAGE+" Pour une première liaison, exportez depuis l’application PC à jour.");
     if(recoveryHash&&remote?.accountRecoveryReceipts?.[recoveryHash])throw new Error("Ce fichier de récupération a déjà été appliqué à ce compte. Aucun nouvel import n’a été effectué.");
-    pendingAccountTransfer={bundle,remote,uid:session.uid,session,recoveryHash,token:window.AllstarSaveService.progressionToken(remote)};
-    review.textContent=`${recoveryHash?"Récupération vérifiée":"PC"} : ${transferSummary(bundle.playerState,bundle.deckState)}. Compte actuel : ${transferSummary(remotePlayerState(remote),remoteDeckState(remote))}. La copie actuelle du compte sera conservée en secours avant le transfert. Le niveau et les titres obtenus sont conservés ; le classement en ligne du compte reste inchangé.`;
+    pendingAccountTransfer={bundle,remote,uid:session.uid,session,recoveryHash,linkedPc,token:window.AllstarSaveService.progressionToken(remote)};
+    review.textContent=`${linkedPc?"Copie PC vérifiée":recoveryHash?"Récupération vérifiée":"PC"} : ${transferSummary(bundle.playerState,bundle.deckState)}. Compte actuel : ${transferSummary(remotePlayerState(remote),remoteDeckState(remote))}. La copie actuelle du compte sera conservée en secours avant le transfert. Le niveau et les titres obtenus sont conservés ; le classement en ligne du compte reste inchangé.`;
+    if(linkedPc)review.textContent+=" Les cartes, la carrière et les decks des deux copies seront conservés. Le solde de crédits et les tickets seront ceux de la copie PC. Après confirmation, la synchronisation sera automatique.";
     button.hidden=false;
   }catch(error){if(request===accountTransferReviewRequest)review.textContent=error.message;}
 }
@@ -4442,22 +4538,26 @@ async function confirmAccountTransfer(){
   let committed=false;
   try{
     validateAccountTransfer(pending.bundle,pending.uid);
-    const recoveryHash=await approvedAccountRecoveryHash(pending.bundle);
+    const fileHash=await accountTransferHash(pending.bundle);
+    const recoveryHash=APPROVED_ACCOUNT_RECOVERY_HASHES.includes(fileHash)||pending.linkedPc&&pending.remote?.pendingPcTransfer?.hash===fileHash&&!window.AllstarSaveService.isAccountLinkComplete(pending.remote)?fileHash:null;
     if(ACCOUNT_TRANSFER_SUSPENDED&&(!recoveryHash||recoveryHash!==pending.recoveryHash))throw new Error(ACCOUNT_TRANSFER_PAUSE_MESSAGE);
     if(pending.session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
     clearTimeout(cloudSaveSyncTimer);await accountSaveChain.catch(()=>{});
-    const data=buildAccountTransferData(pending.bundle,pending.remote);
+    const data=pending.linkedPc?buildLinkedPcTransferData(pending.bundle,pending.remote):buildAccountTransferData(pending.bundle,pending.remote);
     if(recoveryHash)data.accountRecoveryReceipts={...pending.remote?.accountRecoveryReceipts,[recoveryHash]:true};
+    data.saveLinkVerified={schema:1,source:pending.linkedPc?"pc-import":"reviewed-recovery",fileHash:recoveryHash,verifiedAt:Date.now()};
+    data.pendingPcTransfer=null;
     await window.AllstarSaveService.commitProgression(pending.uid,data,pending.token,window.AllstarSaveService.migrationProfileToken(pending.remote));
     committed=true;
     pendingAccountTransfer=null;
     // The confirmed replacement intentionally supersedes this session's cache.
     accountSaveSession=null;
-    await hydrateCloudSaveForUser({uid:pending.uid});
+    await hydrateCloudSaveForUser({uid:pending.uid},{acceptedTransferHash:recoveryHash});
     document.getElementById("accountTransferOverlay").classList.remove("active");
     document.getElementById("accountSaveConflict").classList.remove("active");
+    document.getElementById("accountSaveSetup")?.classList.remove("active");
     G=null;enterSavedGame();
-    cloudSaveStatus("Sauvegarde PC transférée sur le compte ✓ Reconnectez le téléphone.");
+    cloudSaveStatus(pending.linkedPc?"Liaison validée ✓ La progression se synchronise maintenant entre vos appareils.":"Sauvegarde PC transférée sur le compte ✓ Reconnectez le téléphone.");
   }catch(error){document.getElementById("accountTransferReview").textContent=committed
     ? "La récupération a bien été enregistrée sur le compte, mais son affichage n’a pas pu être rechargé. Fermez puis rouvrez ALLSTAR. Ne refaites pas l’import."
     : error.message;}
@@ -4553,10 +4653,12 @@ async function pushCloudSaveNow(){
     collection:playerState.collection||{},
     decks:serializedDeckState()
   }));
+  if(session.sourceReady)payload.saveLinkVerified={schema:1,source:session.sourceReady,verifiedAt:Date.now()};
   const write=accountSaveChain.catch(()=>{}).then(async()=>{
     if(session!==accountSaveSession)return;
     if(session.conflict)throw Object.assign(new Error("Progression modifiée sur un autre appareil."),{code:"allstar/save-conflict"});
     session.token=await window.AllstarSaveService.commitProgression(session.uid,payload,session.token);
+    session.sourceReady=null;
     if(session===accountSaveSession&&generation===session.generation){
       session.dirty=false;
       if(session.notifySaved){
@@ -4667,14 +4769,62 @@ function showAccountSaveProtection(message){
   if(text)text.textContent=message;
   document.getElementById("accountSaveProtection")?.classList.add("active");
 }
+function currentSaveSourceUsable(remote,uid){
+  const player=remotePlayerState(remote),decks=remoteDeckState(remote);
+  if(remote?.uid&&remote.uid!==uid||player?.profileProgress?.uid&&player.profileProgress.uid!==uid)return false;
+  const established=Number(remote?.level)>1||Number(remote?.totalXp)>0||Number(remote?.rankedMatches)>0;
+  const prepared=remote?.pendingPcTransfer?.bundle;
+  if(prepared?.accountUid===uid&&window.AllstarSaveService.regressionReason(prepared.playerState,player,key=>Boolean(cardByKey(key))))return false;
+  const fresh=!remote?.playerState&&!established&&!Object.values(remote?.collection||{}).some(n=>Number(n)>0);
+  return Boolean((player&&typeof player.collection==="object"&&!Array.isArray(player.collection)&&Number.isSafeInteger(player.credits)&&player.credits>=0&&decks&&earnedCareerFloor(remote)<=Number(player.careerUnlocked||0))||(fresh&&!prepared));
+}
+function showAccountSaveSetup(remote){
+  if(accountSaveSession?.setup){accountSaveSession.setupRemote=remote;accountSaveSession.cloudSourceUsable=currentSaveSourceUsable(remote,accountSaveSession.uid);}
+  document.getElementById("accountSaveProtection")?.classList.remove("active");
+  const summary=document.getElementById("accountSaveSetupSummary");
+  if(summary)summary.textContent=remotePlayerState(remote)?transferSummary(remotePlayerState(remote),remoteDeckState(remote)):"Aucune sauvegarde de jeu complète n’est encore disponible sur ce compte.";
+  const current=document.getElementById("accountSaveSetupUseCurrent");
+  if(current)current.disabled=!accountSaveSession?.cloudSourceUsable;
+  const ack=document.getElementById("accountSaveSetupAcknowledged");if(ack)ack.checked=false;
+  const confirm=document.getElementById("accountSaveSetupConfirmCurrent");if(confirm)confirm.hidden=true;
+  const status=document.getElementById("accountSaveSetupStatus");if(status)status.textContent="";
+  document.getElementById("accountSaveSetup")?.classList.add("active");
+}
+function showCurrentSourceConfirmation(){
+  if(!accountSaveSession?.cloudSourceUsable)return;
+  const confirm=document.getElementById("accountSaveSetupConfirmCurrent");if(confirm)confirm.hidden=false;
+}
+async function confirmCurrentSaveSource(){
+  const session=accountSaveSession,status=document.getElementById("accountSaveSetupStatus");
+  if(!session?.cloudSourceUsable||!document.getElementById("accountSaveSetupAcknowledged")?.checked){if(status)status.textContent="Confirmez avoir vérifié la progression affichée avant d’activer la synchronisation.";return;}
+  const button=document.getElementById("accountSaveSetupConfirmButton");if(button)button.disabled=true;
+  try{
+    const user=await window.AllstarAuthService.getCurrentUser();
+    if(user?.uid!==session.uid||session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
+    await window.AllstarSaveService.verifyCurrentSaveSource(session.uid,session.token,window.AllstarSaveService.migrationProfileToken(session.setupRemote));
+    if(session!==accountSaveSession)return;
+    accountSaveSession=null;await hydrateCloudSaveForUser(user);
+    document.getElementById("accountSaveSetup")?.classList.remove("active");
+    G=null;enterSavedGame();await pushCloudSaveNow();
+  }catch(error){if(status)status.textContent=error.message;}
+  finally{if(button)button.disabled=false;}
+}
+function setupSaveLater(){
+  ++cloudSaveHydrationRequest;
+  document.getElementById("accountSaveSetup")?.classList.remove("active");
+  accountSaveSession=null;pendingAccountTransfer=null;G=null;
+  show("saveScreen");renderSaveScreen();
+  setSaveStatus("Liaison reportée. Aucune progression n’a été remplacée et la synchronisation n’a pas été activée.");
+}
 function closeAccountSaveProtection(){
   document.getElementById("accountSaveProtection")?.classList.remove("active");
   accountSaveSession=null;
   G=null;
   show("saveScreen");renderSaveScreen();
 }
-function protectedSaveLoad(uid,remote,message){
-  accountSaveSession={uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false,blocked:true};
+function protectedSaveLoad(uid,remote,message,pcSource=null){
+  accountSaveSession={uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false,blocked:true,pcSource};
+  const pcExport=document.getElementById("pcProtectedExport");if(pcExport)pcExport.hidden=!pcSource||!window.AllstarDesktop?.isElectron;
   showAccountSaveProtection(message);
   throw Object.assign(new Error(message),{code:"allstar/save-protection"});
 }
@@ -4682,7 +4832,7 @@ function earnedCareerFloor(remote){
   const wins=remote?.careerXpWins||remote?.playerState?.profileProgress?.careerXpWins||{};
   return Math.max(0,...Object.entries(wins).filter(([,won])=>won===true).map(([key])=>Number(/^career_(\d+)_/.exec(key)?.[1])||0));
 }
-async function hydrateCloudSaveForUser(user){
+async function hydrateCloudSaveForUser(user,{newAccount=false,acceptedTransferHash=null}={}){
   if(!user || !window.AllstarSaveService)return false;
   const request=++cloudSaveHydrationRequest;
   const currentRequest=()=>{
@@ -4707,22 +4857,46 @@ async function hydrateCloudSaveForUser(user){
   // Guest/other-account caches never participate in an account merge.
   const nextDecks=remoteDecks;
   const nextPlayer=remotePlayer?JSON.parse(JSON.stringify(remotePlayer)):null;
+  let scoped=null,scopedDecks=null;
+  try{scoped=JSON.parse(localStorage.getItem(`allstarsPlayerV1:account:${user.uid}`)||"null");scopedDecks=JSON.parse(localStorage.getItem(`allstarsDecks:account:${user.uid}`)||"null");}catch{}
   preserveAccountLocalCopy(user.uid,"before-cloud-hydration");
-  let legacy=null;
-  try{legacy=JSON.parse(localStorage.getItem("allstarsPlayerV1")||"null");}catch{}
+  let legacy=null,legacyDecks=null;
+  try{legacy=JSON.parse(localStorage.getItem("allstarsPlayerV1")||"null");legacyDecks=JSON.parse(localStorage.getItem("allstarsDecks")||"null");}catch{}
   if(legacy?.profileProgress?.uid===user.uid)preserveAccountLocalCopy(user.uid,"legacy-before-cloud-hydration",null,true);
   const established=Number(remote?.level)>1||Number(remote?.totalXp)>0||Number(remote?.rankedMatches)>0;
   const completePlayer=remotePlayer&&typeof remotePlayer.collection==="object"&&!Array.isArray(remotePlayer.collection)&&Number.isSafeInteger(remotePlayer.credits)&&remotePlayer.credits>=0;
+  const recovered=APPROVED_ACCOUNT_RECOVERY_HASHES.some(hash=>remote?.accountRecoveryReceipts?.[hash]);
+  const mobile=/(?:^|[?&])mobile=1(?:&|$)/.test(window.location?.search||"");
+  if(mobile&&!newAccount&&!window.AllstarSaveService.isAccountLinkComplete(remote)&&!recovered){
+    const cloudSourceUsable=currentSaveSourceUsable(remote,user.uid);
+    accountSaveSession={uid:user.uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false,blocked:true,setup:true,setupRemote:remote,cloudSourceUsable};
+    showAccountSaveSetup(remote);
+    throw Object.assign(new Error("Vérifiez votre sauvegarde avant la première synchronisation sur téléphone."),{code:"allstar/save-setup-required"});
+  }
+  const accepted=acceptedTransferHash&&remote?.accountRecoveryReceipts?.[acceptedTransferHash];
+  let pcCandidate=null;
+  if(legacy?.profileProgress?.uid===user.uid){
+    if(Array.isArray(legacyDecks?.decks)){
+      pcCandidate={playerState:legacy,deckState:legacyDecks};
+      if(scoped&&Array.isArray(scopedDecks?.decks)){
+        const legacyToScoped=window.AllstarSaveService.regressionReason(legacy,scoped,key=>Boolean(cardByKey(key)));
+        const scopedToLegacy=window.AllstarSaveService.regressionReason(scoped,legacy,key=>Boolean(cardByKey(key)));
+        if(!legacyToScoped)pcCandidate={playerState:scoped,deckState:scopedDecks};
+        else if(scopedToLegacy)pcCandidate=null;
+      }
+    }
+  }else if(scoped&&Array.isArray(scopedDecks?.decks))pcCandidate={playerState:scoped,deckState:scopedDecks};
   if(remote?.playerState&&(!completePlayer||!remoteDecks)||established&&!remote?.playerState&&!(Number.isSafeInteger(remote?.credits)&&remote?.collection)){
-    protectedSaveLoad(user.uid,remote,"Le profil du compte existe, mais sa sauvegarde de jeu est absente ou incomplète. Aucun nouveau départ n’a été créé. Vérification nécessaire avant de continuer.");
+    protectedSaveLoad(user.uid,remote,"Le profil du compte existe, mais sa sauvegarde de jeu est absente ou incomplète. Aucun nouveau départ n’a été créé. Vérification nécessaire avant de continuer.",pcCandidate);
   }
   // The old unscoped PC save may be the only complete copy. Its embedded UID
   // must match; a guest or another account never participates in this check.
   if(legacy?.profileProgress?.uid===user.uid){
     const explicitlyRecovered=APPROVED_ACCOUNT_RECOVERY_HASHES.some(hash=>remote?.accountRecoveryReceipts?.[hash]);
     const regression=window.AllstarSaveService.regressionReason(legacy,nextPlayer,key=>Boolean(cardByKey(key)));
-    if(regression&&!explicitlyRecovered)protectedSaveLoad(user.uid,remote,"Une ancienne sauvegarde PC de ce compte contient davantage de cartes ou de carrière. Elle a été conservée. Vérification nécessaire avant de charger la sauvegarde du compte.");
+    if(regression&&!explicitlyRecovered&&!accepted)protectedSaveLoad(user.uid,remote,"Une ancienne sauvegarde PC de ce compte contient davantage de cartes ou de carrière. Elle a été conservée. Vérification nécessaire avant de charger la sauvegarde du compte.",pcCandidate);
   }
+  if(scoped&&!accepted&&window.AllstarSaveService.regressionReason(scoped,nextPlayer,key=>Boolean(cardByKey(key))))protectedSaveLoad(user.uid,remote,"La copie présente sur cet appareil contient une progression absente du compte. Elle a été conservée ; vérifiez la source avant de continuer.",Array.isArray(scopedDecks?.decks)?{playerState:scoped,deckState:scopedDecks}:null);
   const earnedFloor=earnedCareerFloor(remote);
   if(earnedFloor>Number(nextPlayer?.careerUnlocked||0))protectedSaveLoad(user.uid,remote,"La sauvegarde du compte est incohérente avec les victoires de carrière enregistrées. Chargement suspendu ; vos copies locales sont conservées. Contactez l’équipe ALLSTAR pour une récupération.");
   activateSaveScope(user.uid);
@@ -4745,7 +4919,8 @@ async function hydrateCloudSaveForUser(user){
   }finally{
     cloudSaveHydrating=false;
   }
-  accountSaveSession={uid:user.uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false};
+  accountSaveSession={uid:user.uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false,sourceReady:newAccount?(mobile?"new-mobile-account":"new-pc-account"):null};
+  document.querySelectorAll(".desktop-save-link").forEach(button=>button.hidden=!window.AllstarDesktop?.isElectron||window.AllstarSaveService.isAccountLinkComplete(remote));
   document.getElementById("accountSaveProtection")?.classList.remove("active");
   cloudSaveStatus("");
   return Boolean(nextPlayer||nextDecks);
@@ -4764,7 +4939,7 @@ async function createAccountFromStart(){
     profileUiState.user=result.user;
     profileUiState.profile=result.profile;
     setSaveStatus(profileResultMessage("Compte créé", result));
-    await hydrateCloudSaveForUser(result.user);
+    await hydrateCloudSaveForUser(result.user,{newAccount:true});
     resetRuntimeProgress();
     enterSavedGame();
     await pushCloudSaveNow();
@@ -11688,7 +11863,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   runAllstarAudit();
   wireSaveScreen();
   wireDisplayOptions();
-  document.querySelectorAll(".desktop-save-export").forEach(button=>{
+  document.querySelectorAll(".desktop-save-export,.desktop-save-link").forEach(button=>{
     button.hidden=!window.AllstarDesktop?.isElectron;
   });
   wireQuickShortcuts();

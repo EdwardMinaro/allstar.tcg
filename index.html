@@ -317,6 +317,7 @@
               <option value="1920x1080">1920 x 1080</option>
             </select>
             <button class="profile-action desktop-save-export" type="button" hidden onclick="exportAccountSave()">Exporter la sauvegarde</button>
+            <button class="profile-action desktop-save-link" type="button" hidden onclick="preparePcAccountLink()">Préparer pour le téléphone</button>
             <div class="profile-actions">
               <button class="profile-action dark" type="button" onclick="requestProfileLogout()">Se déconnecter</button>
               <button class="profile-action danger" type="button" onclick="requestQuitGame()">Quitter le jeu</button>
@@ -397,6 +398,7 @@
         <option value="1920x1080">1920 x 1080</option>
       </select>
       <button class="profile-action desktop-save-export" type="button" hidden onclick="exportAccountSave()">Exporter la sauvegarde</button>
+      <button class="profile-action desktop-save-link" type="button" hidden onclick="preparePcAccountLink()">Préparer pour le téléphone</button>
     </div>
     <div class="shortcut-options" id="shortcutOptions" hidden>
       <p class="shortcut-intro">Clique sur une touche, puis appuie sur la nouvelle commande.</p>
@@ -891,10 +893,10 @@
 <div class="overlay" id="accountTransferOverlay" role="dialog" aria-modal="true" aria-labelledby="accountTransferTitle">
   <div class="splash level-reward-splash">
     <h2 id="accountTransferTitle">Transférer ma sauvegarde PC</h2>
-    <p>Choisissez le fichier de sauvegarde du PC. Les données seront comparées avant toute modification du compte.</p>
+    <p id="accountTransferDescription">Choisissez le fichier de sauvegarde du PC. Les données seront comparées avant toute modification du compte.</p>
     <input id="accountTransferFile" type="file" accept=".json,application/json" onchange="reviewAccountTransfer(this.files[0])">
     <div id="accountTransferReview" aria-live="polite"></div>
-    <div class="overlay-actions"><button id="accountTransferConfirm" class="small-btn" hidden onclick="confirmAccountTransfer()">Utiliser cette sauvegarde sur mon compte</button><button class="small-btn dark" onclick="document.getElementById('accountTransferOverlay').classList.remove('active')">Fermer</button></div>
+    <div class="overlay-actions"><button id="accountTransferConfirm" class="small-btn" hidden onclick="confirmAccountTransfer()">Utiliser cette sauvegarde sur mon compte</button><button class="small-btn dark" onclick="closeAccountTransfer()">Fermer</button></div>
   </div>
 </div>
 <div class="overlay" id="accountSaveConflict" role="dialog" aria-modal="true" aria-labelledby="accountSaveConflictTitle">
@@ -910,11 +912,41 @@
   <div class="splash level-reward-splash">
     <h2 id="accountSaveProtectionTitle">Sauvegarde protégée</h2>
     <p id="accountSaveProtectionMessage"></p>
-    <p>Aucune fusion automatique n’est effectuée. Conservez vos fichiers et vos copies locales.</p>
+    <p>Aucune progression n’est remplacée sans votre confirmation. Conservez vos fichiers et vos copies locales.</p>
+    <div id="pcProtectedExport" hidden>
+      <p>Votre copie PC a été conservée. Vous pouvez la préparer pour le téléphone sans remplacer la progression active du compte.</p>
+      <div class="overlay-actions"><button class="small-btn" onclick="preparePcAccountLink()">Préparer pour le téléphone</button><button class="small-btn dark" onclick="exportAccountSave()">Exporter cette copie PC</button></div>
+      <p id="pcProtectedExportStatus" role="status"></p>
+    </div>
     <div class="overlay-actions">
       <button class="small-btn" onclick="document.getElementById('accountSaveProtection').classList.remove('active');openAccountTransfer()">Fichier de récupération vérifié</button>
       <button class="small-btn dark" onclick="closeAccountSaveProtection()">Retour à la connexion</button>
     </div>
+  </div>
+</div>
+<div class="overlay" id="accountSaveSetup" role="dialog" aria-modal="true" aria-labelledby="accountSaveSetupTitle">
+  <div class="splash level-reward-splash">
+    <h2 id="accountSaveSetupTitle">Retrouver votre progression</h2>
+    <p>Avant la première synchronisation sur téléphone, vérifiez la progression à utiliser. Le téléphone ne peut pas lire directement la sauvegarde restée sur votre ordinateur.</p>
+    <p><strong>Progression actuellement disponible sur le compte :</strong></p>
+    <p id="accountSaveSetupSummary"></p>
+    <ol class="save-setup-steps">
+      <li>Si vous avez déjà joué sur PC, ouvrez l’application PC à jour avec le même compte.</li>
+      <li>Sur PC, utilisez <strong>Préparer pour le téléphone</strong> dans les options ou sur l’écran « Sauvegarde protégée ».</li>
+      <li>Revenez ici, récupérez la copie PC et vérifiez le récapitulatif avant de confirmer. Aucun fichier à envoyer entre les appareils.</li>
+    </ol>
+    <p class="save-setup-warning">Si vous aviez une partie PC, récupérez-la avant de continuer. Une ancienne version PC peut charger la progression incomplète du compte. « Plus tard » ne modifie rien et n’active pas la synchronisation.</p>
+    <div class="overlay-actions">
+      <button class="small-btn" onclick="receivePreparedPcSave()">Récupérer depuis le PC</button>
+      <button class="small-btn dark" onclick="document.getElementById('accountSaveSetup').classList.remove('active');openAccountTransfer()">J’ai un fichier de récupération</button>
+      <button class="small-btn dark" id="accountSaveSetupUseCurrent" onclick="showCurrentSourceConfirmation()">La progression affichée est la bonne</button>
+      <button class="small-btn dark" onclick="setupSaveLater()">Plus tard</button>
+    </div>
+    <div id="accountSaveSetupConfirmCurrent" hidden>
+      <label><input id="accountSaveSetupAcknowledged" type="checkbox"> J’ai vérifié mes cartes, mes crédits et ma carrière. Je souhaite utiliser cette progression sur mes appareils.</label>
+      <button class="small-btn" id="accountSaveSetupConfirmButton" onclick="confirmCurrentSaveSource()">Confirmer cette progression</button>
+    </div>
+    <p id="accountSaveSetupStatus" role="status" aria-live="polite"></p>
   </div>
 </div>
 <script src="js/firebaseConfig.js"></script>

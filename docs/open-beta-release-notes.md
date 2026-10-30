@@ -2,7 +2,15 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Protection des sauvegardes — version 0.2.35
+## Première liaison PC / téléphone — version 0.2.36
+
+- La première connexion mobile d'un compte dont la liaison n'a pas encore été confirmée ouvre un parcours guidé avant de charger ou d'enregistrer la progression. « Plus tard » revient à la connexion sans activer la synchronisation.
+- Sur PC, « Préparer pour le téléphone » conserve une copie du même compte, y compris lorsqu'une ancienne sauvegarde locale plus complète a déclenché la protection. Cette préparation ne remplace pas la progression active.
+- Sur téléphone, « Récupérer depuis le PC » propose cette copie sans envoi de fichier, puis affiche un récapitulatif avant confirmation. Les cartes, la carrière et les decks des deux copies sont conservés ; les crédits et tickets proviennent de la copie PC choisie et ne sont pas additionnés.
+- Une fois la liaison confirmée, la synchronisation habituelle reprend entre les appareils. Une copie de référence de la progression confirmée est conservée, en plus des secours existants. L'export reste disponible pour conserver un fichier personnel.
+- Les comptes créés directement sur mobile démarrent normalement. Les fichiers de récupération examinés restent acceptés ; les autres imports non préparés restent suspendus.
+
+## Protection des sauvegardes précédente — version 0.2.35
 
 - En jeu normal, un enregistrement qui ferait disparaître des cartes ou régresser la carrière est refusé. Les dépenses de crédits et de tickets restent possibles.
 - Avant un enregistrement, une copie de secours du compte est conservée dans la même transaction : première copie de référence et jusqu'à cinq copies récentes. Les copies locales sont également conservées.

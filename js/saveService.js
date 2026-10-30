@@ -35,10 +35,13 @@
   }
 
   function migrationProfileToken(data){
-    const fields=["level","xp","totalXp","titles","careerXpWins","levelRewards","matchSettlements","onlineMatchSettlements","accountRecoveryReceipts"];
+    const fields=["level","xp","totalXp","titles","careerXpWins","levelRewards","matchSettlements","onlineMatchSettlements","accountRecoveryReceipts","saveLinkVerified","pendingPcTransfer"];
     return progressionToken({playerState:Object.fromEntries(fields.map(key=>[key,data?.[key]??null]))});
   }
   function protectionError(message){return Object.assign(new Error(message),{code:"allstar/save-protection"});}
+  function isAccountLinkComplete(data){
+    return data?.saveLinkVerified?.schema===1&&["new-mobile-account","new-account-confirmed","player-confirmed","pc-import","reviewed-recovery"].includes(data.saveLinkVerified.source);
+  }
   function validateProgression(data){
     const player=data?.playerState,decks=data?.deckState;
     const counts=player?.collection;
@@ -78,12 +81,13 @@
     delete player.savedAt;delete decks.savedAt;
     return progressionToken({playerState:player,deckState:decks});
   }
-  function nextRecoveryHistory(uid,current,data){
+  function nextRecoveryHistory(uid,current,data,verifiedReplacement=false){
     const existing=current?.cloudSaveHistory;
-    if(existing&&(existing.schema!==1||existing.accountUid!==uid||!existing.baseline||!Array.isArray(existing.recent)||[existing.baseline,...existing.recent].some(point=>point.accountUid!==uid||!point.playerState)))throw protectionError("Historique de secours invalide : sauvegarde interrompue.");
+    if(existing&&(existing.schema!==1||existing.accountUid!==uid||!existing.baseline||!Array.isArray(existing.recent)||[existing.baseline,...existing.recent,...(existing.verifiedSource?[existing.verifiedSource]:[])].some(point=>point.accountUid!==uid||!point.playerState)))throw protectionError("Historique de secours invalide : sauvegarde interrompue.");
     const previous=recoveryPoint(uid,current,Number(current?.cloudSaveRevision)||0);
     const next=recoveryPoint(uid,data,(Number(current?.cloudSaveRevision)||0)+1);
     const history=existing?JSON.parse(JSON.stringify(existing)):{schema:1,accountUid:uid,baseline:previous||next,recent:[]};
+    if(verifiedReplacement&&!history.verifiedSource&&next)history.verifiedSource=next;
     if(previous&&meaningful(previous)!==meaningful(next)&&meaningful(previous)!==meaningful(history.baseline)&&meaningful(previous)!==meaningful(history.recent.at(-1)))history.recent.push(previous);
     while(history.recent.length>5)history.recent.shift();
     const bytes=value=>new TextEncoder().encode(JSON.stringify(value)).length;
@@ -108,13 +112,49 @@
       // require the separately reviewed recovery flow and its profile token.
       const regression=regressionReason(current?.playerState,data.playerState);
       if(regression&&expectedProfileToken===null)throw protectionError(regression+" La sauvegarde du compte est conservée.");
-      const history=nextRecoveryHistory(uid,current,data);
+      const history=nextRecoveryHistory(uid,current,data,expectedProfileToken!==null);
       const next={...data,cloudSaveHistory:history,cloudSaveRevision:(Number(current?.cloudSaveRevision)||0)+1,updatedAt:serverTimestamp()};
+      if(current?.pendingPcTransfer&&expectedProfileToken===null&&meaningful(recoveryPoint(uid,current,0))!==meaningful(recoveryPoint(uid,data,0)))next.pendingPcTransfer=null;
       if(new TextEncoder().encode(JSON.stringify({...current,...next})).length>750000)throw protectionError("La sauvegarde et ses copies de secours dépassent la taille autorisée. Aucune progression n’a été remplacée.");
       // update replaces the complete maps, including spent tickets/deleted decks.
       if(snapshot.exists())transaction.update(target,next);
       else transaction.set(target,next);
       return progressionToken(data);
+    });
+  }
+
+  async function registerPcSaveExport(uid,bundle,hash,expectedToken,expectedProfileToken){
+    if(bundle?.accountUid!==uid||bundle?.playerState?.profileProgress?.uid&&bundle.playerState.profileProgress.uid!==uid||!/^[a-f0-9]{64}$/.test(hash||""))throw protectionError("Export PC non vérifié.");
+    validateProgression({playerState:bundle.playerState,deckState:bundle.deckState});
+    const {db,doc,runTransaction,serverTimestamp}=await firestoreTools();
+    return runTransaction(db,async transaction=>{
+      const target=doc(db,"users",uid),snapshot=await transaction.get(target);
+      const current=snapshot.exists()?snapshot.data():null;
+      if(current?.uid&&current.uid!==uid)throw protectionError("L’identité de cette sauvegarde doit être vérifiée avant la liaison.");
+      if(progressionToken(current)!==expectedToken||migrationProfileToken(current)!==expectedProfileToken)throw Object.assign(new Error("Le compte a changé pendant l’export. Recommencez la vérification."),{code:"allstar/save-conflict"});
+      if(isAccountLinkComplete(current))throw protectionError("La liaison est déjà validée pour ce compte. Utilisez la synchronisation normale ; contactez l’équipe ALLSTAR pour une récupération exceptionnelle.");
+      const source={accountUid:uid,createdAt:Date.now(),playerState:bundle.playerState,deckState:bundle.deckState,recovery:bundle.recovery||null};
+      const metadata={pendingPcTransfer:{hash,bundle,createdAt:Date.now()},pcSaveBackup:current?.pcSaveBackup||source,updatedAt:serverTimestamp()};
+      if(new TextEncoder().encode(JSON.stringify({...current,...metadata})).length>750000)throw protectionError("La copie PC ne peut pas être conservée intégralement. Export non autorisé à l’import.");
+      // Metadata only: this never replaces the account's active progression.
+      if(snapshot.exists())transaction.update(target,metadata);else transaction.set(target,{uid,...metadata});
+      return true;
+    });
+  }
+
+  async function verifyCurrentSaveSource(uid,expectedToken,expectedProfileToken){
+    const {db,doc,runTransaction,serverTimestamp}=await firestoreTools();
+    return runTransaction(db,async transaction=>{
+      const target=doc(db,"users",uid),snapshot=await transaction.get(target);
+      const current=snapshot.exists()?snapshot.data():null;
+      if(current?.uid&&current.uid!==uid||current?.playerState?.profileProgress?.uid&&current.playerState.profileProgress.uid!==uid)throw protectionError("L’identité de cette sauvegarde doit être vérifiée avant la liaison.");
+      if(progressionToken(current)!==expectedToken||migrationProfileToken(current)!==expectedProfileToken)throw Object.assign(new Error("La progression du compte a changé. Vérifiez à nouveau le récapitulatif."),{code:"allstar/save-conflict"});
+      const fresh=!current?.playerState&&Number(current?.level||1)<=1&&!Number(current?.totalXp)&&!Number(current?.rankedMatches)&&!Object.values(current?.collection||{}).some(n=>Number(n)>0);
+      if(!fresh)validateProgression({playerState:current?.playerState,deckState:current?.deckState});
+      const metadata={saveLinkVerified:{schema:1,source:fresh?"new-account-confirmed":"player-confirmed",verifiedAt:Date.now()},pendingPcTransfer:null,updatedAt:serverTimestamp()};
+      if(!fresh)metadata.cloudSaveHistory=nextRecoveryHistory(uid,current,current,true);
+      if(new TextEncoder().encode(JSON.stringify({...current,...metadata})).length>750000)throw protectionError("La progression et sa copie de référence ne peuvent pas être conservées intégralement. Liaison suspendue.");
+      if(snapshot.exists())transaction.update(target,metadata);else transaction.set(target,{uid,...metadata});
     });
   }
 
@@ -141,6 +181,9 @@
     commitProgression,
     migrationProfileToken,
     regressionReason,
+    registerPcSaveExport,
+    verifyCurrentSaveSource,
+    isAccountLinkComplete,
     saveDecks,
     loadDecks,
     saveCollection,

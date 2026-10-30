@@ -13,27 +13,31 @@ const serviceWindow={AllstarFirebaseService:{firebaseServices:async()=>({firesto
 Function("window",fs.readFileSync(path.join(root,"js/saveService.js"),"utf8"))(serviceWindow);
 const service=serviceWindow.AllstarSaveService;
 const source=fs.readFileSync(path.join(root,"js/game.js"),"utf8");
-function device(uid,approvedHashes=[]){
+function device(uid,approvedHashes=[],options={}){
   let user={uid};const values=new Map();
   const storage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value),removeItem:key=>values.delete(key)};
-  const window={crypto:crypto.webcrypto,AllstarSaveService:service,AllstarAuthService:{getCurrentUser:async()=>user},AllstarRankingService:{normalizeProgress:value=>value||{}}};
+  const desktopFiles=[];
+  const window={location:{search:options.mobile?'?mobile=1':''},crypto:crypto.webcrypto,AllstarSaveService:service,AllstarAuthService:{getCurrentUser:async()=>user},AllstarRankingService:{normalizeProgress:value=>value||{}}};
+  if(options.desktop)window.AllstarDesktop={isElectron:true,exportSave:async text=>{desktopFiles.push(JSON.parse(text));return {canceled:false}}};
   Function("window",fs.readFileSync(path.join(root,"js/rankingService.js"),"utf8"))(window);
   const status={textContent:'',hidden:true};const timers=new Map();let timerId=0;
-  const transferUi=Object.fromEntries(['accountTransferReview','accountTransferConfirm','accountTransferFile','accountTransferOverlay','accountSaveConflict'].map(id=>[id,{textContent:'',hidden:false,disabled:false,classList:{add(){},remove(){}}}]));
+  const transferUi=Object.fromEntries(['accountTransferReview','accountTransferConfirm','accountTransferFile','accountTransferOverlay','accountSaveConflict','accountSaveSetup','accountSaveSetupSummary','accountSaveSetupUseCurrent','accountSaveSetupAcknowledged','accountSaveSetupConfirmCurrent','accountSaveSetupStatus','accountSaveSetupConfirmButton','pcProtectedExport','pcProtectedExportStatus'].map(id=>[id,{textContent:'',hidden:false,disabled:false,checked:false,classList:{add(){},remove(){}}}]));
   const document={addEventListener(){},getElementById(id){return id==='accountSaveStatus'?status:transferUi[id]||null},querySelector(){return null},querySelectorAll(){return[]}};
   // Test-only hash fixtures in this in-memory copy; no override exists in game UI.
   const testSource=approvedHashes.length?source.replace(/const APPROVED_ACCOUNT_RECOVERY_HASHES=\[[^\n]+;/,'const APPROVED_ACCOUNT_RECOVERY_HASHES='+JSON.stringify(approvedHashes)+';'):source;
   const game=Function("window","document","localStorage","setTimeout","clearTimeout",testSource+`
-enterSavedGame=()=>{};
+enterSavedGame=()=>{playerState={credits:0,collection:{},careerUnlocked:0,...JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)||"{}"),loaded:true};deckState={decks:[],...JSON.parse(localStorage.getItem(DECK_STORAGE_KEY)||"{}"),loaded:true}};
+show=()=>{};renderSaveScreen=()=>{};showSystemToast=()=>{};
 return {hydrateCloudSaveForUser,pushCloudSaveNow,queueCloudSave,notifyAccountProgressSaved,validateAccountTransfer,buildAccountTransferData,buildAccountTransferExport,openAccountTransfer,reviewAccountTransfer,confirmAccountTransfer,approvedAccountRecoveryHash,
+preparePcAccountLink,receivePreparedPcSave,confirmCurrentSaveSource,showCurrentSourceConfirmation,setupSaveLater,exportAccountSave,closeAccountTransfer,
 setPendingTransfer(value){pendingAccountTransfer={...value,session:accountSaveSession}},pendingTransfer(){return pendingAccountTransfer},
 setExportState(player,decks){playerState={...JSON.parse(JSON.stringify(player)),loaded:true};deckState={...JSON.parse(JSON.stringify(decks)),loaded:true}},
 firstKey(){return cardKey(CARD_DATA[0])},normalize:window.AllstarRankingService.normalizeProgress,
 setState(credits,tickets={}){playerState={loaded:true,credits,collection:{one:2},boosterTickets:tickets,savedAt:1};deckState={loaded:true,decks:[],savedAt:1};},
 scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){return accountSaveSession}};`)(window,document,storage,(fn,ms)=>{timers.set(++timerId,{fn,ms});return timerId},id=>timers.delete(id));
-  return{...game,storage,status,transferUi,recoveries(){return [...values].filter(([key])=>key.startsWith('allstarsRecovery:')).map(([,value])=>JSON.parse(value))},expireToast(){for(const [id,timer] of timers)if(timer.ms===2000){timers.delete(id);timer.fn()}},login:async next=>{user={uid:next};return game.hydrateCloudSaveForUser(user)}};
+  return{...game,storage,status,transferUi,desktopFiles,recoveries(){return [...values].filter(([key])=>key.startsWith('allstarsRecovery:')).map(([,value])=>JSON.parse(value))},expireToast(){for(const [id,timer] of timers)if(timer.ms===2000){timers.delete(id);timer.fn()}},login:async(next,hydrateOptions)=>{user={uid:next};return game.hydrateCloudSaveForUser(user,hydrateOptions)}};
 }
-(async()=>{
+if(require.main===module)(async()=>{
   store.set("alice",{pseudo:"Alice",playerState:{credits:100,collection:{one:2},boosterTickets:{premium:1},savedAt:1},deckState:{decks:[],savedAt:1}});
   const pc=device("alice"),phone=device("alice");
   phone.storage.setItem("allstarsPlayerV1",JSON.stringify({credits:99999,collection:{intruder:99},savedAt:999999}));
@@ -114,7 +118,7 @@ scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){ret
   assert.match(exporter.transferUi.accountTransferReview.textContent,/temporairement suspendu/);
   exporter.setPendingTransfer({uid:'export-account',bundle:exported,remote:beforeExport,token:service.progressionToken(beforeExport)});
   await exporter.confirmAccountTransfer();
-  assert.equal(serverReads,readsBefore,'Suspended import neither reads nor writes cloud');
+  assert.equal(serverReads,readsBefore+1,'Unapproved import may read PC authorization metadata but never writes progression');
   assert.deepEqual(store.get('export-account'),importBefore);
   // Preserve a CLEAN complete PC cache before a partial authoritative copy
   // replaces it. No merging (spent resources must not be resurrected).
@@ -125,12 +129,14 @@ scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){ret
   recovery.storage.setItem('allstarsDecks:account:recovery',decksRaw);
   recovery.storage.setItem('allstarsPlayerV1',fullRaw);
   store.set('recovery',{playerState:{credits:350,collection:{[key]:1},careerUnlocked:3},deckState:{decks:[]}});
-  await recovery.login('recovery');
+  await assert.rejects(recovery.login('recovery'),error=>error.code==='allstar/save-protection');
   const copies=recovery.recoveries();
   assert.equal(copies.length,1);
   assert.equal(JSON.parse(copies[0].payload).playerRaw,fullRaw);
   assert.equal(JSON.parse(copies[0].payload).decksRaw,decksRaw);
   assert.equal(recovery.storage.getItem('allstarsPlayerV1'),fullRaw,'Legacy original remains untouched');
+  recovery.storage.setItem('allstarsPlayerV1:account:recovery',JSON.stringify(store.get('recovery').playerState));
+  recovery.storage.setItem('allstarsDecks:account:recovery',JSON.stringify(store.get('recovery').deckState));
   await recovery.login('recovery');
   const secondCount=recovery.recoveries().length;
   await recovery.login('recovery');
@@ -283,3 +289,4 @@ scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){ret
   console.log("Account saves: server authority, account isolation, PC/phone round trip, spent items, conflict with old/new clients and offline retry OK (Firebase mocked).");
   console.log("PC migration: matching account required; complete inventory/decks, earned level, previous cloud backup, preserved online rank and concurrent-change rejection OK.");
 })().catch(error=>{console.error(error);process.exitCode=1});
+module.exports={device,store,service,clone};
