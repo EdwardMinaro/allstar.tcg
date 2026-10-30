@@ -2,7 +2,11 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Nouveautés de la version 0.2.28
+## Nouveautés de la version 0.2.29
+
+- Le profil présente les protège-cartes non possédés en grisé avec un badge. Leur mode d'obtention s'affiche au survol, au clavier ou au toucher, centré sous les choix. Le texte d'explication permanent est retiré.
+
+## Nouveautés précédentes — version 0.2.28
 
 - Sur mobile, le bouton « Verrouiller en paysage » est retiré des options ; l'application conserve son ouverture en paysage et l'import de sauvegarde PC.
 - Sur l'application Windows, les options proposent « Exporter la sauvegarde ». Ce bouton enregistre un fichier JSON à l'emplacement de votre choix, compatible avec l'import mobile du même compte ALLSTAR.

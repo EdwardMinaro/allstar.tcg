@@ -4171,7 +4171,7 @@ function renderProfileStats(profile, connected){
 
 const CARD_SLEEVES=[
   {id:"classic",label:"Classique",filter:"none",art:"assets/branding/allstars_card_back.png"},
-  {id:"halloween",label:"Halloween",filter:"none",art:"assets/branding/allstars_card_back_halloween.png"}
+  {id:"halloween",label:"Halloween",filter:"none",art:"assets/branding/allstars_card_back_halloween.png",acquisition:"Distribué lors de l’événement d’Halloween 2026"}
 ];
 function normalizeSleeveId(id){return CARD_SLEEVES.some(item=>item.id===id)?id:"classic"}
 function ownsCardSleeve(id){return id==="classic"||Boolean(playerState.cosmeticInventory?.sleeves?.[id])}
@@ -4185,12 +4185,22 @@ function setSleeveStyle(el,id){
   el.style.setProperty("--card-back-art",sleeveArt(id));
 }
 function renderSleevePicker(){
-  return `<section class="sleeve-picker"><h3>Protège-cartes</h3><p>Choisis parmi les objets cosmétiques de ton inventaire. Le protège-carte Halloween est offert à ta première connexion du 29 octobre au 19 novembre 2026 inclus.</p><div class="sleeve-options">${CARD_SLEEVES.map(item=>{const owned=ownsCardSleeve(item.id),equipped=equippedCardSleeve()===item.id;return `<button type="button" class="sleeve-option${equipped?" selected":""}" aria-pressed="${equipped}" ${owned?"":"disabled"} onclick="selectCardSleeve('${item.id}')"><span class="sleeve-preview" style="--card-back-filter:${item.filter};--card-back-art:${sleeveArt(item.id)}"></span><strong>${item.label}</strong><small>${!owned?"Non obtenu":equipped?"Équipé":"Choisir"}</small></button>`}).join("")}</div></section>`;
+  return `<section class="sleeve-picker"><h3>Protège-cartes</h3><div class="sleeve-options">${CARD_SLEEVES.map(item=>{
+    const owned=ownsCardSleeve(item.id),equipped=equippedCardSleeve()===item.id;
+    return `<button type="button" class="sleeve-option${equipped?" selected":""}${owned?"":" is-unowned"}" aria-pressed="${equipped}" aria-disabled="${!owned}" aria-describedby="cardSleeveAcquisition" onmouseenter="showSleeveAcquisition('${item.id}')" onfocus="showSleeveAcquisition('${item.id}')" onclick="selectCardSleeve('${item.id}')"><span class="sleeve-preview" style="--card-back-filter:${item.filter};--card-back-art:${sleeveArt(item.id)}">${owned?"":'<span class="collection-count is-unowned sleeve-unowned-badge">Non possédé</span>'}</span><strong>${escapeHtml(item.label)}</strong>${owned?`<small>${equipped?"Équipé":"Choisir"}</small>`:""}</button>`;
+  }).join("")}</div><p id="cardSleeveAcquisition" class="sleeve-acquisition" aria-live="polite" hidden></p></section>`;
+}
+function showSleeveAcquisition(id){
+  const target=document.getElementById("cardSleeveAcquisition");
+  if(!target)return;
+  const item=CARD_SLEEVES.find(sleeve=>sleeve.id===id);
+  target.textContent=item&&!ownsCardSleeve(id)?item.acquisition||"":"";
+  target.hidden=!target.textContent;
 }
 function selectCardSleeve(id){
   if(!CARD_SLEEVES.some(item=>item.id===id))return;
   loadPlayerState();
-  if(!ownsCardSleeve(id))return;
+  if(!ownsCardSleeve(id)){showSleeveAcquisition(id);return;}
   playerState.sleeveId=id;
   savePlayerState();
   renderProfileContent();

@@ -8552,12 +8552,17 @@ body.halloween-active #saveScreen .save-panel{
   filter:var(--card-back-filter,none);pointer-events:none;
 }
 .sleeve-picker{margin-top:20px;padding:16px;border:2px solid #69532a;border-radius:10px;background:#101014}
-.sleeve-picker h3{margin:0 0 6px}.sleeve-picker p{margin:0 0 14px;color:#ddd}
+.sleeve-picker h3{margin:0 0 6px}
+.sleeve-picker .sleeve-acquisition{margin:12px 0 0;color:#ddd;font-size:13px;line-height:1.5;text-align:center}
 .sleeve-options{display:flex;gap:16px;flex-wrap:wrap}
 .sleeve-option{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 20px;border:2px solid #555;border-radius:8px;background:#18181c;color:#fff}
 .sleeve-option.selected{border-color:#ff9c2b;box-shadow:0 0 0 2px #ff9c2b inset}
 .sleeve-preview{position:relative;isolation:isolate;display:block;width:70px;height:100px;border-radius:6px}
 .sleeve-option small{color:#ffc776}
+.sleeve-option.is-unowned{border-color:#494950;color:#c9c9d1;cursor:help}
+.sleeve-option.is-unowned .sleeve-preview:before{filter:grayscale(1) brightness(.48);opacity:.68}
+.sleeve-option.is-unowned:is(:hover,:focus-visible) .sleeve-preview:before{filter:grayscale(1) brightness(.62);opacity:.84}
+.sleeve-unowned-badge{right:-12px;top:0;height:22px;white-space:nowrap}
 
 /* Seasonal colors on the surrounding interface, never on card artwork. */
 body.halloween-active :is(.menu-card,.profile-identity-panel,.profile-level-panel,.profile-rank-panel,.profile-record,.profile-highlights,.collection-toolbar,.collection-preview,.collection-summary,.deck-hub,.deck-editor-shell,.options-block,.challenge-panel,.career-focus,.career-season,.multi-panel,.home-quick-panel,.sleeve-picker){
