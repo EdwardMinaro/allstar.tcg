@@ -4323,6 +4323,9 @@ let cloudSaveHydrating=false;
 let accountSaveSession=null;
 let accountSaveChain=Promise.resolve();
 let pendingAccountTransfer=null;
+// Incident containment: do not replace any shared account save through import.
+const ACCOUNT_TRANSFER_SUSPENDED=true;
+const ACCOUNT_TRANSFER_PAUSE_MESSAGE="Le transfert de sauvegarde est temporairement suspendu après des signalements de pertes de progression. Conservez votre fichier exporté et contactez l’équipe ALLSTAR. Aucun import n’a été effectué.";
 function buildAccountTransferExport(){
   if(!accountSaveSession||cloudSaveHydrating)throw new Error("Connectez-vous à votre compte ALLSTAR avant d’exporter sa sauvegarde.");
   loadPlayerState();loadDeckState();
@@ -4342,7 +4345,9 @@ async function exportAccountSave(){
     const user=await window.AllstarAuthService?.getCurrentUser?.();
     if(!session||session!==accountSaveSession||user?.uid!==session.uid)throw new Error("Connectez-vous à votre compte ALLSTAR avant d’exporter sa sauvegarde.");
     const result=await desktop.exportSave(JSON.stringify(buildAccountTransferExport()));
-    if(!result?.canceled)showSystemToast("Sauvegarde exportée. Vous pouvez l’importer sur mobile avec le même compte ALLSTAR.",6000);
+    if(!result?.canceled)showSystemToast(ACCOUNT_TRANSFER_SUSPENDED
+      ? "Sauvegarde exportée. Conservez ce fichier ; les imports sont temporairement suspendus."
+      : "Sauvegarde exportée. Vous pouvez l’importer sur mobile avec le même compte ALLSTAR.",6000);
   }catch(error){showSystemToast(error.message||"Impossible d’exporter la sauvegarde.",6000);}
   finally{buttons.forEach(button=>button.disabled=false);}
 }
@@ -4355,6 +4360,14 @@ function validateAccountTransfer(bundle,uid){
   return bundle;
 }
 function openAccountTransfer(){
+  if(ACCOUNT_TRANSFER_SUSPENDED){
+    pendingAccountTransfer=null;
+    document.getElementById("accountTransferReview").textContent=ACCOUNT_TRANSFER_PAUSE_MESSAGE;
+    document.getElementById("accountTransferConfirm").hidden=true;
+    document.getElementById("accountTransferFile").disabled=true;
+    document.getElementById("accountTransferOverlay").classList.add("active");
+    return;
+  }
   if(!accountSaveSession){showSystemToast("Connectez-vous au compte ALLSTAR à restaurer.",5000);return;}
   pendingAccountTransfer=null;
   document.getElementById("accountTransferReview").textContent="";
@@ -4387,6 +4400,7 @@ async function reviewAccountTransfer(file){
   const review=document.getElementById("accountTransferReview");
   const button=document.getElementById("accountTransferConfirm");
   pendingAccountTransfer=null;button.hidden=true;
+  if(ACCOUNT_TRANSFER_SUSPENDED){review.textContent=ACCOUNT_TRANSFER_PAUSE_MESSAGE;return;}
   if(!file)return;
   try{
     if(file.size>2e6)throw new Error("Fichier trop volumineux.");
@@ -4402,6 +4416,12 @@ async function reviewAccountTransfer(file){
   }catch(error){review.textContent=error.message;}
 }
 async function confirmAccountTransfer(){
+  if(ACCOUNT_TRANSFER_SUSPENDED){
+    pendingAccountTransfer=null;
+    document.getElementById("accountTransferConfirm").hidden=true;
+    document.getElementById("accountTransferReview").textContent=ACCOUNT_TRANSFER_PAUSE_MESSAGE;
+    return;
+  }
   const pending=pendingAccountTransfer;
   const button=document.getElementById("accountTransferConfirm");
   if(!pending||pending.uid!==accountSaveSession?.uid)return;
@@ -4592,6 +4612,26 @@ function mergePlayerStateForHydration(remotePlayer,localPlayer){
   };
 }
 
+function preserveAccountLocalCopy(uid,reason,runtime=null){
+  // Keep raw, account-scoped bytes: never normalize a recovery copy or merge it
+  // automatically into current progress (spent cards/credits must stay spent).
+  const playerRaw=localStorage.getItem(`allstarsPlayerV1:account:${uid}`);
+  const decksRaw=localStorage.getItem(`allstarsDecks:account:${uid}`);
+  if(playerRaw===null&&decksRaw===null&&!runtime)return;
+  const payload=JSON.stringify({playerRaw,decksRaw,runtime});
+  const index=`allstarsRecoveryLatest:${uid}`;
+  const previousKey=localStorage.getItem(index);
+  const previous=previousKey&&localStorage.getItem(previousKey);
+  if(previous){
+    try{if(JSON.parse(previous).payload===payload)return;}catch{}
+  }
+  const key=`allstarsRecovery:${uid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+  const copy=JSON.stringify({format:"allstar-local-recovery-v1",accountUid:uid,createdAt:Date.now(),reason,payload});
+  // Fail closed if storage is unavailable/full: do not replace the local save.
+  localStorage.setItem(key,copy);
+  if(localStorage.getItem(key)!==copy)throw new Error("La copie de secours locale n’a pas pu être vérifiée. La sauvegarde locale est conservée.");
+  localStorage.setItem(index,key);
+}
 async function hydrateCloudSaveForUser(user){
   if(!user || !window.AllstarSaveService)return false;
   clearTimeout(cloudSaveSyncTimer);
@@ -4599,7 +4639,7 @@ async function hydrateCloudSaveForUser(user){
   await accountSaveChain.catch(()=>{});
   if(accountSaveSession?.dirty){
     // Preserve pending/conflicting work for recovery before taking the server copy.
-    try{localStorage.setItem(`allstarsPending:${accountSaveSession.uid}:${Date.now()}`,JSON.stringify({playerState:serializedPlayerState(),deckState:serializedDeckState()}))}catch{}
+    preserveAccountLocalCopy(accountSaveSession.uid,"pending-before-hydration",{playerState:serializedPlayerState(),deckState:serializedDeckState()});
   }
   accountSaveSession=null;
   const remote=await window.AllstarSaveService.loadPlayerData(user.uid);
@@ -4608,6 +4648,7 @@ async function hydrateCloudSaveForUser(user){
   // Guest/other-account caches never participate in an account merge.
   const nextDecks=remoteDecks;
   const nextPlayer=remotePlayer?JSON.parse(JSON.stringify(remotePlayer)):null;
+  preserveAccountLocalCopy(user.uid,"before-cloud-hydration");
   activateSaveScope(user.uid);
   // The profile document is authoritative for stats; playerState only mirrors it for offline display.
   const cloudProfile=remote&&(remote.level!==undefined||remote.elo!==undefined)

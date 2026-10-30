@@ -2,7 +2,12 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Nouveautés de la version 0.2.32
+## Correctif de protection — version 0.2.33
+
+- Le transfert par import de fichier est temporairement suspendu après des signalements de pertes de progression. Conservez vos fichiers exportés ; cette mise à jour ne restaure pas automatiquement les données manquantes.
+- Avant de charger la progression du compte, le jeu conserve une copie locale brute de la sauvegarde de ce compte déjà présente sur l'appareil, y compris lorsqu'elle n'avait aucune modification en attente. Si cette copie ne peut pas être conservée et vérifiée, le remplacement local est interrompu.
+
+## Nouveautés précédentes — version 0.2.32
 
 - Lorsque le lien est reconnu comme ouvert dans Instagram, l'accueil et le bouton « Installer » expliquent comment l'ouvrir dans un navigateur externe, avec copie du lien et consignes Android/iPhone. L'aide générique mentionne aussi Instagram si son navigateur n'est pas reconnu.
 
