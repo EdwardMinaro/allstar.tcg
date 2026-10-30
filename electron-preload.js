@@ -21,6 +21,9 @@ contextBridge.exposeInMainWorld("AllstarDesktop", {
   getAppVersion() {
     return ipcRenderer.invoke("allstar:get-app-version");
   },
+  exportSave(content) {
+    return ipcRenderer.invoke("allstar:export-save", content);
+  },
   getRememberedCredentials() {
     return ipcRenderer.invoke("allstar:get-remembered-credentials");
   },

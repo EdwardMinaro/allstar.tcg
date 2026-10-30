@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const { app, BrowserWindow, Menu, shell, ipcMain, safeStorage } = require("electron");
+const { app, BrowserWindow, Menu, shell, ipcMain, safeStorage, dialog } = require("electron");
 
 let mainWindow = null;
 let splashWindow = null;
@@ -139,6 +139,23 @@ ipcMain.handle("allstar:set-remembered-credentials", (_event, credentials = {}) 
   } catch {
     return false;
   }
+});
+
+ipcMain.handle("allstar:export-save", async (event, content) => {
+  if(!mainWindow||event.sender!==mainWindow.webContents||event.senderFrame!==mainWindow.webContents.mainFrame)throw new Error("Export non autorisé.");
+  if(typeof content!=="string"||Buffer.byteLength(content,"utf8")>2e6)throw new Error("Fichier de sauvegarde trop volumineux.");
+  const bundle=JSON.parse(content);
+  if(bundle?.format!=="allstar-account-transfer-v1"||typeof bundle.accountUid!=="string"||!bundle.accountUid||!bundle.playerState?.collection||!Array.isArray(bundle.deckState?.decks))throw new Error("Sauvegarde invalide.");
+  const output=JSON.stringify(bundle,null,2)+"\n";
+  if(Buffer.byteLength(output,"utf8")>2e6)throw new Error("Fichier de sauvegarde trop volumineux.");
+  const result=await dialog.showSaveDialog(mainWindow,{
+    title:"Exporter la sauvegarde ALLSTAR",
+    defaultPath:path.join(app.getPath("downloads"),"ALLSTAR-sauvegarde-PC.json"),
+    filters:[{name:"Sauvegarde ALLSTAR",extensions:["json"]}]
+  });
+  if(result.canceled||!result.filePath)return {canceled:true};
+  await fs.promises.writeFile(result.filePath,output,"utf8");
+  return {canceled:false};
 });
 
 function setupAutoUpdater() {

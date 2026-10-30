@@ -36,9 +36,11 @@ const hand=await rect('.hand-area');console.log({oldCard,newCard,hand,ring});ass
 await p.screenshot({path:output+'/mobile-larger-hand.png'});
 assert.equal(await f.$$('.resolution-control').then(a=>a.length),0);assert.equal(await f.$$('.fullscreen-control').then(a=>a.length),0);assert.equal(await f.$$('#shortcutOptions [data-shortcut-action]').then(a=>a.length),0);
 await f.evaluate(()=>{show('homeOptionsScreen');setHomeOptionsTab('shortcuts')});await new Promise(r=>setTimeout(r,450));await p.screenshot({path:output+'/mobile-touch-options.png'});
-await f.evaluate(()=>{setHomeOptionsTab('general');window.parent.requestAllstarLandscape=async()=>({locked:false})});await f.evaluate(()=>document.querySelector('.mobile-landscape-button').click());assert.match(await f.$eval('.mobile-landscape-status',e=>e.textContent),/pas disponible/);
+await f.evaluate(()=>setHomeOptionsTab('general'));
+assert.equal(await f.$$('.mobile-landscape-button').then(a=>a.length),0,'Redundant landscape setting removed');
+assert.equal(await f.$$('.desktop-save-export').then(a=>a.length),0,'PC export is not exposed on mobile');
 await f.evaluate(()=>{window.transferOpened=0;window.openAccountTransfer=()=>transferOpened++;[...document.querySelectorAll('#homeOptionsScreen button')].find(el=>el.textContent.includes('ancienne sauvegarde PC')).click()});
-assert.equal(await f.evaluate(()=>transferOpened),1,'PC recovery remains accessible in options, independently of landscape');
+assert.equal(await f.evaluate(()=>transferOpened),1,'PC recovery remains accessible in mobile options');
 assert.equal(await f.$eval('#accountSaveStatus',el=>el.hidden),true,'Guest has no misleading cloud-save confirmation');
 
 await f.evaluate(()=>{setActiveScreen('menu');closeHomeQuickPanel()});
@@ -53,5 +55,15 @@ const handBox=await rect('#playerHand');assert.equal(await f.$eval('#playerHand'
 await swipe(handBox.x+handBox.width-35,handBox.y+handBox.height/2,-220);assert.ok(await f.$eval('#playerHand',el=>el.scrollLeft)>0,'Long hand scrolls naturally');
 assert.deepEqual(await f.evaluate(()=>musicActions),{next:1,previous:1,pause:1});
 const desktop=await b.newPage();await desktop.goto(testUrl+'/game.html');assert.equal(await desktop.$$('.resolution-control').then(a=>a.length),2);assert.equal(await desktop.$$('#shortcutOptions [data-shortcut-action]').then(a=>a.length),4);
-console.log('Music swipes/double tap, opposite turn, vertical/card exclusions, landscape fallback, desktop controls and exact assembly preserved. Own hand:',oldCard.height,'->',newCard.height);
+assert.equal(await desktop.$$eval('.desktop-save-export',buttons=>buttons.every(button=>button.hidden)),true,'Browser desktop does not expose native-only export');
+await desktop.evaluateOnNewDocument(()=>{window.AllstarDesktop={isElectron:true,getAppVersion:async()=> 'test',exportSave:async()=>({canceled:true})}});
+await desktop.reload();await desktop.waitForFunction(()=>[...document.querySelectorAll('.desktop-save-export')].every(button=>!button.hidden));
+assert.equal(await desktop.$$('.desktop-save-export').then(a=>a.length),2,'Native desktop exposes export in home and match options');
+await desktop.setViewport({width:1360,height:768});
+await desktop.evaluate(()=>{setActiveScreen('homeOptionsScreen');setHomeOptionsTab('general')});
+assert.equal(await desktop.$eval('#homeOptionsScreen .desktop-save-export',button=>getComputedStyle(button).display!=='none'&&button.getBoundingClientRect().width>0),true);
+await desktop.$eval('#homeOptionsScreen .desktop-save-export',button=>button.scrollIntoView({block:'center'}));
+assert.equal(await desktop.$eval('#homeOptionsScreen .desktop-save-export',button=>{const r=button.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight}),true,'Export is reachable at 1360x768');
+await desktop.screenshot({path:output+'/desktop-export-options.png'});
+console.log('Mobile import kept, redundant landscape setting removed, PC-only export visibility and exact assembly verified. Own hand:',oldCard.height,'->',newCard.height);
 }finally{await b.close()}})().catch(e=>{console.error(e);process.exitCode=1});

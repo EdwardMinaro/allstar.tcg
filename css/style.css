@@ -2242,6 +2242,8 @@ body.halloween-active #menu .home-quick-actions button:hover{
   margin-top:6px;
 }
 
+.desktop-save-export[hidden]{display:none!important}
+
 .profile-action{
   min-height:46px;
   border:3px solid #1b6fa9;

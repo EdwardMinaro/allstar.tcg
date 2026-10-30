@@ -4313,6 +4313,29 @@ let cloudSaveHydrating=false;
 let accountSaveSession=null;
 let accountSaveChain=Promise.resolve();
 let pendingAccountTransfer=null;
+function buildAccountTransferExport(){
+  if(!accountSaveSession||cloudSaveHydrating)throw new Error("Connectez-vous à votre compte ALLSTAR avant d’exporter sa sauvegarde.");
+  loadPlayerState();loadDeckState();
+  const bundle=JSON.parse(JSON.stringify({
+    format:"allstar-account-transfer-v1",accountUid:accountSaveSession.uid,createdAt:Date.now(),
+    playerState:serializedPlayerState(),deckState:serializedDeckState()
+  }));
+  return validateAccountTransfer(bundle,accountSaveSession.uid);
+}
+async function exportAccountSave(){
+  const desktop=window.AllstarDesktop;
+  if(!desktop?.isElectron||typeof desktop.exportSave!=="function")return;
+  const buttons=document.querySelectorAll(".desktop-save-export");
+  buttons.forEach(button=>button.disabled=true);
+  try{
+    const session=accountSaveSession;
+    const user=await window.AllstarAuthService?.getCurrentUser?.();
+    if(!session||session!==accountSaveSession||user?.uid!==session.uid)throw new Error("Connectez-vous à votre compte ALLSTAR avant d’exporter sa sauvegarde.");
+    const result=await desktop.exportSave(JSON.stringify(buildAccountTransferExport()));
+    if(!result?.canceled)showSystemToast("Sauvegarde exportée. Vous pouvez l’importer sur mobile avec le même compte ALLSTAR.",6000);
+  }catch(error){showSystemToast(error.message||"Impossible d’exporter la sauvegarde.",6000);}
+  finally{buttons.forEach(button=>button.disabled=false);}
+}
 function validateAccountTransfer(bundle,uid){
   if(bundle?.format!=="allstar-account-transfer-v1"||bundle.accountUid!==uid)throw new Error("Cette sauvegarde ne correspond pas au compte connecté.");
   const player=bundle.playerState,decks=bundle.deckState;
@@ -11532,6 +11555,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
   runAllstarAudit();
   wireSaveScreen();
   wireDisplayOptions();
+  document.querySelectorAll(".desktop-save-export").forEach(button=>{
+    button.hidden=!window.AllstarDesktop?.isElectron;
+  });
   wireQuickShortcuts();
   showInstalledVersion();
   void window.AllstarFirebaseService?.warmup?.().then(services=>{

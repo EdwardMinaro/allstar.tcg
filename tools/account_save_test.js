@@ -21,7 +21,8 @@ function device(uid){
   const status={textContent:'',hidden:true};const timers=new Map();let timerId=0;
   const document={addEventListener(){},getElementById(id){return id==='accountSaveStatus'?status:null},querySelector(){return null},querySelectorAll(){return[]}};
   const game=Function("window","document","localStorage","setTimeout","clearTimeout",source+`
-return {hydrateCloudSaveForUser,pushCloudSaveNow,queueCloudSave,notifyAccountProgressSaved,validateAccountTransfer,buildAccountTransferData,
+return {hydrateCloudSaveForUser,pushCloudSaveNow,queueCloudSave,notifyAccountProgressSaved,validateAccountTransfer,buildAccountTransferData,buildAccountTransferExport,
+setExportState(player,decks){playerState={...JSON.parse(JSON.stringify(player)),loaded:true};deckState={...JSON.parse(JSON.stringify(decks)),loaded:true}},
 firstKey(){return cardKey(CARD_DATA[0])},normalize:window.AllstarRankingService.normalizeProgress,
 setState(credits,tickets={}){playerState={loaded:true,credits,collection:{one:2},boosterTickets:tickets,savedAt:1};deckState={loaded:true,decks:[],savedAt:1};},
 scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){return accountSaveSession}};`)(window,document,storage,(fn,ms)=>{timers.set(++timerId,{fn,ms});return timerId},id=>timers.delete(id));
@@ -78,6 +79,25 @@ scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){ret
   const beforeRace=clone(store.get("bob"));store.get("bob").level=25;
   await assert.rejects(service.commitProgression("bob",migrated,service.progressionToken(beforeRace),service.migrationProfileToken(beforeRace)),error=>error.code==="allstar/save-conflict");
   assert.equal(store.get("bob").level,25,"Concurrent earned progress cannot be overwritten by migration");
+  const exporter=device('export-account');
+  assert.throws(()=>exporter.buildAccountTransferExport(),/Connectez-vous/,'Guests cannot create an account-bound import file');
+  store.set('export-account',{playerState:{credits:0,collection:{}},deckState:{decks:[]}});
+  await exporter.login('export-account');
+  exporter.setExportState({credits:666,collection:{[key]:3},boosterTickets:{premium:2},careerUnlocked:12,sleeveId:'halloween',cosmeticInventory:{sleeves:{halloween:true}},profileProgress:{level:24,xp:1200,titles:['Champion']}},{decks:[{id:'desktop',name:'Mon deck',cards:[key]}],selectedId:'desktop'});
+  exporter.storage.setItem('rememberedCredentials',JSON.stringify({password:'NOT_IN_THE_EXPORT'}));
+  const beforeExport=clone(store.get('export-account'));
+  const exported=exporter.buildAccountTransferExport();
+  exporter.validateAccountTransfer(JSON.parse(JSON.stringify(exported)),'export-account');
+  assert.throws(()=>exporter.validateAccountTransfer(exported,'other-account'),/compte/);
+  assert.equal(exported.playerState.credits,666);assert.equal(exported.playerState.collection[key],3);
+  assert.equal(exported.playerState.boosterTickets.premium,2);assert.equal(exported.playerState.careerUnlocked,12);
+  assert.equal(exported.playerState.profileProgress.level,24);assert.equal(exported.deckState.selectedId,'desktop');
+  assert.deepEqual(exported.deckState.decks[0].cards,[key]);
+  assert.equal(JSON.stringify(exported).includes('NOT_IN_THE_EXPORT'),false);
+  assert.deepEqual(store.get('export-account'),beforeExport,'Export does not write cloud progress');
+  const restored=exporter.buildAccountTransferData(exported,beforeExport);
+  assert.equal(restored.collection[key],3);assert.equal(restored.playerState.credits,666);assert.equal(restored.decks.selectedId,'desktop');
+  console.log('Desktop export: complete account-bound JSON accepted by mobile import, no credential leakage or cloud writes.');
   console.log("Account saves: server authority, account isolation, PC/phone round trip, spent items, conflict with old/new clients and offline retry OK (Firebase mocked).");
   console.log("PC migration: matching account required; complete inventory/decks, earned level, previous cloud backup, preserved online rank and concurrent-change rejection OK.");
 })().catch(error=>{console.error(error);process.exitCode=1});

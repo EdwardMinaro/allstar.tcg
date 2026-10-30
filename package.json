@@ -1,13 +1,13 @@
 {
   "name": "allstar-desktop",
-  "version": "0.2.27",
+  "version": "0.2.28",
   "private": true,
   "description": "ALLSTAR desktop build",
   "author": "ALLSTAR",
   "main": "electron-main.js",
   "scripts": {
     "mobile:preview": "node tools/mobile_preview_server.cjs",
-    "test:accounts": "node tools/account_save_test.js",
+    "test:accounts": "node tools/account_save_test.js && node tools/desktop_save_export_test.cjs",
     "test:mobile": "node tools/mobile_controls_browser_test.cjs",
     "test:mobile-audio": "node tools/mobile_audio_browser_test.cjs",
     "start": "electron .",

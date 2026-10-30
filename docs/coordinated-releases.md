@@ -1,6 +1,6 @@
 # Publication Windows et mobile
 
-Le workflow existant **Publish Windows Release** est conservé. La modification locale ajoute la construction mobile depuis le même commit et la même version, puis la publication Firebase juste avant la release Windows. Seule la branche `main` peut publier. L'adresse mobile reste `https://allstar-mobile-65102.web.app/`.
+Le workflow **Publish Windows Release** construit le mobile depuis le même commit et la même version que Windows, puis publie Firebase juste avant la release Windows. La publication commune0.2.27 a réussi. Seule la branche `main` peut publier. L'adresse mobile reste `https://allstar-mobile-65102.web.app/`.
 
 ## Parcours prévu
 
@@ -28,9 +28,10 @@ Configuration active :
 - Projet existant : `allstar-65102` (`516002177429`).
 - Compte technique : `allstar-mobile-release@allstar-65102.iam.gserviceaccount.com`.
 - Rôles projet : `roles/firebasehosting.admin` (gestion de l'hébergement, y compris les sites du projet) et `roles/serviceusage.apiKeysViewer` (lecture des clés API de configuration requise par la CLI). Aucun rôle d'administration Auth, Firestore ou Realtime Database.
+- Après l'erreur403 de la première tentative de déploiement, Anthony a aussi explicitement autorisé `roles/serviceusage.serviceUsageViewer` : lecture de l'état/configuration des services, nécessaire à la vérification de Hosting par la CLI. Ce droit a été ajouté et vérifié avant la relance réussie.
 - Pool d'identités `allstar-releases`, fournisseur `github`, issuer `https://token.actions.githubusercontent.com`. Activer les API IAM, IAM Credentials et Security Token Service si nécessaire.
 - Confiance limitée au dépôt GitHub ID `1298128377`, propriétaire ID `302782871`, branche `refs/heads/main`, workflow `EdwardMinaro/allstar.tcg/.github/workflows/publish-release.yml@refs/heads/main` (casse canonique retournée par GitHub).
 - `roles/iam.workloadIdentityUser` sur ce seul compte technique pour le principal du dépôt dans ce pool.
 - Aucun fichier de clé privée à générer ou à mettre dans GitHub. Les identifiants temporaires créés par l'action sont exclus du dépôt et du contenu publié.
 
-Les autres politiques IAM ont été conservées avec leur etag. Aucun secret ou réglage GitHub supplémentaire à saisir : le workflow utilise son GITHUB_TOKEN natif et l'identité OIDC temporaire. Il reste à mettre les fichiers du workflow sur GitHub pour qu'il utilise cette configuration. Le premier lancement distant reste à valider lors de la prochaine release : cette étape ne déclenche aucune nouvelle publication du jeu. Augmenter la version package.json pour une nouvelle release comme auparavant ; ne jamais réutiliser un tag pointant vers un autre commit.
+Les autres politiques IAM ont été conservées avec leur etag. Aucun secret ou réglage GitHub supplémentaire à saisir : le workflow utilise son GITHUB_TOKEN natif et l'identité OIDC temporaire. Le workflow est en place sur GitHub et la publication commune a été validée avec0.2.27. Augmenter la version package.json pour une nouvelle release comme auparavant ; ne jamais réutiliser un tag pointant vers un autre commit.

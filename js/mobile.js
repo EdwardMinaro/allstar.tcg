@@ -12,24 +12,20 @@
   });
   document.querySelectorAll(".display-options").forEach(section=>{
     const sessionActions=section.querySelector(".profile-actions");
-    section.innerHTML='<div class="mobile-landscape-options"><strong>Format paysage</strong><button type="button" class="mobile-landscape-button">Verrouiller en paysage</button><p class="mobile-landscape-status" role="status">Le jeu se joue à l’horizontale.</p></div>';
+    section.replaceChildren();
     if(sessionActions)section.append(sessionActions);
+    else section.remove();
   });
   const generalOptions=document.querySelector('#homeOptionsScreen .display-options');
   if(generalOptions){
     const transfer=document.createElement('button');
-    transfer.type='button';transfer.className='mobile-landscape-button mobile-transfer-button';
+    transfer.type='button';transfer.className='mobile-option-button mobile-transfer-button';
     transfer.textContent='Récupérer une ancienne sauvegarde PC';
     transfer.onclick=()=>window.openAccountTransfer?.();
-    generalOptions.querySelector('.mobile-landscape-button').after(transfer);
+    const block=document.createElement('div');block.className='mobile-save-options';
+    const title=document.createElement('strong');title.textContent='Sauvegarde PC';
+    block.append(title,transfer);generalOptions.prepend(block);
   }
-  document.querySelectorAll(".mobile-landscape-options .mobile-landscape-button:not(.mobile-transfer-button)").forEach(button=>button.onclick=async()=>{
-    let locked=false;
-    try{locked=Boolean((await window.parent.requestAllstarLandscape?.())?.locked)}catch{}
-    document.querySelectorAll(".mobile-landscape-status").forEach(status=>{
-      status.textContent=locked?"Paysage verrouillé.":"Tournez le téléphone en paysage. Le verrouillage automatique n’est pas disponible ici.";
-    });
-  });
   let gesture=null,lastTap=null;
   function excluded(target){
     return !target?.closest||Boolean(target.closest('button,a,input,select,textarea,label,summary,[role="button"],[contenteditable="true"],.game-card,.hand,.log,.inventory-card,.deck-thumb'));

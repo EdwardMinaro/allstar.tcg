@@ -2,7 +2,12 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Nouveautés de la version 0.2.27
+## Nouveautés de la version 0.2.28
+
+- Sur mobile, le bouton « Verrouiller en paysage » est retiré des options ; l'application conserve son ouverture en paysage et l'import de sauvegarde PC.
+- Sur l'application Windows, les options proposent « Exporter la sauvegarde ». Ce bouton enregistre un fichier JSON à l'emplacement de votre choix, compatible avec l'import mobile du même compte ALLSTAR.
+
+## Nouveautés précédentes — version 0.2.27
 
 - ALLSTAR est désormais accessible sur téléphone en paysage : [ouvrir ALLSTAR Mobile](https://allstar-mobile-65102.web.app/). L'ajout à l'écran d'accueil permet de le lancer depuis son icône.
 - Les comptes partagent leur collection, leurs decks, leurs crédits et leur progression entre PC et téléphone. Les sauvegardes du compte sont lues sur le serveur, avec protection contre l'écrasement par un appareil resté sur une ancienne progression. Le mode invité reste local.
