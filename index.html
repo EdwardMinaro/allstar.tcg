@@ -906,6 +906,17 @@
   </div>
 </div>
 <script src="js/audio.js"></script>
+<div class="overlay" id="accountSaveProtection" role="dialog" aria-modal="true" aria-labelledby="accountSaveProtectionTitle">
+  <div class="splash level-reward-splash">
+    <h2 id="accountSaveProtectionTitle">Sauvegarde protégée</h2>
+    <p id="accountSaveProtectionMessage"></p>
+    <p>Aucune fusion automatique n’est effectuée. Conservez vos fichiers et vos copies locales.</p>
+    <div class="overlay-actions">
+      <button class="small-btn" onclick="document.getElementById('accountSaveProtection').classList.remove('active');openAccountTransfer()">Fichier de récupération vérifié</button>
+      <button class="small-btn dark" onclick="closeAccountSaveProtection()">Retour à la connexion</button>
+    </div>
+  </div>
+</div>
 <script src="js/firebaseConfig.js"></script>
 <script src="js/firebaseService.js"></script>
 <script src="js/profileService.js"></script>

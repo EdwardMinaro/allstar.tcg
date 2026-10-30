@@ -93,9 +93,14 @@ jobs:
           python-version: '3.12'
 
       - name: Prepare mobile build tools
+        # Recovery is a supported operation: validate the binary archive reader
+        # on synthetic fixtures before distributing this release.
+        # No real player files belong in CI or release artifacts.
         shell: pwsh
         run: |
           python -m pip install Pillow==11.3.0
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/read_local_storage_archive_test.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
             choco install ffmpeg --no-progress -y

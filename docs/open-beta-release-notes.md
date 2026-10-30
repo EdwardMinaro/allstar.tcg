@@ -2,7 +2,15 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Récupérations contrôlées — version 0.2.34
+## Protection des sauvegardes — version 0.2.35
+
+- En jeu normal, un enregistrement qui ferait disparaître des cartes ou régresser la carrière est refusé. Les dépenses de crédits et de tickets restent possibles.
+- Avant un enregistrement, une copie de secours du compte est conservée dans la même transaction : première copie de référence et jusqu'à cinq copies récentes. Les copies locales sont également conservées.
+- Une ancienne sauvegarde PC identifiée comme appartenant au même compte et plus complète, ou un profil connu sans sauvegarde cohérente, déclenche une vérification avant de continuer. Aucun nouveau départ n'est créé automatiquement dans ce cas. Les fichiers de récupération vérifiés restent utilisables.
+- Le chargement vérifie l'écriture locale et l'identité de la session ; une réponse tardive d'un autre compte ne peut pas remplacer le chargement courant.
+- L'outillage de récupération d'archives locales et des historiques de secours est désormais conservé et testé dans le projet. Les imports ordinaires restent suspendus.
+
+## Récupérations contrôlées précédentes — version 0.2.34
 
 - Les imports ordinaires restent suspendus. Seuls les fichiers de récupération examinés par l'équipe peuvent être proposés puis confirmés sur le compte correspondant. Leur contenu est vérifié à la sélection et à la confirmation ; un même fichier ne peut pas être réappliqué après une récupération réussie.
 - La première copie de secours du compte est conservée lors de ces récupérations. Les protections de copie locale de la version 0.2.33 restent actives.

@@ -46,7 +46,7 @@
     const progress = {...profile};
     // Never mirror entire user saves into profileProgress (or write stale
     // inventory/decks back when settling a match or changing a title).
-    for(const key of ["playerState","deckState","collection","decks","mobileMigrationBackup","cloudSaveRevision","accountRecoveryReceipts"])delete progress[key];
+    for(const key of ["playerState","deckState","collection","decks","mobileMigrationBackup","cloudSaveRevision","accountRecoveryReceipts","cloudSaveHistory"])delete progress[key];
     progress.level = Math.max(1, Number(progress.level) || 1);
     progress.xp = Math.max(0, Number(progress.xp) || 0);
     progress.totalXp = Math.max(0, Number(progress.totalXp) || 0);

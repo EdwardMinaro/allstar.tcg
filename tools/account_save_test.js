@@ -53,7 +53,7 @@ scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){ret
   // An old client updates maps without advancing cloudSaveRevision.
   store.get("alice").playerState.credits=75;
   phone.setState(60);await assert.rejects(phone.pushCloudSaveNow(),error=>error.code==="allstar/save-conflict");
-  store.set("bob",{playerState:{credits:3},deckState:{decks:[]}});
+  store.set("bob",{playerState:{credits:3,collection:{one:2}},deckState:{decks:[]}});
   await phone.login("bob");assert.equal(JSON.parse(phone.storage.getItem(phone.scope().player)).credits,3);
   assert.match(phone.scope().player,/:account:bob$/);
   assert.equal(JSON.parse(phone.storage.getItem("allstarsPlayerV1:account:alice")).credits,80);
@@ -210,6 +210,73 @@ scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){ret
   assert.equal(store.get('post-commit-offline').accountRecoveryReceipts[failedDisplayHash],true);
   assert.match(failedDisplay.transferUi.accountTransferReview.textContent,/bien été enregistrée/);
   assert.equal(failedDisplay.session(),null,'Failed reload cannot save stale runtime over committed recovery');
+  const guarded={playerState:{credits:100,collection:{[key]:3},careerUnlocked:4,savedAt:1},deckState:{decks:[{id:'only',cards:[key]}]}};
+  store.set('guarded',clone(guarded));
+  function payload(player){return {playerState:player,deckState:clone(guarded.deckState),collection:clone(player.collection),decks:clone(guarded.deckState)}}
+  for(const change of [p=>p.collection[key]--,p=>p.careerUnlocked--,p=>p.credits=-1]){
+    const player=clone(guarded.playerState);change(player);
+    await assert.rejects(service.commitProgression('guarded',payload(player),service.progressionToken(store.get('guarded'))),error=>error.code==='allstar/save-protection');
+    assert.deepEqual(store.get('guarded'),guarded,'Invalid/regressing writes cannot alter the account');
+  }
+  await assert.rejects(service.saveCollection('guarded',{}),error=>error.code==='allstar/unsafe-save');
+  const purchase=clone(guarded.playerState);purchase.credits=20;purchase.collection[key]=4;
+  await service.commitProgression('guarded',payload(purchase),service.progressionToken(store.get('guarded')));
+  const baseline=clone(store.get('guarded').cloudSaveHistory.baseline);
+  assert.equal(baseline.playerState.credits,100);assert.equal(baseline.playerState.collection[key],3);
+  for(let i=0;i<12;i++){
+    const player=clone(store.get('guarded').playerState);player.credits++;
+    await service.commitProgression('guarded',payload(player),service.progressionToken(store.get('guarded')));
+  }
+  assert.deepEqual(store.get('guarded').cloudSaveHistory.baseline,baseline,'First cloud recovery point is immutable');
+  assert.equal(store.get('guarded').cloudSaveHistory.recent.length,5);
+  const recentBefore=clone(store.get('guarded').cloudSaveHistory.recent);
+  const timestampOnly=clone(store.get('guarded').playerState);timestampOnly.savedAt=10000;
+  await service.commitProgression('guarded',payload(timestampOnly),service.progressionToken(store.get('guarded')));
+  assert.deepEqual(store.get('guarded').cloudSaveHistory.recent,recentBefore,'Reload timestamps do not evict meaningful recovery points');
+  const tooLarge=clone(timestampOnly);tooLarge.limitedRewards={padding:'x'.repeat(800000)};
+  const beforeLarge=clone(store.get('guarded'));
+  await assert.rejects(service.commitProgression('guarded',payload(tooLarge),service.progressionToken(beforeLarge)),error=>error.code==='allstar/save-protection');
+  assert.deepEqual(store.get('guarded'),beforeLarge,'Oversized saves fail before the atomic update');
+  assert.equal(phone.normalize(store.get('guarded')).cloudSaveHistory,undefined,'History never recurses into profile mirrors');
+  const oldPc=device('legacy-owner');
+  const oldPcPlayer={credits:50,collection:{[key]:8},careerUnlocked:24,profileProgress:{uid:'legacy-owner',level:23}};
+  oldPc.storage.setItem('allstarsPlayerV1',JSON.stringify(oldPcPlayer));
+  oldPc.storage.setItem('allstarsDecks',JSON.stringify({decks:[{id:'pc',cards:[key]}]}));
+  store.set('legacy-owner',{playerState:{credits:350,collection:{[key]:1},careerUnlocked:3},deckState:{decks:[]},level:23});
+  const oldPcRemote=clone(store.get('legacy-owner'));
+  await assert.rejects(oldPc.login('legacy-owner'),error=>error.code==='allstar/save-protection');
+  assert.equal(oldPc.session().blocked,true);
+  assert.deepEqual(store.get('legacy-owner'),oldPcRemote);
+  assert.equal(oldPc.storage.getItem('allstarsPlayerV1'),JSON.stringify(oldPcPlayer));
+  assert(oldPc.recoveries().some(copy=>copy.source==='legacy'),'Same-account old PC copy is preserved explicitly');
+  await assert.rejects(oldPc.pushCloudSaveNow(),error=>error.code==='allstar/save-protection');
+  const brokenBundle={...clone(approved),accountUid:'broken-cloud'};
+  const brokenHash=crypto.createHash('sha256').update(JSON.stringify(stable(brokenBundle))).digest('hex');
+  const broken=device('broken-cloud',[brokenHash]);
+  store.set('broken-cloud',{playerState:{credits:350,collection:{[key]:1},careerUnlocked:3},deckState:{decks:[]},level:23,careerXpWins:{career_24_Final:true}});
+  await assert.rejects(broken.login('broken-cloud'),error=>error.code==='allstar/save-protection');
+  assert.equal(broken.session().blocked,true);
+  await broken.reviewAccountTransfer({size:1000,text:async()=>JSON.stringify(brokenBundle)});
+  await broken.confirmAccountTransfer();
+  assert.equal(store.get('broken-cloud').playerState.careerUnlocked,24,'Reviewed recovery remains available from blocked login');
+  assert.notEqual(broken.session()?.blocked,true);
+  const missing=device('missing-progress');store.set('missing-progress',{level:23,totalXp:9000,collection:{}});
+  await assert.rejects(missing.login('missing-progress'),error=>error.code==='allstar/save-protection');
+  assert.equal(store.get('missing-progress').playerState,undefined,'A known profile never receives an automatic replacement starter');
+  const silent=device('silent-write');store.set('silent-write',clone(guarded));
+  const silentSet=silent.storage.setItem;
+  silent.storage.setItem=(k,v)=>{if(k!=='allstarsPlayerV1:account:silent-write')silentSet(k,v)};
+  await assert.rejects(silent.login('silent-write'),error=>error.code==='allstar/save-protection');
+  assert.equal(silent.session(),null,'A failed local cache readback cannot become an active saving session');
+  const racing=device('slow-A');store.set('slow-A',clone(guarded));store.set('fast-B',clone(guarded));
+  const originalLoad=service.loadPlayerData;let releaseSlow;
+  service.loadPlayerData=async uid=>uid==='slow-A'?new Promise(resolve=>{releaseSlow=()=>resolve(clone(store.get(uid)))}):originalLoad(uid);
+  const slow=racing.login('slow-A');const staleRejected=assert.rejects(slow,error=>error.code==='allstar/save-superseded');
+  while(!releaseSlow)await Promise.resolve();
+  await racing.login('fast-B');releaseSlow();await staleRejected;service.loadPlayerData=originalLoad;
+  assert.equal(racing.session().uid,'fast-B');assert.match(racing.scope().player,/:fast-B$/);
+  assert.equal(racing.storage.getItem('allstarsPlayerV1:account:slow-A'),null,'Late responses cannot write the wrong account cache');
+  console.log('Save protection: ordinary card/career regression refused, spending allowed, bounded atomic cloud history, legacy/known-profile checks, cache readback and concurrent logins verified.');
   console.log('Verified recovery: exact file hashes, account binding, read-only preview, tamper/conflict rejection, preserved backup/rank, double confirm, one-time receipt and post-commit offline behavior OK.');
   console.log('Incident protection: import handlers suspended without cloud writes; clean local caches preserved byte-for-byte; immutable recovery, deduplication and storage failure verified.');
   console.log('Desktop export: complete account-bound JSON accepted by mobile import, no credential leakage or cloud writes.');

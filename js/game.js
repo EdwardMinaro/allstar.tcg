@@ -4053,6 +4053,7 @@ function escapeHtml(value){
   }[char]));
 }
 function profileErrorMessage(error){
+  if(error?.code==="allstar/save-protection")return error.message;
   const code=String(error?.code || error?.message || "");
   if(code.includes("auth/email-already-in-use"))return "Cette adresse est déjà utilisée.";
   if(code.includes("auth/invalid-email"))return "Adresse e-mail invalide.";
@@ -4320,6 +4321,7 @@ function profileResultMessage(action,result){
 }
 let cloudSaveSyncTimer=null;
 let cloudSaveHydrating=false;
+let cloudSaveHydrationRequest=0;
 let accountSaveSession=null;
 let accountSaveChain=Promise.resolve();
 let pendingAccountTransfer=null;
@@ -4341,7 +4343,7 @@ async function approvedAccountRecoveryHash(bundle){
   return APPROVED_ACCOUNT_RECOVERY_HASHES.includes(hash)?hash:null;
 }
 function buildAccountTransferExport(){
-  if(!accountSaveSession||cloudSaveHydrating)throw new Error("Connectez-vous à votre compte ALLSTAR avant d’exporter sa sauvegarde.");
+  if(!accountSaveSession||accountSaveSession.blocked||cloudSaveHydrating)throw new Error("Connectez-vous à votre compte ALLSTAR et terminez sa vérification avant d’exporter sa sauvegarde.");
   loadPlayerState();loadDeckState();
   const bundle=JSON.parse(JSON.stringify({
     format:"allstar-account-transfer-v1",accountUid:accountSaveSession.uid,createdAt:Date.now(),
@@ -4462,6 +4464,7 @@ async function confirmAccountTransfer(){
   finally{button.disabled=false;accountTransferCommitting=false;}
 }
 function activateSaveScope(uid=null){
+  ++cloudSaveHydrationRequest;
   clearTimeout(cloudSaveSyncTimer);
   PLAYER_STORAGE_KEY=uid?`allstarsPlayerV1:account:${uid}`:"allstarsPlayerV1";
   DECK_STORAGE_KEY=uid?`allstarsDecks:account:${uid}`:"allstarsDecks";
@@ -4482,6 +4485,12 @@ async function notifyAccountProgressSaved(){
   try{await pushCloudSaveNow()}catch(error){reportCloudSaveFailure(error);}
 }
 function reportCloudSaveFailure(error){
+  if(error?.code==="allstar/save-protection"){
+    if(accountSaveSession)accountSaveSession.blocked=true;
+    cloudSaveStatus(error.message);
+    showAccountSaveProtection(error.message);
+    return;
+  }
   cloudSaveStatus(error?.code==="allstar/save-conflict"
     ? "Le compte a été utilisé sur un autre appareil. Reconnecte-toi pour charger sa progression."
     : "Sauvegarde du compte en attente. Reste sur cet appareil et réessaie avec une connexion Internet.");
@@ -4531,6 +4540,7 @@ function serializedDeckState(){
 async function pushCloudSaveNow(){
   if(cloudSaveHydrating || !accountSaveSession || !window.AllstarAuthService || !window.AllstarSaveService)return;
   const session=accountSaveSession;
+  if(session.blocked)throw Object.assign(new Error("La sauvegarde doit être vérifiée avant de reprendre."),{code:"allstar/save-protection"});
   if(session.conflict)throw Object.assign(new Error("Reconnecte-toi pour charger la progression du compte."),{code:"allstar/save-conflict"});
   const user=await window.AllstarAuthService.getCurrentUser();
   if(user?.uid!==session.uid||session!==accountSaveSession)return;
@@ -4559,7 +4569,7 @@ async function pushCloudSaveNow(){
   return write.catch(error=>{reportCloudSaveFailure(error);throw error;});
 }
 function queueCloudSave(){
-  if(cloudSaveHydrating || !accountSaveSession || !window.AllstarAuthService || !window.AllstarSaveService)return;
+  if(cloudSaveHydrating || !accountSaveSession || accountSaveSession.blocked || !window.AllstarAuthService || !window.AllstarSaveService)return;
   accountSaveSession.generation++;
   accountSaveSession.dirty=true;
   if(cloudSaveStatusTimer)cloudSaveStatus("");
@@ -4632,43 +4642,89 @@ function mergePlayerStateForHydration(remotePlayer,localPlayer){
   };
 }
 
-function preserveAccountLocalCopy(uid,reason,runtime=null){
+function preserveAccountLocalCopy(uid,reason,runtime=null,legacy=false){
   // Keep raw, account-scoped bytes: never normalize a recovery copy or merge it
   // automatically into current progress (spent cards/credits must stay spent).
-  const playerRaw=localStorage.getItem(`allstarsPlayerV1:account:${uid}`);
-  const decksRaw=localStorage.getItem(`allstarsDecks:account:${uid}`);
+  const playerRaw=localStorage.getItem(legacy?"allstarsPlayerV1":`allstarsPlayerV1:account:${uid}`);
+  const decksRaw=localStorage.getItem(legacy?"allstarsDecks":`allstarsDecks:account:${uid}`);
   if(playerRaw===null&&decksRaw===null&&!runtime)return;
   const payload=JSON.stringify({playerRaw,decksRaw,runtime});
-  const index=`allstarsRecoveryLatest:${uid}`;
+  const index=`allstarsRecoveryLatest:${uid}${legacy?":legacy":""}`;
   const previousKey=localStorage.getItem(index);
   const previous=previousKey&&localStorage.getItem(previousKey);
   if(previous){
     try{if(JSON.parse(previous).payload===payload)return;}catch{}
   }
   const key=`allstarsRecovery:${uid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
-  const copy=JSON.stringify({format:"allstar-local-recovery-v1",accountUid:uid,createdAt:Date.now(),reason,payload});
+  const copy=JSON.stringify({format:"allstar-local-recovery-v1",accountUid:uid,createdAt:Date.now(),reason,source:legacy?"legacy":"account",payload});
   // Fail closed if storage is unavailable/full: do not replace the local save.
   localStorage.setItem(key,copy);
   if(localStorage.getItem(key)!==copy)throw new Error("La copie de secours locale n’a pas pu être vérifiée. La sauvegarde locale est conservée.");
   localStorage.setItem(index,key);
 }
+function showAccountSaveProtection(message){
+  const text=document.getElementById("accountSaveProtectionMessage");
+  if(text)text.textContent=message;
+  document.getElementById("accountSaveProtection")?.classList.add("active");
+}
+function closeAccountSaveProtection(){
+  document.getElementById("accountSaveProtection")?.classList.remove("active");
+  accountSaveSession=null;
+  G=null;
+  show("saveScreen");renderSaveScreen();
+}
+function protectedSaveLoad(uid,remote,message){
+  accountSaveSession={uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false,blocked:true};
+  showAccountSaveProtection(message);
+  throw Object.assign(new Error(message),{code:"allstar/save-protection"});
+}
+function earnedCareerFloor(remote){
+  const wins=remote?.careerXpWins||remote?.playerState?.profileProgress?.careerXpWins||{};
+  return Math.max(0,...Object.entries(wins).filter(([,won])=>won===true).map(([key])=>Number(/^career_(\d+)_/.exec(key)?.[1])||0));
+}
 async function hydrateCloudSaveForUser(user){
   if(!user || !window.AllstarSaveService)return false;
+  const request=++cloudSaveHydrationRequest;
+  const currentRequest=()=>{
+    if(request!==cloudSaveHydrationRequest)throw Object.assign(new Error("Chargement remplacé par une autre connexion."),{code:"allstar/save-superseded"});
+  };
   clearTimeout(cloudSaveSyncTimer);
   // Wait for this device's in-flight writes before reading the authoritative save.
   await accountSaveChain.catch(()=>{});
+  currentRequest();
   if(accountSaveSession?.dirty){
     // Preserve pending/conflicting work for recovery before taking the server copy.
     preserveAccountLocalCopy(accountSaveSession.uid,"pending-before-hydration",{playerState:serializedPlayerState(),deckState:serializedDeckState()});
   }
   accountSaveSession=null;
   const remote=await window.AllstarSaveService.loadPlayerData(user.uid);
+  currentRequest();
+  const authenticated=await window.AllstarAuthService?.getCurrentUser?.();
+  currentRequest();
+  if(authenticated?.uid!==user.uid)throw Object.assign(new Error("Le compte connecté a changé pendant le chargement."),{code:"allstar/save-superseded"});
   const remotePlayer=remotePlayerState(remote);
   const remoteDecks=remoteDeckState(remote);
   // Guest/other-account caches never participate in an account merge.
   const nextDecks=remoteDecks;
   const nextPlayer=remotePlayer?JSON.parse(JSON.stringify(remotePlayer)):null;
   preserveAccountLocalCopy(user.uid,"before-cloud-hydration");
+  let legacy=null;
+  try{legacy=JSON.parse(localStorage.getItem("allstarsPlayerV1")||"null");}catch{}
+  if(legacy?.profileProgress?.uid===user.uid)preserveAccountLocalCopy(user.uid,"legacy-before-cloud-hydration",null,true);
+  const established=Number(remote?.level)>1||Number(remote?.totalXp)>0||Number(remote?.rankedMatches)>0;
+  const completePlayer=remotePlayer&&typeof remotePlayer.collection==="object"&&!Array.isArray(remotePlayer.collection)&&Number.isSafeInteger(remotePlayer.credits)&&remotePlayer.credits>=0;
+  if(remote?.playerState&&(!completePlayer||!remoteDecks)||established&&!remote?.playerState&&!(Number.isSafeInteger(remote?.credits)&&remote?.collection)){
+    protectedSaveLoad(user.uid,remote,"Le profil du compte existe, mais sa sauvegarde de jeu est absente ou incomplète. Aucun nouveau départ n’a été créé. Vérification nécessaire avant de continuer.");
+  }
+  // The old unscoped PC save may be the only complete copy. Its embedded UID
+  // must match; a guest or another account never participates in this check.
+  if(legacy?.profileProgress?.uid===user.uid){
+    const explicitlyRecovered=APPROVED_ACCOUNT_RECOVERY_HASHES.some(hash=>remote?.accountRecoveryReceipts?.[hash]);
+    const regression=window.AllstarSaveService.regressionReason(legacy,nextPlayer,key=>Boolean(cardByKey(key)));
+    if(regression&&!explicitlyRecovered)protectedSaveLoad(user.uid,remote,"Une ancienne sauvegarde PC de ce compte contient davantage de cartes ou de carrière. Elle a été conservée. Vérification nécessaire avant de charger la sauvegarde du compte.");
+  }
+  const earnedFloor=earnedCareerFloor(remote);
+  if(earnedFloor>Number(nextPlayer?.careerUnlocked||0))protectedSaveLoad(user.uid,remote,"La sauvegarde du compte est incohérente avec les victoires de carrière enregistrées. Chargement suspendu ; vos copies locales sont conservées. Contactez l’équipe ALLSTAR pour une récupération.");
   activateSaveScope(user.uid);
   // The profile document is authoritative for stats; playerState only mirrors it for offline display.
   const cloudProfile=remote&&(remote.level!==undefined||remote.elo!==undefined)
@@ -4679,13 +4735,18 @@ async function hydrateCloudSaveForUser(user){
   }
   cloudSaveHydrating=true;
   try{
-    if(nextPlayer)localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(nextPlayer));else localStorage.removeItem(PLAYER_STORAGE_KEY);
-    if(nextDecks)localStorage.setItem(DECK_STORAGE_KEY,JSON.stringify(nextDecks));else localStorage.removeItem(DECK_STORAGE_KEY);
+    const playerRaw=nextPlayer?JSON.stringify(nextPlayer):null,decksRaw=nextDecks?JSON.stringify(nextDecks):null;
+    if(nextPlayer)localStorage.setItem(PLAYER_STORAGE_KEY,playerRaw);else localStorage.removeItem(PLAYER_STORAGE_KEY);
+    if(nextDecks)localStorage.setItem(DECK_STORAGE_KEY,decksRaw);else localStorage.removeItem(DECK_STORAGE_KEY);
+    if(localStorage.getItem(PLAYER_STORAGE_KEY)!==playerRaw||localStorage.getItem(DECK_STORAGE_KEY)!==decksRaw){
+      throw Object.assign(new Error("Le chargement local n’a pas pu être vérifié. La sauvegarde du compte reste conservée ; le jeu n’a pas été initialisé."),{code:"allstar/save-protection"});
+    }
     resetRuntimeProgress();
   }finally{
     cloudSaveHydrating=false;
   }
   accountSaveSession={uid:user.uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false};
+  document.getElementById("accountSaveProtection")?.classList.remove("active");
   cloudSaveStatus("");
   return Boolean(nextPlayer||nextDecks);
 }
@@ -4726,6 +4787,7 @@ async function loginAccountFromStart(){
     enterSavedGame();
     await pushCloudSaveNow();
   }catch(error){
+    if(error?.code==="allstar/save-superseded")return;
     setSaveStatus(profileErrorMessage(error));
   }
 }
@@ -4745,7 +4807,7 @@ async function sendPasswordResetFromStart(){
 }
 async function startGuestMode(){
   try{
-    if(accountSaveSession)await pushCloudSaveNow();
+    if(accountSaveSession&&!accountSaveSession.blocked)await pushCloudSaveNow();
     if(accountSaveSession||window.AllstarFirebaseService?.currentUser?.())await window.AllstarAuthService?.logoutUser?.();
   }catch(error){setSaveStatus(profileErrorMessage(error));return;}
   accountSaveSession=null;
@@ -4763,7 +4825,7 @@ async function startGuestMode(){
 }
 async function logoutProfileAccount(){
   try{
-    await pushCloudSaveNow();
+    if(!accountSaveSession?.blocked)await pushCloudSaveNow();
     await window.AllstarAuthService.logoutUser();
   }catch(error){
     renderProfileContent(profileErrorMessage(error), true);

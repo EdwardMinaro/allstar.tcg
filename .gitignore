@@ -4,6 +4,8 @@ dist/
 outputs/
 web-dist/
 .firebase-cli/
+.allstar-test-tmp/
+tools/__pycache__/
 gha-creds-*.json
 
 # Local tooling and operating-system files
