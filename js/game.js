@@ -4323,9 +4323,23 @@ let cloudSaveHydrating=false;
 let accountSaveSession=null;
 let accountSaveChain=Promise.resolve();
 let pendingAccountTransfer=null;
-// Incident containment: do not replace any shared account save through import.
+// Ordinary imports stay suspended. Only exact, reviewed recovery files pass.
 const ACCOUNT_TRANSFER_SUSPENDED=true;
-const ACCOUNT_TRANSFER_PAUSE_MESSAGE="Le transfert de sauvegarde est temporairement suspendu après des signalements de pertes de progression. Conservez votre fichier exporté et contactez l’équipe ALLSTAR. Aucun import n’a été effectué.";
+const APPROVED_ACCOUNT_RECOVERY_HASHES=["a22cb039ac10a6661a8c5c636186b37b7ae508eec7dbc21e8d7194df6978a628","6e907bfca896440a5d4d72dd190eecf0fa5c22be827e1e9862bed1af7cfd188c"];
+const ACCOUNT_TRANSFER_PAUSE_MESSAGE="Le transfert de sauvegarde ordinaire est temporairement suspendu. Seuls les fichiers de récupération vérifiés et fournis par l’équipe ALLSTAR sont acceptés. Conservez votre export original. Aucun import n’a été effectué.";
+let accountTransferCommitting=false;
+let accountTransferReviewRequest=0;
+async function approvedAccountRecoveryHash(bundle){
+  if(!window.crypto?.subtle)return null;
+  function stable(value){
+    if(Array.isArray(value))return value.map(stable);
+    if(value&&typeof value==="object")return Object.fromEntries(Object.keys(value).sort().map(key=>[key,stable(value[key])]));
+    return value;
+  }
+  const digest=await window.crypto.subtle.digest("SHA-256",new TextEncoder().encode(JSON.stringify(stable(bundle))));
+  const hash=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,"0")).join("");
+  return APPROVED_ACCOUNT_RECOVERY_HASHES.includes(hash)?hash:null;
+}
 function buildAccountTransferExport(){
   if(!accountSaveSession||cloudSaveHydrating)throw new Error("Connectez-vous à votre compte ALLSTAR avant d’exporter sa sauvegarde.");
   loadPlayerState();loadDeckState();
@@ -4360,18 +4374,13 @@ function validateAccountTransfer(bundle,uid){
   return bundle;
 }
 function openAccountTransfer(){
-  if(ACCOUNT_TRANSFER_SUSPENDED){
-    pendingAccountTransfer=null;
-    document.getElementById("accountTransferReview").textContent=ACCOUNT_TRANSFER_PAUSE_MESSAGE;
-    document.getElementById("accountTransferConfirm").hidden=true;
-    document.getElementById("accountTransferFile").disabled=true;
-    document.getElementById("accountTransferOverlay").classList.add("active");
-    return;
-  }
   if(!accountSaveSession){showSystemToast("Connectez-vous au compte ALLSTAR à restaurer.",5000);return;}
+  if(accountTransferCommitting)return;
+  ++accountTransferReviewRequest;
   pendingAccountTransfer=null;
-  document.getElementById("accountTransferReview").textContent="";
+  document.getElementById("accountTransferReview").textContent=ACCOUNT_TRANSFER_SUSPENDED?ACCOUNT_TRANSFER_PAUSE_MESSAGE:"";
   document.getElementById("accountTransferConfirm").hidden=true;
+  document.getElementById("accountTransferFile").disabled=false;
   document.getElementById("accountTransferFile").value="";
   document.getElementById("accountTransferOverlay").classList.add("active");
 }
@@ -4394,42 +4403,51 @@ function buildAccountTransferData(bundle,remote){
   player.profileProgress={...cloud,...earned};
   player.savedAt=Date.now();decks.savedAt=player.savedAt;
   return {...earned,playerState:player,deckState:decks,collection:player.collection,decks,
-    mobileMigrationBackup:{createdAt:player.savedAt,playerState:remotePlayerState(remote),deckState:remoteDeckState(remote),profileProgress:cloud}};
+    mobileMigrationBackup:remote?.mobileMigrationBackup||{createdAt:player.savedAt,playerState:remotePlayerState(remote),deckState:remoteDeckState(remote),profileProgress:cloud}};
 }
 async function reviewAccountTransfer(file){
+  if(accountTransferCommitting)return;
+  const request=++accountTransferReviewRequest;
   const review=document.getElementById("accountTransferReview");
   const button=document.getElementById("accountTransferConfirm");
   pendingAccountTransfer=null;button.hidden=true;
-  if(ACCOUNT_TRANSFER_SUSPENDED){review.textContent=ACCOUNT_TRANSFER_PAUSE_MESSAGE;return;}
   if(!file)return;
   try{
     if(file.size>2e6)throw new Error("Fichier trop volumineux.");
     const session=accountSaveSession;
     if(!session)throw new Error("Reconnectez-vous au compte ALLSTAR.");
     const bundle=validateAccountTransfer(JSON.parse(await file.text()),session.uid);
+    const recoveryHash=await approvedAccountRecoveryHash(bundle);
+    if(ACCOUNT_TRANSFER_SUSPENDED&&!recoveryHash)throw new Error(ACCOUNT_TRANSFER_PAUSE_MESSAGE);
+    if(request!==accountTransferReviewRequest)return;
+    if(session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
     clearTimeout(cloudSaveSyncTimer);await accountSaveChain.catch(()=>{});
     const remote=await window.AllstarSaveService.loadPlayerData(session.uid);
+    if(request!==accountTransferReviewRequest)return;
     if(session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
-    pendingAccountTransfer={bundle,remote,uid:session.uid,token:window.AllstarSaveService.progressionToken(remote)};
-    review.textContent=`PC : ${transferSummary(bundle.playerState,bundle.deckState)}. Compte actuel : ${transferSummary(remotePlayerState(remote),remoteDeckState(remote))}. La copie actuelle du compte sera conservée en secours avant le transfert. Le niveau et les titres obtenus sont conservés ; le classement en ligne du compte reste inchangé.`;
+    if(recoveryHash&&remote?.accountRecoveryReceipts?.[recoveryHash])throw new Error("Ce fichier de récupération a déjà été appliqué à ce compte. Aucun nouvel import n’a été effectué.");
+    pendingAccountTransfer={bundle,remote,uid:session.uid,session,recoveryHash,token:window.AllstarSaveService.progressionToken(remote)};
+    review.textContent=`${recoveryHash?"Récupération vérifiée":"PC"} : ${transferSummary(bundle.playerState,bundle.deckState)}. Compte actuel : ${transferSummary(remotePlayerState(remote),remoteDeckState(remote))}. La copie actuelle du compte sera conservée en secours avant le transfert. Le niveau et les titres obtenus sont conservés ; le classement en ligne du compte reste inchangé.`;
     button.hidden=false;
-  }catch(error){review.textContent=error.message;}
+  }catch(error){if(request===accountTransferReviewRequest)review.textContent=error.message;}
 }
 async function confirmAccountTransfer(){
-  if(ACCOUNT_TRANSFER_SUSPENDED){
-    pendingAccountTransfer=null;
-    document.getElementById("accountTransferConfirm").hidden=true;
-    document.getElementById("accountTransferReview").textContent=ACCOUNT_TRANSFER_PAUSE_MESSAGE;
-    return;
-  }
   const pending=pendingAccountTransfer;
   const button=document.getElementById("accountTransferConfirm");
-  if(!pending||pending.uid!==accountSaveSession?.uid)return;
+  if(accountTransferCommitting||!pending||pending.uid!==accountSaveSession?.uid||pending.session!==accountSaveSession)return;
+  accountTransferCommitting=true;
   button.disabled=true;
+  let committed=false;
   try{
+    validateAccountTransfer(pending.bundle,pending.uid);
+    const recoveryHash=await approvedAccountRecoveryHash(pending.bundle);
+    if(ACCOUNT_TRANSFER_SUSPENDED&&(!recoveryHash||recoveryHash!==pending.recoveryHash))throw new Error(ACCOUNT_TRANSFER_PAUSE_MESSAGE);
+    if(pending.session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
     clearTimeout(cloudSaveSyncTimer);await accountSaveChain.catch(()=>{});
     const data=buildAccountTransferData(pending.bundle,pending.remote);
+    if(recoveryHash)data.accountRecoveryReceipts={...pending.remote?.accountRecoveryReceipts,[recoveryHash]:true};
     await window.AllstarSaveService.commitProgression(pending.uid,data,pending.token,window.AllstarSaveService.migrationProfileToken(pending.remote));
+    committed=true;
     pendingAccountTransfer=null;
     // The confirmed replacement intentionally supersedes this session's cache.
     accountSaveSession=null;
@@ -4438,8 +4456,10 @@ async function confirmAccountTransfer(){
     document.getElementById("accountSaveConflict").classList.remove("active");
     G=null;enterSavedGame();
     cloudSaveStatus("Sauvegarde PC transférée sur le compte ✓ Reconnectez le téléphone.");
-  }catch(error){document.getElementById("accountTransferReview").textContent=error.message;}
-  finally{button.disabled=false;}
+  }catch(error){document.getElementById("accountTransferReview").textContent=committed
+    ? "La récupération a bien été enregistrée sur le compte, mais son affichage n’a pas pu être rechargé. Fermez puis rouvrez ALLSTAR. Ne refaites pas l’import."
+    : error.message;}
+  finally{button.disabled=false;accountTransferCommitting=false;}
 }
 function activateSaveScope(uid=null){
   clearTimeout(cloudSaveSyncTimer);

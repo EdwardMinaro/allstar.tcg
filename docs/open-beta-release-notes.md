@@ -2,7 +2,12 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
-## Correctif de protection — version 0.2.33
+## Récupérations contrôlées — version 0.2.34
+
+- Les imports ordinaires restent suspendus. Seuls les fichiers de récupération examinés par l'équipe peuvent être proposés puis confirmés sur le compte correspondant. Leur contenu est vérifié à la sélection et à la confirmation ; un même fichier ne peut pas être réappliqué après une récupération réussie.
+- La première copie de secours du compte est conservée lors de ces récupérations. Les protections de copie locale de la version 0.2.33 restent actives.
+
+## Correctif de protection précédent — version 0.2.33
 
 - Le transfert par import de fichier est temporairement suspendu après des signalements de pertes de progression. Conservez vos fichiers exportés ; cette mise à jour ne restaure pas automatiquement les données manquantes.
 - Avant de charger la progression du compte, le jeu conserve une copie locale brute de la sauvegarde de ce compte déjà présente sur l'appareil, y compris lorsqu'elle n'avait aucune modification en attente. Si cette copie ne peut pas être conservée et vérifiée, le remplacement local est interrompu.

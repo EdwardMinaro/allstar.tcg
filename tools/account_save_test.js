@@ -1,4 +1,4 @@
-const assert=require("assert/strict"),fs=require("fs"),path=require("path");
+const assert=require("assert/strict"),fs=require("fs"),path=require("path"),crypto=require('node:crypto');
 const root=path.resolve(__dirname,"..");
 const clone=value=>JSON.parse(JSON.stringify(value));
 const store=new Map();let offline=false,serverReads=0;
@@ -13,17 +13,20 @@ const serviceWindow={AllstarFirebaseService:{firebaseServices:async()=>({firesto
 Function("window",fs.readFileSync(path.join(root,"js/saveService.js"),"utf8"))(serviceWindow);
 const service=serviceWindow.AllstarSaveService;
 const source=fs.readFileSync(path.join(root,"js/game.js"),"utf8");
-function device(uid){
+function device(uid,approvedHashes=[]){
   let user={uid};const values=new Map();
   const storage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value),removeItem:key=>values.delete(key)};
-  const window={AllstarSaveService:service,AllstarAuthService:{getCurrentUser:async()=>user},AllstarRankingService:{normalizeProgress:value=>value||{}}};
+  const window={crypto:crypto.webcrypto,AllstarSaveService:service,AllstarAuthService:{getCurrentUser:async()=>user},AllstarRankingService:{normalizeProgress:value=>value||{}}};
   Function("window",fs.readFileSync(path.join(root,"js/rankingService.js"),"utf8"))(window);
   const status={textContent:'',hidden:true};const timers=new Map();let timerId=0;
-  const transferUi=Object.fromEntries(['accountTransferReview','accountTransferConfirm','accountTransferFile','accountTransferOverlay'].map(id=>[id,{textContent:'',hidden:false,disabled:false,classList:{add(){}}}]));
+  const transferUi=Object.fromEntries(['accountTransferReview','accountTransferConfirm','accountTransferFile','accountTransferOverlay','accountSaveConflict'].map(id=>[id,{textContent:'',hidden:false,disabled:false,classList:{add(){},remove(){}}}]));
   const document={addEventListener(){},getElementById(id){return id==='accountSaveStatus'?status:transferUi[id]||null},querySelector(){return null},querySelectorAll(){return[]}};
-  const game=Function("window","document","localStorage","setTimeout","clearTimeout",source+`
-return {hydrateCloudSaveForUser,pushCloudSaveNow,queueCloudSave,notifyAccountProgressSaved,validateAccountTransfer,buildAccountTransferData,buildAccountTransferExport,openAccountTransfer,reviewAccountTransfer,confirmAccountTransfer,
-setPendingTransfer(value){pendingAccountTransfer=value},
+  // Test-only hash fixtures in this in-memory copy; no override exists in game UI.
+  const testSource=approvedHashes.length?source.replace(/const APPROVED_ACCOUNT_RECOVERY_HASHES=\[[^\n]+;/,'const APPROVED_ACCOUNT_RECOVERY_HASHES='+JSON.stringify(approvedHashes)+';'):source;
+  const game=Function("window","document","localStorage","setTimeout","clearTimeout",testSource+`
+enterSavedGame=()=>{};
+return {hydrateCloudSaveForUser,pushCloudSaveNow,queueCloudSave,notifyAccountProgressSaved,validateAccountTransfer,buildAccountTransferData,buildAccountTransferExport,openAccountTransfer,reviewAccountTransfer,confirmAccountTransfer,approvedAccountRecoveryHash,
+setPendingTransfer(value){pendingAccountTransfer={...value,session:accountSaveSession}},pendingTransfer(){return pendingAccountTransfer},
 setExportState(player,decks){playerState={...JSON.parse(JSON.stringify(player)),loaded:true};deckState={...JSON.parse(JSON.stringify(decks)),loaded:true}},
 firstKey(){return cardKey(CARD_DATA[0])},normalize:window.AllstarRankingService.normalizeProgress,
 setState(credits,tickets={}){playerState={loaded:true,credits,collection:{one:2},boosterTickets:tickets,savedAt:1};deckState={loaded:true,decks:[],savedAt:1};},
@@ -104,10 +107,11 @@ scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){ret
   const importBefore=clone(store.get('export-account'));
   const readsBefore=serverReads;
   exporter.openAccountTransfer();
-  assert.equal(exporter.transferUi.accountTransferFile.disabled,true);
+  assert.equal(exporter.transferUi.accountTransferFile.disabled,false,'Recovery file chooser available; ordinary files still refused');
   assert.equal(exporter.transferUi.accountTransferConfirm.hidden,true);
   assert.match(exporter.transferUi.accountTransferReview.textContent,/temporairement suspendu/);
-  await exporter.reviewAccountTransfer({size:10,text:()=>{throw Error('Suspended import must not read file')}});
+  await exporter.reviewAccountTransfer({size:100,text:async()=>JSON.stringify(exported)});
+  assert.match(exporter.transferUi.accountTransferReview.textContent,/temporairement suspendu/);
   exporter.setPendingTransfer({uid:'export-account',bundle:exported,remote:beforeExport,token:service.progressionToken(beforeExport)});
   await exporter.confirmAccountTransfer();
   assert.equal(serverReads,readsBefore,'Suspended import neither reads nor writes cloud');
@@ -151,6 +155,62 @@ scope(){return {player:PLAYER_STORAGE_KEY,decks:DECK_STORAGE_KEY}},session(){ret
   assert.equal(pendingCopy.accountUid,'recovery','Pending runtime stays associated with its original account');
   assert.equal(JSON.parse(pendingCopy.payload).runtime.playerState.credits,777);
   assert.equal(store.get('recovery').playerState.credits,350,'Recovery copies never write or merge into cloud');
+  function stable(value){return Array.isArray(value)?value.map(stable):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,stable(value[key])])):value}
+  const approved={format:'allstar-account-transfer-v1',accountUid:'verified-recovery',createdAt:1,
+    playerState:{credits:5050,collection:{[key]:5},careerUnlocked:24,starterGranted:true,welcomeClaimed:true,profileProgress:{level:23},limitedRewards:{recovery_apology_2026_10_30:{credits:5000}}},
+    deckState:{decks:[{id:'restored',cards:[key]}]},recovery:{compensationCredits:5000}};
+  const approvedHash=crypto.createHash('sha256').update(JSON.stringify(stable(approved))).digest('hex');
+  const restoredDevice=device('verified-recovery',[approvedHash]);
+  store.set('verified-recovery',{playerState:{credits:350,collection:{[key]:1},careerUnlocked:3},deckState:{decks:[]},level:23,elo:1500,mobileMigrationBackup:{firstBackup:true}});
+  await restoredDevice.login('verified-recovery');
+  const recoveryFile={size:1000,text:async()=>JSON.stringify(approved)};
+  const beforeApproved=clone(store.get('verified-recovery'));
+  await restoredDevice.reviewAccountTransfer(recoveryFile);
+  assert.equal(restoredDevice.transferUi.accountTransferConfirm.hidden,false);
+  assert.deepEqual(store.get('verified-recovery'),beforeApproved,'Preview is read-only');
+  restoredDevice.pendingTransfer().bundle.playerState.credits++;
+  await restoredDevice.confirmAccountTransfer();
+  assert.match(restoredDevice.transferUi.accountTransferReview.textContent,/temporairement suspendu/);
+  assert.deepEqual(store.get('verified-recovery'),beforeApproved,'Changed file fails recheck before write');
+  await restoredDevice.reviewAccountTransfer(recoveryFile);
+  store.get('verified-recovery').level++;
+  await restoredDevice.confirmAccountTransfer();
+  assert.equal(store.get('verified-recovery').playerState.credits,350,'Concurrent earned progress blocks replacement');
+  await restoredDevice.reviewAccountTransfer(recoveryFile);
+  await Promise.all([restoredDevice.confirmAccountTransfer(),restoredDevice.confirmAccountTransfer()]);
+  const restoredRemote=store.get('verified-recovery');
+  assert.equal(restoredRemote.playerState.credits,5050);
+  assert.equal(restoredRemote.playerState.careerUnlocked,24);
+  assert.equal(restoredRemote.collection[key],5);
+  assert.equal(restoredRemote.level,24,'Higher live level survives recovery');
+  assert.equal(restoredRemote.elo,1500);
+  assert.deepEqual(restoredRemote.mobileMigrationBackup,{firstBackup:true},'First backup is never replaced');
+  assert.equal(restoredRemote.accountRecoveryReceipts[approvedHash],true);
+  await restoredDevice.reviewAccountTransfer(recoveryFile);
+  assert.equal(restoredDevice.transferUi.accountTransferConfirm.hidden,true);
+  assert.match(restoredDevice.transferUi.accountTransferReview.textContent,/déjà été appliqué/);
+  restoredDevice.setExportState(restoredRemote.playerState,restoredRemote.deckState);
+  await restoredDevice.pushCloudSaveNow();
+  assert.equal(store.get('verified-recovery').accountRecoveryReceipts[approvedHash],true,'Normal saves keep recovery receipt');
+  assert.equal(restoredDevice.normalize(restoredRemote).accountRecoveryReceipts,undefined,'Receipt is not recursively mirrored into profile');
+  await restoredDevice.login('other-recovery-account');
+  await restoredDevice.reviewAccountTransfer(recoveryFile);
+  assert.match(restoredDevice.transferUi.accountTransferReview.textContent,/compte connecté/,'Same file cannot cross accounts');
+  // A commit can succeed even if the subsequent display reload fails offline.
+  const failedDisplayBundle={...clone(approved),accountUid:'post-commit-offline'};
+  const failedDisplayHash=crypto.createHash('sha256').update(JSON.stringify(stable(failedDisplayBundle))).digest('hex');
+  const failedDisplay=device('post-commit-offline',[failedDisplayHash]);
+  store.set('post-commit-offline',{playerState:{credits:1,collection:{}},deckState:{decks:[]}});
+  await failedDisplay.login('post-commit-offline');
+  await failedDisplay.reviewAccountTransfer({size:1000,text:async()=>JSON.stringify(failedDisplayBundle)});
+  const originalCommit=service.commitProgression;
+  service.commitProgression=async(...args)=>{const result=await originalCommit(...args);offline=true;return result};
+  try{await failedDisplay.confirmAccountTransfer()}finally{offline=false;service.commitProgression=originalCommit}
+  assert.equal(store.get('post-commit-offline').playerState.credits,5050);
+  assert.equal(store.get('post-commit-offline').accountRecoveryReceipts[failedDisplayHash],true);
+  assert.match(failedDisplay.transferUi.accountTransferReview.textContent,/bien été enregistrée/);
+  assert.equal(failedDisplay.session(),null,'Failed reload cannot save stale runtime over committed recovery');
+  console.log('Verified recovery: exact file hashes, account binding, read-only preview, tamper/conflict rejection, preserved backup/rank, double confirm, one-time receipt and post-commit offline behavior OK.');
   console.log('Incident protection: import handlers suspended without cloud writes; clean local caches preserved byte-for-byte; immutable recovery, deduplication and storage failure verified.');
   console.log('Desktop export: complete account-bound JSON accepted by mobile import, no credential leakage or cloud writes.');
   console.log("Account saves: server authority, account isolation, PC/phone round trip, spent items, conflict with old/new clients and offline retry OK (Firebase mocked).");

@@ -36,7 +36,7 @@
   }
 
   function migrationProfileToken(data){
-    const fields=["level","xp","totalXp","titles","careerXpWins","levelRewards","matchSettlements","onlineMatchSettlements"];
+    const fields=["level","xp","totalXp","titles","careerXpWins","levelRewards","matchSettlements","onlineMatchSettlements","accountRecoveryReceipts"];
     return progressionToken({playerState:Object.fromEntries(fields.map(key=>[key,data?.[key]??null]))});
   }
   async function commitProgression(uid,data,expectedToken,expectedProfileToken=null){
