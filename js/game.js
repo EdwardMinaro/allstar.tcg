@@ -4652,6 +4652,7 @@ function serializedDeckState(){
 async function pushCloudSaveNow(){
   if(cloudSaveHydrating || !accountSaveSession || !window.AllstarAuthService || !window.AllstarSaveService)return;
   const session=accountSaveSession;
+  if(session.rewardClaimPromise)return session.rewardClaimPromise;
   if(session.blocked)throw Object.assign(new Error("La sauvegarde doit être vérifiée avant de reprendre."),{code:"allstar/save-protection"});
   if(session.conflict)throw Object.assign(new Error("Reconnecte-toi pour charger la progression du compte."),{code:"allstar/save-conflict"});
   const user=await window.AllstarAuthService.getCurrentUser();
@@ -9783,6 +9784,9 @@ function isEventExclusiveCard(card){
 let halloweenBatTimer=null;
 let halloweenAnnouncementSeen=false;
 let startupRewardsPending=false;
+let startupWelcomeRewards=[];
+let startupRewardRun=0;
+let halloweenAnnouncementCloseAction=null;
 
 function showHalloweenAnnouncement(){
   if(!isHalloweenEventActive()||halloweenAnnouncementSeen||startupRewardsPending)return;
@@ -9796,6 +9800,84 @@ function closeHalloweenAnnouncement(){
   document.getElementById("halloweenAnnouncement")?.classList.remove("active");
   halloweenAnnouncementSeen=true;
   try{localStorage.setItem("allstarHalloween2026OfficialAnnouncement","seen")}catch{}
+  const next=halloweenAnnouncementCloseAction;
+  halloweenAnnouncementCloseAction=null;
+  if(next)next();
+}
+
+async function presentStartupRewards(){
+  const run=++startupRewardRun;
+  const extras=startupWelcomeRewards.splice(0);
+  const session=accountSaveSession;
+  const menu=document.getElementById("menu");
+  let gift=null;
+  try{
+    if(session&&!session.blocked){
+      if(menu)menu.inert=true;
+      await pushCloudSaveNow();
+      clearTimeout(cloudSaveSyncTimer);
+      if(session!==accountSaveSession)return;
+      const user=await window.AllstarAuthService.getCurrentUser();
+      if(user?.uid!==session.uid)return;
+      const work=accountSaveChain.catch(()=>{}).then(async()=>{
+        if(session!==accountSaveSession)return null;
+        return window.AllstarSaveService.claimMobileLaunchGift(session.uid,CARD_DATA.filter(card=>card.rarity==="Ultime").map(cardKey),session.token);
+      });
+      accountSaveChain=work;
+      const reload=work.then(async result=>{
+        if(session!==accountSaveSession)return null;
+        if(result){
+          // The transaction has finished before hydration waits for the save
+          // chain. Reload through the normal protected cache path.
+          await hydrateCloudSaveForUser(user);
+          loadPlayerState();loadDeckState();
+        }
+        return result;
+      });
+      session.rewardClaimPromise=reload;
+      try{gift=await reload;}finally{delete session.rewardClaimPromise;}
+    }
+  }catch(error){
+    reportCloudSaveFailure(error);
+  }finally{
+    if(menu)menu.inert=false;
+  }
+  if(run!==startupRewardRun)return;
+  if(accountSaveSession?.blocked||accountSaveSession?.conflict||session&&accountSaveSession?.uid!==session.uid){startupRewardsPending=false;return;}
+  const finish=()=>{startupRewardsPending=false;};
+  const presentExtras=()=>{
+    const next=extras.shift();
+    if(!next){finish();return;}
+    const reveal=()=>openBooster(next.cards,next.title,next.newCardKeys||new Set(),presentExtras);
+    if(next.communique)showOfficialCommunique(next.communique.subtitle,next.communique.items,reveal);
+    else reveal();
+  };
+  const presentHalloween=()=>{
+    startupRewardsPending=false;
+    showHalloweenAnnouncement();
+    if(document.getElementById("halloweenAnnouncement")?.classList.contains("active")){
+      startupRewardsPending=true;
+      halloweenAnnouncementCloseAction=presentExtras;
+    }else{startupRewardsPending=true;presentExtras();}
+  };
+  const receipt=gift?.receipt;
+  if(receipt&&!receipt.presentedAt){
+    const card=cardByKey(receipt.cardKey);
+    if(card){
+      showOfficialCommunique("ALLSTAR débarque sur téléphone : bienvenue sur le ring !",[
+        {title:"5 000 crédits offerts",label:"Ils ont été ajoutés à votre compte."},
+        {title:"Une carte Ultime aléatoire offerte",label:"Toutes les Ultimes participent, y compris les événementielles. Priorité à une carte non possédée."},
+        {title:"Nouveaux joueurs et anciens joueurs PC",label:"Du 1er au 30 novembre 2026 inclus. Un seul cadeau par compte, commun au PC et au téléphone."}
+      ],()=>openBooster([card],"Votre Ultime offerte",receipt.newCard?new Set([receipt.cardKey]):new Set(),()=>{
+        // If acknowledgment fails, the presentation can replay at next login;
+        // the account receipt still prevents a second grant.
+        void window.AllstarSaveService.acknowledgeMobileLaunchGift(session.uid,receipt.cardKey).catch(()=>{});
+        presentHalloween();
+      }));
+      return;
+    }
+  }
+  presentHalloween();
 }
 
 function scheduleHalloweenBats(){
@@ -9989,18 +10071,11 @@ function loadPlayerState(){
   claimHalloweenSleeveGift();
   if(!ownsCardSleeve(playerState.sleeveId))playerState.sleeveId="classic";
   savePlayerState();
-  startupRewardsPending=Boolean(welcomeCards||limitedGift);
-  const finishStartupRewards=()=>{
-    startupRewardsPending=false;
-    showHalloweenAnnouncement();
-  };
-  const revealLimitedGift=limitedGift ? ()=>showOfficialCommunique(
-    "50 joueurs : merci à toute la communauté ALLSTAR !",
-    [{title:"Cadeau Exclusif",label:"La carte Ultime Marc Sebire rejoint votre collection."}],
-    ()=>openBooster(limitedGift.cards,limitedGift.title,limitedGift.newCardKeys,finishStartupRewards)
-  ) : null;
-  if(welcomeCards)setTimeout(()=>openBooster(welcomeCards,"Pack Champion offert",new Set(),revealLimitedGift||finishStartupRewards),450);
-  else if(revealLimitedGift)setTimeout(revealLimitedGift,450);
+  if(welcomeCards)startupWelcomeRewards.push({cards:welcomeCards,title:"Pack Champion offert"});
+  if(limitedGift)startupWelcomeRewards.push({...limitedGift,communique:{
+    subtitle:"50 joueurs : merci à toute la communauté ALLSTAR !",
+    items:[{title:"Cadeau Exclusif",label:"La carte Ultime Marc Sebire rejoint votre collection."}]
+  }});
 }
 
 function savePlayerState(){
@@ -10263,6 +10338,9 @@ function openBooster(cards,title,newCardKeys=new Set(),onClose=null){
     return;
   }
   boosterCloseAction=typeof onClose==="function" ? onClose : null;
+  // Startup announcements continue in a fixed order before navigation resumes.
+  const collectionButton=actions.querySelector("button.dark");
+  if(collectionButton)collectionButton.hidden=startupRewardsPending;
   document.getElementById("boosterTitle").textContent=title;
   document.getElementById("boosterSub").textContent="Ouverture du booster...";
   cardBox.innerHTML="";
@@ -11383,6 +11461,7 @@ let deckState = {
 };
 
 function resetRuntimeProgress(){
+  startupWelcomeRewards.length=0;
   playerState = {
     credits: 0,
     collection: {},
@@ -11429,9 +11508,14 @@ function renderSaveScreen(){
 
 function enterSavedGame(){
   try{
+    if(accountSaveSession?.blocked)return;
     loadPlayerState();
     loadDeckState();
+    startupRewardsPending=true;
+    const menu=document.getElementById("menu");
+    if(menu)menu.inert=true;
     showMenu();
+    setTimeout(()=>void presentStartupRewards(),450);
   }catch(error){
     setSaveStatus(`Impossible d'ouvrir la partie : ${error?.message||"erreur inconnue"}.`);
   }

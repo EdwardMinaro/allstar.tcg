@@ -35,7 +35,7 @@
   }
 
   function migrationProfileToken(data){
-    const fields=["level","xp","totalXp","titles","careerXpWins","levelRewards","matchSettlements","onlineMatchSettlements","accountRecoveryReceipts","saveLinkVerified","pendingPcTransfer"];
+    const fields=["level","xp","totalXp","titles","careerXpWins","levelRewards","matchSettlements","onlineMatchSettlements","accountRecoveryReceipts","saveLinkVerified","pendingPcTransfer","campaignRewards"];
     return progressionToken({playerState:Object.fromEntries(fields.map(key=>[key,data?.[key]??null]))});
   }
   function protectionError(message){return Object.assign(new Error(message),{code:"allstar/save-protection"});}
@@ -158,6 +158,57 @@
     });
   }
 
+  const MOBILE_LAUNCH_GIFT=Object.freeze({id:"mobile_launch_2026_11",credits:5000,start:Date.parse("2026-11-01T00:00:00+01:00"),end:Date.parse("2026-12-01T00:00:00+01:00")});
+
+  // A receipt and its inventory/wallet changes are one atomic account write.
+  // Replaying an interrupted presentation never grants the reward again.
+  async function claimMobileLaunchGift(uid,ultimateKeys,expectedToken){
+    if(!uid||typeof expectedToken!=="string")throw protectionError("Chargement du compte requis pour le cadeau.");
+    const keys=[...new Set(ultimateKeys)].filter(key=>typeof key==="string"&&key.startsWith("ultime_"));
+    if(!keys.length)throw protectionError("Catalogue des cartes Ultimes indisponible.");
+    const {db,doc,runTransaction,serverTimestamp}=await firestoreTools();
+    return runTransaction(db,async transaction=>{
+      const target=doc(db,"users",uid),snapshot=await transaction.get(target);
+      const current=snapshot.exists()?snapshot.data():null;
+      if(current?.uid&&current.uid!==uid)throw protectionError("Compte du cadeau non vérifié.");
+      const receipt=current?.campaignRewards?.[MOBILE_LAUNCH_GIFT.id];
+      if(receipt)return {receipt,data:current};
+      const now=Date.now();
+      if(now<MOBILE_LAUNCH_GIFT.start||now>=MOBILE_LAUNCH_GIFT.end)return null;
+      if(progressionToken(current)!==expectedToken)throw Object.assign(new Error("La progression a changé avant le cadeau. Reconnectez-vous pour la recharger."),{code:"allstar/save-conflict"});
+      validateProgression(current);
+      // A prepared PC source must be recovered first. Do not invalidate it by
+      // granting a reward into the potentially incomplete canonical save.
+      if(current.pendingPcTransfer)return null;
+      const player=JSON.parse(JSON.stringify(current.playerState));
+      const unowned=keys.filter(key=>!Number(player.collection[key]));
+      const pool=unowned.length?unowned:keys;
+      const cardKey=pool[Math.floor(Math.random()*pool.length)];
+      player.credits+=MOBILE_LAUNCH_GIFT.credits;
+      if(!Number.isSafeInteger(player.credits))throw protectionError("Solde du compte invalide.");
+      player.collection[cardKey]=(player.collection[cardKey]||0)+1;
+      player.savedAt=now;
+      const awarded={cardKey,credits:MOBILE_LAUNCH_GIFT.credits,grantedAt:now,newCard:unowned.length>0};
+      const data={playerState:player,deckState:current.deckState,collection:player.collection,decks:current.deckState};
+      const next={...data,campaignRewards:{...current.campaignRewards,[MOBILE_LAUNCH_GIFT.id]:awarded},cloudSaveRevision:(Number(current.cloudSaveRevision)||0)+1,cloudSaveHistory:nextRecoveryHistory(uid,current,data),updatedAt:serverTimestamp()};
+      if(new TextEncoder().encode(JSON.stringify({...current,...next})).length>750000)throw protectionError("Le cadeau ne peut pas être sauvegardé avec ses copies de secours. Réessayez après vérification du compte.");
+      transaction.update(target,next);
+      return {receipt:awarded,data:{...current,...next}};
+    });
+  }
+
+  async function acknowledgeMobileLaunchGift(uid,cardKey){
+    const {db,doc,runTransaction,serverTimestamp}=await firestoreTools();
+    return runTransaction(db,async transaction=>{
+      const target=doc(db,"users",uid),snapshot=await transaction.get(target);
+      const current=snapshot.exists()?snapshot.data():null;
+      const receipt=current?.campaignRewards?.[MOBILE_LAUNCH_GIFT.id];
+      if(!receipt||receipt.cardKey!==cardKey)throw protectionError("Reçu du cadeau introuvable.");
+      if(receipt.presentedAt)return;
+      transaction.update(target,{campaignRewards:{...current.campaignRewards,[MOBILE_LAUNCH_GIFT.id]:{...receipt,presentedAt:Date.now()}},updatedAt:serverTimestamp()});
+    });
+  }
+
   async function saveDecks(uid, decks){
     return savePlayerData(uid, {decks: decks || {}});
   }
@@ -184,6 +235,9 @@
     registerPcSaveExport,
     verifyCurrentSaveSource,
     isAccountLinkComplete,
+    MOBILE_LAUNCH_GIFT,
+    claimMobileLaunchGift,
+    acknowledgeMobileLaunchGift,
     saveDecks,
     loadDecks,
     saveCollection,

@@ -16,7 +16,7 @@ const pcDecks={decks:[{id:'same',name:'PC',cards:[a]}],selectedId:'same'};
    await page.setViewport(mobile?{width:844,height:390,isMobile:true,hasTouch:true}:{width:1360,height:768});
    await page.setRequestInterception(true);
    page.on('request',req=>req.url().startsWith(base+'/')||req.url().startsWith('data:')?req.continue():req.abort());
-   for(const name of ['loadPlayerData','commitProgression','registerPcSaveExport','verifyCurrentSaveSource'])await page.exposeFunction('__setup_'+name,async(...args)=>{assert.equal(args[0],uid);return service[name](...args)});
+   for(const name of ['loadPlayerData','commitProgression','registerPcSaveExport','verifyCurrentSaveSource','claimMobileLaunchGift','acknowledgeMobileLaunchGift'])await page.exposeFunction('__setup_'+name,async(...args)=>{assert.equal(args[0],uid);return service[name](...args)});
    return {page,context};
   }
   const phone=await newPage(true);await phone.page.goto(base+'/');
@@ -26,7 +26,7 @@ const pcDecks={decks:[{id:'same',name:'PC',cards:[a]}],selectedId:'same'};
   async function bind(frame,desktop){
    await frame.evaluate(({uid,desktop})=>{
     audioManager.stopMusic();window.AllstarAuthService={getCurrentUser:async()=>({uid})};
-    for(const name of ['loadPlayerData','commitProgression','registerPcSaveExport','verifyCurrentSaveSource'])window.AllstarSaveService[name]=(...args)=>window.parent['__setup_'+name](...args);
+    for(const name of ['loadPlayerData','commitProgression','registerPcSaveExport','verifyCurrentSaveSource','claimMobileLaunchGift','acknowledgeMobileLaunchGift'])window.AllstarSaveService[name]=(...args)=>window.parent['__setup_'+name](...args);
     if(desktop)window.AllstarDesktop={isElectron:true,exportSave:async()=>({canceled:true})};
    },{uid,desktop});
   }
