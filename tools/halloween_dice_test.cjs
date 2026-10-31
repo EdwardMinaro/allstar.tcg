@@ -75,6 +75,15 @@ for(const boosted of [false,true]){
  api.applyTrackedObjectEffect(p,a,c);assert.equal(p.hand.length,1);assert.equal(p.grave.length,1,'Inverted immediate draw becomes discard');
 }
 // Hades rolls on entry before the object can be played: same-turn bonus without a reroll.
+{
+ const {p,a}=setup(hades);p.cat=null;
+ const h=card(hades),m=card(mask);p.hand=[h,m];
+ rng([.999,0],()=>api.playCard(p,a,h,0));
+ assert.equal(a.cat.mods.Force,-6,'Actual wrestler play applies the entry die first');
+ api.playCard(p,a,m,0);
+ assert.equal(a.cat.mods.Force,-7,'Actual subsequent object play raises the completed entry roll by one');
+ assert.equal(p.cat.effectDie.base,6);assert.equal(p.cat.effectDie.result,7);
+}
 for(const beforeEntry of [false,true]){
  const {p,a,g}=setup(hades);if(beforeEntry)equip(p,a);
  rng([.999,0],()=>api.applyWrestlerEntryEffect(p,p.cat.card));

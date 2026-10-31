@@ -7065,6 +7065,7 @@ function applyMaskToEntryDie(owner,opponent,object){
   (die.appliedObjects??=[]).push(objectId);
   log(`[EFFET] ${object.name} : dé de ${owner.cat.card.name} porté à ${die.result} (${die.base}${die.bonus>=0?"+":""}${die.bonus}) ; ${opponent.cat.card.name} perd ${bonus} ${die.stat} supplémentaire.`);
   showEffectFeedback(opponent.cat.card,object.name,`Dé : ${die.result} · -${bonus} ${die.stat}`,"malus",2400);
+  return die;
 }
 
 function applyWrestlerEntryEffect(owner,c){
@@ -7535,8 +7536,8 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
   switch(c.ability){
     case"objectDieBonusOrDraw":
       if(hasWrestlerDieEffect(owner)){
-        applyMaskToEntryDie(owner,opp,c);
-        feedback=`Dé du catcheur +${mult}`;
+        const entryDie=applyMaskToEntryDie(owner,opp,c);
+        feedback=entryDie?`Dé : ${entryDie.base} → ${entryDie.result} · adversaire -${entryDie.result} ${entryDie.stat}`:`Dé du catcheur +${mult}`;
       }else{
         const before=owner.hand.length;
         draw(owner,mult);
@@ -9109,8 +9110,14 @@ function cardHTML(c,attrs="",id=""){
   attrs=`data-card-id="${escapeAttr(c.id||id||"")}" ${attrs}`;
   const effectOverlay=effectOverlayHTML(c);
   if(c.renderArt){
+    // The approved mask artwork has 58/59 transparent rows around a shorter
+    // card. Crop its source viewport, then map it into the standard card frame.
+    // This preserves the supplied lettering/art; other cards keep their render.
+    const art=cardKey(c)==="rare_objets_masque_halloween"
+      ? `<svg class="full-card-art" viewBox="0 58 1102 1381" preserveAspectRatio="none" role="img" aria-label="${escapeAttr(c.name)}"><image href="${renderArtSrc(c.renderArt)}" width="1102" height="1498" /></svg>`
+      : `<img class="full-card-art" src="${renderArtSrc(c.renderArt)}" alt="${c.name}" onerror="this.closest('.game-card')?.classList.add('render-fallback');this.remove()">`;
     return `<div class="game-card rendered ${String(c.type||"").toLowerCase()} ${String(c.rarity||"").toLowerCase()}" ${attrs}>
-      <img class="full-card-art" src="${renderArtSrc(c.renderArt)}" alt="${c.name}" onerror="this.closest('.game-card')?.classList.add('render-fallback');this.remove()">
+      ${art}
       <div class="render-card-fallback">
         <b>${c.name}</b>
         <span>${displayCardType(c.type)} - ${c.rarity||"Standard"}</span>
