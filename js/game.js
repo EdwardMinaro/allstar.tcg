@@ -3383,9 +3383,19 @@ const CARD_DATA = [
       "Technique": 6,
       "Charisme": 9
     },
-    "effect": "Une fois par match : gagne +2 sur un duel de Force ou impose une relance.",
+    "effect": "Au début de chaque duel, lancez un dé. Si le résultat est 5 ou plus, choisissez la statistique du duel.",
     "renderArt": "assets/card_renders/ultime_catcheurs_ultima_sombra_halloween.png",
-    "ability": "ultimateForceOrReroll",
+    "ability": "roundDieChooseStat",
+    "exclusiveEvent": "halloween_2026"
+  },
+  {
+    "key": "rare_objets_masque_halloween",
+    "type": "Objet",
+    "rarity": "Rare",
+    "name": "Masque d’Halloween",
+    "effect": "Si l’effet de votre catcheur inclut un lancer de dé, ajoutez +1 à son résultat. Sinon, piochez immédiatement une carte.",
+    "renderArt": "assets/card_renders/rare_objets_masque_halloween.png",
+    "ability": "objectDieBonusOrDraw",
     "exclusiveEvent": "halloween_2026"
   }
 ];
@@ -3607,7 +3617,8 @@ const EFFECT_REGISTRY = {
   winNextEnemySpeedMinus2: { timing:"win", text:"Après victoire : prochain catcheur adverse -2 Vitesse." },
   winNextEnemySpeedMinus3: { timing:"win", text:"Après victoire : prochain catcheur adverse -3 Vitesse." },
   winSpeedCharisma1: { timing:"win", text:"Après victoire : +1 Vitesse et +1 Charisme." },
-  ultimateForceOrReroll: { timing:"roulette", text:"Une fois par match : +2 lors d'un duel de Force ou relance la roulette.", choice:true }
+  roundDieChooseStat: { timing:"roulette", text:"À chaque duel : dé à 6 faces ; sur 5 ou plus, choisis la statistique du duel.", choice:true },
+  objectDieBonusOrDraw: { timing:"entry", text:"Ajoute +1 au dé de l'effet du catcheur ; sans effet au dé, pioche immédiatement une carte." }
 };
 
 function runAllstarAudit(){
@@ -5119,7 +5130,7 @@ function syncEffectChoiceGalleryNav(shell){
   next.disabled=!overflow||gallery.scrollLeft+gallery.clientWidth>=gallery.scrollWidth-4;
 }
 
-function requestEffectChoice({title,text,choices,onChoose,onlineKind="effect"}){
+function requestEffectChoice({title,text,choices,onChoose,onlineKind="effect",publishOnChoose=true}){
   const overlay=document.getElementById("effectChoiceOverlay");
   const titleEl=document.getElementById("effectChoiceTitle");
   const textEl=document.getElementById("effectChoiceText");
@@ -5162,7 +5173,7 @@ function requestEffectChoice({title,text,choices,onChoose,onlineKind="effect"}){
       splash?.classList.remove("has-card-gallery");
       endOnlineChoice(onlineToken);
       if(onChoose)onChoose(choice?.value);
-      publishResolvedOnlineChoice();
+      if(publishOnChoose)publishResolvedOnlineChoice();
     },{once:true});
   });
   const galleryShell=choicesEl.querySelector(".effect-card-gallery-shell");
@@ -6072,11 +6083,11 @@ function applyOnlineRoomSnapshot(room, playerSlot){
 }
 
 function queueOnlineSnapshotPublish(){
-  if(!isOnlineMatch()||onlineApplyingRemote||activeOnlineChoice?.kind==="ace-reveal"||!onlineDirty)return;
+  if(!isOnlineMatch()||onlineApplyingRemote||["ace-reveal","die-stat-remote","die-stat-submit"].includes(activeOnlineChoice?.kind)||!onlineDirty)return;
   if(typeof window.publishOnlineMatchState!=="function")return;
   clearTimeout(onlinePublishTimer);
   onlinePublishTimer=setTimeout(async()=>{
-    if(!isOnlineMatch()||onlineApplyingRemote||activeOnlineChoice?.kind==="ace-reveal"||!onlineDirty)return;
+    if(!isOnlineMatch()||onlineApplyingRemote||["ace-reveal","die-stat-remote","die-stat-submit"].includes(activeOnlineChoice?.kind)||!onlineDirty)return;
     const snapshot=onlineSnapshotFromGame();
     if(!snapshot)return;
     const hash=JSON.stringify(snapshot);
@@ -6094,7 +6105,7 @@ function queueOnlineSnapshotPublish(){
 }
 
 function publishOnlineSnapshotNow(){
-  if(!isOnlineMatch()||onlineApplyingRemote)return;
+  if(!isOnlineMatch()||onlineApplyingRemote||["die-stat-remote","die-stat-submit"].includes(activeOnlineChoice?.kind))return;
   if(typeof window.publishOnlineMatchState!=="function")return;
   const snapshot=onlineSnapshotFromGame();
   if(!snapshot)return;
@@ -6109,6 +6120,7 @@ function publishOnlineSnapshotNow(){
 
 function startRound(){
   G.round++;
+  if(G.wheelRerollEvent?.kind==="die-stat")G.wheelRerollEvent=null;
   G.stat=null;
   G.resolving=false;
   G.turnsTaken=0;
@@ -6271,6 +6283,7 @@ function invertOpponentSupports(owner){
 function applyInvertedObject(owner,opp,c){
   const count=supportEffectMultiplier(owner,c);
   switch(c.originalAbility){
+    case "objectDieBonusOrDraw":if(!hasWrestlerDieEffect(owner))discardRandomCards(owner,count);break;
     case "drawNext1":owner.nextDiscardBonus=Number(owner.nextDiscardBonus||0)+count;break;
     case "recoverGrave":{
       const discardOne=remaining=>{
@@ -7018,6 +7031,41 @@ function closeHandReveal(){
   document.getElementById("handRevealOverlay")?.classList.remove("active");
 }
 
+function hasWrestlerDieEffect(owner){
+  return ["entryDieEnemyRandomStatLoss","roundDieChooseStat"].includes(wrestlerAbility(owner?.cat));
+}
+
+function wrestlerDieBonus(owner){
+  const object=owner?.obj;
+  if(!object||owner.objectsBlocked||isCardEffectImmune(owner.cat))return 0;
+  const inverted=object.ability==="invertedSupport"&&object.originalAbility==="objectDieBonusOrDraw";
+  if(object.ability!=="objectDieBonusOrDraw"&&!inverted)return 0;
+  return supportEffectMultiplier(owner,object)*(inverted?-1:1);
+}
+
+function rollWrestlerEffectDie(owner,kind,details={}){
+  const base=Math.floor(Math.random()*6)+1,bonus=wrestlerDieBonus(owner);
+  const die={...details,kind,round:G.round,base,result:base+bonus,bonus,appliedObjects:bonus?[owner.obj.id||cardKey(owner.obj)]:[]};
+  owner.cat.effectDie=die;
+  markOnlineDirty();
+  return die;
+}
+
+function applyMaskToEntryDie(owner,opponent,object){
+  const die=owner.cat?.effectDie;
+  if(die?.kind!=="entry-stat-loss"||die.round!==G.round)return;
+  const objectId=object.id||cardKey(object);
+  if((die.appliedObjects||[]).includes(objectId))return;
+  if(opponent?.cat?.card.id!==die.targetId||isCardEffectImmune(opponent.cat))return;
+  const bonus=wrestlerDieBonus(owner);
+  if(!bonus)return;
+  opponent.cat.mods[die.stat]-=bonus;
+  die.result+=bonus;die.bonus+=bonus;
+  (die.appliedObjects??=[]).push(objectId);
+  log(`[EFFET] ${object.name} : dé de ${owner.cat.card.name} porté à ${die.result} (${die.base}${die.bonus>=0?"+":""}${die.bonus}) ; ${opponent.cat.card.name} perd ${bonus} ${die.stat} supplémentaire.`);
+  showEffectFeedback(opponent.cat.card,object.name,`Dé : ${die.result} · -${bonus} ${die.stat}`,"malus",2400);
+}
+
 function applyWrestlerEntryEffect(owner,c){
   if(owner.wrestlerEffectsBlocked&&c.ability&&c.ability!=="entryInvertOpponentSupports"){
     log(`[EFFET] ${c.name} est annulé par le bonus adverse.`);
@@ -7055,8 +7103,10 @@ function applyWrestlerEntryEffect(owner,c){
       log(`[EFFET] ${c.name} : aucun catcheur adverse vulnérable sur le ring.`);
       return;
     }
-    const roll=Math.floor(Math.random()*6)+1;
+    const die=rollWrestlerEffectDie(owner,"entry-stat-loss",{targetId:opponent.cat.card.id});
+    const roll=die.result;
     const stat=STATS[Math.floor(Math.random()*STATS.length)];
+    die.stat=stat;
     opponent.cat.mods[stat]-=roll;
     log(`[EFFET] ${c.name} obtient ${roll} au dé : ${opponent.cat.card.name} perd ${roll} ${stat}.`);
     showEffectFeedback(opponent.cat.card,c.name,`-${roll} ${stat} (dé : ${roll})`,"malus",2400);
@@ -7482,6 +7532,17 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
   let kind="buff";
 
   switch(c.ability){
+    case"objectDieBonusOrDraw":
+      if(hasWrestlerDieEffect(owner)){
+        applyMaskToEntryDie(owner,opp,c);
+        feedback=`Dé du catcheur +${mult}`;
+      }else{
+        const before=owner.hand.length;
+        draw(owner,mult);
+        feedback=`Pioche immédiate : ${owner.hand.length-before}`;
+      }
+      kind="special";
+      break;
     case"mForce1":addTrackedStat(effect,s,"Force",mult);feedback=`+${mult} Force`;break;
     case"mForce":addTrackedStat(effect,s,"Force",2*mult);feedback=`+${2*mult} Force`;break;
     case"mForce3":addTrackedStat(effect,s,"Force",3*mult);feedback=`+${3*mult} Force`;break;
@@ -8365,7 +8426,6 @@ function score(s,stat){
   if(ability==="secondPlayerTechnique2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&stat==="Technique")v+=2;
   if(ability==="secondPlayerTechniqueCharisma2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Technique"||stat==="Charisme"))v+=2;
   if(ability==="forcePlus"&&!s.forcePlusUsed&&stat==="Force")v+=2;
-  if(ability==="ultimateForceOrReroll"&&s.ultimateForceBonusRound===G.round&&stat==="Force")v+=2;
   if(ability==="charismaPlus"&&stat==="Charisme")v++;
   if(ability==="objectOwnedSpeed2"&&s.owner?.obj&&stat==="Vitesse")v+=2;
   if(ability==="objectOwnedSpeedCharisma2"&&s.owner?.obj&&(stat==="Vitesse"||stat==="Charisme"))v+=2;
@@ -8425,7 +8485,6 @@ function statAbilityFeedback(s,stat){
   if(ability==="secondPlayerTechnique2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&stat==="Technique")return "Second +2 Technique";
   if(ability==="secondPlayerTechniqueCharisma2"&&s.owner?.side&&G.roundStarter&&s.owner.side!==G.roundStarter&&(stat==="Technique"||stat==="Charisme"))return `Second +2 ${stat}`;
   if(ability==="forcePlus"&&!s.forcePlusUsed&&stat==="Force")return "+2 Force";
-  if(ability==="ultimateForceOrReroll"&&s.ultimateForceBonusRound===G.round&&stat==="Force")return "+2 Force";
   if(ability==="charismaPlus"&&stat==="Charisme")return "+1 Charisme";
   if(ability==="objectOwnedSpeed2"&&s.owner?.obj&&stat==="Vitesse")return "+2 Vitesse";
   if(ability==="objectOwnedSpeedCharisma2"&&s.owner?.obj&&(stat==="Vitesse"||stat==="Charisme"))return `+2 ${stat}`;
@@ -8962,6 +9021,8 @@ function previewEffectStrip(c){
 
   if(s.save)items.push({label:"Sauvetage",kind:"block"});
   if(owner.pinShield)items.push({label:`Protection -${owner.pinShield}`,kind:"block"});
+  const dieBonus=hasWrestlerDieEffect(owner)?wrestlerDieBonus(owner):0;
+  if(dieBonus)items.push({label:`Dé du catcheur ${dieBonus>0?"+":""}${dieBonus}`,kind:dieBonus>0?"buff":"malus"});
   if(owner.obj&&owner.objTurnsRemaining>1)items.push({label:`Durée : ${owner.objTurnsRemaining} tours`,kind:"special"});
   const ability=wrestlerAbility(s);
   if(ability==="pinBonus")items.push({label:"Tombé +20",kind:"pin"});
@@ -9125,17 +9186,7 @@ function chooseRoundStat(){
 }
 
 function getRoundReroller(){
-  return [G.player,G.ai].find(p=>(wrestlerAbility(p.cat)==="rerollStat"||wrestlerAbility(p.cat)==="ultimateForceOrReroll"||p.man?.ability==="rerollStat")&&!p.rerollUsed);
-}
-
-function acceptUltimateForceBonus(owner,currentStat=G.stat){
-  if(!owner?.cat||wrestlerAbility(owner.cat)!=="ultimateForceOrReroll"||currentStat!=="Force"||owner.rerollUsed)return false;
-  owner.rerollUsed=true;
-  owner.cat.ultimateForceBonusRound=G.round;
-  log(`[EFFET] ${owner.cat.card.name} conserve la Force et gagne +2 pour ce duel.`);
-  showEffectFeedback(owner.cat.card,owner.cat.card.name,"Duel de Force +2","buff",2200);
-  markOnlineDirty();
-  return true;
+  return [G.player,G.ai].find(p=>(wrestlerAbility(p.cat)==="rerollStat"||p.man?.ability==="rerollStat")&&!p.rerollUsed);
 }
 
 function rerollRoundStatFor(reroller,currentStat){
@@ -9158,6 +9209,7 @@ function requestOnlineWheelRerollChoice(event){
   if(!isOnlineMatch()||!event?.id||G.wheelRerollEvent?.id!==event.id||G.wheelRerollEvent.status!=="pending")return;
   const reroller=wheelRerollerForOnlineEvent(event);
   if(reroller?.side!=="player")return;
+  if(event.kind==="die-stat")return requestOnlineDieStatChoice(event);
   const source=reroller.man?.ability==="rerollStat"?reroller.man:reroller.cat?.card;
   const overlay=document.getElementById("wheelOverlay");
   const actions=document.getElementById("wheelRerollActions");
@@ -9168,9 +9220,8 @@ function requestOnlineWheelRerollChoice(event){
   onlineRemoteWheelHoldOpen=true;
   overlay.classList.add("active");
   actions.classList.add("active");
-  const ultimateForce=wrestlerAbility(reroller.cat)==="ultimateForceOrReroll"&&event.currentStat==="Force";
-  if(sub)sub.textContent=ultimateForce?`${source.name} choisit : +2 Force ou relance.`:`${source.name} peut relancer la roulette.`;
-  keepButton.textContent=ultimateForce?"Garder (+2 Force)":"Conserver";
+  if(sub)sub.textContent=`${source.name} peut relancer la roulette.`;
+  keepButton.textContent="Conserver";
   const token=beginOnlineChoice("wheel-reroll");
   const submit=async choice=>{
     if(onlineWheelRerollSubmitting)return;
@@ -9202,6 +9253,14 @@ function requestOnlineWheelRerollChoice(event){
 
 function resumeOnlineWheelReroll(event){
   if(!isOnlineMatch()||!event?.id||event.status!=="resolved"||G.wheelRerollEvent?.id!==event.id)return;
+  if(event.kind==="die-stat"){
+    if(!STATS.includes(event.choice))return;
+    G.wheelRerollEvent={...event,nextStat:event.choice};
+    G.matchPhase="roulette";
+    log(`[EFFET] ${event.sourceName} choisit ${event.choice} grâce au dé (${event.result}).`);
+    showWheelCore(()=>duel(),{forcedStat:event.choice});
+    return;
+  }
   const reroller=wheelRerollerForOnlineEvent(event);
   const source=reroller?.man?.ability==="rerollStat"?reroller.man:reroller?.cat?.card;
   if(!reroller||!source)return;
@@ -9212,7 +9271,6 @@ function resumeOnlineWheelReroll(event){
     showWheelCore(()=>duel(),{forcedStat:next,allowReroll:false});
     return;
   }
-  acceptUltimateForceBonus(reroller,event.currentStat||G.stat);
   log(`[EFFET] ${source.name} : relance conservée.`);
   markOnlineDirty();
   render();
@@ -9271,8 +9329,70 @@ function resolveRoundRpsAll1(done){
   resolveNext();
 }
 
+function roundDieStatContender(){
+  const contenders=[];
+  for(const owner of [G.player,G.ai]){
+    const cat=owner.cat;
+    if(wrestlerAbility(cat)!=="roundDieChooseStat"||cat.statDieRound===G.round)continue;
+    cat.statDieRound=G.round;
+    const die=rollWrestlerEffectDie(owner,"choose-stat");
+    log(`[DÉ] ${cat.card.name} : ${die.base}${die.bonus?`${die.bonus>0?"+":""}${die.bonus}`:""} = ${die.result}${die.result>=5?", choix de statistique disponible":", roulette normale"}.`);
+    showEffectFeedback(cat.card,cat.card.name,`Dé : ${die.result}${die.bonus?` (${die.base}${die.bonus>0?"+":""}${die.bonus})`:""}`,"special",2400);
+    if(die.result>=5)contenders.push({owner,result:die.result});
+  }
+  contenders.sort((a,b)=>b.result-a.result);
+  if(contenders.length>1&&contenders[0].result===contenders[1].result){
+    log("[DÉ] Ultima Sombra : égalité des dés réussis, la roulette décide.");
+    return null;
+  }
+  return contenders[0]||null;
+}
+
+function resolveRoundDieStatChoice(done){
+  const contender=roundDieStatContender();
+  if(!contender){done(null);return;}
+  const {owner,result}=contender;
+  const apply=stat=>{
+    if(!STATS.includes(stat))return;
+    log(`[EFFET] ${owner.cat.card.name} choisit ${stat} grâce au dé (${result}).`);
+    markOnlineDirty();done(stat);
+  };
+  if(owner.side==="player"){
+    requestEffectChoice({title:owner.cat.card.name,text:`Dé : ${result}. Choisissez la statistique de ce duel.`,choices:STATS.map(stat=>({label:stat,value:stat})),onlineKind:"die-stat",onChoose:apply});
+  }else if(isOnlineMatch()){
+    const ctx=onlineContext();
+    G.stat=null;
+    G.wheelRerollEvent={id:`${G.matchOptions?.onlineMatchId||ctx.roomCode}:${G.round}:die-stat:${Date.now()}`,kind:"die-stat",round:G.round,status:"pending",ownerSlot:localSideToOnlineSlot(owner.side),resolverSlot:ctx.playerSlot,sourceName:owner.cat.card.name,result};
+    G.matchPhase="die-choice";
+    markOnlineDirty();render();publishOnlineSnapshotNow();
+  }else{
+    const opponent=owner.side==="player"?G.ai:G.player;
+    const best=[...STATS].sort((a,b)=>(score(owner.cat,b)-score(opponent.cat,b))-(score(owner.cat,a)-score(opponent.cat,a)))[0];
+    apply(best);
+  }
+}
+
+function requestOnlineDieStatChoice(event){
+  requestEffectChoice({title:event.sourceName,text:`Dé : ${event.result}. Choisissez la statistique de ce duel.`,choices:STATS.map(stat=>({label:stat,value:stat})),onlineKind:"die-stat-remote",publishOnChoose:false,onChoose:async stat=>{
+    if(onlineWheelRerollSubmitting||G?.wheelRerollEvent?.id!==event.id||G.wheelRerollEvent.status!=="pending")return;
+    onlineWheelRerollSubmitting=true;
+    const token=beginOnlineChoice("die-stat-submit");
+    try{
+      const room=await window.submitOnlineWheelRerollChoice(event.id,stat);
+      if(G?.wheelRerollEvent?.id===event.id&&room?.matchState?.wheelRerollEvent)G.wheelRerollEvent=room.matchState.wheelRerollEvent;
+    }catch(error){
+      showSystemToast(error?.message||"Le choix n’a pas pu être envoyé.");
+      if(G?.wheelRerollEvent?.id===event.id&&G.wheelRerollEvent.status==="pending")setTimeout(()=>requestOnlineDieStatChoice(event),100);
+    }finally{
+      onlineWheelRerollSubmitting=false;endOnlineChoice(token);
+      const deferred=deferredOnlineRoomSnapshot;deferredOnlineRoomSnapshot=null;
+      if(deferred)applyOnlineRoomSnapshot(deferred.room,deferred.playerSlot);
+    }
+  }});
+}
+
 function showWheel(cb){
-  resolveRoundRpsAll1(()=>showWheelCore(cb));
+  resolveRoundRpsAll1(()=>resolveRoundDieStatChoice(stat=>showWheelCore(cb,{forcedStat:stat})));
 }
 
 function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
@@ -9284,6 +9404,7 @@ function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
   const rerollButton=document.getElementById("wheelRerollButton");
   const keepButton=document.getElementById("wheelKeepButton");
   const statWasLocked=Boolean(G.lockedStat);
+  if(forcedStat)G.lockedStat=null;
   let finalStat=forcedStat||chooseRoundStat();
   const autoReroller=!forcedStat&&!statWasLocked?[G.player,G.ai].map(p=>p.cat).find(s=>s&&wrestlerAbility(s)==="wheelAutoReroll20"):null;
   if(autoReroller&&Math.random()<.2){
@@ -9362,9 +9483,8 @@ function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
     if(reroller.side==="player"){
       const onlineToken=beginOnlineChoice("reroll");
       rerollActions?.classList.add("active");
-      const ultimateForce=wrestlerAbility(reroller.cat)==="ultimateForceOrReroll"&&G.stat==="Force";
-      if(sub)sub.textContent=ultimateForce?`${source.name} choisit : +2 Force ou relance.`:`${source.name} peut relancer la roulette.`;
-      if(keepButton)keepButton.textContent=ultimateForce?"Garder (+2 Force)":"Conserver";
+      if(sub)sub.textContent=`${source.name} peut relancer la roulette.`;
+      if(keepButton)keepButton.textContent="Conserver";
       if(rerollButton)rerollButton.onclick=()=>{
         rerollActions?.classList.remove("active");
         endOnlineChoice(onlineToken);
@@ -9375,7 +9495,6 @@ function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
       if(keepButton)keepButton.onclick=()=>{
         rerollActions?.classList.remove("active");
         endOnlineChoice(onlineToken);
-        acceptUltimateForceBonus(reroller,G.stat);
         log(`[EFFET] ${source.name} : relance conservée.`);
         markOnlineDirty();
         publishResolvedOnlineChoice();
@@ -9402,11 +9521,6 @@ function showWheelCore(cb,{forcedStat=null,allowReroll=true}={}){
       return;
     }
     setTimeout(()=>{
-      if(acceptUltimateForceBonus(reroller,G.stat)){
-        render();
-        setTimeout(closeWheel,800);
-        return;
-      }
       const next=rerollRoundStatFor(reroller,G.stat);
       spinTo(next,()=>setTimeout(closeWheel,1300));
     },900);
@@ -9653,7 +9767,8 @@ const HALLOWEEN_EVENT = {
     {key:"rare_catcheurs_melusine_halloween",chance:.20},
     {key:"legende_catcheurs_black_sam_halloween",chance:.10},
     {key:"legende_catcheurs_hades_halloween",chance:.10},
-    {key:"ultime_catcheurs_ultima_sombra_halloween",chance:.01}
+    {key:"ultime_catcheurs_ultima_sombra_halloween",chance:.01},
+    {key:"rare_objets_masque_halloween",chance:.20}
   ]
 };
 
@@ -11506,7 +11621,7 @@ function setDeckPreview(cardOrKey){
 // Une carte peut appartenir à plusieurs familles ; les identifiants d'effet
 // évitent de dépendre de la formulation affichée sur son visuel.
 const DECK_EFFECT_FAMILIES=[
-  {id:"stats",label:"Bonus de stats",test:ability=>/^(?:bellRandomStats2|bonus(?:EquippedForceSpeed2|OdysseeTechForceTeam|PassionForceCharTeam|PfiCharSpeedTeam)|bossSecondWind|charismaWinRandom3|drawToSixBonusStats|entry(?:CopyOpponentStatChanges|DiscardUpTo3RandomStat2|IfTrevorInGraveFTV1|MelusineGraveSpeedTechnique1Each|RandomStat3|RandomStats5IfMoreWrestlersGrave|StatChoice3)|first(?:Round(?!OpponentMill1)|WinAll1)|graveElAmnesicoAll1|m(?:All|Char|Force|Random|Technique|Vitesse|Weakest)|managerOwnedTechForceSpeed1|matchRoundOneAll1|next(?:EntryAll1|SpeedOnFirstLoss)|object(?:Choice|Owned)|pinObject20|reveal(?:CharlieEachRoundForcePin|DanEachRoundTechSpeed2|ObjectHandCharSpeed)|round(?:2|4|Rps)|secondPlayer|starter|techniqueRound1|turn(?:CatRandom|CharismaMinus1|RandomPermanent|RandomTransfer)|ultimateForceOrReroll|winSpeedCharisma1)/.test(ability)},
+  {id:"stats",label:"Bonus de stats",test:ability=>/^(?:bellRandomStats2|bonus(?:EquippedForceSpeed2|OdysseeTechForceTeam|PassionForceCharTeam|PfiCharSpeedTeam)|bossSecondWind|charismaWinRandom3|drawToSixBonusStats|entry(?:CopyOpponentStatChanges|DiscardUpTo3RandomStat2|IfTrevorInGraveFTV1|MelusineGraveSpeedTechnique1Each|RandomStat3|RandomStats5IfMoreWrestlersGrave|StatChoice3)|first(?:Round(?!OpponentMill1)|WinAll1)|graveElAmnesicoAll1|m(?:All|Char|Force|Random|Technique|Vitesse|Weakest)|managerOwnedTechForceSpeed1|matchRoundOneAll1|next(?:EntryAll1|SpeedOnFirstLoss)|object(?:Choice|Owned)|pinObject20|reveal(?:CharlieEachRoundForcePin|DanEachRoundTechSpeed2|ObjectHandCharSpeed)|round(?:2|4|Rps)|secondPlayer|starter|techniqueRound1|turn(?:CatRandom|CharismaMinus1|RandomPermanent|RandomTransfer)|winSpeedCharisma1)/.test(ability)},
   {id:"malus",label:"Malus de stats",test:ability=>/^(?:entryDieEnemy|entryEnemy|lossEnemy|turnEnemy(?:Force|Random|Speed)|turnOpponentDiscardWorldCharisma|winNextEnemy)/.test(ability)},
   {id:"draw",label:"Pioche",test:ability=>/draw|megaphoneRound1/i.test(ability)},
   {id:"discard",label:"Défausse",test:ability=>/discard|mill|megaphoneRound1/i.test(ability)},
@@ -11514,10 +11629,10 @@ const DECK_EFFECT_FAMILIES=[
   {id:"cancel",label:"Annulation",test:ability=>/cancel|immuneOtherCardEffects|entryResetEnemyStatMods/i.test(ability)},
   {id:"pin",label:"Tombé",test:ability=>/pin/i.test(ability)},
   {id:"defense",label:"Protection / survie",test:ability=>/pinShield|pinDual|turnEnemyPinMinus10|firstLossDeck|bossSecondWind|immuneOtherCardEffects|lossReturnEnemyWrestlerToHand/i.test(ability)},
-  {id:"wheel",label:"Roulette / duel",test:ability=>/wheel|reroll|sameStatNext|roundRpsAll1/i.test(ability)},
+  {id:"wheel",label:"Roulette / duel",test:ability=>/wheel|reroll|sameStatNext|roundRpsAll1|roundDieChooseStat/i.test(ability)},
   {id:"tag",label:"Tag",test:ability=>/tag/i.test(ability)},
   {id:"deck",label:"Manipulation du deck",test:ability=>/tutor|entryRecoverFactionDeck|recoverBonusDeck|recoverJaydonOrFenrir|firstRoundOpponentMill1/i.test(ability)},
-  {id:"support",label:"Bonus / objets",test:ability=>/objectExtra|doubleEquipped|bonusEquipped|managerOwned|objectOwned|opponentDiscardOnSupport|entryPlaySupportFromGrave/i.test(ability)},
+  {id:"support",label:"Bonus / objets",test:ability=>/objectDieBonus|objectExtra|doubleEquipped|bonusEquipped|managerOwned|objectOwned|opponentDiscardOnSupport|entryPlaySupportFromGrave/i.test(ability)},
   {id:"copy",label:"Copie / inversion",test:ability=>/copy|invert/i.test(ability)},
   {id:"reveal",label:"Révélation",test:ability=>/^reveal/i.test(ability)},
   {id:"none",label:"Sans effet",test:()=>false},

@@ -33,6 +33,8 @@ has("megaphoneRound1","draw","discard");
 has("entryDiscardUpTo3RandomStat2","stats","discard");
 has("pinDual20Shield10","pin","defense");
 has("roundRpsAll1","stats","wheel");
+has("roundDieChooseStat","wheel");
+has("objectDieBonusOrDraw","draw","support");
 has("entryCopyOpponentAbility","copy");
 has("entryInvertOpponentSupports","copy");
 

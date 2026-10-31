@@ -3365,9 +3365,19 @@
         "Technique": 6,
         "Charisme": 9
       },
-      "effect": "Une fois par match : gagne +2 sur un duel de Force ou impose une relance.",
+      "effect": "Au début de chaque duel, lancez un dé. Si le résultat est 5 ou plus, choisissez la statistique du duel.",
       "renderArt": "assets/card_renders/ultime_catcheurs_ultima_sombra_halloween.png",
-      "ability": "ultimateForceOrReroll",
+      "ability": "roundDieChooseStat",
+      "exclusiveEvent": "halloween_2026"
+    },
+    {
+      "key": "rare_objets_masque_halloween",
+      "type": "Objet",
+      "rarity": "Rare",
+      "name": "Masque d’Halloween",
+      "effect": "Si l’effet de votre catcheur inclut un lancer de dé, ajoutez +1 à son résultat. Sinon, piochez immédiatement une carte.",
+      "renderArt": "assets/card_renders/rare_objets_masque_halloween.png",
+      "ability": "objectDieBonusOrDraw",
       "exclusiveEvent": "halloween_2026"
     }
   ]

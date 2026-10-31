@@ -141,7 +141,7 @@ function verifyRecentEffects() {
   const cards = JSON.parse(read("data/cards.json")).cards;
   const byKey = Object.fromEntries(cards.map(card => [card.key, card]));
   assert(
-    game.includes('activeOnlineChoice?.kind==="ace-reveal"')
+    game.includes('["ace-reveal","die-stat-remote","die-stat-submit"].includes(activeOnlineChoice?.kind)')
       && !game.includes("onlineApplyingRemote||activeOnlineChoice||!onlineDirty"),
     "Les choix en ligne restent synchronises pendant la protection Ace Angel"
   );

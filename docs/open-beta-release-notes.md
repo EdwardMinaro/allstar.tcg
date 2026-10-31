@@ -2,6 +2,15 @@
 
 Cette version permet de tester publiquement le jeu complet : carrière, duel contre l'IA, Défi ALLSTAR, collection, construction de decks et multijoueur.
 
+## Dés et cartes Halloween — version 0.2.38
+
+- Ultima Sombra lance désormais un dé à six faces avant chaque duel. Sur 5 ou plus, son propriétaire choisit la statistique du duel. Cet effet remplace entièrement l'ancien bonus de Force ou la relance unique ; les statistiques de la carte sont conservées.
+- Nouvel objet rare exclusif : Masque d’Halloween. Il ajoute +1 au résultat des dés des effets de votre catcheur ; si celui-ci n'a pas d'effet au dé, vous piochez immédiatement une carte. Le bonus cesse avec l'objet, mais les résultats déjà appliqués restent acquis.
+- Avec le Masque, Ultima Sombra réussit dès un 4 naturel. Hadès peut atteindre un résultat modifié de 7 : jouer le Masque après son arrivée, dans le même tour, augmente le résultat déjà obtenu sans relancer le dé.
+- Si deux Ultima Sombra réussissent leur dé dans le même duel, le meilleur résultat modifié obtient le choix ; en cas d'égalité, la roulette normale décide.
+- Le Masque dispose de 20 % de chance par paquet Halloween, comme les deux autres rares. Les chances des cinq autres cartes, le prix de 666 crédits et les cinq cartes par paquet restent identiques. Chaque paquet contient au maximum une exclusive.
+- Les deux visuels fournis sont intégrés avec contours transparents. Le choix de statistique fonctionne aussi pour le joueur à distance en ligne.
+
 ## Options de secours — version 0.2.37
 
 - Un troisième onglet « Sauvegardes », à côté des touches rapides ou gestes tactiles, regroupe les outils de secours : export sur ordinateur et récupération depuis un fichier.

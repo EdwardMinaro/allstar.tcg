@@ -113,6 +113,13 @@ class RoomService {
       }
       if (!room.players?.[playerSlot]) throw new Error("Joueur introuvable.");
       const previousVersion = Number(room.matchState?.version || room.matchState?.updatedAt || 0);
+      const dieChoice = room.matchState?.wheelRerollEvent;
+      if (dieChoice?.kind === "die-stat" && dieChoice.round === matchState?.round) {
+        // Only the duel resolver publishes full states during this handoff.
+        // The other human submits the statistic through its own transaction.
+        if (playerSlot !== dieChoice.resolverSlot || !matchState?.wheelRerollEvent ||
+          (dieChoice.status === "resolved" && matchState.wheelRerollEvent.id === dieChoice.id && matchState.wheelRerollEvent.status === "pending")) return room;
+      }
       const requestedVersion = Number(matchState?.version || 0);
       const version = Math.max(previousVersion + 1, requestedVersion, Date.now());
       const updatedRoom = {
@@ -172,17 +179,17 @@ class RoomService {
 
   async submitWheelRerollChoice(code, playerSlot, eventId, choice) {
     const normalized = String(code || "").trim().toUpperCase();
-    const allowedChoices = new Set(["reroll", "keep"]);
     const update = room => {
       if (!room) throw new Error("Room introuvable.");
       if (room.status !== "playing") throw new Error("La partie n'est pas active.");
       if (!room.players?.[playerSlot]) throw new Error("Joueur introuvable.");
-      if (!allowedChoices.has(choice)) throw new Error("Choix de roulette invalide.");
       const event = room.matchState?.wheelRerollEvent;
       if (!event || event.id !== eventId || event.status !== "pending") {
         throw new Error("Cette relance de roulette n'est plus active.");
       }
       if (event.ownerSlot !== playerSlot) throw new Error("Cette relance appartient à l'adversaire.");
+      const allowedChoices = new Set(event.kind === "die-stat" ? ["Force", "Vitesse", "Technique", "Charisme"] : ["reroll", "keep"]);
+      if (!allowedChoices.has(choice)) throw new Error("Choix de roulette invalide.");
       const previousVersion = Number(room.matchState?.version || room.matchState?.updatedAt || 0);
       const version = Math.max(previousVersion + 1, Date.now());
       return {
