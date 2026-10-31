@@ -9097,6 +9097,7 @@ const REFRESHED_RENDER_ART=new Set([
 
 function renderArtSrc(path){
   const src=String(path||"");
+  if(src==="assets/card_renders/rare_objets_masque_halloween.png")return `${src}?art=mask-final-format-1`;
   return REFRESHED_RENDER_ART.has(src) ? `${src}?art=0212-refresh-1` : src;
 }
 
@@ -9110,14 +9111,8 @@ function cardHTML(c,attrs="",id=""){
   attrs=`data-card-id="${escapeAttr(c.id||id||"")}" ${attrs}`;
   const effectOverlay=effectOverlayHTML(c);
   if(c.renderArt){
-    // The approved mask artwork has 58/59 transparent rows around a shorter
-    // card. Crop its source viewport, then map it into the standard card frame.
-    // This preserves the supplied lettering/art; other cards keep their render.
-    const art=cardKey(c)==="rare_objets_masque_halloween"
-      ? `<svg class="full-card-art" viewBox="0 58 1102 1381" preserveAspectRatio="none" role="img" aria-label="${escapeAttr(c.name)}"><image href="${renderArtSrc(c.renderArt)}" width="1102" height="1498" /></svg>`
-      : `<img class="full-card-art" src="${renderArtSrc(c.renderArt)}" alt="${c.name}" onerror="this.closest('.game-card')?.classList.add('render-fallback');this.remove()">`;
     return `<div class="game-card rendered ${String(c.type||"").toLowerCase()} ${String(c.rarity||"").toLowerCase()}" ${attrs}>
-      ${art}
+      <img class="full-card-art" src="${renderArtSrc(c.renderArt)}" alt="${c.name}" onerror="this.closest('.game-card')?.classList.add('render-fallback');this.remove()">
       <div class="render-card-fallback">
         <b>${c.name}</b>
         <span>${displayCardType(c.type)} - ${c.rarity||"Standard"}</span>
