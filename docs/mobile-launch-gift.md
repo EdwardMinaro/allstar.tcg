@@ -1,6 +1,6 @@
 # Cadeau de lancement téléphone — novembre 2026
 
-Version 0.2.39. Campagne `mobile_launch_2026_11`, du 1er novembre 2026 à 00 h au 1er décembre à 00 h exclu, heure de Paris (donc 1er–30 novembre inclus).
+Version 0.2.39. Campagne `mobile_launch_2026_11`, du 1er novembre 2026 à 20 h au 1er décembre à 00 h exclu, heure de Paris (donc jusqu'au 30 novembre inclus). Début synchronisé avec l'annonce prévue à 20 h : 19 h UTC. Attribution à la connexion/entrée dans le jeu à partir de cet horaire ; une session déjà ouverte doit se reconnecter.
 
 Chaque compte connecté reçoit une seule fois 5 000 crédits et une Ultime aléatoire. Les six Ultimes du catalogue participent, dont Marc Sebire et Ultima Sombra Halloween. Tirage uniforme parmi les Ultimes non possédées ; si toutes sont déjà possédées, tirage uniforme parmi les six. Le cadeau est commun aux versions PC et téléphone, nouveaux et anciens comptes. Pas d'attribution en invité.
 

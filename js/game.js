@@ -9869,7 +9869,7 @@ async function presentStartupRewards(){
       showOfficialCommunique("ALLSTAR débarque sur téléphone : bienvenue sur le ring !",[
         {title:"5 000 crédits offerts",label:"Ils ont été ajoutés à votre compte."},
         {title:"Une carte Ultime aléatoire offerte",label:"Toutes les Ultimes participent, y compris les événementielles. Priorité à une carte non possédée."},
-        {title:"Nouveaux joueurs et anciens joueurs PC",label:"Du 1er au 30 novembre 2026 inclus. Un seul cadeau par compte, commun au PC et au téléphone."}
+        {title:"Nouveaux joueurs et anciens joueurs PC",label:"Du 1er novembre 2026 à 20 h (heure de Paris) au 30 novembre inclus. Un seul cadeau par compte, commun au PC et au téléphone."}
       ],()=>openBooster([card],"Votre Ultime offerte",receipt.newCard?new Set([receipt.cardKey]):new Set(),()=>{
         // If acknowledgment fails, the presentation can replay at next login;
         // the account receipt still prevents a second grant.

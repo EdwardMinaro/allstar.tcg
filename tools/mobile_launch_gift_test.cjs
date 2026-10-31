@@ -20,6 +20,8 @@ function fixture(uid,collection={}){const data={uid,playerState:{credits:41,coll
 const claim=uid=>service.claimMobileLaunchGift(uid,keys,service.progressionToken(store.get(uid)));
 (async()=>{
  assert.equal(keys.length,6);assert(keys.includes('ultime_catcheurs_marc_sebire'));assert(keys.includes('ultime_catcheurs_ultima_sombra_halloween'));
+ assert.equal(service.MOBILE_LAUNCH_GIFT.start,Date.parse('2026-11-01T19:00:00Z'),'Launch is 20:00 Paris, not midnight or UTC 20:00');
+ fixture('morning');now=Date.parse('2026-11-01T12:00:00+01:00');assert.equal(await claim('morning'),null);assert.equal(store.get('morning').playerState.credits,41);
  fixture('bounds');now=service.MOBILE_LAUNCH_GIFT.start-1;assert.equal(await claim('bounds'),null);
  now++;assert((await claim('bounds')).receipt);assert.equal(store.get('bounds').playerState.credits,5041);
  fixture('end');now=service.MOBILE_LAUNCH_GIFT.end;assert.equal(await claim('end'),null);

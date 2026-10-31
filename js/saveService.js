@@ -158,7 +158,7 @@
     });
   }
 
-  const MOBILE_LAUNCH_GIFT=Object.freeze({id:"mobile_launch_2026_11",credits:5000,start:Date.parse("2026-11-01T00:00:00+01:00"),end:Date.parse("2026-12-01T00:00:00+01:00")});
+  const MOBILE_LAUNCH_GIFT=Object.freeze({id:"mobile_launch_2026_11",credits:5000,start:Date.parse("2026-11-01T20:00:00+01:00"),end:Date.parse("2026-12-01T00:00:00+01:00")});
 
   // A receipt and its inventory/wallet changes are one atomic account write.
   // Replaying an interrupted presentation never grants the reward again.

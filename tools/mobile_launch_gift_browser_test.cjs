@@ -4,7 +4,7 @@ const {store,service,clone}=require('./account_save_test.js');
 const base=(process.env.ALLSTAR_TEST_URL||'http://127.0.0.1:8268').replace(/\/$/,'');
 const out=path.resolve(__dirname,'../../../outputs/mobile-launch-gift-qa');fs.mkdirSync(out,{recursive:true});
 const uid='launch-gift-browser-fixture',key='standard_catcheurs_angelo_folena';
-const now=Date.parse('2026-11-01T10:00:00+01:00');Date.now=()=>now;
+const now=Date.parse('2026-11-01T20:05:00+01:00');Date.now=()=>now;
 const names=['loadPlayerData','commitProgression','registerPcSaveExport','verifyCurrentSaveSource','claimMobileLaunchGift','acknowledgeMobileLaunchGift'];
 (async()=>{
  const original={uid,playerState:{credits:50,collection:{[key]:8},careerUnlocked:12,starterGranted:true,welcomeClaimed:true},deckState:{decks:[]},level:1};store.set(uid,clone(original));
