@@ -930,6 +930,12 @@
     <p id="accountSaveProtectionMessage"></p>
     <p>Aucune progression n’est remplacée sans votre confirmation. Conservez vos fichiers et vos copies locales.</p>
     <p>N’importez pas de fichier de récupération sans consigne de l’équipe ALLSTAR.</p>
+    <div id="protectedCopyExport" hidden>
+      <p>La copie conservée peut être comparée au compte avant synchronisation. Aucune carte déjà possédée sur le compte ne doit disparaître.</p>
+      <button class="small-btn" id="reviewProtectedLocalSyncButton" onclick="reviewProtectedLocalSync()" hidden>Synchroniser la copie conservée</button>
+      <p id="protectedCopyStatus" role="status" style="white-space:pre-line"></p>
+      <button class="small-btn" id="confirmProtectedLocalSyncButton" onclick="confirmProtectedLocalSync()" hidden>Confirmer cette progression</button>
+    </div>
     <div id="pcProtectedExport" hidden>
       <p>Votre copie PC a été conservée. Vous pouvez la préparer pour le téléphone sans remplacer la progression active du compte.</p>
       <div class="overlay-actions"><button class="small-btn" onclick="preparePcAccountLink()">Préparer pour le téléphone</button><button class="small-btn dark" onclick="exportAccountSave()">Exporter cette copie PC</button></div>

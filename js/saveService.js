@@ -142,6 +142,32 @@
     });
   }
 
+  async function commitProtectedLocalProgression(uid,data,expectedToken,expectedProfileToken){
+    if(!uid||typeof expectedToken!=="string"||typeof expectedProfileToken!=="string")throw protectionError("Vérification de la copie locale requise.");
+    const fields=["playerState","deckState","collection","decks","level","xp","totalXp","titles","careerXpWins","levelRewards","matchSettlements","onlineMatchSettlements","mobileMigrationBackup"];
+    data=Object.fromEntries(fields.filter(key=>Object.hasOwn(data||{},key)).map(key=>[key,data[key]]));
+    validateProgression(data);
+    if(data.playerState.profileProgress?.uid&&data.playerState.profileProgress.uid!==uid)throw protectionError("Cette copie appartient à un autre compte.");
+    const tickets=data.playerState.boosterTickets;
+    if(tickets&&(typeof tickets!=="object"||Array.isArray(tickets)||Object.values(tickets).some(n=>!Number.isSafeInteger(n)||n<0)))throw protectionError("Quantité de paquets gagnés invalide.");
+    const {db,doc,runTransaction,serverTimestamp}=await firestoreTools();
+    return runTransaction(db,async transaction=>{
+      const target=doc(db,"users",uid),snapshot=await transaction.get(target),current=snapshot.exists()?snapshot.data():null;
+      if(current?.uid&&current.uid!==uid)throw protectionError("Identité du compte incohérente.");
+      if(!isAccountLinkComplete(current)||current.pendingPcTransfer)throw protectionError("Terminez d’abord la liaison de la sauvegarde PC.");
+      if(progressionToken(current)!==expectedToken||migrationProfileToken(current)!==expectedProfileToken)throw Object.assign(new Error("Le compte a changé pendant la vérification. Recommencez la comparaison ; aucune progression remplacée."),{code:"allstar/save-conflict"});
+      validateProgression(current);
+      // Strictly per card, never just a grand total: extra Standards cannot
+      // compensate for a missing Ultimate or even one missing duplicate.
+      const regression=regressionReason(current.playerState,data.playerState);
+      if(regression)throw protectionError(regression+" Synchronisation refusée.");
+      const next={...data,cloudSaveHistory:nextRecoveryHistory(uid,current,data,true),cloudSaveRevision:(Number(current.cloudSaveRevision)||0)+1,updatedAt:serverTimestamp()};
+      if(new TextEncoder().encode(JSON.stringify({...current,...next})).length>750000)throw protectionError("Les copies de secours ne peuvent pas être conservées intégralement. Aucune progression remplacée.");
+      transaction.update(target,next);
+      return progressionToken(data);
+    });
+  }
+
   async function verifyCurrentSaveSource(uid,expectedToken,expectedProfileToken){
     const {db,doc,runTransaction,serverTimestamp}=await firestoreTools();
     return runTransaction(db,async transaction=>{
@@ -230,6 +256,7 @@
     loadPlayerData,
     progressionToken,
     commitProgression,
+    commitProtectedLocalProgression,
     migrationProfileToken,
     regressionReason,
     registerPcSaveExport,

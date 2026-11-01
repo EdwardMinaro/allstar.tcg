@@ -8597,3 +8597,9 @@ body.halloween-active .profile-active-title{color:#ffd0a0}
 .music-playlists input{accent-color:#ec8b25;width:16px;height:16px}
 .music-playlist-status{font-size:12px;color:#ffc776}
 .music-playlist-status:empty{display:none}
+
+/* Keep the protected-copy comparison and confirmation reachable on phones. */
+#accountSaveProtection .splash{
+  max-height:calc(100dvh - 32px);
+  overflow-y:auto;
+}

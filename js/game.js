@@ -4402,6 +4402,55 @@ async function exportAccountSave(){
   }catch(error){showSystemToast(error.message||"Impossible d’exporter la sauvegarde.",6000);}
   finally{buttons.forEach(button=>button.disabled=false);}
 }
+
+let protectedLocalSyncReview=null;
+let protectedLocalSyncBusy=false;
+async function reviewProtectedLocalSync(){
+  const session=accountSaveSession,status=document.getElementById("protectedCopyStatus"),confirm=document.getElementById("confirmProtectedLocalSyncButton");
+  protectedLocalSyncReview=null;if(confirm)confirm.hidden=true;
+  if(protectedLocalSyncBusy)return;
+  try{
+    const user=await window.AllstarAuthService.getCurrentUser();
+    if(!session?.blocked||!session.pcSource||user?.uid!==session.uid||session!==accountSaveSession)throw new Error("Reconnectez-vous au même compte pour vérifier la copie conservée.");
+    const bundle=preparedPcExport(session.pcSource.playerState,session.pcSource.deckState,session.uid);
+    const remote=await window.AllstarSaveService.loadPlayerData(session.uid);
+    if(session!==accountSaveSession)return;
+    if(!window.AllstarSaveService.isAccountLinkComplete(remote)||remote.pendingPcTransfer)throw new Error("Terminez d’abord la liaison de votre sauvegarde PC.");
+    const regression=window.AllstarSaveService.regressionReason(remotePlayerState(remote),bundle.playerState);
+    if(regression)throw new Error(regression+" Synchronisation refusée : la copie doit conserver chaque carte déjà possédée sur le compte.");
+    const data=buildLinkedPcTransferData(bundle,remote);
+    protectedLocalSyncReview={session,bundle,remote,token:window.AllstarSaveService.progressionToken(remote),profileToken:window.AllstarSaveService.migrationProfileToken(remote),hash:await accountTransferHash(session.pcSource),data};
+    if(session!==accountSaveSession){protectedLocalSyncReview=null;return;}
+    if(status)status.textContent=`Compte : ${transferSummary(remotePlayerState(remote),remoteDeckState(remote))}\nCopie à synchroniser : ${transferSummary(data.playerState,data.deckState)}\nChaque carte du compte est conservée. Les crédits et paquets gagnés seront ceux de la copie locale, sans addition. Les deux progressions seront conservées pour récupération. Vérifiez ces valeurs avant de confirmer.`;
+    if(confirm)confirm.hidden=false;
+  }catch(error){if(status)status.textContent=error.message;}
+}
+async function confirmProtectedLocalSync(){
+  const review=protectedLocalSyncReview,session=accountSaveSession,status=document.getElementById("protectedCopyStatus"),button=document.getElementById("confirmProtectedLocalSyncButton");
+  if(protectedLocalSyncBusy||!review||review.session!==session||!session?.blocked)return;
+  protectedLocalSyncBusy=true;if(button)button.disabled=true;
+  let committed=false;
+  try{
+    const user=await window.AllstarAuthService.getCurrentUser();
+    if(user?.uid!==session.uid||session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
+    preparedPcExport(session.pcSource.playerState,session.pcSource.deckState,session.uid);
+    if(await accountTransferHash(session.pcSource)!==review.hash)throw new Error("La copie locale a changé ; recommencez la vérification.");
+    if(session!==accountSaveSession)throw new Error("Le compte connecté a changé.");
+    // Preserve raw local evidence before any write. The service atomically
+    // preserves the account's previous state and rechecks every card as well.
+    preserveAccountLocalCopy(session.uid,"before-protected-local-sync",session.pcSource);
+    await window.AllstarSaveService.commitProtectedLocalProgression(session.uid,review.data,review.token,review.profileToken);
+    committed=true;protectedLocalSyncReview=null;
+    if(session!==accountSaveSession)return;
+    accountSaveSession=null;await hydrateCloudSaveForUser(user);
+    document.getElementById("accountSaveProtection")?.classList.remove("active");
+    document.getElementById("accountSaveConflict")?.classList.remove("active");
+    G=null;enterSavedGame();cloudSaveStatus("Copie conservée synchronisée ✓",3000);
+  }catch(error){
+    if(status)status.textContent=committed?"La copie a bien été enregistrée sur le compte, mais son affichage n’a pas pu être rechargé. Fermez puis rouvrez ALLSTAR ; ne refaites pas la synchronisation.":error.message;
+    if(!committed){protectedLocalSyncReview=null;if(button)button.hidden=true;}
+  }finally{protectedLocalSyncBusy=false;if(button)button.disabled=false;}
+}
 async function preparePcAccountLink(){
   const status=document.getElementById("pcProtectedExportStatus");
   if(!window.AllstarDesktop?.isElectron||pcLinkPreparing)return;
@@ -4875,6 +4924,11 @@ function closeAccountSaveProtection(){
 function protectedSaveLoad(uid,remote,message,pcSource=null){
   accountSaveSession={uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false,blocked:true,pcSource};
   const pcExport=document.getElementById("pcProtectedExport");if(pcExport)pcExport.hidden=!pcSource||!window.AllstarDesktop?.isElectron;
+  const controls=document.getElementById("protectedCopyExport");if(controls)controls.hidden=!pcSource;
+  const status=document.getElementById("protectedCopyStatus");if(status)status.textContent="";
+  protectedLocalSyncReview=null;
+  const sync=document.getElementById("reviewProtectedLocalSyncButton");if(sync)sync.hidden=!pcSource||!window.AllstarSaveService.isAccountLinkComplete(remote);
+  const confirm=document.getElementById("confirmProtectedLocalSyncButton");if(confirm)confirm.hidden=true;
   showAccountSaveProtection(message);
   throw Object.assign(new Error(message),{code:"allstar/save-protection"});
 }

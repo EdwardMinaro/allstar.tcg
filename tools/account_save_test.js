@@ -21,7 +21,7 @@ function device(uid,approvedHashes=[],options={}){
   if(options.desktop)window.AllstarDesktop={isElectron:true,exportSave:async text=>{desktopFiles.push(JSON.parse(text));return {canceled:false}}};
   Function("window",fs.readFileSync(path.join(root,"js/rankingService.js"),"utf8"))(window);
   const status={textContent:'',hidden:true};const timers=new Map();let timerId=0;
-  const transferUi=Object.fromEntries(['accountTransferReview','accountTransferConfirm','accountTransferFile','accountTransferOverlay','accountSaveConflict','accountSaveSetup','accountSaveSetupSummary','accountSaveSetupUseCurrent','accountSaveSetupAcknowledged','accountSaveSetupConfirmCurrent','accountSaveSetupStatus','accountSaveSetupConfirmButton','pcProtectedExport','pcProtectedExportStatus'].map(id=>[id,{textContent:'',hidden:false,disabled:false,checked:false,classList:{add(){},remove(){}}}]));
+  const transferUi=Object.fromEntries(['accountTransferReview','accountTransferConfirm','accountTransferFile','accountTransferOverlay','accountSaveConflict','accountSaveSetup','accountSaveSetupSummary','accountSaveSetupUseCurrent','accountSaveSetupAcknowledged','accountSaveSetupConfirmCurrent','accountSaveSetupStatus','accountSaveSetupConfirmButton','pcProtectedExport','pcProtectedExportStatus','protectedCopyStatus','protectedCopyExport','reviewProtectedLocalSyncButton','confirmProtectedLocalSyncButton'].map(id=>[id,{textContent:'',hidden:false,disabled:false,checked:false,classList:{add(){},remove(){}}}]));
   const document={addEventListener(){},getElementById(id){return id==='accountSaveStatus'?status:transferUi[id]||null},querySelector(){return null},querySelectorAll(){return[]}};
   // Test-only hash fixtures in this in-memory copy; no override exists in game UI.
   const testSource=approvedHashes.length?source.replace(/const APPROVED_ACCOUNT_RECOVERY_HASHES=\[[^\n]+;/,'const APPROVED_ACCOUNT_RECOVERY_HASHES='+JSON.stringify(approvedHashes)+';'):source;
@@ -29,7 +29,7 @@ function device(uid,approvedHashes=[],options={}){
 enterSavedGame=()=>{playerState={credits:0,collection:{},careerUnlocked:0,...JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)||"{}"),loaded:true};deckState={decks:[],...JSON.parse(localStorage.getItem(DECK_STORAGE_KEY)||"{}"),loaded:true}};
 show=()=>{};renderSaveScreen=()=>{};showSystemToast=()=>{};
 return {hydrateCloudSaveForUser,pushCloudSaveNow,queueCloudSave,notifyAccountProgressSaved,resume:checkAccountProgressOnResume,retryPendingAccountSave,buyBooster,buyHalloweenBooster,openTicketBooster,validateAccountTransfer,buildAccountTransferData,buildAccountTransferExport,openAccountTransfer,reviewAccountTransfer,confirmAccountTransfer,approvedAccountRecoveryHash,
-preparePcAccountLink,receivePreparedPcSave,confirmCurrentSaveSource,showCurrentSourceConfirmation,setupSaveLater,exportAccountSave,closeAccountTransfer,
+preparePcAccountLink,receivePreparedPcSave,confirmCurrentSaveSource,showCurrentSourceConfirmation,setupSaveLater,exportAccountSave,reviewProtectedLocalSync,confirmProtectedLocalSync,closeAccountTransfer,
 setPendingTransfer(value){pendingAccountTransfer={...value,session:accountSaveSession}},pendingTransfer(){return pendingAccountTransfer},
 setExportState(player,decks){playerState={...JSON.parse(JSON.stringify(player)),loaded:true};deckState={...JSON.parse(JSON.stringify(decks)),loaded:true}},
 firstKey(){return cardKey(CARD_DATA[0])},normalize:window.AllstarRankingService.normalizeProgress,
