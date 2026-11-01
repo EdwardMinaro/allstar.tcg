@@ -28,7 +28,7 @@ function device(uid,approvedHashes=[],options={}){
   const game=Function("window","document","localStorage","setTimeout","clearTimeout",testSource+`
 enterSavedGame=()=>{playerState={credits:0,collection:{},careerUnlocked:0,...JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)||"{}"),loaded:true};deckState={decks:[],...JSON.parse(localStorage.getItem(DECK_STORAGE_KEY)||"{}"),loaded:true}};
 show=()=>{};renderSaveScreen=()=>{};showSystemToast=()=>{};
-return {hydrateCloudSaveForUser,pushCloudSaveNow,queueCloudSave,notifyAccountProgressSaved,validateAccountTransfer,buildAccountTransferData,buildAccountTransferExport,openAccountTransfer,reviewAccountTransfer,confirmAccountTransfer,approvedAccountRecoveryHash,
+return {hydrateCloudSaveForUser,pushCloudSaveNow,queueCloudSave,notifyAccountProgressSaved,resume:checkAccountProgressOnResume,retryPendingAccountSave,buyBooster,buyHalloweenBooster,openTicketBooster,validateAccountTransfer,buildAccountTransferData,buildAccountTransferExport,openAccountTransfer,reviewAccountTransfer,confirmAccountTransfer,approvedAccountRecoveryHash,
 preparePcAccountLink,receivePreparedPcSave,confirmCurrentSaveSource,showCurrentSourceConfirmation,setupSaveLater,exportAccountSave,closeAccountTransfer,
 setPendingTransfer(value){pendingAccountTransfer={...value,session:accountSaveSession}},pendingTransfer(){return pendingAccountTransfer},
 setExportState(player,decks){playerState={...JSON.parse(JSON.stringify(player)),loaded:true};deckState={...JSON.parse(JSON.stringify(decks)),loaded:true}},

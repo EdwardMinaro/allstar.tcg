@@ -918,9 +918,9 @@
 <div class="overlay" id="accountSaveConflict" role="dialog" aria-modal="true" aria-labelledby="accountSaveConflictTitle">
   <div class="splash level-reward-splash">
     <h2 id="accountSaveConflictTitle">Progression du compte modifiée</h2>
-    <p>Un autre appareil a enregistré une progression. Chargez celle du compte pour continuer ici.</p>
+    <p>La progression du compte semble avoir changé. Réessayez d’abord la sauvegarde de cet appareil. Aucun fichier à importer pour cette vérification.</p>
     <p id="accountSaveConflictMessage"></p>
-    <div class="overlay-actions"><button class="small-btn" onclick="reloadAccountProgress()">Charger la progression du compte</button></div>
+    <div class="overlay-actions"><button class="small-btn" onclick="retryPendingAccountSave()">Réessayer la sauvegarde</button><button class="small-btn dark" onclick="reloadAccountProgress()">Charger la progression du compte</button></div>
   </div>
 </div>
 <script src="js/audio.js"></script>
@@ -929,6 +929,7 @@
     <h2 id="accountSaveProtectionTitle">Sauvegarde protégée</h2>
     <p id="accountSaveProtectionMessage"></p>
     <p>Aucune progression n’est remplacée sans votre confirmation. Conservez vos fichiers et vos copies locales.</p>
+    <p>N’importez pas de fichier de récupération sans consigne de l’équipe ALLSTAR.</p>
     <div id="pcProtectedExport" hidden>
       <p>Votre copie PC a été conservée. Vous pouvez la préparer pour le téléphone sans remplacer la progression active du compte.</p>
       <div class="overlay-actions"><button class="small-btn" onclick="preparePcAccountLink()">Préparer pour le téléphone</button><button class="small-btn dark" onclick="exportAccountSave()">Exporter cette copie PC</button></div>

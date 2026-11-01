@@ -4625,6 +4625,29 @@ async function reloadAccountProgress(){
     enterSavedGame();
   }catch(error){document.getElementById("accountSaveConflictMessage").textContent=error.message;}
 }
+
+async function retryPendingAccountSave(){
+  const session=accountSaveSession,message=document.getElementById("accountSaveConflictMessage");
+  if(!session||session.blocked)return;
+  try{
+    await accountSaveChain.catch(()=>{});
+    const user=await window.AllstarAuthService.getCurrentUser();
+    if(session!==accountSaveSession||user?.uid!==session.uid)return;
+    const remote=await window.AllstarSaveService.loadPlayerData(session.uid);
+    if(session!==accountSaveSession)return;
+    if(window.AllstarSaveService.progressionToken(remote)!==session.token){
+      if(message)message.textContent="Le compte contient bien une autre progression. Vos copies locales sont conservées ; ne choisissez pas de fichier de récupération sans consigne de l’équipe ALLSTAR.";
+      return;
+    }
+    // Only retry against the exact version previously accepted by this device.
+    // commitProgression still rejects any new concurrent write or card loss.
+    session.conflict=false;
+    await pushCloudSaveNow();
+    if(session!==accountSaveSession)return;
+    document.getElementById("accountSaveConflict")?.classList.remove("active");
+    cloudSaveStatus("Progression sauvegardée ✓",2000);
+  }catch(error){reportCloudSaveFailure(error);if(message)message.textContent=error.message;}
+}
 function serializedPlayerState(){
   return {
     sleeveId:normalizeSleeveId(playerState.sleeveId),
@@ -4690,6 +4713,20 @@ function queueCloudSave(){
   if(cloudSaveStatusTimer)cloudSaveStatus("");
   clearTimeout(cloudSaveSyncTimer);
   cloudSaveSyncTimer=setTimeout(()=>pushCloudSaveNow().catch(()=>{}),500);
+}
+
+async function checkAccountProgressOnResume(){
+  const session=accountSaveSession;
+  if(!session)return;
+  // Compare one server read against a stable local version. A snapshot can
+  // arrive after our own next write; comparing it with the newer token would
+  // incorrectly report another device and strand locally purchased cards.
+  await accountSaveChain.catch(()=>{});
+  if(session!==accountSaveSession||session.dirty||session.blocked||session.conflict||session.rewardClaimPromise||cloudSaveHydrating)return;
+  const token=session.token,generation=session.generation;
+  const remote=await window.AllstarSaveService.loadPlayerData(session.uid);
+  if(session!==accountSaveSession||session.token!==token||session.generation!==generation||session.dirty||session.rewardClaimPromise||cloudSaveHydrating)return;
+  if(window.AllstarSaveService.progressionToken(remote)!==token)reportCloudSaveFailure({code:"allstar/save-conflict"});
 }
 function remotePlayerState(remote){
   if(remote?.playerState)return remote.playerState;
@@ -10194,7 +10231,15 @@ function capBoosterLegendaries(cards, maxLegendaries=3){
   return cards;
 }
 
+function canPurchaseWithCurrentSave(){
+  if(accountSaveSession?.blocked||accountSaveSession?.conflict||accountSaveSession?.rewardClaimPromise||cloudSaveHydrating){
+    showSystemToast("Terminez la vérification de la sauvegarde avant d’ouvrir un autre paquet.",5000);
+    return false;
+  }
+  return true;
+}
 function buyBooster(id){
+  if(!canPurchaseWithCurrentSave())return;
   loadPlayerState();
   const booster=BOOSTERS[id];
   if(!booster)return;
@@ -10210,6 +10255,7 @@ function buyBooster(id){
 }
 
 function buyHalloweenBooster(){
+  if(!canPurchaseWithCurrentSave())return;
   loadPlayerState();
   if(!isHalloweenEventActive()){
     renderShop();
@@ -10228,6 +10274,7 @@ function buyHalloweenBooster(){
 }
 
 function openTicketBooster(id){
+  if(!canPurchaseWithCurrentSave())return;
   loadPlayerState();
   const booster=BOOSTERS[id];
   if(!booster)return;
@@ -12088,15 +12135,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
   document.addEventListener("visibilitychange",()=>{
     if(!accountSaveSession)return;
     if(document.hidden){if(accountSaveSession.dirty)void pushCloudSaveNow().catch(()=>{});return;}
-    const session=accountSaveSession;
-    void window.AllstarSaveService.loadPlayerData(session.uid).then(remote=>{
-      if(session===accountSaveSession&&window.AllstarSaveService.progressionToken(remote)!==session.token){
-        // A queued local write might still be settling; check after it completes.
-        return accountSaveChain.catch(()=>{}).then(async()=>{
-          const latest=await window.AllstarSaveService.loadPlayerData(session.uid);
-          if(session===accountSaveSession&&window.AllstarSaveService.progressionToken(latest)!==session.token)reportCloudSaveFailure({code:"allstar/save-conflict"});
-        });
-      }
-    }).catch(reportCloudSaveFailure);
+    void checkAccountProgressOnResume().catch(reportCloudSaveFailure);
   });
 });
