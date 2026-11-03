@@ -2723,7 +2723,8 @@ const CARD_DATA = [
     "stats": {},
     "effect": "Si 3 catcheurs ou plus dans le vestiaire : +2 à toutes les stats.",
     "ability": "mAll2IfGrave3",
-    "renderArt": "assets/card_renders/legende_managers_r_man.png"
+    "renderArt": "assets/card_renders/legende_managers_r_man.png",
+    "musicId": "r_man"
   },
   {
     "key": "legende_managers_tommy_rauzy",
@@ -3397,6 +3398,18 @@ const CARD_DATA = [
     "renderArt": "assets/card_renders/rare_objets_masque_halloween.png",
     "ability": "objectDieBonusOrDraw",
     "exclusiveEvent": "halloween_2026"
+  },
+  {
+    "key": "rare_managers_r_man_halloween",
+    "type": "Manager",
+    "rarity": "Rare",
+    "name": "R-MAN",
+    "stats": {},
+    "effect": "Apparition : +1 Force et +1 Technique. Si votre catcheur est une carte Halloween, +1 à toutes les statistiques à la place.",
+    "ability": "mForceTechniqueHalloween1",
+    "renderArt": "assets/card_renders/rare_managers_r_man_halloween.png",
+    "exclusiveEvent": "halloween_2026",
+    "musicId": "r_man"
   }
 ];
 
@@ -3459,6 +3472,7 @@ const EFFECT_REGISTRY = {
   cancelAllObjects: { timing:"entry", text:"Annule tous les objets actifs." },
   cancelOpponentWrestlerEffects: { timing:"manager", text:"Annule les effets des catcheurs adverses tant que ce bonus est actif." },
   bonusOdysseeTechForceTeam: { timing:"manager", text:"+1 Technique et +1 Force. Doublé avec Charlie Bergson ou Trevor Mayden." },
+  mForceTechniqueHalloween1: { timing:"manager", text:"+1 Force et +1 Technique ; avec un catcheur Halloween, remplace par +1 à toutes les statistiques." },
   bonusPassionForceCharTeam: { timing:"manager", text:"+1 Force et +1 Charisme. Doublé avec Black Sam ou Angelo Folena." },
   bonusPfiCharSpeedTeam: { timing:"manager", text:"+1 Charisme et +1 Vitesse. Doublé avec Ethan Riley ou Maxime Cuadrado." },
   bellRandomStats2: { timing:"object", text:"+1 dans deux stats aléatoires." },
@@ -7983,6 +7997,10 @@ function applyEffectUntracked(owner,opp,c){
     case"mCharisme":s.mods.Charisme+=2*mult;feedback=`+${2*mult} Charisme`;break;
     case"mCharisme3":s.mods.Charisme+=3*mult;feedback=`+${3*mult} Charisme`;break;
     case"mAll1":addAllStats(s,mult);feedback=`+${mult} partout`;break;
+    case"mForceTechniqueHalloween1":
+      if(s.card.exclusiveEvent===HALLOWEEN_EVENT.id){addAllStats(s,mult);feedback=`Halloween : +${mult} partout`;}
+      else{s.mods.Force+=mult;s.mods.Technique+=mult;feedback=`+${mult} Force / +${mult} Technique`;}
+      break;
     case"mAll2":addAllStats(s,2*mult);feedback=`+${2*mult} partout`;break;
     case"mAll2IfGrave3":{
       const wrestlersInGrave=owner.grave.filter(card=>card.type==="Catcheur").length;
@@ -8313,6 +8331,7 @@ function aiCareerCardScore(card,type){
     mAll3:26,
     megaphoneRound1:22,
     mAll1:16,
+    mForceTechniqueHalloween1:G?.ai?.cat?.card?.exclusiveEvent===HALLOWEEN_EVENT.id?16:8,
     mAll2IfGrave3:18,
     pinObject30:22,
     recoverGrave:16,
@@ -9862,7 +9881,8 @@ const HALLOWEEN_EVENT = {
     {key:"legende_catcheurs_black_sam_halloween",chance:.10},
     {key:"legende_catcheurs_hades_halloween",chance:.10},
     {key:"ultime_catcheurs_ultima_sombra_halloween",chance:.01},
-    {key:"rare_objets_masque_halloween",chance:.20}
+    {key:"rare_objets_masque_halloween",chance:.20},
+    {key:"rare_managers_r_man_halloween",chance:.20}
   ]
 };
 
@@ -10249,19 +10269,32 @@ function generateBooster(id){
   return shuffle(cards).map(card=>({...card,id:Math.random().toString(36).slice(2)}));
 }
 
-function pickHalloweenExclusive(roll=Math.random()){
+function pickHalloweenExclusives(roll=Math.random(),entries=HALLOWEEN_EVENT.exclusives){
+  if(!Number.isFinite(roll)||roll<0||roll>=1)return [];
+  const cards=[];
   let cursor=0;
-  for(const entry of HALLOWEEN_EVENT.exclusives){
+  for(const entry of entries){
+    const start=cursor;
     cursor+=entry.chance;
-    if(roll<cursor)return cardByKey(entry.key)||null;
+    // Circular intervals preserve each card's per-pack chance. Above 100%
+    // total, the small overlap yields two exclusives instead of truncating one.
+    if((roll>=start&&roll<cursor)||(cursor>1&&roll<cursor-1)){
+      const card=cardByKey(entry.key);if(card)cards.push(card);
+    }
   }
-  return null;
+  return cards;
+}
+function pickHalloweenExclusive(roll=Math.random()){
+  return pickHalloweenExclusives(roll)[0]||null;
 }
 
 function generateHalloweenBooster(roll=Math.random()){
   const cards=generateBooster("premium");
-  const exclusive=pickHalloweenExclusive(roll);
-  if(exclusive)cards[0]={...cloneCard(exclusive),id:Math.random().toString(36).slice(2)};
+  // Randomize the overlap pair if two exclusives are possible, while each
+  // circular interval still has exactly its configured marginal probability.
+  const entries=HALLOWEEN_EVENT.exclusives.reduce((sum,e)=>sum+e.chance,0)>1?shuffle([...HALLOWEEN_EVENT.exclusives]):HALLOWEEN_EVENT.exclusives;
+  const exclusives=pickHalloweenExclusives(roll,entries);
+  exclusives.forEach((card,index)=>{cards[index]={...cloneCard(card),id:Math.random().toString(36).slice(2)};});
   return shuffle(cards);
 }
 

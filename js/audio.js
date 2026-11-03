@@ -14,6 +14,7 @@ const HALLOWEEN_AUDIO_END = 2579.44;
 
 const AUDIO_LIBRARY = {
   music: {
+    r_man: { label:"R-MAN", wrestler:"R-MAN", src:"assets/audio/music/r_man.mp3" },
     ...Object.fromEntries(HALLOWEEN_TRACKS.map(([start,label],index)=>{
       const id=`halloween_${String(index+1).padStart(2,"0")}`;
       return [id,{label,playlist:"halloween",seasonal:true,start,src:`assets/audio/music/halloween/${id}.mp3?v=cuts2`}];

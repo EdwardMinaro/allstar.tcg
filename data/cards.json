@@ -2705,7 +2705,8 @@
       "stats": {},
       "effect": "Si 3 catcheurs ou plus dans le vestiaire : +2 à toutes les stats.",
       "ability": "mAll2IfGrave3",
-      "renderArt": "assets/card_renders/legende_managers_r_man.png"
+      "renderArt": "assets/card_renders/legende_managers_r_man.png",
+      "musicId": "r_man"
     },
     {
       "key": "legende_managers_tommy_rauzy",
@@ -3379,6 +3380,18 @@
       "renderArt": "assets/card_renders/rare_objets_masque_halloween.png",
       "ability": "objectDieBonusOrDraw",
       "exclusiveEvent": "halloween_2026"
+    },
+    {
+      "key": "rare_managers_r_man_halloween",
+      "type": "Manager",
+      "rarity": "Rare",
+      "name": "R-MAN",
+      "stats": {},
+      "effect": "Apparition : +1 Force et +1 Technique. Si votre catcheur est une carte Halloween, +1 à toutes les statistiques à la place.",
+      "ability": "mForceTechniqueHalloween1",
+      "renderArt": "assets/card_renders/rare_managers_r_man_halloween.png",
+      "exclusiveEvent": "halloween_2026",
+      "musicId": "r_man"
     }
   ]
 }

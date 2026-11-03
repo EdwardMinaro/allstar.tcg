@@ -15,7 +15,7 @@ const documentStub={
 const game=Function("document","window","setTimeout","clearTimeout",`${source}
 return {
   CARD_DATA,HALLOWEEN_EVENT,EFFECT_REGISTRY,STATS,cardByKey,cardKey,state,score,
-  isHalloweenEventActive,rarityPool,pickHalloweenExclusive,generateHalloweenBooster,
+  isHalloweenEventActive,rarityPool,pickHalloweenExclusive,pickHalloweenExclusives,generateHalloweenBooster,
   applyWrestlerEntryEffect,applyYacineTransfer,lowerRarityPinBonus,roundDieStatContender,
   claimHalloweenSleeveGift,ownsCardSleeve,equippedCardSleeve,serializedPlayerState,mergePlayerStateForHydration,
   player(value){playerState=value;},
@@ -47,7 +47,7 @@ assert.equal(game.ownsCardSleeve("halloween"),false);
 assert.equal(game.isHalloweenEventActive(Date.parse("2026-10-29T00:00:00+01:00")),true);
 assert.equal(game.isHalloweenEventActive(Date.parse("2026-11-19T23:59:59+01:00")),true);
 assert.equal(game.isHalloweenEventActive(Date.parse("2026-11-20T00:00:00+01:00")),false);
-assert.equal(game.HALLOWEEN_EVENT.exclusives.length,6);
+assert.equal(game.HALLOWEEN_EVENT.exclusives.length,7);
 game.HALLOWEEN_EVENT.exclusives.forEach(entry=>assert.ok(game.cardByKey(entry.key),`missing Halloween card ${entry.key}`));
 
 const expectedRolls=[
@@ -63,7 +63,8 @@ const expectedRolls=[
   [.609999,"ultime_catcheurs_ultima_sombra_halloween"],
   [.61,"rare_objets_masque_halloween"],
   [.809999,"rare_objets_masque_halloween"],
-  [.81,null]
+  [.81,"rare_managers_r_man_halloween"],
+  [.999999,"rare_managers_r_man_halloween"]
 ];
 expectedRolls.forEach(([roll,key])=>assert.equal(game.pickHalloweenExclusive(roll)?.key||null,key,`wrong Halloween roll boundary ${roll}`));
 for(const rarity of ["Rare","Legende","Ultime"]){
@@ -72,8 +73,10 @@ for(const rarity of ["Rare","Legende","Ultime"]){
 const halloweenPack=game.generateHalloweenBooster(.605);
 assert.equal(halloweenPack.length,5);
 assert.equal(halloweenPack.filter(card=>card.exclusiveEvent).length,1);
-assert.equal(halloweenPack.find(card=>card.exclusiveEvent)?.key,"ultime_catcheurs_ultima_sombra_halloween");
-assert.equal(game.generateHalloweenBooster(.9).some(card=>card.exclusiveEvent),false);
+assert.equal(game.pickHalloweenExclusives(.605)[0].key,"ultime_catcheurs_ultima_sombra_halloween");
+assert.equal(game.generateHalloweenBooster(.9).filter(card=>card.exclusiveEvent).length,1);
+assert.equal(game.generateHalloweenBooster(.005).filter(card=>card.exclusiveEvent).length,2);
+assert.equal(game.generateHalloweenBooster(.005).length,5);
 
 const makeSide=(side,label)=>({side,label,cat:null,man:null,obj:null,hand:[],deck:[],grave:[],effectMarks:{},rerollUsed:false});
 const player=makeSide("player","Joueur"),ai=makeSide("ai","Adversaire");
@@ -123,4 +126,4 @@ Math.random=originalRandom;
 assert.equal(game.score(player.cat,"Force"),ultima.stats.Force,"The old Force bonus is gone");
 assert.equal(game.roundDieStatContender(),null,"A die cannot be rolled again in the same duel");
 
-console.log("Halloween 2026: dates, 666-credit pack odds, six exclusives and card effects OK");
+console.log("Halloween 2026: dates, 666-credit pack odds, seven exclusives and one-percent double-exclusive packs OK");
