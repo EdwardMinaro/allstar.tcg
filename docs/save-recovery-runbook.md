@@ -53,6 +53,8 @@ Références du format : [tables LevelDB](https://github.com/google/leveldb/blob
 
 ## 3. Inspecter toutes les copies, sans choisir automatiquement
 
+**Politique de soutien validée par Anthony le 9 novembre 2026 :** lors d'une récupération après incident, retenir les éléments attestés les plus favorables au joueur du même compte. Pour les crédits, choisir le solde le plus élevé réellement retrouvé dans les copies identifiées, sans les additionner. Conserver les cartes des différentes copies au maximum par identifiant et les progressions acquises, après comparaison et vérification des identités. Les archives restent inchangées et le résultat est présenté avant confirmation. Cette politique de récupération ne change pas la synchronisation normale des achats et dépenses.
+
 ```powershell
 node tools/recover_account_save.cjs inspect "outputs/recuperation-joueur-01/records-private.json" "outputs/recuperation-joueur-01/candidats"
 ```
@@ -61,7 +63,7 @@ Le dossier de candidats doit être nouveau. L'outil reconnaît les anciennes sau
 
 Les identités sont abrégées dans la console ; les candidats et le rapport complets restent privés. Les sauvegardes sans identité démontrée ne sont pas automatiquement attribuées à un joueur. L'UID du candidat, du cache correspondant et du JSON de référence doivent correspondre. Vérifier aussi les dates, séquences, cartes, crédits, carrière et decks avec le joueur.
 
-Ne pas choisir simplement le plus grand nombre de cartes, le solde le plus élevé ou la date la plus récente. Un solde inférieur peut venir d'une dépense légitime. Ne pas fusionner les candidats, les comptes ou les récompenses. Les anciens decks sans UID sont liés par origine et séquence seulement : leur provenance et les cartes réellement possédées doivent être examinées séparément.
+Ne pas désigner une copie complète sur la seule base du nombre total de cartes ou de sa date. Comparer chaque identifiant pour conserver aussi les acquisitions présentes seulement dans l'autre copie ; documenter le solde maximal attesté choisi selon la politique de soutien ci-dessus. Ne jamais mélanger des comptes ou additionner leurs récompenses. Les anciens decks sans UID sont liés par origine et séquence seulement : leur provenance et les cartes réellement possédées doivent être examinées séparément.
 
 ## 4. Produire un fichier séparé
 
