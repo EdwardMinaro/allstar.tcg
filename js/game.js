@@ -4394,6 +4394,7 @@ function buildAccountTransferExport(){
   return preparedPcExport(serializedPlayerState(),serializedDeckState(),accountSaveSession.uid);
 }
 async function exportAccountSave(){
+  if(isGuestSave()){showSystemToast('Cette partie est en mode invité. Utilisez « Enregistrer ma progression invitée sur un compte » dans Options → Sauvegarde.',6500);return;}
   const desktop=window.AllstarDesktop;
   if(!desktop?.isElectron||typeof desktop.exportSave!=="function")return;
   const buttons=document.querySelectorAll(".desktop-save-export");
@@ -4638,11 +4639,84 @@ async function confirmAccountTransfer(){
     : error.message;}
   finally{button.disabled=false;accountTransferCommitting=false;}
 }
+function isGuestSave(){return PLAYER_STORAGE_KEY==='allstarsPlayerV1:guest';}
+function makeGuestSourceId(){
+  if(window.crypto?.randomUUID)return window.crypto.randomUUID();
+  if(window.crypto?.getRandomValues)return Array.from(window.crypto.getRandomValues(new Uint8Array(16)),n=>n.toString(16).padStart(2,'0')).join('');
+  throw new Error('Impossible de vérifier la nouvelle sauvegarde invitée sur cet appareil.');
+}
+let guestTransferSource=null,guestTransferReview=null,guestTransferBusy=false;
+async function beginGuestTransfer(){
+  try{
+    if(G&&!G.over&&document.getElementById('game')?.classList.contains('active'))throw new Error("Terminez la partie avant de rattacher la progression invitée.");
+    if(isGuestSave()){loadPlayerState();loadDeckState();savePlayerState();saveDeckState();}
+    else if(accountSaveSession)await pushCloudSaveNow();
+    const playerRaw=localStorage.getItem('allstarsPlayerV1:guest'),deckRaw=localStorage.getItem('allstarsDecks:guest');
+    const player=JSON.parse(playerRaw||'null'),decks=JSON.parse(deckRaw||'null');
+    if(!player?.guestOrigin||player.guestOrigin.consumedBy||player.profileProgress?.uid)throw new Error("Aucune progression invitée disponible à rattacher sur cet appareil.");
+    guestTransferSource={playerState:player,deckState:decks};
+    const backup=JSON.stringify(guestTransferSource),key=`allstarsGuestRecovery:${player.guestOrigin.id}`;
+    if(!localStorage.getItem(key))localStorage.setItem(key,backup);
+    if(!localStorage.getItem(key))throw new Error("Impossible de conserver la copie de secours invitée.");
+    document.querySelectorAll('.overlay.active').forEach(el=>el.classList.remove('active'));
+    const user=await window.AllstarAuthService.getCurrentUser();
+    if(user)await reviewGuestTransfer(user,false);
+    else{show('saveScreen');showAccountChoice();setSaveStatus('Rattacher la progression invitée : créez un compte ou connectez-vous à un compte existant. Une comparaison sera affichée avant confirmation.');}
+  }catch(error){guestTransferSource=null;showSystemToast(error.message,6000);}
+}
+async function reviewGuestTransfer(user,newAccount){
+  if(!guestTransferSource)return;
+  const remote=await window.AllstarSaveService.loadPlayerData(user.uid);
+  newAccount=Boolean(newAccount||!remote?.playerState&&!Object.values(remote?.collection||{}).some(n=>n>0)&&Number(remote?.level||1)<=1&&!Number(remote?.totalXp));
+  const options={newAccount,knownKeys:CARD_DATA.map(cardKey)};
+  const data=window.AllstarSaveService.buildGuestTransfer(remote,guestTransferSource,options);
+  guestTransferReview={uid:user.uid,remote,data,options,source:JSON.stringify(guestTransferSource)};
+  document.getElementById('guestTransferSummary').textContent=`Compte : ${user.displayName||profileUiState.profile?.pseudo||'ALLSTAR'}\nAvant : ${remotePlayerState(remote)?transferSummary(remotePlayerState(remote),remoteDeckState(remote)):'Nouveau compte'}\nAprès : ${transferSummary(data.playerState,data.deckState)}`;
+  document.getElementById('guestTransferWarning').textContent=newAccount
+    ?'Votre progression et vos cadeaux invités sont conservés. Les cadeaux du compte seront attribués une seule fois après le rattachement.'
+    :'Attention : les cadeaux uniques ne seront pas transférés. Les cartes communes aux deux collections ne sont pas additionnées. Un seul rattachement invité est possible par compte.';
+  document.getElementById('guestTransferLegacy').textContent=!newAccount&&guestTransferSource.playerState.guestOrigin.legacy?'Ancienne sauvegarde invitée : les crédits et paquets dont l’origine ne peut pas être vérifiée ne sont pas transférés vers un compte existant. Ils sont conservés en créant un compte depuis cette partie. La copie originale est conservée.':'';
+  document.getElementById('guestTransferStatus').textContent='';document.getElementById('guestTransferOverlay').classList.add('active');
+}
+async function confirmGuestTransfer(){
+  if(guestTransferBusy||!guestTransferReview)return;
+  guestTransferBusy=true;const review=guestTransferReview,button=document.getElementById('guestTransferConfirm');button.disabled=true;let committed=false;
+  try{
+    const user=await window.AllstarAuthService.getCurrentUser();
+    if(user?.uid!==review.uid||review!==guestTransferReview||JSON.stringify(guestTransferSource)!==review.source)throw new Error('La source ou le compte a changé. Recommencez la comparaison.');
+    const disk=JSON.parse(localStorage.getItem('allstarsPlayerV1:guest')||'null');
+    const diskDecks=JSON.parse(localStorage.getItem('allstarsDecks:guest')||'null');
+    if(JSON.stringify(disk)!==JSON.stringify(guestTransferSource.playerState)||JSON.stringify(diskDecks)!==JSON.stringify(guestTransferSource.deckState))throw new Error('La partie invitée a changé. Recommencez la comparaison.');
+    await window.AllstarSaveService.commitGuestTransfer(user.uid,guestTransferSource,window.AllstarSaveService.progressionToken(review.remote),window.AllstarSaveService.migrationProfileToken(review.remote),review.options);committed=true;
+    disk.guestOrigin.consumedBy=user.uid;localStorage.setItem('allstarsPlayerV1:guest',JSON.stringify(disk));
+    guestTransferSource=null;guestTransferReview=null;accountSaveSession=null;
+    await hydrateCloudSaveForUser(user,{newAccount:review.options.newAccount});
+    document.getElementById('guestTransferOverlay').classList.remove('active');G=null;enterSavedGame();await pushCloudSaveNow();
+    showSystemToast('Progression invitée enregistrée sur le compte ✓',4000);
+  }catch(error){document.getElementById('guestTransferStatus').textContent=committed?'Le transfert est enregistré sur le compte. Fermez puis rouvrez ALLSTAR pour le charger ; ne recommencez pas le transfert.':String(error.code||'').includes('permission-denied')?'Rattachement non autorisé : cette progression a peut-être déjà été utilisée. Votre copie invitée est conservée.':error.message;}
+  finally{guestTransferBusy=false;button.disabled=false;}
+}
+async function cancelGuestTransfer(){
+  if(guestTransferBusy)return;
+  guestTransferSource=null;guestTransferReview=null;
+  document.getElementById('guestTransferOverlay').classList.remove('active');
+  // A newly authenticated destination must never inherit the running guest.
+  if(!accountSaveSession){await window.AllstarAuthService.logoutUser();profileUiState.user=null;profileUiState.profile=null;activateSaveScope();show('saveScreen');renderSaveScreen();}
+}
 function activateSaveScope(uid=null){
   ++cloudSaveHydrationRequest;
   clearTimeout(cloudSaveSyncTimer);
-  PLAYER_STORAGE_KEY=uid?`allstarsPlayerV1:account:${uid}`:"allstarsPlayerV1";
-  DECK_STORAGE_KEY=uid?`allstarsDecks:account:${uid}`:"allstarsDecks";
+  if(!uid&&!localStorage.getItem('allstarsPlayerV1:guest')){
+    const legacy=localStorage.getItem('allstarsPlayerV1'),decks=localStorage.getItem('allstarsDecks');
+    if(legacy){const saved=JSON.parse(legacy);if(!saved.profileProgress?.uid&&!saved.uid&&!saved.accountUid){
+      const backup=JSON.stringify({playerRaw:legacy,decksRaw:decks});localStorage.setItem('allstarsGuestLegacyBackup',backup);
+      if(localStorage.getItem('allstarsGuestLegacyBackup')!==backup)throw new Error("La copie invitée n’a pas pu être conservée.");
+      saved.guestOrigin=saved.guestOrigin||{schema:1,id:makeGuestSourceId(),createdAt:Date.now(),legacy:true};
+      localStorage.setItem('allstarsPlayerV1:guest',JSON.stringify(saved));if(decks)localStorage.setItem('allstarsDecks:guest',decks);
+    }}
+  }
+  PLAYER_STORAGE_KEY=uid?`allstarsPlayerV1:account:${uid}`:"allstarsPlayerV1:guest";
+  DECK_STORAGE_KEY=uid?`allstarsDecks:account:${uid}`:"allstarsDecks:guest";
   resetRuntimeProgress();
 }
 let cloudSaveStatusTimer=null;
@@ -4717,6 +4791,8 @@ function serializedPlayerState(){
     cosmeticInventory:playerState.cosmeticInventory||{sleeves:{}},
     credits:playerState.credits,
     collection:playerState.collection||{},
+    cardConversions:playerState.cardConversions||{},
+    guestOrigin:playerState.guestOrigin||null,
     boosterTickets:playerState.boosterTickets||{},
     challenge:playerState.challenge||null,
     starterGranted:Boolean(playerState.starterGranted),
@@ -5037,7 +5113,7 @@ async function hydrateCloudSaveForUser(user,{newAccount=false,acceptedTransferHa
   }finally{
     cloudSaveHydrating=false;
   }
-  accountSaveSession={uid:user.uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false,sourceReady:newAccount?(mobile?"new-mobile-account":"new-pc-account"):null};
+  accountSaveSession={uid:user.uid,token:window.AllstarSaveService.progressionToken(remote),generation:0,dirty:false,conflict:false,sourceReady:newAccount?(mobile?"new-mobile-account":"new-pc-account"):null,personalRewardsPending:Object.values(remote?.personalRewards||{}).some(r=>r.status==='pending'||r.status==='granted'&&!r.presentedAt)};
   document.querySelectorAll(".desktop-save-link").forEach(button=>button.hidden=!window.AllstarDesktop?.isElectron||window.AllstarSaveService.isAccountLinkComplete(remote));
   document.getElementById("accountSaveProtection")?.classList.remove("active");
   cloudSaveStatus("");
@@ -5056,12 +5132,14 @@ async function createAccountFromStart(){
     const result=await window.AllstarAuthService.registerUser(email,password,pseudo);
     profileUiState.user=result.user;
     profileUiState.profile=result.profile;
+    if(guestTransferSource){await reviewGuestTransfer(result.user,true);return;}
     setSaveStatus(profileResultMessage("Compte créé", result));
     await hydrateCloudSaveForUser(result.user,{newAccount:true});
     resetRuntimeProgress();
     enterSavedGame();
     await pushCloudSaveNow();
   }catch(error){
+    if(guestTransferSource){await window.AllstarAuthService.logoutUser();setSaveStatus(error.message);return;}
     setSaveStatus(profileErrorMessage(error));
   }
 }
@@ -5073,6 +5151,7 @@ async function loginAccountFromStart(){
     profileUiState.user=result.user;
     profileUiState.profile=result.profile;
     await saveRememberedCredentials({email,password,remember:loginRememberChoice()});
+    if(guestTransferSource){await reviewGuestTransfer(result.user,false);return;}
     setSaveStatus("Connexion réussie. Chargement du profil cloud...");
     const cloudLoaded=await hydrateCloudSaveForUser(result.user);
     setSaveStatus(profileResultMessage(cloudLoaded ? "Sauvegarde cloud chargée" : "Connecté", result));
@@ -5081,6 +5160,7 @@ async function loginAccountFromStart(){
     await pushCloudSaveNow();
   }catch(error){
     if(error?.code==="allstar/save-superseded")return;
+    if(guestTransferSource){await window.AllstarAuthService.logoutUser();setSaveStatus(error.message);return;}
     setSaveStatus(profileErrorMessage(error));
   }
 }
@@ -5099,6 +5179,7 @@ async function sendPasswordResetFromStart(){
   }
 }
 async function startGuestMode(){
+  guestTransferSource=null;guestTransferReview=null;
   try{
     if(accountSaveSession&&!accountSaveSession.blocked)await pushCloudSaveNow();
     if(accountSaveSession||window.AllstarFirebaseService?.currentUser?.())await window.AllstarAuthService?.logoutUser?.();
@@ -9934,7 +10015,13 @@ async function presentStartupRewards(){
       if(user?.uid!==session.uid)return;
       const work=accountSaveChain.catch(()=>{}).then(async()=>{
         if(session!==accountSaveSession)return null;
-        return window.AllstarSaveService.claimMobileLaunchGift(session.uid,CARD_DATA.filter(card=>card.rarity==="Ultime").map(cardKey),session.token);
+        const launch=await window.AllstarSaveService.claimMobileLaunchGift(session.uid,CARD_DATA.filter(card=>card.rarity==="Ultime").map(cardKey),session.token);
+        if(!session.personalRewardsPending||!window.AllstarSaveService.claimPersonalRewards)return launch;
+        const personal=await window.AllstarSaveService.claimPersonalRewards(session.uid,launch?.data?window.AllstarSaveService.progressionToken(launch.data):session.token);
+        for(const [id,reward] of Object.entries(personal?.personalRewards||{}))if(reward.status==='granted'&&!reward.presentedAt){
+          const card=cardByKey(reward.cardKey);if(card)extras.unshift({cards:[{...card,conversionCredits:reward.conversionCredits||0}],title:'Votre cadeau ALLSTAR',communique:{subtitle:reward.message,items:[{title:'25 000 crédits offerts',label:'Pour vous aider à reconstruire votre deck.'},{title:'Marc Sebire — Ultime',label:'La carte rejoint votre collection.'}]},personalRewardId:id,personalRewardUid:session.uid});
+        }
+        return launch||{data:personal};
       });
       accountSaveChain=work;
       const reload=work.then(async result=>{
@@ -9961,7 +10048,7 @@ async function presentStartupRewards(){
   const presentExtras=()=>{
     const next=extras.shift();
     if(!next){finish();return;}
-    const reveal=()=>openBooster(next.cards,next.title,next.newCardKeys||new Set(),presentExtras);
+    const reveal=()=>openBooster(next.cards,next.title,next.newCardKeys||new Set(),()=>{if(next.personalRewardId)void window.AllstarSaveService.acknowledgePersonalReward(next.personalRewardUid,next.personalRewardId).catch(()=>{});presentExtras();});
     if(next.communique)showOfficialCommunique(next.communique.subtitle,next.communique.items,reveal);
     else reveal();
   };
@@ -10112,6 +10199,7 @@ function autoDeckFromCollection(){
 }
 
 function claimLimitedGiftCampaign(){
+  if(isGuestSave())return null;
   playerState.limitedRewards=playerState.limitedRewards||{};
   const campaign=LIMITED_GIFT_CAMPAIGN;
   const now=Date.now();
@@ -10127,6 +10215,7 @@ function claimLimitedGiftCampaign(){
 }
 
 function claimHalloweenSleeveGift(now=Date.now()){
+  if(isGuestSave())return false;
   if(!isHalloweenEventActive(now))return false;
   playerState.cosmeticInventory=playerState.cosmeticInventory||{};
   playerState.cosmeticInventory.sleeves=playerState.cosmeticInventory.sleeves||{};
@@ -10145,6 +10234,8 @@ function loadPlayerState(){
         cosmeticInventory:saved.cosmeticInventory||{sleeves:{}},
         credits:Number(saved.credits ?? saved["crédits"])||0,
         collection:saved.collection||{},
+        cardConversions:saved.cardConversions||{},
+        guestOrigin:saved.guestOrigin||null,
         boosterTickets:saved.boosterTickets||{},
         challenge:saved.challenge||null,
         starterGranted:Boolean(saved.starterGranted),
@@ -10169,11 +10260,11 @@ function loadPlayerState(){
   playerState.savedAt=Number(playerState.savedAt)||0;
   if(!playerState.starterGranted){
     playerState.starterGranted=true;
-    playerState.credits=Math.max(playerState.credits,1000);
+    if(!isGuestSave())playerState.credits=Math.max(playerState.credits,1000);
     addCardsToCollection(starterStandardCards());
   }
   let welcomeCards=null;
-  if(!playerState.welcomeClaimed){
+  if(!playerState.welcomeClaimed&&!isGuestSave()){
     playerState.welcomeClaimed=true;
     welcomeCards=generateBooster("champion");
     ensureBoosterHasWrestler(welcomeCards,"Legende");
@@ -10181,6 +10272,12 @@ function loadPlayerState(){
     addCardsToCollection(welcomeCards);
   }
   const limitedGift=claimLimitedGiftCampaign();
+  if(isGuestSave()&&!playerState.guestOrigin){
+    playerState.guestOrigin={schema:1,id:makeGuestSourceId(),createdAt:Date.now(),legacy:Boolean(playerState.welcomeClaimed)};
+  }
+  if(isGuestSave()&&playerState.guestOrigin?.consumedBy)throw new Error('Cette progression invitée a été rattachée à un compte. Connectez-vous à ce compte pour continuer.');
+  const converted=window.AllstarSaveService?.convertSurplus(playerState)||0;
+  if(converted)setTimeout(()=>showSystemToast(`Surplus de cartes converti : +${converted} crédits.`,4500),700);
   claimHalloweenSleeveGift();
   if(!ownsCardSleeve(playerState.sleeveId))playerState.sleeveId="classic";
   savePlayerState();
@@ -10199,6 +10296,8 @@ function savePlayerState(){
       cosmeticInventory:playerState.cosmeticInventory||{sleeves:{}},
       credits:playerState.credits,
       collection:playerState.collection,
+      cardConversions:playerState.cardConversions||{},
+      guestOrigin:playerState.guestOrigin||null,
       boosterTickets:playerState.boosterTickets||{},
       challenge:playerState.challenge||null,
       starterGranted:playerState.starterGranted,
@@ -10231,6 +10330,7 @@ function addCardsToCollection(cards){
     const key=cardKey(card);
     if(!ownedCount(key))newCardKeys.add(key);
     playerState.collection[key]=(playerState.collection[key]||0)+1;
+    card.conversionCredits=window.AllstarSaveService?.convertSurplus(playerState)||0;
   });
   return newCardKeys;
 }
@@ -10493,6 +10593,9 @@ function openBooster(cards,title,newCardKeys=new Set(),onClose=null){
         badge.className="booster-new-label";
         badge.textContent="Nouveau";
         slot.appendChild(badge);
+      }
+      if(card.conversionCredits){
+        const badge=document.createElement("span");badge.className="booster-new-label";badge.textContent=`Surplus : +${card.conversionCredits} crédits`;slot.appendChild(badge);
       }
       cardBox.appendChild(slot);
       document.getElementById("boosterSub").textContent=`${card.rarity} - ${card.name}`;

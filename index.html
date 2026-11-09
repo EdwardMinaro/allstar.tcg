@@ -330,6 +330,7 @@
           <div class="profile-actions">
             <button class="profile-action desktop-save-export" type="button" hidden onclick="exportAccountSave()">Exporter la sauvegarde</button>
             <button class="profile-action dark" type="button" onclick="openAccountTransfer()">Récupérer une sauvegarde depuis un fichier</button>
+            <button class="profile-action" type="button" onclick="beginGuestTransfer()">Enregistrer ma progression invitée sur un compte</button>
           </div>
         </div>
         <div class="options-block shortcut-options-home" hidden>
@@ -414,6 +415,7 @@
       <div class="profile-actions">
         <button class="profile-action desktop-save-export" type="button" hidden onclick="exportAccountSave()">Exporter la sauvegarde</button>
         <button class="profile-action dark" type="button" onclick="openAccountTransfer()">Récupérer une sauvegarde depuis un fichier</button>
+        <button class="profile-action" type="button" onclick="beginGuestTransfer()">Enregistrer ma progression invitée sur un compte</button>
       </div>
     </div>
     <div class="shortcut-options" id="shortcutOptions" hidden>
@@ -978,6 +980,15 @@
 <script src="js/ticketService.js"></script>
 <script src="js/authService.js"></script>
 <script src="js/connectionManager.js"></script>
+<div id="guestTransferOverlay" class="overlay"><div class="splash guest-transfer-panel">
+  <h2>Enregistrer ma progression invitée</h2>
+  <p id="guestTransferWarning"></p>
+  <p id="guestTransferLegacy"></p>
+  <p id="guestTransferSummary" style="white-space:pre-line"></p>
+  <p>Une copie de secours est conservée. Le compte existant garde ses cartes, ses cadeaux et son classement.</p>
+  <p id="guestTransferStatus" role="status"></p>
+  <div class="overlay-actions active"><button id="guestTransferConfirm" class="small-btn" onclick="confirmGuestTransfer()">Confirmer le rattachement</button><button class="small-btn dark" onclick="cancelGuestTransfer()">Annuler</button></div>
+</div></div>
 <script src="js/saveService.js"></script>
 <script src="js/matchmakingService.js"></script>
 <script src="js/rankingService.js"></script>

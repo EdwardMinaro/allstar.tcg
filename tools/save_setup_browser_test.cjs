@@ -61,12 +61,13 @@ const pcDecks={decks:[{id:'same',name:'PC',cards:[a]}],selectedId:'same'};
   assert.deepEqual(store.get(uid).playerState,cloud.playerState);
   await tap('#accountTransferConfirm');
   await f.waitForFunction(()=>!document.getElementById('accountTransferOverlay').classList.contains('active'));
-  assert.equal(store.get(uid).playerState.credits,50);assert.equal(store.get(uid).playerState.careerUnlocked,24);
-  assert.equal(store.get(uid).collection[a],8);assert.equal(store.get(uid).collection[b],1);
+  await f.waitForFunction(()=>!accountSaveSession.dirty);
+  assert.equal(store.get(uid).playerState.credits,110);assert.equal(store.get(uid).playerState.careerUnlocked,24);
+  assert.equal(store.get(uid).collection[a],2);assert.equal(store.get(uid).collection[b],1);
   assert.equal(store.get(uid).saveLinkVerified.source,'pc-import');assert.equal(store.get(uid).pendingPcTransfer,null);
   await pc.page.evaluate(async uid=>hydrateCloudSaveForUser({uid}),uid);
   const loaded=await pc.page.evaluate(uid=>JSON.parse(localStorage.getItem(`allstarsPlayerV1:account:${uid}`)),uid);
-  assert.equal(loaded.credits,50);assert.equal(loaded.collection[b],1);
+  assert.equal(loaded.credits,110);assert.equal(loaded.collection[b],1);
   console.log('Browser guided link: real mobile touch, Later unchanged, native-PC source protected/prepared, fileless receipt, read-only comparison, explicit confirmation and PC reload OK. Firebase/auth simulated; external traffic blocked.');
  }finally{await browser.close()}
 })().catch(error=>{console.error(error);process.exitCode=1});

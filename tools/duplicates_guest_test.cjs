@@ -1,0 +1,43 @@
+const assert=require('assert/strict'),fs=require('fs'),path=require('path');
+const {service:s,store,clone,device}=require('./account_save_test.js');
+const cards=JSON.parse(fs.readFileSync(path.join(__dirname,'../data/cards.json'),'utf8')).cards,knownKeys=cards.map(c=>c.key);
+const standard=cards.find(c=>c.rarity==='Standard').key,rare=cards.find(c=>c.rarity==='Rare').key,legend=cards.find(c=>c.rarity==='Legende').key,ultimate='ultime_catcheurs_marc_sebire';
+const player=(collection={},credits=100)=>({credits,collection,careerUnlocked:0,boosterTickets:{},starterGranted:true,welcomeClaimed:true,limitedRewards:{}});
+const data=p=>({uid:'owner',playerState:p,deckState:{decks:[]},collection:p.collection,decks:{decks:[]},saveLinkVerified:{schema:1,source:'player-confirmed'}});
+const source=(id,legacy=false)=>({playerState:{...player({[standard]:2,[rare]:1,[ultimate]:1},300),guestOrigin:{schema:1,id,legacy},profileProgress:{totalXp:100,level:2,xp:0},limitedRewards:{milestone_50_players_2026:1}},deckState:{decks:[]}});
+(async()=>{
+ const original=player({[standard]:5,[rare]:4,[legend]:3,[ultimate]:3},10),p=clone(original);
+ assert.equal(s.convertSurplus(p),730);assert.equal(p.credits,740);assert(Object.values(p.collection).every(n=>n===2));assert.equal(s.convertSurplus(p),0);assert.equal(s.regressionReason(original,p),'');
+ const deleted=clone(p);deleted.collection[ultimate]=1;deleted.cardConversions[ultimate]++;assert.match(s.regressionReason(p,deleted),/dispara/);
+ const rollback=clone(p);delete rollback.cardConversions;assert.match(s.regressionReason(p,rollback),/conversion/);
+ store.set('owner',data(original));await s.commitProgression('owner',data(p),s.progressionToken(store.get('owner')));
+ assert.equal(store.get('owner').cloudSaveHistory.baseline.playerState.collection[ultimate],3);
+ assert.equal(store.get('owner').playerState.credits,740);
+ const stale=data(original);await assert.rejects(s.commitProgression('owner',stale,s.progressionToken(store.get('owner'))),/conversion/);
+ // Hydrate on a fresh second device: converted copies must not look lost.
+ const phone=device('owner');await phone.login('owner');
+ const first=source('guest-source-00000000000001',true);
+ const existing=data(player({[standard]:2,[legend]:1},50));existing.elo=1450;existing.campaignRewards={gift:{once:true}};
+ const preview=s.buildGuestTransfer(existing,first,{knownKeys});assert.equal(preview.playerState.credits,50,'Legacy wallet is excluded');
+ // A modern guest has no unique gifts; fixture marks legacy for this branch.
+ first.playerState.guestOrigin.legacy=true;
+ const legacy=s.buildGuestTransfer(existing,first,{knownKeys});assert(!legacy.playerState.collection[ultimate]);assert.equal(legacy.playerState.collection[standard],2);assert.equal(legacy.playerState.collection[rare],1);
+ const fresh=s.buildGuestTransfer({uid:'new'},first,{knownKeys,newAccount:true});assert.equal(fresh.playerState.credits,300);assert.equal(fresh.playerState.collection[ultimate],1);assert.equal(fresh.playerState.welcomeClaimed,true);assert.equal(fresh.totalXp,100);
+ assert.throws(()=>s.buildGuestTransfer(existing,{...first,playerState:{...first.playerState,profileProgress:{uid:'someone'}}},{knownKeys}),/invitée/);
+ assert.throws(()=>s.buildGuestTransfer(existing,{...first,playerState:{...first.playerState,credits:-1}},{knownKeys}),/invalide/);
+ store.set('owner',existing);await s.commitGuestTransfer('owner',first,s.progressionToken(existing),s.migrationProfileToken(existing),{knownKeys});
+ const after=store.get('owner');assert.equal(after.elo,1450);assert.deepEqual(after.campaignRewards,existing.campaignRewards);assert.deepEqual(after.guestTransferBackup,first);assert.equal(after.playerState.credits,50);
+ await assert.rejects(s.commitGuestTransfer('owner',first,s.progressionToken(after),s.migrationProfileToken(after),{knownKeys}),/déjà/);
+ store.set('other',{...data(player()),uid:'other'});const other=store.get('other');
+ await assert.rejects(s.commitGuestTransfer('other',first,s.progressionToken(other),s.migrationProfileToken(other),{knownKeys}),/déjà/);
+ const modern=source('guest-source-00000000000002');delete modern.playerState.limitedRewards.milestone_50_players_2026;delete modern.playerState.collection[ultimate];
+ const modernPreview=s.buildGuestTransfer(other,modern,{knownKeys});assert.equal(modernPreview.playerState.credits,400);assert.equal(modernPreview.playerState.collection[standard],2);
+ const changed=clone(other);changed.playerState.credits++;store.set('other',changed);
+ await assert.rejects(s.commitGuestTransfer('other',modern,s.progressionToken(other),s.migrationProfileToken(other),{knownKeys}),/changé/);
+ store.set('personal',{...data(player({[ultimate]:2},100)),uid:'personal',personalRewards:{support:{status:'pending',credits:25000,cardKey:ultimate,message:'Bon rétablissement et courage pour ton épaule !'}}});
+ const reward=await s.claimPersonalRewards('personal',s.progressionToken(store.get('personal')));
+ assert.equal(reward.playerState.credits,25600);assert.equal(reward.playerState.collection[ultimate],2);assert.equal(reward.personalRewards.support.conversionCredits,500);
+ const replay=await s.claimPersonalRewards('personal',s.progressionToken(reward));assert.equal(replay.playerState.credits,25600);
+ await s.acknowledgePersonalReward('personal','support');assert(store.get('personal').personalRewards.support.presentedAt);
+ console.log('Surplus: all rates, migration once, card-loss and stale-ledger protections, second-device hydration. Guest: preview, legacy/new account gifts, maximum collection merge, wallet rules, backups, both receipts, account isolation and conflicts. Personal reward: one grant, excess Ultimate conversion, replay and acknowledgment. All fictitious accounts.');
+})().catch(e=>{console.error(e);process.exitCode=1});

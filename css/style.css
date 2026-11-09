@@ -8603,3 +8603,5 @@ body.halloween-active .profile-active-title{color:#ffd0a0}
   max-height:calc(100dvh - 32px);
   overflow-y:auto;
 }
+
+.guest-transfer-panel{width:min(800px,92vw);min-width:0;max-height:88vh;overflow:auto;box-sizing:border-box}.guest-transfer-panel h2{color:var(--gold)}#guestTransferWarning{font-weight:900;color:#ffe8b5}#guestTransferSummary{padding:14px;border:1px solid var(--gold);border-radius:10px;background:#08080d}#guestTransferLegacy{font-size:14px;color:#ddd}#guestTransferStatus{color:#ffd450}

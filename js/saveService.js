@@ -35,10 +35,24 @@
   }
 
   function migrationProfileToken(data){
-    const fields=["level","xp","totalXp","titles","careerXpWins","levelRewards","matchSettlements","onlineMatchSettlements","accountRecoveryReceipts","saveLinkVerified","pendingPcTransfer","campaignRewards"];
+    const fields=["level","xp","totalXp","titles","careerXpWins","levelRewards","matchSettlements","onlineMatchSettlements","accountRecoveryReceipts","saveLinkVerified","pendingPcTransfer","campaignRewards","guestTransferReceipt","personalRewards"];
     return progressionToken({playerState:Object.fromEntries(fields.map(key=>[key,data?.[key]??null]))});
   }
   function protectionError(message){return Object.assign(new Error(message),{code:"allstar/save-protection"});}
+  const COPY_LIMIT=2;
+  function duplicateValue(key){return {standard:10,rare:50,legende:100,ultime:500}[String(key).split('_')[0]]||0;}
+  function convertSurplus(player){
+    const counts={...(player.collection||{})},conversions={...(player.cardConversions||{})};let credits=0;
+    for(const [key,n] of Object.entries(counts)){
+      const value=duplicateValue(key);
+      if(!Number.isSafeInteger(n)||n<0||!Number.isSafeInteger(conversions[key]||0)||(conversions[key]||0)<0)throw protectionError("Quantité de cartes invalide.");
+      if(n>COPY_LIMIT&&value){const excess=n-COPY_LIMIT;counts[key]=COPY_LIMIT;conversions[key]=(conversions[key]||0)+excess;credits+=excess*value;}
+    }
+    const balance=player.credits+credits;
+    if(!Number.isSafeInteger(balance)||balance<0)throw protectionError("Solde de conversion invalide.");
+    player.collection=counts;player.cardConversions=conversions;player.credits=balance;
+    return credits;
+  }
   function isAccountLinkComplete(data){
     return data?.saveLinkVerified?.schema===1&&["new-mobile-account","new-account-confirmed","player-confirmed","pc-import","reviewed-recovery"].includes(data.saveLinkVerified.source);
   }
@@ -54,11 +68,97 @@
     }
     if(data.collection&&progressionToken({collection:data.collection})!==progressionToken({collection:counts}))throw protectionError("Collection incohérente : sauvegarde interrompue.");
     if(data.decks&&progressionToken({deckState:data.decks})!==progressionToken({deckState:decks}))throw protectionError("Decks incohérents : sauvegarde interrompue.");
+    if(player.cardConversions&&(typeof player.cardConversions!=="object"||Array.isArray(player.cardConversions)||Object.entries(player.cardConversions).some(([key,n])=>!duplicateValue(key)||!Number.isSafeInteger(n)||n<0)))throw protectionError("Relevé de conversion invalide.");
+  }
+  function buildGuestTransfer(current,source,{newAccount=false,knownKeys=[]}={}){
+    const guest=source?.playerState,origin=guest?.guestOrigin;
+    if(!origin||origin.schema!==1||!/^[-a-zA-Z0-9]{20,80}$/.test(origin.id||"")||guest.profileProgress?.uid||guest.uid||guest.accountUid||source.accountUid)throw protectionError("Cette progression n’est pas une sauvegarde invitée vérifiée.");
+    validateProgression(source);
+    if(current?.guestTransferReceipt)throw protectionError("Une progression invitée a déjà été rattachée à ce compte.");
+    if(current?.pendingPcTransfer)throw protectionError("Récupérez d’abord la sauvegarde PC préparée.");
+    const fresh=!current?.playerState&&!Object.values(current?.collection||{}).some(n=>n>0)&&Number(current?.level||1)<=1&&!Number(current?.totalXp);
+    if(newAccount&&!fresh)throw protectionError("Le compte contient déjà une progression.");
+    if(!newAccount){validateProgression(current);if(!isAccountLinkComplete(current))throw protectionError("Vérifiez d’abord la sauvegarde du compte avant de rattacher la partie invitée.");}
+    const known=new Set(knownKeys),clone=v=>JSON.parse(JSON.stringify(v));
+    const player=newAccount?clone(guest):clone(current.playerState);
+    // Legacy guest wallets may include starting/promotional credits: no unsafe
+    // estimate. Keep their raw source as a recovery copy and transfer no wallet.
+    const guestCredits=origin.legacy&&!newAccount?0:guest.credits;
+    player.credits=newAccount?guestCredits:player.credits+guestCredits;
+    player.cardConversions=newAccount?{...(guest.cardConversions||{})}:{...(player.cardConversions||{})};
+    player.collection=newAccount?{}:{...(player.collection||{})};
+    for(const [key,count] of Object.entries(guest.collection)){
+      if(!known.has(key))throw protectionError("La partie invitée contient une carte inconnue.");
+      const uniqueGift=!newAccount&&key==='ultime_catcheurs_marc_sebire'&&guest.limitedRewards?.milestone_50_players_2026;
+      const eligibleCount=uniqueGift?Math.max(0,count-1):count;
+      if(eligibleCount)player.collection[key]=Math.max(Number(player.collection[key]||0),Math.min(COPY_LIMIT,eligibleCount));
+    }
+    // Collections merge by maximum, never by addition: no credits from overlap.
+    player.careerUnlocked=Math.max(Number(player.careerUnlocked||0),Number(guest.careerUnlocked||0));
+    if(!newAccount){player.boosterTickets={...(player.boosterTickets||{})};if(!origin.legacy)for(const [key,n] of Object.entries(guest.boosterTickets||{})){if(!Number.isSafeInteger(n)||n<0)throw protectionError("Paquets invités invalides.");player.boosterTickets[key]=(player.boosterTickets[key]||0)+n;}}
+    else{player.boosterTickets=clone(guest.boosterTickets||{});player.profileProgress={};if(!origin.legacy){player.credits+=1000;player.starterGranted=true;player.welcomeClaimed=false;player.limitedRewards={};player.cosmeticInventory={sleeves:{}};}}
+    const remoteProfile=current||{},guestProfile=guest.profileProgress||{},earned={};
+    const guestFurther=Number(guestProfile.totalXp||0)>Number(remoteProfile.totalXp||0);
+    for(const key of ['level','xp','totalXp'])earned[key]=(guestFurther?guestProfile:remoteProfile)[key]??(key==='level'?1:0);
+    for(const key of ['careerXpWins','levelRewards','matchSettlements'])earned[key]={...(remoteProfile[key]||{}),...(guestProfile[key]||{})};
+    earned.titles=[...new Set([...(remoteProfile.titles||['Rookie']),...(guestProfile.titles||[])])];
+    player.profileProgress={...(current?.playerState?.profileProgress||{}),...earned};
+    delete player.guestOrigin;player.savedAt=Date.now();
+    const decks=clone(newAccount?source.deckState:current.deckState);
+    if(!newAccount){for(const d of source.deckState.decks){if(!decks.decks.some(old=>JSON.stringify(old.cards)===JSON.stringify(d.cards))){decks.decks.push({...d,id:`guest_${origin.id}_${decks.decks.length}`});}}}
+    const data={...earned,playerState:player,deckState:decks,collection:player.collection,decks};
+    validateProgression(data);return data;
+  }
+  async function commitGuestTransfer(uid,source,expectedToken,expectedProfileToken,options){
+    const {db,doc,runTransaction,serverTimestamp}=await firestoreTools();
+    return runTransaction(db,async transaction=>{
+      const target=doc(db,'users',uid),snap=await transaction.get(target),current=snap.exists()?snap.data():null;
+      if(current?.uid&&current.uid!==uid)throw protectionError("Le compte connecté a changé.");
+      if(progressionToken(current)!==expectedToken||migrationProfileToken(current)!==expectedProfileToken)throw Object.assign(new Error("Le compte a changé. Recommencez la comparaison."),{code:'allstar/save-conflict'});
+      const data=buildGuestTransfer(current,source,options),id=source.playerState.guestOrigin.id;
+      const claim=doc(db,'guestTransfers',id),claimed=await transaction.get(claim);
+      if(claimed.exists())throw protectionError("Cette progression invitée a déjà été utilisée. Aucun nouvel ajout effectué.");
+      const receipt={sourceId:id,createdAt:Date.now(),newAccount:Boolean(options.newAccount)};
+      const next={...data,guestTransferReceipt:receipt,guestTransferBackup:JSON.parse(JSON.stringify(source)),cloudSaveHistory:nextRecoveryHistory(uid,current,data,true),cloudSaveRevision:(Number(current?.cloudSaveRevision)||0)+1,updatedAt:serverTimestamp()};
+      if(options.newAccount)next.saveLinkVerified={schema:1,source:'new-account-confirmed',verifiedAt:Date.now()};
+      if(new TextEncoder().encode(JSON.stringify({...current,...next})).length>750000)throw protectionError("Les copies de secours ne peuvent pas être conservées intégralement.");
+      transaction.set(claim,{uid,sourceId:id,createdAt:receipt.createdAt});
+      if(snap.exists())transaction.update(target,next);else transaction.set(target,{uid,...next});
+      return {...current,...next};
+    });
+  }
+  async function claimPersonalRewards(uid,expectedToken){
+    const {db,doc,runTransaction,serverTimestamp}=await firestoreTools();
+    return runTransaction(db,async transaction=>{
+      const target=doc(db,'users',uid),snap=await transaction.get(target),current=snap.exists()?snap.data():null;
+      if(progressionToken(current)!==expectedToken)throw Object.assign(new Error("La progression a changé avant le cadeau."),{code:'allstar/save-conflict'});
+      if(current?.pendingPcTransfer)return current;
+      const pending=Object.entries(current?.personalRewards||{}).filter(([,r])=>r.status==='pending');
+      if(!pending.length)return current;
+      validateProgression(current);const player=JSON.parse(JSON.stringify(current.playerState)),rewards={...current.personalRewards};
+      for(const [id,r] of pending){
+        if(!Number.isSafeInteger(r.credits)||r.credits<0||r.cardKey!=='ultime_catcheurs_marc_sebire')throw protectionError("Cadeau personnel invalide.");
+        player.credits+=r.credits;player.collection[r.cardKey]=(player.collection[r.cardKey]||0)+1;
+        const conversionCredits=convertSurplus(player);
+        rewards[id]={...r,status:'granted',grantedAt:Date.now(),conversionCredits};
+      }
+      const data={playerState:player,deckState:current.deckState,collection:player.collection,decks:current.deckState};validateProgression(data);
+      const next={...data,personalRewards:rewards,cloudSaveRevision:(Number(current.cloudSaveRevision)||0)+1,cloudSaveHistory:nextRecoveryHistory(uid,current,data),updatedAt:serverTimestamp()};
+      if(new TextEncoder().encode(JSON.stringify({...current,...next})).length>750000)throw protectionError("La copie du cadeau dépasse la taille autorisée.");
+      transaction.update(target,next);return {...current,...next};
+    });
+  }
+  async function acknowledgePersonalReward(uid,id){
+    const {db,doc,runTransaction}=await firestoreTools();
+    return runTransaction(db,async t=>{const target=doc(db,'users',uid),s=await t.get(target),current=s.data(),r=current?.personalRewards?.[id];if(r?.status==='granted'&&!r.presentedAt)t.update(target,{personalRewards:{...current.personalRewards,[id]:{...r,presentedAt:Date.now()}}});});
   }
   function regressionReason(before,after,knownCard=()=>true){
     if(!before)return "";
     if(Number(after?.careerUnlocked||0)<Number(before.careerUnlocked||0))return "La progression de carrière diminuerait.";
-    if(Object.entries(before.collection||{}).some(([key,n])=>knownCard(key)&&Number(n)>Number(after?.collection?.[key]||0)))return "Des cartes possédées disparaîtraient.";
+    if(Object.entries(before.cardConversions||{}).some(([key,n])=>Number(n)>Number(after?.cardConversions?.[key]||0)))return "Le relevé des conversions de cartes disparaîtrait.";
+    if(Object.entries(before.collection||{}).some(([key,n])=>knownCard(key)&&(
+      Math.min(Number(n),COPY_LIMIT)>Number(after?.collection?.[key]||0)||
+      Number(n)+Number(before.cardConversions?.[key]||0)>Number(after?.collection?.[key]||0)+Number(after?.cardConversions?.[key]||0))))return "Des cartes possédées disparaîtraient.";
     return "";
   }
   function recoveryPoint(uid,data,revision){
@@ -213,8 +313,9 @@
       player.credits+=MOBILE_LAUNCH_GIFT.credits;
       if(!Number.isSafeInteger(player.credits))throw protectionError("Solde du compte invalide.");
       player.collection[cardKey]=(player.collection[cardKey]||0)+1;
+      const conversionCredits=convertSurplus(player);
       player.savedAt=now;
-      const awarded={cardKey,credits:MOBILE_LAUNCH_GIFT.credits,grantedAt:now,newCard:unowned.length>0};
+      const awarded={cardKey,credits:MOBILE_LAUNCH_GIFT.credits,conversionCredits,grantedAt:now,newCard:unowned.length>0};
       const data={playerState:player,deckState:current.deckState,collection:player.collection,decks:current.deckState};
       const next={...data,campaignRewards:{...current.campaignRewards,[MOBILE_LAUNCH_GIFT.id]:awarded},cloudSaveRevision:(Number(current.cloudSaveRevision)||0)+1,cloudSaveHistory:nextRecoveryHistory(uid,current,data),updatedAt:serverTimestamp()};
       if(new TextEncoder().encode(JSON.stringify({...current,...next})).length>750000)throw protectionError("Le cadeau ne peut pas être sauvegardé avec ses copies de secours. Réessayez après vérification du compte.");
@@ -252,6 +353,7 @@
   }
 
   window.AllstarSaveService = {
+    COPY_LIMIT,duplicateValue,convertSurplus,buildGuestTransfer,commitGuestTransfer,claimPersonalRewards,acknowledgePersonalReward,
     savePlayerData,
     loadPlayerData,
     progressionToken,
