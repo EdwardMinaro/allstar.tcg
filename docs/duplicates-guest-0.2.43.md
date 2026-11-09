@@ -30,10 +30,12 @@ Un cadeau administratif en attente est accordé atomiquement après chargement d
 - Régressions navigateur du cadeau de lancement et de la liaison PC/téléphone réussies ; la liaison convertit maintenant les surplus après récupération.
 - Construction mobile réussie. Captures dans `outputs/duplicates-guest-qa/` à la racine `al`.
 
-## Étape de publication requise
+## Règles de production activées
 
-Le registre immuable `guestTransfers/{sourceId}` nécessite la règle ajoutée dans `docs/firestore.rules`. Les règles actuelles de production ont été lues et comparées : tous les autres blocs sont identiques. La nouvelle règle a passé `projects:test` (compilation uniquement, aucun déploiement).
+Le registre immuable `guestTransfers/{sourceId}` utilise la règle ajoutée dans `docs/firestore.rules`. Les règles précédentes de production ont été lues et comparées : tous les autres blocs sont identiques. La nouvelle règle a passé `projects:test`, puis la compilation Firebase au déploiement.
 
 Un premier projet de règle permettant la lecture de tous les reçus aux utilisateurs connectés a été rejeté et remplacé : seuls les propriétaires lisent les reçus existants ; aucune liste, modification ou suppression n'est permise. La création exige le même UID et le reçu du compte dans la même transaction. Une tentative d'utiliser la source d'autrui est refusée, sans révéler ses métadonnées.
 
-Le déploiement de cette règle en production reste **en attente d'une autorisation explicite**, demandé par le contrôle automatique. Ne pas publier cette version avant activation de la règle. Aucun push ni Publish Windows Release n'est effectué par ces vérifications.
+Après le refus initial du contrôle automatique, Anthony a explicitement autorisé l'activation de cette règle. Déploiement `firestore:rules` réussi le 9 novembre 2026 à 13:12 UTC. Relecture par l'API Firebase Rules : le contenu actif correspond exactement au fichier versionné (fins de ligne normalisées). Identifiant du ruleset : `38b3bdd2-1f9a-40bc-a72f-e9244b183945`.
+
+Les copies avant/après sont conservées hors dépôt dans `outputs/christophe-compensation/rules-before-deployment.json` et `rules-after-deployment.json`. Cette étape n'a créé ni modifié aucune progression de joueur. Aucun push ni Publish Windows Release effectué ; la version 0.2.43 est maintenant prête pour ce parcours de publication habituel.
