@@ -1,13 +1,13 @@
 {
   "name": "allstar-desktop",
-  "version": "0.2.43",
+  "version": "0.2.44",
   "private": true,
   "description": "ALLSTAR desktop build",
   "author": "ALLSTAR",
   "main": "electron-main.js",
   "scripts": {
     "mobile:preview": "node tools/mobile_preview_server.cjs",
-    "test:accounts": "node tools/account_save_test.js && node tools/desktop_save_export_test.cjs && node tools/recover_account_save_test.cjs && node tools/save_setup_test.cjs && node tools/mobile_launch_gift_test.cjs && node tools/shop_save_race_test.cjs && node tools/protected_local_sync_test.cjs && node tools/duplicates_guest_test.cjs",
+    "test:accounts": "node tools/account_save_test.js && node tools/desktop_save_export_test.cjs && node tools/recover_account_save_test.cjs && node tools/save_setup_test.cjs && node tools/mobile_launch_gift_test.cjs && node tools/shop_save_race_test.cjs && node tools/protected_local_sync_test.cjs && node tools/duplicates_guest_test.cjs && node tools/guest_welcome_test.cjs",
     "test:save-setup-browser": "node tools/save_setup_browser_test.cjs",
     "test:halloween-dice-browser": "node tools/halloween_dice_browser_test.cjs",
     "test:launch-gift": "node tools/mobile_launch_gift_test.cjs",
@@ -25,7 +25,8 @@
     "dist": "electron-builder --win nsis",
     "publish": "electron-builder --win nsis --publish always",
     "test:duplicates-guest": "node tools/duplicates_guest_test.cjs",
-    "test:duplicates-guest-browser": "node tools/duplicates_guest_browser_test.cjs"
+    "test:duplicates-guest-browser": "node tools/duplicates_guest_browser_test.cjs",
+    "test:guest-welcome": "node tools/guest_welcome_test.cjs"
   },
   "dependencies": {
     "electron-updater": "^6.6.2"

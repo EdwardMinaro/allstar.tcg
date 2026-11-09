@@ -93,9 +93,12 @@ const names=['loadPlayerData','commitProgression','registerPcSaveExport','verify
   await fresh.frame.waitForFunction(()=>!startupRewardsPending);
   const accountAfter=clone(store.get(uid));
   await fresh.frame.evaluate(()=>{accountSaveSession=null;window.AllstarAuthService.getCurrentUser=async()=>null;activateSaveScope();enterSavedGame()});
+  await fresh.frame.waitForFunction(()=>document.getElementById('boosterTitle').textContent==='Pack Champion offert'&&document.getElementById('boosterActions').classList.contains('active'));
+  assert.equal(await fresh.frame.$$eval('#boosterCards .booster-reveal',e=>e.length),5);
+  await fresh.frame.evaluate(()=>closeBooster());
   await fresh.frame.waitForFunction(()=>!startupRewardsPending);
   assert.equal(await fresh.frame.evaluate(()=>playerState.credits),0,'Guest has no starting credits');
-  assert.equal(await fresh.frame.evaluate(()=>playerState.welcomeClaimed),false,'Guest has no welcome pack');
+  assert.equal(await fresh.frame.evaluate(()=>playerState.welcomeClaimed),true,'Guest receives the starter Champion once');
   assert.equal(await fresh.frame.$eval('#boosterOverlay',e=>e.classList.contains('active')),false);
   assert.deepEqual(store.get(uid),accountAfter,'Guest play grants no account campaign reward');
   assert.deepEqual(fresh.errors,[]);

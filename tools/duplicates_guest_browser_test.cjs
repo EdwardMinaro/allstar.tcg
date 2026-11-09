@@ -27,7 +27,13 @@ const names=['loadPlayerData','commitProgression','commitGuestTransfer','claimMo
   }
   const guest=await client(true),f=guest.frame;
   await f.evaluate(async()=>{await startGuestMode();await new Promise(r=>setTimeout(r,700));});
-  const initial=await f.evaluate(()=>serializedPlayerState());assert.equal(initial.credits,0);assert.equal(initial.welcomeClaimed,false);assert(!initial.cosmeticInventory.sleeves.halloween);assert(initial.guestOrigin.id);assert(Object.keys(initial.collection).every(key=>key.startsWith('standard_')));
+  const initial=await f.evaluate(()=>serializedPlayerState());assert.equal(initial.credits,0);assert.equal(initial.welcomeClaimed,true);assert(!initial.cosmeticInventory.sleeves.halloween);assert(initial.guestOrigin.id);assert.equal(Object.values(initial.collection).reduce((a,n)=>a+n,0),20);
+  assert.equal(await f.evaluate(()=>deckLaunchMessage(selectedDeck())),'');
+  await f.waitForFunction(()=>document.getElementById('boosterActions').classList.contains('active'));
+  assert.equal(await f.$eval('#boosterTitle',e=>e.textContent),'Pack Champion offert');
+  assert.equal(await f.$$eval('#boosterCards .booster-reveal',cards=>cards.length),5);
+  await guest.page.screenshot({path:path.join(out,'guest-champion-mobile.png')});
+  await f.evaluate(()=>closeBooster());await f.waitForFunction(()=>!startupRewardsPending);
   await f.evaluate(key=>{G=null;awardMatchCredits(true);addCardsToCollection([cloneCard(cardByKey(key)),cloneCard(cardByKey(key)),cloneCard(cardByKey(key))]);savePlayerState();},standard);
   assert.equal(await f.evaluate(key=>ownedCount(key),standard),2);
   await f.evaluate(async()=>{await beginGuestTransfer();showAccountCreate();await createAccountFromStart();});
@@ -65,6 +71,6 @@ const names=['loadPlayerData','commitProgression','commitGuestTransfer','claimMo
   assert.equal(store.get(pid).playerState.credits,25400);assert.equal(store.get(pid).playerState.collection[marc],1);
   await personal.page.screenshot({path:path.join(out,'personal-official-communique.png')});
   assert.deepEqual(personal.errors,[]);await personal.context.close();
-  console.log('Browser PC/mobile: real guest startup without gifts, duplicate conversion, new-account registration/review/confirmation and consumed source, existing-account warning and gift exclusion, unchanged rank, and personal official communiqué. Firebase mocked, all external traffic blocked.');
+  console.log('Browser PC/mobile: real guest Champion reveal and playable 20-card deck, no promotional credits/gifts, duplicate conversion, new-account registration/review/confirmation and consumed source, existing-account warning and gift exclusion, unchanged rank, and personal official communiqué. Firebase mocked, all external traffic blocked.');
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -1,5 +1,7 @@
 # Collections et progression invitée — 0.2.43
 
+Suite 0.2.44 : le pack Champion invité est rétabli afin de démarrer avec un deck jouable de vingt cartes. Voir `guest-champion-0.2.44.md` ; le retrait décrit ci-dessous est l'état historique de la 0.2.43.
+
 ## Deux exemplaires par carte
 
 Les surplus actuels et futurs sont convertis en crédits : Standard 10, Rare 50, Légende 100, Ultime 500. Il s'agit du même identifiant de carte ; les variantes de rareté ou d'événement restent distinctes. L'ouverture de paquet signale les cartes converties. Un message récapitule la conversion de la collection existante au chargement.

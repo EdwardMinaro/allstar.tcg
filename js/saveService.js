@@ -87,16 +87,21 @@
     player.credits=newAccount?guestCredits:player.credits+guestCredits;
     player.cardConversions=newAccount?{...(guest.cardConversions||{})}:{...(player.cardConversions||{})};
     player.collection=newAccount?{}:{...(player.collection||{})};
+    const starterGifts={};
+    if(origin.welcomeCards!==undefined){
+      if(!Array.isArray(origin.welcomeCards)||origin.welcomeCards.length!==5||origin.welcomeCards.some(key=>!known.has(key)))throw protectionError("Reçu du pack de départ invité invalide.");
+      for(const key of origin.welcomeCards)starterGifts[key]=(starterGifts[key]||0)+1;
+    }
     for(const [key,count] of Object.entries(guest.collection)){
       if(!known.has(key))throw protectionError("La partie invitée contient une carte inconnue.");
       const uniqueGift=!newAccount&&key==='ultime_catcheurs_marc_sebire'&&guest.limitedRewards?.milestone_50_players_2026;
-      const eligibleCount=uniqueGift?Math.max(0,count-1):count;
+      const eligibleCount=newAccount?count:Math.max(0,count-(uniqueGift?1:0)-(starterGifts[key]||0));
       if(eligibleCount)player.collection[key]=Math.max(Number(player.collection[key]||0),Math.min(COPY_LIMIT,eligibleCount));
     }
     // Collections merge by maximum, never by addition: no credits from overlap.
     player.careerUnlocked=Math.max(Number(player.careerUnlocked||0),Number(guest.careerUnlocked||0));
     if(!newAccount){player.boosterTickets={...(player.boosterTickets||{})};if(!origin.legacy)for(const [key,n] of Object.entries(guest.boosterTickets||{})){if(!Number.isSafeInteger(n)||n<0)throw protectionError("Paquets invités invalides.");player.boosterTickets[key]=(player.boosterTickets[key]||0)+n;}}
-    else{player.boosterTickets=clone(guest.boosterTickets||{});player.profileProgress={};if(!origin.legacy){player.credits+=1000;player.starterGranted=true;player.welcomeClaimed=false;player.limitedRewards={};player.cosmeticInventory={sleeves:{}};}}
+    else{player.boosterTickets=clone(guest.boosterTickets||{});player.profileProgress={};if(!origin.legacy){player.credits+=1000;player.starterGranted=true;player.welcomeClaimed=Boolean(guest.welcomeClaimed);player.limitedRewards={};player.cosmeticInventory={sleeves:{}};}}
     const remoteProfile=current||{},guestProfile=guest.profileProgress||{},earned={};
     const guestFurther=Number(guestProfile.totalXp||0)>Number(remoteProfile.totalXp||0);
     for(const key of ['level','xp','totalXp'])earned[key]=(guestFurther?guestProfile:remoteProfile)[key]??(key==='level'?1:0);

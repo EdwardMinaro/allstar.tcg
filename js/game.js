@@ -4711,7 +4711,7 @@ function activateSaveScope(uid=null){
     if(legacy){const saved=JSON.parse(legacy);if(!saved.profileProgress?.uid&&!saved.uid&&!saved.accountUid){
       const backup=JSON.stringify({playerRaw:legacy,decksRaw:decks});localStorage.setItem('allstarsGuestLegacyBackup',backup);
       if(localStorage.getItem('allstarsGuestLegacyBackup')!==backup)throw new Error("La copie invitée n’a pas pu être conservée.");
-      saved.guestOrigin=saved.guestOrigin||{schema:1,id:makeGuestSourceId(),createdAt:Date.now(),legacy:true};
+      saved.guestOrigin=saved.guestOrigin||{schema:1,id:guestWelcomeReceipt()?.sourceId||makeGuestSourceId(),createdAt:Date.now(),legacy:true};
       localStorage.setItem('allstarsPlayerV1:guest',JSON.stringify(saved));if(decks)localStorage.setItem('allstarsDecks:guest',decks);
     }}
   }
@@ -10183,6 +10183,42 @@ function starterStandardCards(){
   ].slice(0,15).map(cloneCard);
 }
 
+const GUEST_WELCOME_STORAGE_KEY='allstarsGuestWelcomeV1';
+function guestWelcomeReceipt(){
+  const raw=localStorage.getItem(GUEST_WELCOME_STORAGE_KEY);
+  if(!raw)return null;
+  const receipt=JSON.parse(raw);
+  if(receipt?.schema!==1||!/^[-a-zA-Z0-9]{20,80}$/.test(receipt.sourceId||'')||!Array.isArray(receipt.cards)||receipt.cards.length!==5||receipt.cards.some(key=>!cardByKey(key))||legalDeckKeys([...starterStandardCards().map(cardKey),...receipt.cards]).length!==20)throw new Error('Le pack de départ invité conservé doit être vérifié. Votre sauvegarde a été préservée.');
+  return receipt;
+}
+function generateGuestWelcomeCards(){
+  const cards=generateBooster('champion');
+  ensureBoosterHasWrestler(cards,'Legende');capBoosterLegendaries(cards,3);
+  const keys=starterStandardCards().map(cardKey),accepted=[];
+  for(let card of cards){
+    const fits=candidate=>candidate.rarity!=='Standard'&&legalDeckKeys([...keys,...accepted.map(cardKey),cardKey(candidate)]).length===keys.length+accepted.length+1;
+    if(!fits(card)){
+      const candidates=rarityPool('Rare').filter(fits);
+      if(!candidates.length)throw new Error('Le pack de départ ne peut pas être préparé.');
+      card=cloneCard(randomFrom(candidates));
+    }
+    accepted.push(card);
+  }
+  return accepted;
+}
+function claimGuestWelcomePack(){
+  let receipt=guestWelcomeReceipt();
+  if(!receipt){
+    receipt={schema:1,sourceId:playerState.guestOrigin.id,cards:generateGuestWelcomeCards().map(cardKey),createdAt:Date.now()};
+    const raw=JSON.stringify(receipt);localStorage.setItem(GUEST_WELCOME_STORAGE_KEY,raw);
+    if(localStorage.getItem(GUEST_WELCOME_STORAGE_KEY)!==raw)throw new Error('Le pack de départ invité ne peut pas être conservé sur cet appareil.');
+  }
+  // The device keeps the same draw and source ID across a guest reset: no reroll
+  // or new transferable source is created by deleting the guest progression.
+  playerState.guestOrigin.welcomeCards=[...receipt.cards];
+  return receipt.cards.map(key=>cloneCard(cardByKey(key)));
+}
+
 function autoDeckFromCollection(){
   const keys=[];
   const perCard={};
@@ -10264,18 +10300,22 @@ function loadPlayerState(){
     addCardsToCollection(starterStandardCards());
   }
   let welcomeCards=null;
-  if(!playerState.welcomeClaimed&&!isGuestSave()){
+  if(isGuestSave()&&!playerState.guestOrigin){
+    const receipt=guestWelcomeReceipt();
+    playerState.guestOrigin={schema:1,id:receipt?.sourceId||makeGuestSourceId(),createdAt:Date.now(),legacy:Boolean(playerState.welcomeClaimed)};
+  }
+  if(isGuestSave()&&playerState.guestOrigin?.consumedBy)throw new Error('Cette progression invitée a été rattachée à un compte. Connectez-vous à ce compte pour continuer.');
+  if(!playerState.welcomeClaimed){
+    if(isGuestSave())welcomeCards=claimGuestWelcomePack();
+    else{
+      welcomeCards=generateBooster("champion");
+      ensureBoosterHasWrestler(welcomeCards,"Legende");
+      capBoosterLegendaries(welcomeCards,3);
+    }
     playerState.welcomeClaimed=true;
-    welcomeCards=generateBooster("champion");
-    ensureBoosterHasWrestler(welcomeCards,"Legende");
-    capBoosterLegendaries(welcomeCards,3);
     addCardsToCollection(welcomeCards);
   }
   const limitedGift=claimLimitedGiftCampaign();
-  if(isGuestSave()&&!playerState.guestOrigin){
-    playerState.guestOrigin={schema:1,id:makeGuestSourceId(),createdAt:Date.now(),legacy:Boolean(playerState.welcomeClaimed)};
-  }
-  if(isGuestSave()&&playerState.guestOrigin?.consumedBy)throw new Error('Cette progression invitée a été rattachée à un compte. Connectez-vous à ce compte pour continuer.');
   const converted=window.AllstarSaveService?.convertSurplus(playerState)||0;
   if(converted)setTimeout(()=>showSystemToast(`Surplus de cartes converti : +${converted} crédits.`,4500),700);
   claimHalloweenSleeveGift();
@@ -11853,6 +11893,13 @@ function loadDeckState(){
         savedAt: Number(saved.savedAt)||0,
         loaded: true
       };
+      if(isGuestSave()&&playerState.welcomeClaimed){
+        const starter=deckState.decks.find(deck=>deck.id==='starter');
+        if(starter&&starter.cards.length<20){
+          const cards=legalDeckKeys(normalizeOwnedDeckCards([...starter.cards,...autoDeckFromCollection()]));
+          if(cards.length===20){starter.cards=cards;saveDeckState();}
+        }
+      }
       return;
     }
   } catch {
