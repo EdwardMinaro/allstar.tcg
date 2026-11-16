@@ -9288,6 +9288,7 @@ const REFRESHED_RENDER_ART=new Set([
 
 function renderArtSrc(path){
   const src=String(path||"");
+  if(src==="assets/card_renders/rare_catcheurs_john_gage.png")return `${src}?art=john-gage-photo-20261116`;
   if(src==="assets/card_renders/rare_objets_masque_halloween.png")return `${src}?art=mask-final-format-1`;
   return REFRESHED_RENDER_ART.has(src) ? `${src}?art=0212-refresh-1` : src;
 }
