@@ -3081,10 +3081,10 @@
     {
       "key": "rare_objets_poubelle",
       "type": "Objet",
-      "rarity": "Rare",
+      "rarity": "Standard",
       "name": "Poubelle",
       "stats": {},
-      "effect": "Votre adversaire défausse une carte.",
+      "effect": "L’adversaire choisit une carte de sa main puis la défausse.",
       "ability": "opponentDiscard1",
       "renderArt": "assets/card_renders/rare_objets_poubelle.png"
     },

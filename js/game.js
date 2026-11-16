@@ -3099,10 +3099,10 @@ const CARD_DATA = [
   {
     "key": "rare_objets_poubelle",
     "type": "Objet",
-    "rarity": "Rare",
+    "rarity": "Standard",
     "name": "Poubelle",
     "stats": {},
-    "effect": "Votre adversaire défausse une carte.",
+    "effect": "L’adversaire choisit une carte de sa main puis la défausse.",
     "ability": "opponentDiscard1",
     "renderArt": "assets/card_renders/rare_objets_poubelle.png"
   },
@@ -3545,7 +3545,7 @@ const EFFECT_REGISTRY = {
   objectExtra2: { timing:"manager", text:"Les objets durent 2 tours supplémentaires." },
   objectChoiceForceCharisma2: { timing:"object", text:"Choisissez +2 Force ou +2 Charisme.", choice:true },
   objectChoiceStat1: { timing:"object", text:"Choisissez une statistique : +1.", choice:true },
-  opponentDiscard1: { timing:"object", text:"L'adversaire défausse 1 carte." },
+  opponentDiscard1: { timing:"object", text:"L’adversaire choisit une carte de sa main puis la défausse.", choice:true },
   opponentDiscardRandom1: { timing:"object", text:"L'adversaire défausse 1 carte aléatoire." },
   opponentDiscardChoice1: { timing:"entry", text:"L'adversaire défausse 1 carte de son choix.", choice:true },
   opponentDiscardOnSupport: { timing:"manager", text:"Chaque bonus ou objet adverse force une défausse." },
@@ -5441,7 +5441,7 @@ function chooseRingsiderCards(owner,source,selectedIds=[]){
 
 function requestRingsiderRecovery(owner){
   const source=owner?.man;
-  if(!G||G.over||G.resolving||G.discarding||G.currentTurn!=="player"||owner!==G.player)return;
+  if(!G||G.over||G.resolving||pendingChosenHandDiscard()||G.discarding||G.currentTurn!=="player"||owner!==G.player)return;
   if(source?.ability==="invertedSupport"&&isRingsiderRecoveryAbility(source.originalAbility))return useInvertedRingsider(owner,false);
   if(!source||!isRingsiderRecoveryAbility(source.ability)||owner.managersBlocked)return;
   if(owner.ringsiderDecisionRound===G.round)return;
@@ -6239,7 +6239,7 @@ function applyOnlineSnapshot(snapshot, playerSlot){
   ){
     closeWheelOverlayVisual();
   }
-  if(!G.over&&G.currentTurn==="player")setTimeout(()=>requestRingsiderRecovery(G.player),80);
+  if(!G.over&&!pendingChosenHandDiscard()&&G.currentTurn==="player")setTimeout(()=>requestRingsiderRecovery(G.player),80);
 }
 
 function enterOnlineMatchFromSnapshot(room, playerSlot){
@@ -6270,11 +6270,11 @@ function applyOnlineRoomSnapshot(room, playerSlot){
 }
 
 function queueOnlineSnapshotPublish(){
-  if(!isOnlineMatch()||onlineApplyingRemote||["ace-reveal","die-stat-remote","die-stat-submit"].includes(activeOnlineChoice?.kind)||!onlineDirty)return;
+  if(!isOnlineMatch()||onlineApplyingRemote||["ace-reveal","die-stat-remote","die-stat-submit","hand-discard-remote","hand-discard-submit"].includes(activeOnlineChoice?.kind)||!onlineDirty)return;
   if(typeof window.publishOnlineMatchState!=="function")return;
   clearTimeout(onlinePublishTimer);
   onlinePublishTimer=setTimeout(async()=>{
-    if(!isOnlineMatch()||onlineApplyingRemote||["ace-reveal","die-stat-remote","die-stat-submit"].includes(activeOnlineChoice?.kind)||!onlineDirty)return;
+    if(!isOnlineMatch()||onlineApplyingRemote||["ace-reveal","die-stat-remote","die-stat-submit","hand-discard-remote","hand-discard-submit"].includes(activeOnlineChoice?.kind)||!onlineDirty)return;
     const snapshot=onlineSnapshotFromGame();
     if(!snapshot)return;
     const hash=JSON.stringify(snapshot);
@@ -6292,7 +6292,7 @@ function queueOnlineSnapshotPublish(){
 }
 
 function publishOnlineSnapshotNow(){
-  if(!isOnlineMatch()||onlineApplyingRemote||["die-stat-remote","die-stat-submit"].includes(activeOnlineChoice?.kind))return;
+  if(!isOnlineMatch()||onlineApplyingRemote||["die-stat-remote","die-stat-submit","hand-discard-remote","hand-discard-submit"].includes(activeOnlineChoice?.kind))return;
   if(typeof window.publishOnlineMatchState!=="function")return;
   const snapshot=onlineSnapshotFromGame();
   if(!snapshot)return;
@@ -7839,13 +7839,7 @@ function applyTrackedObjectEffect(owner,opp,c,choice=null){
       break;
     }
     case"opponentDiscard1":{
-      const discarded=[];
-      for(let i=0;i<mult&&opp.hand.length;i++)discarded.push(opp.hand.pop());
-      if(discarded.length){
-        opp.grave.push(...discarded);
-        feedback=`${discarded.length} défausse${discarded.length>1?"s":""} adverse${discarded.length>1?"s":""}`;
-        kind="malus";
-      }
+      requestChosenHandDiscard(opp,c,mult);
       break;
     }
     case"opponentDiscardRandom1":{
@@ -7965,7 +7959,7 @@ function cardFromTaggedState(catState){
 }
 
 function canTagPlayer(){
-  if(!G||G.over||G.resolving||G.discarding||G.tagging)return false;
+  if(!G||G.over||G.resolving||pendingChosenHandDiscard()||G.discarding||G.tagging)return false;
   if(G.currentTurn!=="player")return false;
   const p=G.player;
   if(!p?.cat)return false;
@@ -7974,7 +7968,7 @@ function canTagPlayer(){
 }
 
 function tagPlayer(){
-  if(!G||G.over||G.resolving)return;
+  if(!G||G.over||G.resolving||pendingChosenHandDiscard())return;
   if(G.discarding==="player"){
     playSound("erreur");
     log("Termine la défausse avant de faire un TAG.");
@@ -8143,9 +8137,7 @@ function applyEffectUntracked(owner,opp,c){
       break;
     }
     case"opponentDiscard1":{
-      const discarded=[];
-      for(let i=0;i<mult&&opp.hand.length;i++)discarded.push(opp.hand.pop());
-      if(discarded.length){opp.grave.push(...discarded);feedback=`${discarded.length} défausse${discarded.length>1?"s":""} adverse${discarded.length>1?"s":""}`;kind="malus";}
+      requestChosenHandDiscard(opp,c,mult);
       break;
     }
     case"cancelObjects":{
@@ -8200,8 +8192,67 @@ function applyEffectUntracked(owner,opp,c){
   }
 }
 
+// Poubelle: the affected player owns the choice, even on the other turn.
+function pendingChosenHandDiscard(){
+  return G?.wheelRerollEvent?.kind==="hand-discard";
+}
+
+function requestChosenHandDiscard(target,source,count=1){
+  count=Math.min(target.hand.length,Math.max(0,Math.floor(count)));
+  if(!count)return;
+  if(target.side==="ai"&&!isOnlineMatch()){
+    for(let i=0;i<count;i++){
+      const cats=target.hand.filter(card=>card.type==="Catcheur").length;
+      const candidates=target.hand.filter(card=>cats!==1||card.type!=="Catcheur");
+      const chosen=(candidates.length?candidates:target.hand).slice().sort((a,b)=>aiCareerCardScore(a,a.type)-aiCareerCardScore(b,b.type))[0];
+      const [discarded]=target.hand.splice(target.hand.findIndex(card=>card.id===chosen.id),1);
+      target.grave.push(discarded);
+      log(`[EFFET] ${source.name} : ${target.label} choisit de défausser ${discarded.name}.`);
+    }
+    return;
+  }
+  const ctx=isOnlineMatch()?onlineContext():null;
+  const event={id:`discard:${Date.now()}:${Math.random().toString(36).slice(2)}`,kind:"hand-discard",round:G.round,status:"pending",ownerSlot:ctx?localSideToOnlineSlot(target.side):null,resolverSlot:ctx?.playerSlot||null,sourceName:source.name,remaining:count};
+  G.wheelRerollEvent=event;
+  markOnlineDirty();
+  if(target.side==="player")requestChosenHandDiscardDialog(event);
+}
+
+function finishChosenHandDiscard(event,cardId){
+  if(G?.wheelRerollEvent?.id!==event.id)return;
+  const side=isOnlineMatch()?onlineSlotToLocalSide(event.ownerSlot):"player";
+  const target=side==="player"?G.player:G.ai;
+  const index=target.hand.findIndex(card=>card.id===cardId);
+  if(index<0)return;
+  const [card]=target.hand.splice(index,1);target.grave.push(card);
+  log(`[EFFET] ${event.sourceName} : ${target.label} choisit de défausser ${card.name}.`);
+  G.wheelRerollEvent=null;
+  if(event.remaining>1)requestChosenHandDiscard(target,{name:event.sourceName},event.remaining-1);
+  markOnlineDirty();render();
+}
+
+function requestChosenHandDiscardDialog(event){
+  const remote=isOnlineMatch()&&event.resolverSlot!==onlineContext().playerSlot;
+  requestEffectChoice({title:event.sourceName,text:`Choisissez une carte de votre main à défausser.${event.remaining>1?` Encore ${event.remaining} cartes à choisir.`:""}`,choices:G.player.hand.map(card=>({label:card.name,value:card.id})),onlineKind:remote?"hand-discard-remote":"hand-discard",publishOnChoose:!remote,onChoose:async cardId=>{
+    if(G?.wheelRerollEvent?.id!==event.id)return;
+    if(!remote){finishChosenHandDiscard(event,cardId);return;}
+    const token=beginOnlineChoice("hand-discard-submit");
+    try{
+      const room=await window.submitOnlineWheelRerollChoice(event.id,cardId);
+      if(G?.wheelRerollEvent?.id===event.id&&room?.matchState?.wheelRerollEvent)G.wheelRerollEvent=room.matchState.wheelRerollEvent;
+    }catch(error){
+      showSystemToast(error?.message||"Le choix n’a pas pu être envoyé.");
+      if(G?.wheelRerollEvent?.id===event.id&&G.wheelRerollEvent.status==="pending")setTimeout(()=>requestChosenHandDiscardDialog(event),100);
+    }finally{
+      endOnlineChoice(token);
+      const deferred=deferredOnlineRoomSnapshot;deferredOnlineRoomSnapshot=null;
+      if(deferred)applyOnlineRoomSnapshot(deferred.room,deferred.playerSlot);
+    }
+  }});
+}
+
 function playPlayer(idx){
-  if(G.over||G.resolving)return;
+  if(G.over||G.resolving||pendingChosenHandDiscard())return;
   if(G.discarding==="player"){
     discardPlayerCard(idx);
     return;
@@ -8386,8 +8437,9 @@ function aiTurnSequence(){
 
   let i=0;
   const run=()=>{
+    if(pendingChosenHandDiscard()){setTimeout(run,200);return;}
     if(i>=steps.length){
-      setTimeout(endTurn,800);
+      setTimeout(()=>pendingChosenHandDiscard()?run():endTurn(),800);
       return;
     }
     steps[i++]();
@@ -8458,7 +8510,7 @@ function aiPlayOne(type){
 }
 
 function passTurn(){
-  if(G.over||G.resolving)return;
+  if(G.over||G.resolving||pendingChosenHandDiscard())return;
   if(G.discarding==="player")return;
   if(G.currentTurn!=="player")return;
   log("Le Joueur passe.");
@@ -8467,7 +8519,7 @@ function passTurn(){
 }
 
 function resolveRound(){
-  if(G.over||G.resolving)return;
+  if(G.over||G.resolving||pendingChosenHandDiscard())return;
   if(G.discarding==="player")return;
   if(G.currentTurn!=="player")return;
   if(G.tagging==="player"){
@@ -8480,7 +8532,7 @@ function resolveRound(){
 }
 
 function endTurn(){
-  if(G.over||G.resolving||G.discarding)return;
+  if(G.over||G.resolving||G.discarding||pendingChosenHandDiscard())return;
   if(G.tagging){
     if(G.tagging==="player")log("Choisis un catcheur pour terminer le TAG.");
     return;
@@ -9288,6 +9340,7 @@ const REFRESHED_RENDER_ART=new Set([
 
 function renderArtSrc(path){
   const src=String(path||"");
+  if(src==="assets/card_renders/rare_objets_poubelle.png")return `${src}?art=poubelle-standard-20261116`;
   if(src==="assets/card_renders/rare_catcheurs_john_gage.png")return `${src}?art=john-gage-photo-20261116`;
   if(src==="assets/card_renders/rare_objets_masque_halloween.png")return `${src}?art=mask-final-format-1`;
   return REFRESHED_RENDER_ART.has(src) ? `${src}?art=0212-refresh-1` : src;
@@ -9404,6 +9457,7 @@ function requestOnlineWheelRerollChoice(event){
   if(!isOnlineMatch()||!event?.id||G.wheelRerollEvent?.id!==event.id||G.wheelRerollEvent.status!=="pending")return;
   const reroller=wheelRerollerForOnlineEvent(event);
   if(reroller?.side!=="player")return;
+  if(event.kind==="hand-discard")return requestChosenHandDiscardDialog(event);
   if(event.kind==="die-stat")return requestOnlineDieStatChoice(event);
   const source=reroller.man?.ability==="rerollStat"?reroller.man:reroller.cat?.card;
   const overlay=document.getElementById("wheelOverlay");
@@ -9448,6 +9502,9 @@ function requestOnlineWheelRerollChoice(event){
 
 function resumeOnlineWheelReroll(event){
   if(!isOnlineMatch()||!event?.id||event.status!=="resolved"||G.wheelRerollEvent?.id!==event.id)return;
+  if(event.kind==="hand-discard"){
+    finishChosenHandDiscard(event,event.choice);publishOnlineSnapshotNow();return;
+  }
   if(event.kind==="die-stat"){
     if(!STATS.includes(event.choice))return;
     G.wheelRerollEvent={...event,nextStat:event.choice};
@@ -11105,6 +11162,9 @@ function renderChallengeMatchHud(){
 }
 
 function showChallengeResult(title,detail,won=false){
+  const replay=document.getElementById("pinReplayButton");
+  if(replay){replay.hidden=won;replay.disabled=won;replay.style.display=won?"none":"inline-flex";}
+
   const ov=document.getElementById("pinOverlay");
   const count=document.getElementById("pinCount");
   const msg=document.getElementById("pinMessage");

@@ -40,7 +40,8 @@
   }
   function protectionError(message){return Object.assign(new Error(message),{code:"allstar/save-protection"});}
   const COPY_LIMIT=2;
-  function duplicateValue(key){return {standard:10,rare:50,legende:100,ultime:500}[String(key).split('_')[0]]||0;}
+  // Stable collection key retained after Poubelle moved from Rare to Standard.
+  function duplicateValue(key){return key==='rare_objets_poubelle'?10:({standard:10,rare:50,legende:100,ultime:500}[String(key).split('_')[0]]||0);}
   function convertSurplus(player){
     const counts={...(player.collection||{})},conversions={...(player.cardConversions||{})};let credits=0;
     for(const [key,n] of Object.entries(counts)){

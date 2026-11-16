@@ -114,6 +114,13 @@ class RoomService {
       if (!room.players?.[playerSlot]) throw new Error("Joueur introuvable.");
       const previousVersion = Number(room.matchState?.version || room.matchState?.updatedAt || 0);
       const dieChoice = room.matchState?.wheelRerollEvent;
+      if (dieChoice?.kind === "hand-discard" && dieChoice.round === matchState?.round) {
+        // The targeted human submits only a card ID. The effect resolver alone
+        // consumes that choice and publishes the resulting hands/graveyards.
+        if (playerSlot !== dieChoice.resolverSlot) return room;
+        if (dieChoice.status === "pending" && matchState?.wheelRerollEvent?.id !== dieChoice.id) return room;
+        if (dieChoice.status === "resolved" && matchState?.wheelRerollEvent?.id === dieChoice.id) return room;
+      }
       if (dieChoice?.kind === "die-stat" && dieChoice.round === matchState?.round) {
         // Only the duel resolver publishes full states during this handoff.
         // The other human submits the statistic through its own transaction.
@@ -188,7 +195,8 @@ class RoomService {
         throw new Error("Cette relance de roulette n'est plus active.");
       }
       if (event.ownerSlot !== playerSlot) throw new Error("Cette relance appartient à l'adversaire.");
-      const allowedChoices = new Set(event.kind === "die-stat" ? ["Force", "Vitesse", "Technique", "Charisme"] : ["reroll", "keep"]);
+      const hand = event.ownerSlot === "p1" ? room.matchState.player?.hand : room.matchState.ai?.hand;
+      const allowedChoices = new Set(event.kind === "hand-discard" ? (hand || []).map(card => card.id) : event.kind === "die-stat" ? ["Force", "Vitesse", "Technique", "Charisme"] : ["reroll", "keep"]);
       if (!allowedChoices.has(choice)) throw new Error("Choix de roulette invalide.");
       const previousVersion = Number(room.matchState?.version || room.matchState?.updatedAt || 0);
       const version = Math.max(previousVersion + 1, Date.now());
